@@ -146,7 +146,7 @@
   .netbadge{display:none;margin-left:7px;padding:2px 8px;border-radius:999px;background:var(--ginger-soft);
     border:1.5px solid var(--ginger);color:var(--ginger-deep);font-size:.58rem;letter-spacing:.6px;}
   .netbadge.show{display:inline-block;}
-  .netbadge.live{display:inline-block;background:var(--jade-soft);border-color:var(--jade);color:#14624A;}
+
   .asklab{font-family:var(--mono);font-weight:700;font-size:.63rem;letter-spacing:1.3px;
     color:var(--slate);text-transform:uppercase;margin:0 0 11px;}
   .chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:11px;}
@@ -169,16 +169,13 @@
     font-size:.82rem;opacity:.4;padding:2px;line-height:1;}
   .speakbtn:hover{opacity:1;}
 
-  .foot{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
-  .paws{display:flex;gap:5px;align-items:center;}
-  .paws svg{width:21px;height:21px;}
+  .paws{display:flex;gap:4px;align-items:center;margin-top:3px;}
+  .paws svg{width:17px;height:17px;}
   .paws svg .pw{fill:var(--line);transition:fill .3s ease;}
   .paws svg.lit .pw{fill:var(--ginger);}
   .paws svg.pop{animation:pawpop .4s cubic-bezier(.2,1.7,.4,1);}
   @keyframes pawpop{0%{transform:scale(.4) rotate(-14deg);}100%{transform:scale(1) rotate(0);}}
-  .foot .fs{margin-left:auto;font-family:var(--mono);font-size:.74rem;color:var(--slate);}
-  .foot .fs b{color:var(--ink);}
-  .streaklab{font-family:var(--mono);font-size:.63rem;letter-spacing:1.2px;color:var(--slate);text-transform:uppercase;}
+
 
   .ov{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;
     padding:18px;background:rgba(42,31,26,.5);}
@@ -277,7 +274,7 @@
     </div>
     <div class="topmeta">
       <b id="catName">Mochi</b>
-      <span class="catmood" id="catMood">settled</span>
+      <span class="paws" id="paws" aria-label="Streak"></span>
     </div>
     <span class="sp" style="flex:1"></span>
     <span class="netbadge" id="netBadge"></span>
@@ -345,7 +342,6 @@
   </section>
 
   <section class="card">
-    <p class="asklab" id="askLab"><span id="askLabText">Ask Mochi</span></p>
     <div class="thread" id="thread" role="log" aria-live="polite" aria-label="Conversation"></div>
     <div class="chips">
       <button class="chip" data-ask="I don't know how to start.">I don't know how to start</button>
@@ -358,13 +354,6 @@
     </div>
   </section>
 
-  <section class="card">
-    <div class="foot">
-      <span class="streaklab">Streak</span>
-      <span class="paws" id="paws"></span>
-      <span class="fs"><b id="fDone">0</b> done · <b id="fAcc">—</b> correct</span>
-    </div>
-  </section>
 </div>
 
 <div class="ov" id="ov">
@@ -405,7 +394,7 @@
         <input type="password" id="keyInput" placeholder="API key" aria-label="API key" autocomplete="off" />
       </div>
       <div class="field">
-        <input type="text" id="modelInput" placeholder="model for talking" aria-label="Model for talking" autocomplete="off" />
+        <input type="text" id="modelInput" placeholder="model for talking, e.g. gpt-5.6-terra" aria-label="Model for talking" autocomplete="off" />
       </div>
       <div class="field">
         <input type="text" id="readInput" placeholder="model for reading handwriting" aria-label="Model for reading handwriting" autocomplete="off" />
@@ -414,6 +403,9 @@
       </div>
       <p class="pnote" id="keyNote"></p>
       <p class="pnote" id="useNote"></p>
+
+      <p class="sect">This session</p>
+      <p class="pnote" id="sessionNote"></p>
 
       <p class="sect">Progress by topic</p>
       <div class="mast" id="mast"></div>
@@ -1017,7 +1009,6 @@ function setCat(mood){
   const w = $('catWrap');
   w.classList.remove('settled','curious','pleased','unsure');
   w.classList.add(mood);
-  $('catMood').textContent = mood;
 }
 function showPhoto(url){
   if(!url) return;
@@ -1083,8 +1074,7 @@ function drawPaws(pop){
     sv.classList.toggle('lit', on);
   });
   box.setAttribute('aria-label', 'Streak ' + S.streak);
-  $('fDone').textContent = S.done;
-  $('fAcc').textContent = S.done ? Math.round((S.right/S.done)*100)+'%' + (S.streak>5 ? ` ×${S.streak}` : '') : '—';
+  box.title = S.streak > 5 ? 'Streak of ' + S.streak : '';
 }
 
 /* =========================================================
@@ -1237,7 +1227,7 @@ function submit(){
    Two rules: she can only ask about the question on screen,
    and losing the connection must not leave her with nothing.
    ============================================================ */
-function keyReady(){ return !!apiKey(); }   // on a real host, every provider needs a key
+function keyReady(){ return !!apiKey(); }
 function netReady(){ return (navigator.onLine !== false) && keyReady(); }
 
 /* --- the topic gate runs here, before a single token is spent --- */
@@ -1288,6 +1278,16 @@ function concerning(msg){
   const t = String(msg).toLowerCase();
   return CONCERN.some(p=>t.indexOf(p) > -1);
 }
+/* A child asking what she is talking to deserves a straight answer, every time.
+   Answered here so no model can get it wrong and no call is needed. */
+const IDENTITY = ['are you real','are you alive','are you a real','a real cat','are you human',
+ 'are you a person','are you a robot','are you a computer','are you ai','are you an ai','are you a bot',
+ 'are you chatgpt','are you claude','who made you','what are you','are u real','are u a real'];
+function identityQ(msg){
+  const t = String(msg).toLowerCase();
+  return IDENTITY.some(p=>t.indexOf(p) > -1);
+}
+const IDENTITY_REPLY = 'I am a computer program that helps you with maths, drawn as a cat. Not a real one, I am afraid! Shall we get back to the question?';
 const CONCERN_REPLY = 'That sounds really hard, and I am only a maths app, so I am not the right one to help with it. Please tell a grown-up you trust, like a parent or a teacher, as soon as you can. They will want to know.';
 
 /* --- offline: a real hint ladder built from the worked solution --- */
@@ -1320,14 +1320,14 @@ function offlineReply(kind){
 
 function localSay(text){ addMsg('cat', text); speak(text); }
 function shortName(p){ return PROVIDERS[p].label.split(' ')[0]; }   // 'Claude' / 'ChatGPT'
+/* Euna is talking to Mochi. Which engine is behind him is a grown-up's concern,
+   so the only thing shown to her is whether he can talk at all. */
 function updateNet(){
   const b = $('netBadge'); if(!b) return;
-  if(USE.last === 'local'){ b.textContent = 'offline hints'; b.className = 'netbadge show'; return; }
-  if(USE.last){ b.textContent = 'via ' + shortName(USE.last) + (LAST.model ? ' \u00b7 ' + LAST.model : '');
-                b.className = 'netbadge live'; return; }
-  if(!netReady()){ b.textContent = 'offline hints'; b.className = 'netbadge show'; return; }
-  b.textContent = shortName(provider()) + ' ready';
-  b.className = 'netbadge live';
+  const off = (USE.last === 'local') || !netReady();
+  b.textContent = off ? 'offline' : '';
+  b.className = 'netbadge' + (off ? ' show' : '');
+  b.title = off ? (S.cat||'Mochi') + ' has no connection, so he is giving built-in hints' : '';
 }
 function markSource(local){
   if(local){ USE.local++; USE.last = 'local'; }
@@ -1337,13 +1337,17 @@ function markSource(local){
 }
 function avgSecs(p){ return USE[p] ? (USE.ms[p]/USE[p]/1000).toFixed(1) + 's' : ''; }
 function usageLine(){
+  const now = USE.last === 'local' ? 'built-in hints (no model)'
+            : USE.last ? PROVIDERS[USE.last].label + ' \u00b7 ' + (LAST.model || '')
+            : 'nothing has answered yet';
   const bits = [];
   if(USE.anthropic) bits.push(USE.anthropic + ' from Claude (avg ' + avgSecs('anthropic') + ')');
   if(USE.openai)    bits.push(USE.openai + ' from ChatGPT (avg ' + avgSecs('openai') + ')');
   if(USE.local)     bits.push(USE.local + ' local');
-  if(!bits.length)  return 'No replies yet this session. Average reply time appears here once it has answered a few times.';
-  return 'This session: ' + bits.join(', ') + '.' +
-    (LAST.model ? ' Last model: ' + LAST.model + '.' : '');
+  const acc = S.done ? Math.round((S.right/S.done)*100) + '%' : '\u2014';
+  const work = S.done + ' answered, ' + acc + ' correct, best streak ' + S.best + '.';
+  if(!bits.length) return 'Answering: ' + now + '. ' + work;
+  return 'Answering: ' + now + '. Replies: ' + bits.join(', ') + '. ' + work;
 }
 window.addEventListener('online',  updateNet);
 window.addEventListener('offline', updateNet);
@@ -1359,6 +1363,7 @@ const PROVIDERS = {
 };
 function provider(){ return S.provider === 'openai' ? 'openai' : 'anthropic'; }
 function apiKey(p){ return String((S.keys && S.keys[p || provider()]) || '').trim(); }
+function normModel(v){ return String(v || '').trim().toLowerCase().replace(/\s+/g, '-'); }
 function modelName(p){
   p = p || provider();
   return String((S.models && S.models[p]) || '').trim() || PROVIDERS[p].defaultModel;
@@ -1478,9 +1483,11 @@ function systemPrompt(){
     '- Talk to Euna directly and warmly. Never mocking, never baby talk, never flattery she has not earned.',
     '- Answer only about the question above. If she asks about anything else at all, say in one short sentence that you can only help with the maths in front of her, and stop there.',
     '',
-    'ABOUT BEING A CAT:',
-    '- Euna knows you are her cat. Let it show rarely and lightly, at most one reply in five, and never in the middle of explaining a step.',
-    '- Never meow, never use asterisks for actions, never pun on cat words. The maths always comes first.'
+    'YOU ARE MOCHI:',
+    '- Euna is talking to ' + cat + ', her cat. Never name the company, product or model that runs you, and never call yourself an AI, an assistant, a chatbot or a language model.',
+    '- Let being a cat show rarely and lightly, at most one reply in five, and never in the middle of explaining a step.',
+    '- Never meow, never use asterisks for actions, never pun on cat words. The maths always comes first.',
+    '- If she asks whether you are real, alive, a person, a robot or a computer: tell her plainly and kindly that you are a computer program that helps her with maths, drawn as a cat. Never claim to be alive or a real cat. Then bring her back to the question.'
   ].filter(Boolean).join('\n');
 }
 
@@ -1496,6 +1503,7 @@ const queue = [];
 async function askMochi(kind, extra){
   if(kind === 'free'){
     if(concerning(extra)){ localSay(CONCERN_REPLY); return; }      // never routed to a model
+    if(identityQ(extra)){ localSay(IDENTITY_REPLY); return; }       // answered honestly, locally
     if(!onTopic(extra)){ localSay(pick(REDIRECTS)); return; }      // never costs a call
   }
   if(busy){ if(queue.length < 3) queue.push({kind, extra}); return; }
@@ -1984,7 +1992,7 @@ function explainError(msg, p, model){
 async function testConnection(){
   const p = $('provSel').value;
   const key = $('keyInput').value.trim();
-  const model = $('modelInput').value.trim() || PROVIDERS[p].defaultModel;
+  const model = normModel($('modelInput').value) || PROVIDERS[p].defaultModel;
   if(!key && p === 'openai'){ $('keyNote').textContent = 'Paste an OpenAI key first.'; return; }
   $('tutorTest').disabled = true;
   $('keyNote').textContent = 'Testing ' + model + '\u2026';
@@ -2017,6 +2025,7 @@ function syncTutorFields(){
   $('readInput').value = (S.readModels && S.readModels[p]) || '';
   $('readInput').placeholder = 'same as above (' + PROVIDERS[p].defaultRead + ')';
   if($('useNote')) $('useNote').textContent = usageLine();
+  if($('sessionNote')) $('sessionNote').textContent = usageLine();
   $('keyNote').textContent = apiKey(p)
     ? 'Key saved on this device. ' + PROVIDERS[p].label + ' will answer as ' + (S.cat||'Mochi') + '.'
     : 'No key for ' + PROVIDERS[p].label + ' yet. Questions, marking, bar models and the working page all still run without one.';
@@ -2027,8 +2036,8 @@ $('tutorSave').onclick = ()=>{
   const p = $('provSel').value;
   S.provider = p;
   S.keys = S.keys || {}; S.keys[p] = $('keyInput').value.trim();
-  S.models = S.models || {}; S.models[p] = $('modelInput').value.trim();
-  S.readModels = S.readModels || {}; S.readModels[p] = $('readInput').value.trim();
+  S.models = S.models || {}; S.models[p] = normModel($('modelInput').value);
+  S.readModels = S.readModels || {}; S.readModels[p] = normModel($('readInput').value);
   USE.last = null; LAST = {p:null, model:null, at:0};
   save(S); syncTutorFields(); updateNet();
   $('keyNote').textContent = 'Saved. ' + PROVIDERS[p].label + ' is now the tutor, using ' + modelName(p) + '. The badge by Ask ' + (S.cat||'Mochi') + ' will confirm it once it answers.';
@@ -2051,7 +2060,7 @@ $('ov').onclick = e=>{ if(e.target === $('ov')) $('ov').classList.remove('show')
 function applyCatName(){
   const c = S.cat || 'Mochi';
   $('catName').textContent = c;
-  $('askLabText').textContent = 'Ask ' + c;
+  $('chatInput').placeholder = 'Ask ' + c + '\u2026';
 }
 
 /* ---------- boot ---------- */
@@ -2085,7 +2094,7 @@ async function hydrate(){
 }
 
 if('serviceWorker' in navigator){
-  window.addEventListener('load', ()=> navigator.serviceWorker.register('sw.js?v=7').catch(()=>{}));
+  window.addEventListener('load', ()=> navigator.serviceWorker.register('sw.js?v=9').catch(()=>{}));
 }
 </script>
 </body>

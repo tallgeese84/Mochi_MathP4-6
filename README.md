@@ -45,27 +45,48 @@ delivered by voice alone. The speaker button in the top bar turns automatic read
 if she wants it; with it off, each reply still carries a small speaker she can tap to
 hear just that one.
 
-## How to tell which engine is answering
+## Euna only ever meets Mochi
 
-Next to **Ask Mochi** there is a badge, and it reports what actually answered the last
-reply rather than what is merely configured:
+The engine is invisible to her. No product name, no model id, no "via ChatGPT" appears
+anywhere on her side of the screen; the tutor is simply Mochi. The prompt forbids naming
+the company or model and forbids calling itself an AI or a chatbot.
 
-| badge | meaning |
-|---|---|
-| `ChatGPT ready` (green) | a key is saved and it is online, but nothing has answered yet |
-| `via ChatGPT - gpt-5.6` (green) | that reply came from OpenAI, using that model |
-| `via Claude - claude-sonnet-4-6` (green) | that reply came from Anthropic |
-| `offline hints` (orange) | the built-in hint ladder answered, not a model |
+It stops short of lying to her. If she asks whether Mochi is real, alive, a person, a
+robot, or "are you ChatGPT", she gets a straight answer - *"I am a computer program that
+helps you with maths, drawn as a cat"* - and that reply is generated on the device, so no
+model can get it wrong and it costs nothing.
 
-If a call fails mid-session the badge drops back to `offline hints` on its own, so a
-silent failure cannot be mistaken for a working tutor. Switching provider clears the
-badge back to `... ready` until the new one has actually answered.
+The one thing she does see is an `offline` chip when there is no connection, so she knows
+why Mochi is only giving short hints.
 
-The grown-ups panel also shows a running count, e.g.
-`This session: 1 from Claude, 2 from ChatGPT, 1 local. Last model used: gpt-5.6.`
+## How to tell which engine is answering (grown-ups)
+
+Open the cog. Under **This session** it reports what actually answered the last reply,
+rather than what is merely configured:
+
+`Answering: ChatGPT (OpenAI) - gpt-5.6-terra. Replies: 4 from ChatGPT (avg 1.4s), 1 local.
+12 answered, 75% correct, best streak 5.`
+
+If a call fails mid-session it flips to `built-in hints (no model)` on its own, so a silent
+failure cannot be mistaken for a working tutor. Switching provider clears it until the new
+one has actually answered. Her score lives here too rather than on screen - a running
+accuracy percentage in front of a child is discouraging, and a streak of paw prints is not.
 
 For proof independent of anything this app says, open **platform.openai.com/usage** -
 the requests appear there within a minute or two.
+
+## Reading the OpenAI dashboard
+
+The dashboard lists display names; the API wants ids. The app converts them for you, so
+typing `GPT-5.6 Terra` stores `gpt-5.6-terra`. Mapping:
+
+| Dashboard card | Type this | Use it for |
+|---|---|---|
+| GPT-5.6 Sol | `gpt-5.6-sol` | skip - frontier model, slower and dearer for no gain here |
+| GPT-5.6 Terra | `gpt-5.6-terra` | talking, and reading handwriting |
+| GPT-5.6 Luna | `gpt-5.6-luna` | talking, if Terra feels slow |
+| Audio | - | not needed; reading aloud uses the device's own voice, offline and free |
+| Image | - | not needed; that card *generates* images. Reading her handwriting is image *input*, which Terra and Luna already do |
 
 ## Which model to pick
 
