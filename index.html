@@ -419,6 +419,7 @@
       </div>
       <div class="field">
         <input type="text" id="modelInput" placeholder="model name" aria-label="Model name" autocomplete="off" />
+        <button class="btn quiet" id="tutorTest">Test</button>
         <button class="btn sm" id="tutorSave">Save</button>
       </div>
       <p class="pnote" id="keyNote"></p>
@@ -1319,7 +1320,10 @@ function modelName(p){
 }
 
 async function callModel(opts, signal){
-  const p = provider(), key = apiKey(p), model = modelName(p);
+  const as = opts.as || {};
+  const p     = as.p     || provider();
+  const key   = (as.key !== undefined) ? as.key : apiKey(p);
+  const model = as.model || modelName(p);
   const maxTok = opts.maxTokens || 900;
 
   if(p === 'anthropic'){
@@ -1889,6 +1893,54 @@ $('catSave').onclick = ()=>{
   const v = $('catInput').value.trim().slice(0,14);
   if(v){ S.cat = v; applyCatName(); save(S); }
 };
+
+/* Say plainly what went wrong instead of leaving a cat to mumble a fallback. */
+function explainError(msg, p, model){
+  const where = p==='openai' ? 'platform.openai.com' : 'console.anthropic.com';
+  if(/AbortError|aborted/i.test(msg))
+    return 'No reply within 20 seconds. Check the connection and try again.';
+  if(/\b401\b|invalid_api_key|Incorrect API key|authentication/i.test(msg))
+    return 'The key was rejected. It needs to be an API key from ' + where + ' \u2014 not a website password, and not a ChatGPT subscription login.';
+  if(/\b403\b|permission/i.test(msg))
+    return 'The key works but is not allowed to use ' + model + '. Check the project permissions on ' + where + '.';
+  if(/\b404\b|model_not_found|does not exist|unknown model/i.test(msg))
+    return 'There is no model called \u201c' + model + '\u201d on this account. Clear the model box to use the default, or type a name you can see in your dashboard.';
+  if(/\b429\b|quota|insufficient_quota|billing|credit/i.test(msg))
+    return 'Out of credit, or rate limited. ' + (p==='openai'
+      ? 'A ChatGPT Plus subscription does NOT include API credit \u2014 add billing at platform.openai.com.'
+      : 'Add credit in the Anthropic Console.');
+  if(/Failed to fetch|NetworkError|CORS|Load failed/i.test(msg))
+    return 'The request could not leave the browser. This happens when the page is opened straight from a file instead of being served over https, or when the network blocks it.';
+  return 'Did not work: ' + String(msg).slice(0,150);
+}
+
+async function testConnection(){
+  const p = $('provSel').value;
+  const key = $('keyInput').value.trim();
+  const model = $('modelInput').value.trim() || PROVIDERS[p].defaultModel;
+  if(!key && p === 'openai'){ $('keyNote').textContent = 'Paste an OpenAI key first.'; return; }
+  $('tutorTest').disabled = true;
+  $('keyNote').textContent = 'Testing ' + model + '\u2026';
+  const ctrl = new AbortController();
+  const timer = setTimeout(()=> ctrl.abort(), 20000);
+  try{
+    const t = await callModel({
+      system: 'You reply with one word only.',
+      messages: [{role:'user', content:'Say the word ready.'}],
+      maxTokens: 200,
+      as: {p, key, model}
+    }, ctrl.signal);
+    $('keyNote').textContent = t
+      ? 'Working. ' + model + ' replied \u201c' + t.slice(0,30) + '\u201d. Tap Save to use it.'
+      : 'Connected, but ' + model + ' sent nothing back. Try a different model name.';
+  }catch(err){
+    $('keyNote').textContent = explainError(String((err && err.message) || err), p, model);
+  }finally{
+    clearTimeout(timer);
+    $('tutorTest').disabled = false;
+  }
+}
+
 function syncTutorFields(){
   const p = $('provSel').value;
   $('keyInput').value = apiKey(p);
@@ -1900,6 +1952,7 @@ function syncTutorFields(){
     : 'No key for ' + PROVIDERS[p].label + ' yet. Questions, marking, bar models and the working page all still run without one.';
 }
 $('provSel').onchange = ()=> syncTutorFields();
+$('tutorTest').onclick = ()=> testConnection();
 $('tutorSave').onclick = ()=>{
   const p = $('provSel').value;
   S.provider = p;
@@ -1961,7 +2014,7 @@ async function hydrate(){
 }
 
 if('serviceWorker' in navigator){
-  window.addEventListener('load', ()=> navigator.serviceWorker.register('sw.js?v=3').catch(()=>{}));
+  window.addEventListener('load', ()=> navigator.serviceWorker.register('sw.js?v=4').catch(()=>{}));
 }
 </script>
 </body>

@@ -24,6 +24,20 @@ never calculates.
 3. Open the URL, tap the cog, answer the multiplication gate, paste an Anthropic API key.
 4. On the iPad: Share → **Add to Home Screen**. It installs as a standalone app.
 
+## Turning on the ChatGPT tutor
+
+1. Get an **API key** at platform.openai.com -> API keys. This is separate from a
+   ChatGPT Plus subscription; Plus does not include API credit. Add a little billing
+   under Settings -> Billing, and set a monthly limit while you are there.
+2. Open the app on your Pages URL, tap the cog, answer the multiplication.
+3. Under **Tutor**, choose `ChatGPT (OpenAI)`, paste the key, leave the model box empty
+   for the default (`gpt-5.6`) or type another name.
+4. Tap **Test**. It makes one tiny call and tells you exactly what happened - working,
+   key rejected, no such model, or out of credit.
+5. Tap **Save**. The `offline hints` badge next to *Ask Mochi* disappears once it is live.
+
+Switching back to Claude is the same panel; both keys are remembered separately.
+
 ## Choosing the tutor
 
 Under the cog you can pick **Claude (Anthropic)** or **ChatGPT (OpenAI)**, paste a key for
