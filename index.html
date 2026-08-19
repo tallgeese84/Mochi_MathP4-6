@@ -150,6 +150,9 @@
     place-items:center;font-family:var(--mono);font-weight:700;font-size:.74rem;flex:none;}
   .st{font-size:.95rem;line-height:1.58;font-weight:500;}
 
+  .netbadge{display:none;margin-left:7px;padding:2px 8px;border-radius:999px;background:var(--ginger-soft);
+    border:1.5px solid var(--ginger);color:var(--ginger-deep);font-size:.58rem;letter-spacing:.6px;}
+  .netbadge.show{display:inline-block;}
   .asklab{font-family:var(--mono);font-weight:700;font-size:.63rem;letter-spacing:1.3px;
     color:var(--slate);text-transform:uppercase;margin:0 0 11px;}
   .chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:11px;}
@@ -196,6 +199,11 @@
   .mfill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--nose),var(--ginger),var(--jade));}
   .mpct{width:38px;text-align:right;font-family:var(--mono);font-size:.74rem;color:var(--slate);flex:none;}
   .field{display:flex;gap:9px;margin:9px 0;}
+  .field select{flex:1;min-width:0;background:var(--milk);border:2px solid var(--line);border-radius:12px;
+    padding:11px 13px;font-family:var(--body);font-weight:700;font-size:.95rem;color:var(--ink);outline:none;}
+  .field input[type=password]{flex:1;min-width:0;background:var(--milk);border:2px solid var(--line);
+    border-radius:12px;padding:11px 13px;font-family:var(--mono);font-size:.9rem;color:var(--ink);outline:none;}
+  .field input[type=password]:focus,.field select:focus{border-color:var(--ginger);}
   .field input[type=text]{flex:1;background:var(--milk);border:2px solid var(--line);border-radius:12px;
     padding:11px 13px;font-family:var(--body);font-weight:700;font-size:.95rem;color:var(--ink);outline:none;min-width:0;}
   .field input[type=text]:focus{border-color:var(--ginger);}
@@ -313,6 +321,7 @@
       <canvas id="wkCanvas" class="wkcanvas" aria-label="Write your working here"></canvas>
       <div class="wkrow">
         <button class="btn quiet" id="wkCheck">Check my working</button>
+        <button class="btn quiet" id="wkAdd">Type a line</button>
         <span class="wkhint" id="wkHint">Write out your steps, then I will read them back to you.</span>
       </div>
       <div class="lines" id="wkLines"></div>
@@ -346,7 +355,7 @@
   </section>
 
   <section class="card">
-    <p class="asklab" id="askLab">Ask Mochi</p>
+    <p class="asklab" id="askLab"><span id="askLabText">Ask Mochi</span><span class="netbadge" id="netBadge"></span></p>
     <div class="chips">
       <button class="chip" data-ask="I don't know how to start.">I don't know how to start</button>
       <button class="chip" data-ask="What is this question asking me to find?">What is it asking?</button>
@@ -398,12 +407,21 @@
       </div>
       <p class="pnote" id="photoNote">PNG or JPEG. A cut-out PNG with a transparent background looks best. It is resized to 400px and stored on this device only.</p>
 
-      <p class="sect">Tutor connection</p>
+      <p class="sect">Tutor</p>
       <div class="field">
-        <input type="password" id="keyInput" placeholder="Anthropic API key (sk-ant-...)" aria-label="API key" autocomplete="off" />
-        <button class="btn sm" id="keySave">Save</button>
+        <select id="provSel" aria-label="Model provider">
+          <option value="anthropic">Claude (Anthropic)</option>
+          <option value="openai">ChatGPT (OpenAI)</option>
+        </select>
       </div>
-      <p class="pnote" id="keyNote">Stored on this device only. Without it the questions, marking, bar models and working page all still run &mdash; Mochi just stops talking and cannot read handwriting. Set a monthly spend cap in the Anthropic Console.</p>
+      <div class="field">
+        <input type="password" id="keyInput" placeholder="API key" aria-label="API key" autocomplete="off" />
+      </div>
+      <div class="field">
+        <input type="text" id="modelInput" placeholder="model name" aria-label="Model name" autocomplete="off" />
+        <button class="btn sm" id="tutorSave">Save</button>
+      </div>
+      <p class="pnote" id="keyNote"></p>
 
       <p class="sect">Progress by topic</p>
       <div class="mast" id="mast"></div>
@@ -436,7 +454,6 @@ const MEM = {};
 const KEY = 'mochi-tutor-v1';
 function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
 function lsSet(k,v){ try{ localStorage.setItem(k,v); return true; }catch(e){ return false; } }
-function lsDel(k){ try{ localStorage.removeItem(k); }catch(e){} }
 async function save(obj){
   const str = JSON.stringify(obj);
   try { if(window.storage){ await window.storage.set(KEY, str); return; } } catch(e){}
@@ -755,6 +772,7 @@ function semicircle(){
     const area = (22/7)*r*r/2;
     return {
       topic:'Circles', stars:3, suffix:'cm²', fig:FIG.semicircle(d),
+      figDesc:`A semicircle. Its straight edge, the diameter, is labelled ${d} cm.`,
       text:`The figure shows a semicircle with a diameter of ${d} cm. Find its area. Take π = 22/7.`,
       answer:r2(area),
       steps:[`Radius = ${d} ÷ 2 = ${r} cm.`,
@@ -765,6 +783,7 @@ function semicircle(){
   const per = (22/7)*r + d;
   return {
     topic:'Circles', stars:4, suffix:'cm', fig:FIG.semicircle(d),
+    figDesc:`A semicircle. Its straight edge, the diameter, is labelled ${d} cm.`,
     text:`The figure shows a semicircle with a diameter of ${d} cm. Find its perimeter. Take π = 22/7.`,
     answer:r2(per),
     steps:[`Radius = ${d} ÷ 2 = ${r} cm.`,
@@ -782,6 +801,7 @@ function quadrant(){
     const area = (22/7)*r*r/4;
     return {
       topic:'Circles', stars:3, suffix:'cm²', fig:FIG.quadrant(r),
+      figDesc:`A quadrant, a quarter of a circle. Both straight edges are radii labelled ${r} cm, with a right angle between them.`,
       text:`The figure shows a quadrant with a radius of ${r} cm. Find its area. Take π = 22/7.`,
       answer:r2(area),
       steps:[`Area of a whole circle = 22/7 × ${r} × ${r} = ${money((22/7)*r*r)} cm².`,
@@ -792,6 +812,7 @@ function quadrant(){
   const per = (22/7)*r/2 + 2*r;
   return {
     topic:'Circles', stars:4, suffix:'cm', fig:FIG.quadrant(r),
+    figDesc:`A quadrant, a quarter of a circle. Both straight edges are radii labelled ${r} cm, with a right angle between them.`,
     text:`The figure shows a quadrant with a radius of ${r} cm. Find its perimeter. Take π = 22/7.`,
     answer:r2(per),
     steps:[`The curved part is a quarter of the circumference = 22/7 × 2 × ${r} ÷ 4 = ${money((22/7)*r/2)} cm.`,
@@ -811,6 +832,7 @@ function volume(){
   const litres = cm3/1000;
   return {
     topic:'Volume', stars:3, suffix:'litres', fig:FIG.tank(L,W,H,h),
+    figDesc:`An open rectangular tank drawn in 3D. The base is ${L} cm by ${W} cm, the tank is ${H} cm tall, and the water inside is marked ${h} cm deep.`,
     text:`A rectangular tank measuring ${L} cm by ${W} cm by ${H} cm is filled with water to a depth of ${h} cm. Find the volume of water in the tank. Give your answer in litres.`,
     answer:r2(litres),
     steps:[`Volume of water = length × width × depth of water.`,
@@ -827,6 +849,7 @@ function angles(){
   const x = 180 - b;
   return {
     topic:'Angles', stars:3, suffix:'°', fig:FIG.triangleLine(a,b),
+    figDesc:`A triangle standing on the straight line PQ, with its apex above. The angle inside the triangle at P is ${a}° and the angle inside the triangle at Q is ${b}°. The angle marked x is OUTSIDE the triangle, between the sloping side that meets Q and the part of the line PQ that carries on to the right of Q.`,
     text:`In the figure, PQ is a straight line. Find the value of angle x. (The figure is not drawn to scale.)`,
     answer:x,
     accept:[String(x)+'°'],
@@ -995,17 +1018,6 @@ function isCorrect(input, q){
 const BUILTIN_PHOTO = ($('catImg').getAttribute('src') || '');
 const PHOTO_KEY = 'cat-photo-v1';
 
-/* The key lives on this device only. It is never sent anywhere but Anthropic. */
-function apiKey(){ return String(S.key || '').trim(); }
-function apiHeaders(){
-  return {
-    "Content-Type": "application/json",
-    "x-api-key": apiKey(),
-    "anthropic-version": "2023-06-01",
-    "anthropic-dangerous-direct-browser-access": "true"
-  };
-}
-
 /* =========================================================
    THE CAT — mood shown by the frame, not a drawn face
    ========================================================= */
@@ -1109,7 +1121,8 @@ function opener(q){ return q.fig ? FIG_OPENER : pick(OPENERS); }
 
 function renderQuestion(){
   current = chooseGenerator()();
-  settled = false; revealed = false; history = [];
+  settled = false; revealed = false; askCount = 0;
+  history = [];   // the chat is scoped to the question on screen
   S.tick++; S.lastSeen[current.topic] = S.tick;
 
   $('qTopicName').textContent = current.topic;
@@ -1203,82 +1216,246 @@ function submit(){
   askMochi(ok ? 'praise' : 'wrong', raw);
 }
 
+
+
+/* ============================================================
+   SCOPE AND OFFLINE
+   Two rules: she can only ask about the question on screen,
+   and losing the connection must not leave her with nothing.
+   ============================================================ */
+function keyReady(){ return !!apiKey(); }   // on a real host, every provider needs a key
+function netReady(){ return (navigator.onLine !== false) && keyReady(); }
+
+/* --- the topic gate runs here, before a single token is spent --- */
+const HELP_PHRASES = ['help','stuck','hint','explain','why','how do','how to','how does','how many',
+ 'what do i','what does','what is this','i dont',"i don't",'dont get',"don't get",'dont understand',
+ "don't understand",'no idea','not sure','confused','where do i','start','next','again','show me',
+ 'what now','lost','huh','check','is that right','am i right','simpler','slower','repeat','mean','more'];
+const MATH_WORDS = ['add','plus','sum','subtract','minus','take away','times','multiply','divide',
+ 'fraction','numerator','denominator','ratio','unit','part','whole','percent','decimal','average',
+ 'total','remainder','angle','degree','triangle','straight','circle','radius','diameter','circumference',
+ 'area','perimeter','volume','litre','liter','speed','distance','time','bar model','step','method',
+ 'working','answer','equation','calculate','work out','solve','maths','math','number','question','figure'];
+
+function onTopic(msg){
+  const t = ' ' + String(msg).toLowerCase().trim() + ' ';
+  if(t.trim().length < 3) return true;                        // "?" or "ok"
+  if(/\d/.test(t)) return true;                               // any number
+  if(/[+\-\u00d7\u00f7*\/=%]/.test(t)) return true;           // any operator
+  if(HELP_PHRASES.some(p=>t.indexOf(p) > -1)) return true;
+  if(MATH_WORDS.some(w=>t.indexOf(w) > -1)) return true;
+  const q = new Set((current.text + ' ' + current.steps.join(' ') + ' ' + current.topic)
+    .toLowerCase().split(/[^a-z']+/).filter(w=>w.length > 3));
+  return t.split(/[^a-z']+/).filter(w=>w.length > 3).some(w=>q.has(w));
+}
+const REDIRECTS = [
+  'I can only help with the maths question on the screen. Which part of it is giving you trouble?',
+  'That one is outside what I do \u2014 I only know the question in front of you. Where are you stuck on it?',
+  'I stick to the maths on this page. Shall we look at the question again?'
+];
+
+/* A maths app is the wrong place for this, and brushing it aside would be worse. */
+const CONCERN = ['kill myself','want to die','wanna die','hurt myself','hurting myself','hate myself',
+ 'end it all','cut myself','self harm','worthless','nobody likes me','no one likes me','everyone hates me',
+ 'want to disappear'];
+function concerning(msg){
+  const t = String(msg).toLowerCase();
+  return CONCERN.some(p=>t.indexOf(p) > -1);
+}
+const CONCERN_REPLY = 'That sounds really hard, and I am only a maths app, so I am not the right one to help with it. Please tell a grown-up you trust, like a parent or a teacher, as soon as you can. They will want to know.';
+
+/* --- offline: a real hint ladder built from the worked solution --- */
+const FIRST_NUDGE = {
+  'Fractions':'Draw the whole amount as one long bar. What fraction is taken away first, and how much of the bar is left after that?',
+  'Ratio':'Turn the ratio into units. How many units is each person, and how many units is the difference between them?',
+  'Percentage':'Decide what counts as 100% in this question. Everything else is measured against that.',
+  'Speed':'Write down which two of distance, speed and time you have been given. The missing one is what you are looking for.',
+  'Algebra':'Replace the letter with the number you were given, then work it out like an ordinary sum.',
+  'Circles':'Find the radius first. Then decide whether the question wants the space inside or the distance round the edge.',
+  'Volume':'Volume is length times width times depth. Be careful to use the depth of the water, not the height of the tank.',
+  'Angles':'Look for angles sitting on a straight line, or the three angles inside a triangle. Both of those add up to 180 degrees.',
+  'Average':'Averages always go through the total. Find the total first, then work from there.',
+  'Whole numbers':'Read it twice. Write down what you are told, and underline what you are asked to find.',
+  'Decimals':'Work in cents if that feels easier, then turn your answer back into dollars at the end.'
+};
+function offlineReply(kind){
+  if(kind==='praise')  return 'That is correct. Look at the working below and check that your method matches it.';
+  if(kind==='wrong')   return 'Not quite. Read the question again and underline what it is asking you to find, then try the first step once more.';
+  if(kind==='working') return 'I need a connection to read handwriting, but the lines you type on the working page are still checked properly.';
+  const n = askCount;
+  if(n <= 1) return FIRST_NUDGE[current.topic] || 'Start with the first sentence. What are you told, and what are you asked to find?';
+  const i = n - 2;
+  if(i < current.steps.length){
+    return (i===0 ? 'Here is the first step. ' : 'Next step. ') + current.steps[i] +
+           (i < current.steps.length-1 ? ' See how far you get from there.' : '');
+  }
+  return 'That is the whole method. Tap Show the working to see every step together.';
+}
+
+function localSay(text){ say(text,false); addMsg('cat',text); speak(text); }
+function updateNet(){
+  const b = $('netBadge'); if(!b) return;
+  const on = netReady();
+  b.textContent = on ? '' : 'offline hints';
+  b.className = 'netbadge' + (on ? '' : ' show');
+}
+window.addEventListener('online',  updateNet);
+window.addEventListener('offline', updateNet);
+
+/* ============================================================
+   MODEL PROVIDERS
+   The tutor's voice is swappable. Everything that decides
+   right from wrong stays in JavaScript either way.
+   ============================================================ */
+const PROVIDERS = {
+  anthropic: { label:'Claude (Anthropic)', defaultModel:'claude-sonnet-4-6', keyHint:'sk-ant-...' },
+  openai:    { label:'ChatGPT (OpenAI)',   defaultModel:'gpt-5.6',           keyHint:'sk-...' }
+};
+function provider(){ return S.provider === 'openai' ? 'openai' : 'anthropic'; }
+function apiKey(p){ return String((S.keys && S.keys[p || provider()]) || '').trim(); }
+function modelName(p){
+  p = p || provider();
+  return String((S.models && S.models[p]) || '').trim() || PROVIDERS[p].defaultModel;
+}
+
+async function callModel(opts, signal){
+  const p = provider(), key = apiKey(p), model = modelName(p);
+  const maxTok = opts.maxTokens || 900;
+
+  if(p === 'anthropic'){
+    const msgs = opts.messages.map(m=>({role:m.role, content:m.content}));
+    if(opts.image){
+      const last = msgs[msgs.length-1];
+      last.content = [{type:'image', source:{type:'base64', media_type:'image/png', data:opts.image}},
+                      {type:'text', text:last.content}];
+    }
+    const h = {'Content-Type':'application/json'};
+    if(key){ h['x-api-key']=key; h['anthropic-version']='2023-06-01'; h['anthropic-dangerous-direct-browser-access']='true'; }
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST', headers:h, signal,
+      body: JSON.stringify({model, max_tokens:maxTok, system:opts.system, messages:msgs})
+    });
+    if(!r.ok) throw new Error('HTTP '+r.status+' '+(await r.text()).slice(0,160));
+    const d = await r.json();
+    return (d.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('\n').trim();
+  }
+
+  // OpenAI: system goes in the message list, and images use image_url.
+  const msgs = [{role:'system', content:opts.system}]
+    .concat(opts.messages.map(m=>({role:m.role, content:m.content})));
+  if(opts.image){
+    const last = msgs[msgs.length-1];
+    last.content = [{type:'text', text:last.content},
+                    {type:'image_url', image_url:{url:'data:image/png;base64,'+opts.image}}];
+  }
+  const send = (field)=>{
+    const body = {model, messages:msgs};
+    body[field] = maxTok;
+    return fetch('https://api.openai.com/v1/chat/completions', {
+      method:'POST', signal,
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+      body: JSON.stringify(body)
+    });
+  };
+  // GPT-5 era wants max_completion_tokens; older models want max_tokens. Try, then fall back.
+  let r = await send('max_completion_tokens');
+  if(r.status === 400) r = await send('max_tokens');
+  if(!r.ok) throw new Error('HTTP '+r.status+' '+(await r.text()).slice(0,160));
+  const d = await r.json();
+  return String((d.choices && d.choices[0] && d.choices[0].message && d.choices[0].message.content) || '').trim();
+}
+
 /* =========================================================
    THE TALKING LAYER
    ========================================================= */
 function systemPrompt(){
   const cat = S.cat || 'Mochi';
+  const weak = TOPICS.map(t=>({t, m:S.mastery[t]||{a:0,c:0}}))
+    .filter(o=>o.m.a >= 3)
+    .sort((a,b)=>(a.m.c/a.m.a)-(b.m.c/b.m.a))
+    .slice(0,3)
+    .map(o=>o.t+' ('+Math.round(o.m.c/o.m.a*100)+'%)');
+  const working = (WK.lines && WK.lines.length)
+    ? 'HER HANDWRITTEN WORKING SO FAR:\n' + WK.lines.map((l,i)=>(i+1)+'. '+l).join('\n') : '';
+
   return [
-    `You are ${cat}, Euna's cat, and you tutor her in Mathematics. Euna is 11 and is preparing for the Singapore MOE SPERS-Sec Secondary 1 placement test, which covers the Primary 6 syllabus.`,
-    "",
-    "THE CURRENT QUESTION:",
+    `You are ${cat}, Euna's cat, and you are her Mathematics tutor. Euna is 11. She is working towards the Singapore MOE SPERS-Sec Secondary 1 placement test, which covers the Primary 6 syllabus.`,
+    '',
+    'THE QUESTION SHE IS ON NOW:',
     current.text,
-    "",
-    "THE CORRECT ANSWER (given to you — never recompute it): " + current.answer + (current.suffix ? " " + current.suffix : ""),
-    "",
-    "THE WORKED SOLUTION:",
-    current.steps.map((s,i)=>(i+1)+". "+s).join("\n"),
-    "",
-    "HOW YOU MUST BEHAVE:",
-    "- Never state the final answer unless Euna has already answered correctly, or has asked three or more times and is clearly stuck.",
-    "- Ask one guiding question at a time. Lead her to the next step; do not walk through the whole solution.",
-    "- Keep every reply to 2-3 short sentences. She reads it on a tablet.",
-    "- Use Singapore primary school maths vocabulary: units, parts, the whole, bar model, remainder, before and after. Never use secondary school terms like 'variable', 'coefficient' or 'linear equation'.",
-    "- Match the English register of a P6 exam paper: plain and clear.",
-    "- If she is wrong, work out what she probably did, name it kindly, then ask the question that reopens the step she missed.",
-    "- Never invent a different question or different numbers. Stay on this question.",
-    "- If she asks about something other than maths, bring her back to the question in one short sentence.",
-    "- Do not use markdown, headings, bullet points or LaTeX. Plain sentences only.",
-    "",
-    "ABOUT BEING A CAT:",
-    "- Euna knows you are her cat. Let it show rarely and lightly — at most one reply in five, and never in the middle of explaining a step.",
-    "- Never meow, never use asterisks for actions, never pun on cat words. The maths always comes first."
-  ].join("\n");
+    current.figDesc ? 'WHAT THE FIGURE SHOWS: ' + current.figDesc : '',
+    '',
+    'THE CORRECT ANSWER (given to you — never recompute it): ' + current.answer + (current.suffix ? ' ' + current.suffix : ''),
+    '',
+    'THE WORKED SOLUTION:',
+    current.steps.map((s2,i)=>(i+1)+'. '+s2).join('\n'),
+    working,
+    '',
+    'WHERE SHE IS:',
+    settled
+      ? '- She has already submitted an answer, so you may explain the whole method openly, including the answer.'
+      : '- She has not answered yet.',
+    '- She has asked you for help on this question ' + askCount + (askCount===1 ? ' time.' : ' times.'),
+    weak.length ? '- The topics she finds hardest right now: ' + weak.join(', ') + '.' : '',
+    '- This conversation is only about the question above. Nothing earlier in it refers to any other question.',
+    '',
+    'HOW MUCH TO GIVE HER. Follow the level she is at:',
+    'Level 1 — ask one short question that gets her to see what the question is asking, or what the first step is. Do none of the working.',
+    'Level 2 — name the exact step she is stuck on and teach the method for it, using a small worked example with different numbers. Still do not do her sum for her.',
+    'Level 3 or more — work the first step right through with her real numbers, show it, then ask her to take the next one. If she is still stuck after that, work the whole thing through clearly. Never leave her with nothing.',
+    '',
+    'STYLE:',
+    '- At level 1, two or three sentences.',
+    '- At level 2 and above you may use up to about 130 words, and you may lay steps out as short numbered lines. Numbered lines are clearer than a paragraph and you should use them when explaining a method.',
+    '- Use Singapore primary maths vocabulary: units, parts, the whole, bar model, remainder, before and after. Never use secondary school terms like variable, coefficient or linear equation.',
+    '- Plain sentences and numbered lines only. No markdown headings, no bold, no LaTeX.',
+    '- Talk to Euna directly and warmly. Never mocking, never baby talk, never flattery she has not earned.',
+    '- Answer only about the question above. If she asks about anything else at all, say in one short sentence that you can only help with the maths in front of her, and stop there.',
+    '',
+    'ABOUT BEING A CAT:',
+    '- Euna knows you are her cat. Let it show rarely and lightly, at most one reply in five, and never in the middle of explaining a step.',
+    '- Never meow, never use asterisks for actions, never pun on cat words. The maths always comes first.'
+  ].filter(Boolean).join('\n');
 }
 
 function userTurn(kind, extra){
-  if(kind==='wrong')  return `Euna answered "${extra}", which is wrong. Give her one short nudge that helps her find her own mistake. Do not give the answer.`;
-  if(kind==='praise') return `Euna answered "${extra}", which is correct. In one or two sentences, confirm it and name the key idea she used, so it sticks.`;
+  if(kind==='wrong')  return `Euna answered "${extra}", which is wrong. Work out what she most likely did, name it kindly, and ask the one question that reopens the step she missed. Do not give the answer.`;
+  if(kind==='praise') return `Euna answered "${extra}", which is correct. In one or two sentences, confirm it and name the idea she used so it sticks.`;
   return extra;   // 'free' and 'working' pass their text straight through
 }
 
+let askCount = 0;
 let busy = false;
+const queue = [];
 async function askMochi(kind, extra){
-  if(busy) return;
-  busy = true;
-  if(kind === 'free' || kind === 'working'){ setCat('curious'); say($('bubbleText').textContent, true); }
-  if(!apiKey()){
-    const fb = fallbackLine(kind);
-    say(fb, false); addMsg('cat', fb); speak(fb); busy = false; return;
+  if(kind === 'free'){
+    if(concerning(extra)){ localSay(CONCERN_REPLY); return; }      // never routed to a model
+    if(!onTopic(extra)){ localSay(pick(REDIRECTS)); return; }      // never costs a call
   }
+  if(busy){ if(queue.length < 3) queue.push({kind, extra}); return; }
+  busy = true;
+  if(kind === 'free' || kind === 'working') askCount++;
+  if(!netReady()){ localSay(offlineReply(kind)); busy = false; updateNet(); return; }
+  if(kind === 'free' || kind === 'working'){ setCat('curious'); say($('bubbleText').textContent, true); }
 
   const turn = userTurn(kind, extra);
   history.push({role:'user', content:turn});
 
   const ctrl = new AbortController();
-  const timer = setTimeout(()=> ctrl.abort(), 12000);   // never hang the UI
+  const timer = setTimeout(()=> ctrl.abort(), 30000);   // never hang the UI
   try{
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
-      method:"POST",
-      headers: apiHeaders(),
-      signal: ctrl.signal,
-      body: JSON.stringify({
-        model:"claude-sonnet-4-6",
-        max_tokens:1000,
-        system: systemPrompt(),
-        messages: history.slice(-8)
-      })
-    });
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    const data = await res.json();
-    const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('\n').trim();
+    const text = await callModel({
+      system: systemPrompt(),
+      messages: history.slice(-14),
+      maxTokens: 900
+    }, ctrl.signal);
     if(!text) throw new Error('empty');
     say(text, false);
     addMsg('cat', text);
     history.push({role:'assistant', content:text});
     speak(text);
   } catch(err){
-    const fb = fallbackLine(kind);
+    const fb = offlineReply(kind);
     say(fb, false);
     addMsg('cat', fb);
     history.pop();
@@ -1286,6 +1463,7 @@ async function askMochi(kind, extra){
   } finally {
     clearTimeout(timer);
     busy = false;
+    if(queue.length){ const q = queue.shift(); setTimeout(()=>askMochi(q.kind, q.extra), 20); }
   }
 }
 
@@ -1559,32 +1737,28 @@ function wkRenderLines(){
 async function wkCheckNow(){
   if(!WK.ok || busy) return;
   if(wkInk() < 6){ $('wkHint').textContent = 'Write some working on the page first.'; return; }
-  if(!apiKey()){ $('wkHint').textContent = 'Add an API key under the cog and I can read your handwriting back to you.'; return; }
+  if(!netReady()){
+    $('wkHint').textContent = 'I need a connection to read handwriting. Tap Type a line and I will still check every line you enter.';
+    return; }
   $('wkCheck').disabled = true;
   $('wkHint').textContent = 'Reading your handwriting\u2026';
 
   const png = wkToPng(1000);
   const b64 = png.split(',')[1];
   const ctrl = new AbortController();
-  const timer = setTimeout(()=> ctrl.abort(), 25000);
+  const timer = setTimeout(()=> ctrl.abort(), 40000);
   try{
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
-      method:"POST", headers: apiHeaders(), signal: ctrl.signal,
-      body: JSON.stringify({
-        model:"claude-sonnet-4-6", max_tokens:1000,
-        messages:[{role:"user", content:[
-          {type:"image", source:{type:"base64", media_type:"image/png", data:b64}},
-          {type:"text", text: TRANSCRIBE + "\n\nFor context only, the question is: " +
-            (current ? current.text : "") +
-            "\nDo not use the question to guess at what should be written. Transcribe only what you can actually see."}
-        ]}]
-      })
-    });
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    const data = await res.json();
-    let text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('\n').trim();
+    let text = await callModel({
+      system: 'You transcribe handwriting. You reply with JSON and nothing else.',
+      messages: [{role:'user', content: TRANSCRIBE +
+        "\n\nFor context only, the question is: " + (current ? current.text : "") +
+        "\nDo not use the question to guess at what should be written. Transcribe only what you can actually see."}],
+      image: b64,
+      maxTokens: 900
+    }, ctrl.signal);
     text = text.replace(/```json/gi,'').replace(/```/g,'').trim();
-    const parsed = JSON.parse(text);
+    const m = text.match(/\{[\s\S]*\}/);
+    const parsed = JSON.parse(m ? m[0] : text);
     if(!parsed || !Array.isArray(parsed.lines)) throw new Error('shape');
     WK.lines = parsed.lines.map(l=>String(l));
     if(!WK.lines.length){ $('wkHint').textContent = 'I could not find any working on the page.'; return; }
@@ -1640,7 +1814,7 @@ $('workingBtn').onclick = ()=>{
 
 function sendChat(){
   const t = $('chatInput').value.trim();
-  if(!t || busy) return;
+  if(!t) return;
   $('chatInput').value='';
   addMsg('kid', t);
   askMochi('free', t);
@@ -1648,7 +1822,7 @@ function sendChat(){
 $('sendBtn').onclick = sendChat;
 $('chatInput').addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); sendChat(); } });
 document.querySelectorAll('.chip').forEach(b=>{
-  b.onclick = ()=>{ if(busy) return; addMsg('kid', b.dataset.ask); askMochi('free', b.dataset.ask); };
+  b.onclick = ()=>{ addMsg('kid', b.dataset.ask); askMochi('free', b.dataset.ask); };
 });
 $('earlierBtn').onclick = ()=>{
   const t = $('thread'); const on = t.classList.toggle('show');
@@ -1666,6 +1840,13 @@ $('voiceBtn').onclick = ()=>{
 
 /* ---------- working pad ---------- */
 $('wkCheck').onclick = ()=> wkCheckNow();
+$('wkAdd').onclick = ()=>{                       // works with no connection at all
+  WK.lines = (WK.lines||[]).concat(['']);
+  wkRenderLines();
+  const rows = $('wkLines').children;
+  if(rows.length) rows[rows.length-1].querySelector('.lnin').focus();
+  $('wkHint').textContent = 'Type a line like  2/5 x 150 = 60  and I will check it, connection or not.';
+};
 $('wkPen').onclick = ()=>{ WK.erase=false; $('wkPen').classList.add('on'); $('wkErase').classList.remove('on'); };
 $('wkErase').onclick = ()=>{ WK.erase=true; $('wkErase').classList.add('on'); $('wkPen').classList.remove('on'); };
 $('wkUndo').onclick = ()=>{ WK.strokes.pop(); wkRedraw(); };
@@ -1689,10 +1870,9 @@ $('gateBtn').onclick = ()=>{
   $('ovTitle').textContent='Settings';
   $('ovSub').textContent='Topics she gets wrong come round more often.';
   $('catInput').value = S.cat || 'Mochi';
-  $('keyInput').value = apiKey();
-  $('keyNote').textContent = apiKey()
-    ? 'Key saved on this device. Mochi can talk and read handwriting.'
-    : 'No key yet. Questions, marking, bar models and the working page all still run without one.';
+  $('provSel').value = provider();
+  syncTutorFields();
+  updateNet();
   const list = $('mast'); list.innerHTML='';
   TOPICS.forEach(t=>{
     const m = S.mastery[t] || {a:0,c:0};
@@ -1709,10 +1889,24 @@ $('catSave').onclick = ()=>{
   const v = $('catInput').value.trim().slice(0,14);
   if(v){ S.cat = v; applyCatName(); save(S); }
 };
-$('keySave').onclick = ()=>{
-  S.key = $('keyInput').value.trim();
-  save(S);
-  $('keyNote').textContent = apiKey() ? 'Key saved on this device.' : 'Key cleared.';
+function syncTutorFields(){
+  const p = $('provSel').value;
+  $('keyInput').value = apiKey(p);
+  $('keyInput').placeholder = PROVIDERS[p].keyHint;
+  $('modelInput').value = (S.models && S.models[p]) || '';
+  $('modelInput').placeholder = PROVIDERS[p].defaultModel;
+  $('keyNote').textContent = apiKey(p)
+    ? 'Key saved on this device. ' + PROVIDERS[p].label + ' will answer as ' + (S.cat||'Mochi') + '.'
+    : 'No key for ' + PROVIDERS[p].label + ' yet. Questions, marking, bar models and the working page all still run without one.';
+}
+$('provSel').onchange = ()=> syncTutorFields();
+$('tutorSave').onclick = ()=>{
+  const p = $('provSel').value;
+  S.provider = p;
+  S.keys = S.keys || {}; S.keys[p] = $('keyInput').value.trim();
+  S.models = S.models || {}; S.models[p] = $('modelInput').value.trim();
+  save(S); syncTutorFields();
+  $('keyNote').textContent = 'Saved. ' + PROVIDERS[p].label + ' is now the tutor, using ' + modelName(p) + '.';
 };
 $('photoInput').addEventListener('change', e=> handleFile(e.target.files && e.target.files[0]));
 $('photoClear').onclick = async ()=>{
@@ -1732,7 +1926,7 @@ $('ov').onclick = e=>{ if(e.target === $('ov')) $('ov').classList.remove('show')
 function applyCatName(){
   const c = S.cat || 'Mochi';
   $('catName').textContent = c;
-  $('askLab').textContent = 'Ask ' + c;
+  $('askLabText').textContent = 'Ask ' + c;
 }
 
 /* ---------- boot ---------- */
@@ -1740,6 +1934,7 @@ function applyCatName(){
   applyCatName();
   wkInit();
   renderQuestion();   // paints immediately — nothing is awaited ahead of it
+  updateNet();
   hydrate();          // saved progress catches up on its own
 })();
 
@@ -1766,7 +1961,7 @@ async function hydrate(){
 }
 
 if('serviceWorker' in navigator){
-  window.addEventListener('load', ()=> navigator.serviceWorker.register('sw.js?v=1').catch(()=>{}));
+  window.addEventListener('load', ()=> navigator.serviceWorker.register('sw.js?v=3').catch(()=>{}));
 }
 </script>
 </body>
