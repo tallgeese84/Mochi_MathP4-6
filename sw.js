@@ -1,6 +1,6 @@
 /* Mochi Maths — service worker.
    Bump SHELL when you deploy, and always deploy this file alongside index.html. */
-const SHELL = 'mochi-shell-v5';
+const SHELL = 'mochi-shell-v7';
 const FONTS = 'mochi-fonts-v1';          // separate bucket: code deploys never evict fonts
 const ASSETS = ['./', './index.html', './manifest.webmanifest',
                 './icon-192.png', './icon-512.png', './icon-maskable-512.png'];

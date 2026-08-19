@@ -38,6 +38,13 @@ never calculates.
 
 Switching back to Claude is the same panel; both keys are remembered separately.
 
+## Sound is off by default
+
+Every reply is written out in full in the chat panel under the question, so nothing is
+delivered by voice alone. The speaker button in the top bar turns automatic reading on
+if she wants it; with it off, each reply still carries a small speaker she can tap to
+hear just that one.
+
 ## How to tell which engine is answering
 
 Next to **Ask Mochi** there is a badge, and it reports what actually answered the last
@@ -59,6 +66,33 @@ The grown-ups panel also shows a running count, e.g.
 
 For proof independent of anything this app says, open **platform.openai.com/usage** -
 the requests appear there within a minute or two.
+
+## Which model to pick
+
+This app never asks a model to do the maths. Questions, answers, working and marking are
+all generated and checked in JavaScript. So raw mathematical ability is not the thing to
+select on; what matters is following the tutoring rules, replying fast enough that an
+11-year-old does not drift off, and reading handwriting.
+
+There are two model boxes for that reason:
+
+- **model for talking** - runs many times a session. Pick for speed.
+  `gpt-5.6-terra` or `claude-sonnet-5` to start. If it feels slow, drop to
+  `gpt-5.6-luna` or `claude-haiku-4-5-20251001`.
+- **model for reading handwriting** - runs rarely and is genuinely hard vision work.
+  Leave it on the stronger model. Blank means "same as the talking model".
+
+Skip the flagship tiers (`gpt-5.6-sol`, `claude-opus-5`) and any high reasoning effort.
+The app already sets `reasoning_effort: low` on OpenAI, because a model that has been
+handed the answer and the worked steps has nothing to deliberate about, and deliberating
+is just waiting.
+
+Cost is not the deciding factor at this scale. A tutoring reply is roughly 1,200 input
+and 200 output tokens - well under a dollar a month on Terra at daily practice, and
+pennies on Luna. Choose on how well it explains and how quickly it answers.
+
+The grown-ups panel shows the average reply time per provider, and the **Test** button
+reports how long a single call took, so you can compare rather than guess.
 
 ## Choosing the tutor
 
