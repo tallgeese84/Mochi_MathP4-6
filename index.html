@@ -153,6 +153,7 @@
   .netbadge{display:none;margin-left:7px;padding:2px 8px;border-radius:999px;background:var(--ginger-soft);
     border:1.5px solid var(--ginger);color:var(--ginger-deep);font-size:.58rem;letter-spacing:.6px;}
   .netbadge.show{display:inline-block;}
+  .netbadge.live{display:inline-block;background:var(--jade-soft);border-color:var(--jade);color:#14624A;}
   .asklab{font-family:var(--mono);font-weight:700;font-size:.63rem;letter-spacing:1.3px;
     color:var(--slate);text-transform:uppercase;margin:0 0 11px;}
   .chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:11px;}
@@ -423,6 +424,7 @@
         <button class="btn sm" id="tutorSave">Save</button>
       </div>
       <p class="pnote" id="keyNote"></p>
+      <p class="pnote" id="useNote"></p>
 
       <p class="sect">Progress by topic</p>
       <div class="mast" id="mast"></div>
@@ -1294,11 +1296,29 @@ function offlineReply(kind){
 }
 
 function localSay(text){ say(text,false); addMsg('cat',text); speak(text); }
+function shortName(p){ return PROVIDERS[p].label.split(' ')[0]; }   // 'Claude' / 'ChatGPT'
 function updateNet(){
   const b = $('netBadge'); if(!b) return;
-  const on = netReady();
-  b.textContent = on ? '' : 'offline hints';
-  b.className = 'netbadge' + (on ? '' : ' show');
+  if(USE.last === 'local'){ b.textContent = 'offline hints'; b.className = 'netbadge show'; return; }
+  if(USE.last){ b.textContent = 'via ' + shortName(USE.last) + (LAST.model ? ' \u00b7 ' + LAST.model : '');
+                b.className = 'netbadge live'; return; }
+  if(!netReady()){ b.textContent = 'offline hints'; b.className = 'netbadge show'; return; }
+  b.textContent = shortName(provider()) + ' ready';
+  b.className = 'netbadge live';
+}
+function markSource(local){
+  if(local){ USE.local++; USE.last = 'local'; }
+  else { const p = LAST.p || provider(); USE[p] = (USE[p]||0) + 1; USE.last = p; }
+  updateNet();
+}
+function usageLine(){
+  const bits = [];
+  if(USE.anthropic) bits.push(USE.anthropic + ' from Claude');
+  if(USE.openai)    bits.push(USE.openai + ' from ChatGPT');
+  if(USE.local)     bits.push(USE.local + ' local');
+  if(!bits.length)  return 'No replies yet this session.';
+  return 'This session: ' + bits.join(', ') + '.' +
+    (LAST.model ? ' Last model used: ' + LAST.model + '.' : '');
 }
 window.addEventListener('online',  updateNet);
 window.addEventListener('offline', updateNet);
@@ -1318,6 +1338,9 @@ function modelName(p){
   p = p || provider();
   return String((S.models && S.models[p]) || '').trim() || PROVIDERS[p].defaultModel;
 }
+
+let LAST = {p:null, model:null, at:0};
+const USE = {anthropic:0, openai:0, local:0, last:null};
 
 async function callModel(opts, signal){
   const as = opts.as || {};
@@ -1341,6 +1364,7 @@ async function callModel(opts, signal){
     });
     if(!r.ok) throw new Error('HTTP '+r.status+' '+(await r.text()).slice(0,160));
     const d = await r.json();
+    LAST = {p, model, at:Date.now()};
     return (d.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('\n').trim();
   }
 
@@ -1366,6 +1390,7 @@ async function callModel(opts, signal){
   if(r.status === 400) r = await send('max_tokens');
   if(!r.ok) throw new Error('HTTP '+r.status+' '+(await r.text()).slice(0,160));
   const d = await r.json();
+  LAST = {p, model, at:Date.now()};
   return String((d.choices && d.choices[0] && d.choices[0].message && d.choices[0].message.content) || '').trim();
 }
 
@@ -1439,7 +1464,7 @@ async function askMochi(kind, extra){
   if(busy){ if(queue.length < 3) queue.push({kind, extra}); return; }
   busy = true;
   if(kind === 'free' || kind === 'working') askCount++;
-  if(!netReady()){ localSay(offlineReply(kind)); busy = false; updateNet(); return; }
+  if(!netReady()){ localSay(offlineReply(kind)); busy = false; markSource(true); return; }
   if(kind === 'free' || kind === 'working'){ setCat('curious'); say($('bubbleText').textContent, true); }
 
   const turn = userTurn(kind, extra);
@@ -1458,12 +1483,14 @@ async function askMochi(kind, extra){
     addMsg('cat', text);
     history.push({role:'assistant', content:text});
     speak(text);
+    markSource(false);
   } catch(err){
     const fb = offlineReply(kind);
     say(fb, false);
     addMsg('cat', fb);
     history.pop();
     speak(fb);
+    markSource(true);
   } finally {
     clearTimeout(timer);
     busy = false;
@@ -1766,7 +1793,8 @@ async function wkCheckNow(){
     if(!parsed || !Array.isArray(parsed.lines)) throw new Error('shape');
     WK.lines = parsed.lines.map(l=>String(l));
     if(!WK.lines.length){ $('wkHint').textContent = 'I could not find any working on the page.'; return; }
-    $('wkHint').textContent = 'This is what I read. Tap any line to correct it.';
+    $('wkHint').textContent = 'Read by ' + shortName(LAST.p || provider()) + '. Tap any line to correct it.';
+    markSource(false);
     const result = wkRenderLines();
 
     // offer the value she reached, but never submit it for her
@@ -1947,19 +1975,21 @@ function syncTutorFields(){
   $('keyInput').placeholder = PROVIDERS[p].keyHint;
   $('modelInput').value = (S.models && S.models[p]) || '';
   $('modelInput').placeholder = PROVIDERS[p].defaultModel;
+  if($('useNote')) $('useNote').textContent = usageLine();
   $('keyNote').textContent = apiKey(p)
     ? 'Key saved on this device. ' + PROVIDERS[p].label + ' will answer as ' + (S.cat||'Mochi') + '.'
     : 'No key for ' + PROVIDERS[p].label + ' yet. Questions, marking, bar models and the working page all still run without one.';
 }
-$('provSel').onchange = ()=> syncTutorFields();
+$('provSel').onchange = ()=>{ USE.last = null; LAST = {p:null, model:null, at:0}; syncTutorFields(); updateNet(); };
 $('tutorTest').onclick = ()=> testConnection();
 $('tutorSave').onclick = ()=>{
   const p = $('provSel').value;
   S.provider = p;
   S.keys = S.keys || {}; S.keys[p] = $('keyInput').value.trim();
   S.models = S.models || {}; S.models[p] = $('modelInput').value.trim();
-  save(S); syncTutorFields();
-  $('keyNote').textContent = 'Saved. ' + PROVIDERS[p].label + ' is now the tutor, using ' + modelName(p) + '.';
+  USE.last = null; LAST = {p:null, model:null, at:0};
+  save(S); syncTutorFields(); updateNet();
+  $('keyNote').textContent = 'Saved. ' + PROVIDERS[p].label + ' is now the tutor, using ' + modelName(p) + '. The badge by Ask ' + (S.cat||'Mochi') + ' will confirm it once it answers.';
 };
 $('photoInput').addEventListener('change', e=> handleFile(e.target.files && e.target.files[0]));
 $('photoClear').onclick = async ()=>{
@@ -2014,7 +2044,7 @@ async function hydrate(){
 }
 
 if('serviceWorker' in navigator){
-  window.addEventListener('load', ()=> navigator.serviceWorker.register('sw.js?v=4').catch(()=>{}));
+  window.addEventListener('load', ()=> navigator.serviceWorker.register('sw.js?v=5').catch(()=>{}));
 }
 </script>
 </body>

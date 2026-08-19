@@ -38,6 +38,28 @@ never calculates.
 
 Switching back to Claude is the same panel; both keys are remembered separately.
 
+## How to tell which engine is answering
+
+Next to **Ask Mochi** there is a badge, and it reports what actually answered the last
+reply rather than what is merely configured:
+
+| badge | meaning |
+|---|---|
+| `ChatGPT ready` (green) | a key is saved and it is online, but nothing has answered yet |
+| `via ChatGPT - gpt-5.6` (green) | that reply came from OpenAI, using that model |
+| `via Claude - claude-sonnet-4-6` (green) | that reply came from Anthropic |
+| `offline hints` (orange) | the built-in hint ladder answered, not a model |
+
+If a call fails mid-session the badge drops back to `offline hints` on its own, so a
+silent failure cannot be mistaken for a working tutor. Switching provider clears the
+badge back to `... ready` until the new one has actually answered.
+
+The grown-ups panel also shows a running count, e.g.
+`This session: 1 from Claude, 2 from ChatGPT, 1 local. Last model used: gpt-5.6.`
+
+For proof independent of anything this app says, open **platform.openai.com/usage** -
+the requests appear there within a minute or two.
+
 ## Choosing the tutor
 
 Under the cog you can pick **Claude (Anthropic)** or **ChatGPT (OpenAI)**, paste a key for
