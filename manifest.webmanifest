@@ -1,0 +1,16 @@
+{
+  "name": "Mochi — Maths with Euna",
+  "short_name": "Mochi Maths",
+  "description": "Primary 6 maths practice for the Singapore SPERS-Sec Secondary 1 placement test.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FDF2EC",
+  "theme_color": "#FDF2EC",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
