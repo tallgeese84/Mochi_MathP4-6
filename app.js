@@ -284,7 +284,7 @@ function fracRemainder(){
   const P = pick(PEOPLE);
   return {
     topic:'Fractions', stars:3, prefix:'$',
-    text:`${P.n} had $${total}. ${P.S} spent ${f1[0]}/${f1[1]} of ${P.p} money on a book. ${P.S} then spent ${f2[0]}/${f2[1]} of the remainder on lunch. How much money had ${P.s} left?`,
+    text:`${P.n} had $${total}. ${P.S} spent ${f1[0]}/${f1[1]} of ${P.p} money on a book. ${P.S} then spent ${f2[0]}/${f2[1]} of the remainder on lunch. How much money did ${P.s} have left?`,
     answer:r2(left),
     steps:[
       `Money spent on the book = ${f1[0]}/${f1[1]} × $${total} = $${money(spent1)}.`,
@@ -293,7 +293,7 @@ function fracRemainder(){
       `Money left = $${money(rem)} − $${money(spent2)} = $${money(left)}.`
     ],
     bar:{
-      caption:`The whole bar is $${total}. The book takes ${f1[0]} of ${f1[1]} equal units. The remainder is then cut again for lunch.`,
+      caption:`The whole bar is $${total}. The book takes ${f1[0]} of ${f1[1]} equal units. The remaining amount is then divided into equal parts for the lunch fraction.`,
       segments:[
         {w:f1[0]/f1[1], label:'book', fill:'var(--coral)'},
         {w:(rem-left)/total, label:'lunch', fill:'var(--gold)'},
@@ -321,7 +321,7 @@ function ratioDiff(){
       `Total = ${p+q} units = ${p+q} × ${k} = ${total} stickers.`
     ],
     bar:{
-      caption:`${a} is ${p} units, ${b} is ${q} units. The extra ${p-q} units are worth ${diff} stickers.`,
+      caption:`The number of stickers ${a} has is represented by ${p} units, and the number ${b} has by ${q} units. The extra ${p-q} units are worth ${diff} stickers.`,
       segments:[
         {w:p/(p+q), label:`${a} · ${p}u`, fill:'var(--sky)'},
         {w:q/(p+q), label:`${b} · ${q}u`, fill:'var(--berry)'}
@@ -397,7 +397,7 @@ function speed(){
   };
   if(mode==='distance') return {
     topic:'Speed', stars:2, suffix:'km',
-    text:`${P.n} cycled at an average speed of ${s} km/h for ${t} hours. What distance did ${P.s} cover?`,
+    text:`${P.n} travelled at an average speed of ${s} km/h for ${t} hours. What distance did ${P.s} cover?`,
     answer:d,
     steps:[`Distance = average speed × time.`,
            `= ${s} km/h × ${t} h.`,
@@ -500,9 +500,9 @@ function volume(){
   return {
     topic:'Volume', stars:3, suffix:'litres', fig:FIG.tank(L,W,H,h),
     figDesc:`An open rectangular tank drawn in 3D. The base is ${L} cm by ${W} cm, the tank is ${H} cm tall, and the water inside is marked ${h} cm deep.`,
-    text:`A rectangular tank measuring ${L} cm by ${W} cm by ${H} cm is filled with water to a depth of ${h} cm. Find the volume of water in the tank. Give your answer in litres.`,
+    text:`A rectangular tank with internal dimensions ${L} cm by ${W} cm by ${H} cm is filled with water to a depth of ${h} cm. Find the volume of water in the tank. Give your answer in litres.`,
     answer:r2(litres),
-    steps:[`Volume of water = length × width × depth of water.`,
+    steps:[`Volume of water = length × breadth × depth of water.`,
            `= ${L} × ${W} × ${h} = ${cm3} cm³.`,
            `1 litre = 1000 cm³.`,
            `Volume = ${cm3} ÷ 1000 = ${money(litres)} litres.`]
@@ -520,7 +520,7 @@ function angles(){
     text:`In the figure, PQ is a straight line. Find the value of angle x. (The figure is not drawn to scale.)`,
     answer:x,
     accept:[String(x)+'°'],
-    steps:[`Angle x and the ${b}° angle sit next to each other on the straight line PQ.`,
+    steps:[`Angle x and the ${b}° angle are adjacent on the straight line PQ.`,
            `Angles on a straight line add up to 180°.`,
            `x = 180° − ${b}° = ${x}°.`,
            `(As a check, the third angle inside the triangle is ${inner}°.)`]
@@ -562,7 +562,7 @@ function gapDiff(){
            `Number of children = ${r1+r2} ÷ ${q-p} = ${kids}.`,
            `(Check: ${p} × ${kids} + ${r1} = ${totalSweets} sweets, and ${q} × ${kids} = ${q*kids}, which is ${r2} more than ${totalSweets}.)`],
     bar:{
-      caption:`Two bars of the same length. The top bar gives ${p} each with ${r1} spare; the bottom gives ${q} each and runs ${r2} short.`,
+      caption:`The bar compares the sweets needed for ${q} per child with those available. It shows the sweets for ${p} per child, the ${r1} left over and the shortfall of ${r2}.`,
       segments:[
         {w:(p*kids)/(q*kids), label:`${p} each`, fill:'var(--sky)'},
         {w:r1/(q*kids), label:'spare', fill:'var(--mint)'},
@@ -650,7 +650,7 @@ function percentChange(){
       : `The price of ${item} fell from $${base} to $${after}. Find the percentage decrease.`,
     answer:pct,
     steps:[`The change is $${Math.max(base,after)} − $${Math.min(base,after)} = $${delta}.`,
-           `A percentage change is always measured against the ORIGINAL amount, $${base}.`,
+           `For this change, use the original amount as the reference, $${base}.`,
            `Percentage change = ${delta}/${base} \u00d7 100% = ${pct}%.`]
   };
 },
@@ -665,12 +665,12 @@ function twoLegSpeed(){
   const P = pick(PEOPLE);
   return {
     topic:'Speed', stars:5, suffix:'km/h',
-    text:`${P.n} cycled the first ${d} km of a journey at an average speed of ${s1} km/h. ${P.S} cycled the next ${d} km at an average speed of ${s2} km/h. Find ${P.p} average speed for the whole journey.`,
+    text:`${P.n} travelled the first ${d} km of a journey at an average speed of ${s1} km/h. ${P.S} travelled the next ${d} km at an average speed of ${s2} km/h. Find ${P.p} average speed for the whole journey.`,
     answer:Math.round(avg*100)/100,
     steps:[`Time for the first part = ${d} \u00f7 ${s1} = ${money(d/s1)} h.`,
            `Time for the second part = ${d} \u00f7 ${s2} = ${money(d/s2)} h.`,
            `Total distance = ${2*d} km and total time = ${money(d/s1 + d/s2)} h.`,
-           `Average speed = ${2*d} \u00f7 ${money(d/s1+d/s2)} = ${money(avg)} km/h. (It is not ${money((s1+s2)/2)} km/h \u2014 you cannot average the two speeds.)`]
+           `Average speed = ${2*d} \u00f7 ${money(d/s1+d/s2)} = ${money(avg)} km/h. (It is not ${money((s1+s2)/2)} km/h \u2014 for these equal distances, the times differ, so the average of the two speeds is not the average speed for the journey.)`]
   };
 },
 
@@ -701,7 +701,7 @@ function volumeDepth(){
   return {
     topic:'Volume', stars:4, suffix:'cm', fig:FIG.tank(L,W,H,h,true),
     figDesc:`An open rectangular tank drawn in 3D. The base is ${L} cm by ${W} cm and the tank is ${H} cm tall. The water inside is marked with a question mark for its depth.`,
-    text:`A rectangular tank measuring ${L} cm by ${W} cm by ${H} cm contains ${cm3/1000} litres of water. Find the depth of the water in the tank.`,
+    text:`A rectangular tank with internal dimensions ${L} cm by ${W} cm by ${H} cm contains ${cm3/1000} litres of water. Find the depth of the water in the tank.`,
     answer:h,
     steps:[`${cm3/1000} litres = ${cm3} cm\u00b3.`,
            `The base area of the tank = ${L} \u00d7 ${W} = ${L*W} cm\u00b2.`,
@@ -719,7 +719,7 @@ function parallelogramAngle(){
     text:`ABCD is a parallelogram. Angle ADC = ${a}\u00b0. Find the value of angle x. (The figure is not drawn to scale.)`,
     answer:180-a,
     accept:[String(180-a)+'\u00b0'],
-    steps:[`In a parallelogram, two angles that are next to each other add up to 180\u00b0.`,
+    steps:[`Adjacent angles in a parallelogram add up to 180\u00b0.`,
            `Angle DAB and angle ADC are next to each other along the side AD.`,
            `x = 180\u00b0 \u2212 ${a}\u00b0 = ${180-a}\u00b0.`,
            `(The angle opposite x, angle BCD, is also ${180-a}\u00b0.)`]
@@ -740,8 +740,8 @@ function fractionDivide(){
     text:`${P.n} had ${T} kg of ${stuff[0]}. ${P.S} packed all of it into ${stuff[1]} of ${p}/${q} kg each. How many ${stuff[1]} did ${P.s} pack?`,
     answer:n,
     steps:[`This asks how many lots of ${p}/${q} kg fit into ${T} kg.`,
-           `${T} \u00f7 ${p}/${q} means ${T} \u00d7 ${q}/${p}.`,
-           `= ${T} \u00d7 ${q} \u00f7 ${p} = ${n} ${stuff[1]}.`]
+           `${T} kg contains ${T*q} parts of 1/${q} kg. Each ${stuff[1].slice(0,-1)} contains ${p} of these parts.`,
+           `Number of ${stuff[1]} = ${T} \u00d7 ${q} \u00f7 ${p} = ${n}.`]
   };
 },
 
@@ -782,7 +782,7 @@ function placeValue(){
   const grouped = String(n).replace(/\B(?=(\d{3})+(?!\d))/g,' ');
   return {
     topic:'Whole numbers', stars:1,
-    text:`What does the digit ${ds[pos]} in ${grouped} stand for?`,
+    text:`What is the value of the digit ${ds[pos]} in ${grouped}?`,
     answer:val,
     steps:[`Count the places from the right: ones, tens, hundreds, thousands, ten thousands, hundred thousands.`,
            `The digit ${ds[pos]} sits in the ${['hundred thousands','ten thousands','thousands','hundreds','tens','ones'][pos]} place.`,
@@ -826,11 +826,11 @@ function factorsMultiples(){
   const l = a*b/g(a,b);
   return {
     topic:'Whole numbers', stars:2,
-    text:`What is the smallest number that is a multiple of both ${a} and ${b}?`,
+    text:`What is the smallest positive number that is a multiple of both ${a} and ${b}?`,
     answer:l,
     steps:[`List the multiples of ${a}: ${[1,2,3,4,5].map(k=>a*k).join(', ')}, and so on.`,
            `List the multiples of ${b}: ${[1,2,3,4,5].map(k=>b*k).join(', ')}, and so on.`,
-           `The smallest one in both lists is ${l}.`]
+           `Continue the lists until their first common positive multiple, ${l}.`]
   };
 },
 
@@ -863,10 +863,11 @@ function timeDuration(){
   const t24 = m => String(Math.floor(m/60)).padStart(2,'0') + ' ' + String(m%60).padStart(2,'0');
   return {
     topic:'Time', stars:2, suffix:'minutes',
-    text:`A show started at ${t24(startM)} and ended at ${t24(endM)}. How long did it last, in minutes?`,
+    text:`A show started at ${t24(startM)} and ended at ${t24(endM)}. How long did it last, in minutes? The times use the 24-hour clock.`,
     answer:dur,
-    steps:[`From ${t24(startM)} to ${t24(startM + (60 - startM%60)%60 || startM)} is part of the first hour.`,
-           `Count the whole hours, then add the extra minutes.`,
+    steps:[`Start: ${Math.floor(startM/60)} × 60 + ${startM%60} = ${startM} minutes after midnight.`,
+           `End: ${Math.floor(endM/60)} × 60 + ${endM%60} = ${endM} minutes after midnight.`,
+           `Duration = ${endM} − ${startM} = ${dur} minutes.`,
            `The show lasted ${dur} minutes.`]
   };
 },
@@ -901,7 +902,7 @@ function fracDivWhole(){
   const np = p/k, nq = dq/k;
   return {
     topic:'Fractions', stars:3,
-    text:`Find the value of ${p}/${q} \u00f7 ${n}. Give your answer in its simplest form.`,
+    text:`Find the value of ${p}/${q} \u00f7 ${n}. Give your answer as a fraction.`,
     answer:np/nq, answerLabel:np+'/'+nq, accept:[np+'/'+nq],
     steps:[`Dividing by ${n} is the same as multiplying by 1/${n}.`,
            `${p}/${q} \u00d7 1/${n} = ${p}/${dq}.`,
@@ -1061,7 +1062,7 @@ function averageTable(){
     text:`The average mark of ${n} pupils in a test was ${avg}. ${n-1} of them scored ${others.slice(0,-1).join(', ')} and ${others[others.length-1]} marks. How many marks did the last pupil score?`,
     answer:miss,
     steps:[`Total marks of all ${n} pupils = ${n} \u00d7 ${avg} = ${n*avg}.`,
-           `The ${n-1} known pupils scored ${others.join(' + ')} = ${others.reduce((a,b)=>a+b,0)} marks.`,
+           `The ${n-1} pupils with known scores obtained ${others.join(' + ')} = ${others.reduce((a,b)=>a+b,0)} marks.`,
            `The last pupil scored ${n*avg} \u2212 ${others.reduce((a,b)=>a+b,0)} = ${miss} marks.`]
   };
 },
@@ -1151,7 +1152,7 @@ function waterTransfer(){
   return {
     topic:'Volume', stars:5, suffix:'cm', fig:FIG.tank(L,W,H,d),
     figDesc:`An open rectangular tank X drawn in 3D. Its base is ${L} cm by ${W} cm and it is ${H} cm tall. The water inside is ${d} cm deep.`,
-    text:`Tank X measures ${L} cm by ${W} cm by ${H} cm and holds water to a depth of ${d} cm. Water from tank X is poured into an empty tank Y measuring ${l} cm by ${w} cm by ${h} cm until tank Y is completely full. Find the depth of the water left in tank X.`,
+    text:`Tank X has internal dimensions ${L} cm by ${W} cm by ${H} cm and holds water to a depth of ${d} cm. Water from tank X is poured into an empty tank Y with internal dimensions ${l} cm by ${w} cm by ${h} cm until tank Y is completely full. Find the depth of the water left in tank X.`,
     answer:r,
     steps:[`Water in tank X at first = ${L} \u00d7 ${W} \u00d7 ${d} = ${L*W*d} cm\u00b3.`,
            `Tank Y holds ${l} \u00d7 ${w} \u00d7 ${h} = ${Vy} cm\u00b3 when full.`,
@@ -1166,7 +1167,7 @@ function waterTransfer(){
 /* =========================================================
    STATE
    ========================================================= */
-GEN.push(...MochiBank.generators, ...MochiChallenges.generators);
+GEN.push(...MochiBank.generators, ...MochiChallenges.generators, ...(typeof MochiTransfer!=='undefined'?MochiTransfer.generators:[]));
 const BANK = MochiLearning.catalog(GEN);
 const TOPICS = ['Fractions','Ratio','Percentage','Speed','Rate','Algebra','Circles','Volume','Angles','Average','Whole numbers','Decimals','Measurement','Time','Data','Money','Geometry','Problem solving','Investigation'];
 let S = {
@@ -1919,7 +1920,7 @@ async function askMochi(kind, extra){
 }
 
 function fallbackLine(kind){
-  if(kind==='praise') return "That is correct. Look at the working below and check that your method matches it.";
+  if(kind==='praise') return "That is correct. Explain why your method works. Can you check it in another way?";
   if(kind==='wrong')  return "Not quite. Read the question again and underline what it is asking you to find, then try the first step once more. Tap Show the working when you want to see it.";
   return "Start with the first sentence. What are you told, and what are you asked to find? Tap Draw the model if a picture would help.";
 }
@@ -2477,7 +2478,7 @@ function applyCatName(){
 async function boot(){
   applyCatName();wkInit();paintCoins();
   await hydrate();
-  MochiLearning.init(S);studyInit();if(typeof studioInit==='function')studioInit();renderQuestion();updateNet();
+  MochiLearning.init(S);studyInit();if(typeof studioInit==='function')studioInit();renderQuestion();if(typeof scInit==='function')scInit();updateNet();
 }
 
 /* Storage is a network round-trip. It must never sit in front of a question. */
@@ -2503,5 +2504,5 @@ async function hydrate(){
 }
 
 if('serviceWorker' in navigator){
-  window.addEventListener('load', ()=> navigator.serviceWorker.register('sw.js?v=3.2.0').catch(()=>{}));
+  window.addEventListener('load', ()=> navigator.serviceWorker.register('sw.js?v=4.2.0').catch(()=>{}));
 }

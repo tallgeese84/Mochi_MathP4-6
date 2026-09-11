@@ -1,3 +1,37 @@
+# v4.2.0 — MOE terminology and explanation review
+
+- Review all authored questions, explanations, probes, model observations and tutor
+  instructions against the current official primary syllabuses.
+- Use heat gain/loss for changes of state, gullet and digested food for human
+  systems, and clear primary terminology for circuits, plants and food webs.
+- Label science extensions; correct ice particle spacing and unequal starting
+  temperatures in the fair-test activity and graph.
+- Clarify maths terminology, question constraints, captions and worked reasoning;
+  accept correct alternative wording and methods in tutor guidance.
+- Document sources and limits in docs/MOE_LANGUAGE_REVIEW.md. No MOE approval or
+  guarantee of future AI replies is implied. All 153 automated checks pass.
+
+# v4.1.0 — Illustrated science refresh
+
+- Added original painted organ studies, matching insulated/bare cups and a dynamics cart.
+- Replaced the body flowchart with an illustrated study and readable pathway steps.
+- Gave food-web arrows fixed-size heads and clear gaps around labels. Opposing force
+  arrows occupy separate lanes and share one length scale.
+- Reveal cooling curves and body explanations after a recorded prediction and trial;
+  keep these explanations out of independent checks.
+- Optimised the new art to WebP (about 206 KB combined) and added offline caching.
+
+# v4.0.0 — Maths and science trial
+
+- Added eight illustrated science activity areas with original botanical and pond
+  artwork, checked scientific diagrams, prediction-led trials and a saved notebook.
+- Added 24 science practice questions and 8 reserved independent checks with
+  delayed feedback, assistance/guess tracking, review selection and parent evidence.
+- Integrated subject navigation, stylus notes/transcription, the existing tutor
+  connection and combined learning backups. Preserved all existing maths features.
+- Added eight connected maths problem generators (88 total) and independent checks.
+- 147 tests pass; first browser/device and live-provider trial remains outstanding.
+
 ## 3.2.0 — Reading comfort and Euna’s avatar
 
 - Larger question text (24px on phones, 28px on tablets, up to 30px on desktop at default browser size), smaller topic headings and improved spacing.

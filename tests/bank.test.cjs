@@ -26,7 +26,7 @@ const solve={
  parallelogramAngle(q){return 180-nums(q.text)[0];},
  fractionDivide(q){const [t,a,b]=nums(q.text);return t*b/a;},
  workingBackwards(q){const [a,b,x,y]=nums(q.text);return (x+y)/(1-a/b);},
- placeValue(q){const m=q.text.match(/digit (\d) in ([\d ]+) stand/);const s=m[2].replace(/ /g,'');return +m[1]*10**(s.length-s.indexOf(m[1])-1);},
+ placeValue(q){const m=q.text.match(/digit (\d) in ([\d ]+)/);const s=m[2].replace(/ /g,'');return +m[1]*10**(s.length-s.indexOf(m[1])-1);},
  rounding(q){const n=Number(q.text.match(/Round ([\d ]+) to/)[1].replace(/ /g,'')),p=/thousand/.test(q.text)?1000:/hundred/.test(q.text)?100:10;return Math.floor((n+p/2)/p)*p;},
  factorsMultiples(q){const [a,b]=nums(q.text);if(!b){let count=0;for(let d=1;d<=a;d++)if(a%d===0)count++;return count;}let n=a;while(n%b)n+=a;return n;},
  measureConvert(q){const [n]=nums(q.text);return /in grams|in millilitres/.test(q.text)?n*1000:/in kilometres/.test(q.text)?n/1000:n/100;},
@@ -83,6 +83,14 @@ const solve={
  borderGeneralise(q){const [n]=nums(q.text);let count=0;for(let x=0;x<n;x++)for(let y=0;y<n;y++)if(x===0||y===0||x===n-1||y===n-1)count++;return count;},
  constrainedDigits(q){const digits=nums(q.text).slice(0,4);return Array.from({length:90},(_,i)=>i+10).filter(n=>n%3===0&&Math.floor(n/10)!==n%10&&digits.includes(Math.floor(n/10))&&digits.includes(n%10)).length;},
  closestNumbers(q){const ds=nums(q.text).slice(0,4).sort().join('');let best=100;for(let a=10;a<=99;a++)for(let b=10;b<a;b++)if((String(a)+String(b)).split('').sort().join('')===ds)best=Math.min(best,a-b);return best;},
+ overlappingClubs(q){const [n,m,s,b]=nums(q.text);return n-m-s+b;},
+ averageAfterRemoval(q){const [n,m,a,b]=nums(q.text);return (n*m-a-b)/(n-2);},
+ insideBorder(q){const [w,h,b]=nums(q.text);let count=0;for(let x=0;x<w;x++)for(let y=0;y<h;y++)if(x<b||y<b||x>=w-b||y>=h-b)count++;return count;},
+ ratioWithFixedPart(q){const [a,b,removed,A,B]=nums(q.text);return removed*(a+b)/(b-a*B/A);},
+ submergedObject(q){const [l,w,h]=nums(q.text);return l*w*h;},
+ successiveDiscounts(q){const [a,b,paid]=nums(q.text);return paid/(1-a/100)/(1-b/100);},
+ hiddenRectangle(q){const [p,d]=nums(q.text);for(let w=1;w<p;w++)if(2*(w+w+d)===p)return w*(w+d);},
+ repeatedRemainder(q){const n=nums(q.text);return n.at(-1)/((1-n[0]/n[1])*(1-n[2]/n[3])*.5);},
  evidenceClaim(){return '8 of these 10 friends prefer chess';}
 };
 for(const g of gens)test(`${g.name}: independently solve 100 generated statements and reject wrong answers`,()=>{
