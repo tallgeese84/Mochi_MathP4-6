@@ -61,3 +61,29 @@ test('a late science tutor reply cannot overwrite the next subject view',async()
  const h=studio();h.run("netReady=()=>true;callModel=()=>new Promise(resolve=>globalThis.finishScienceReply=resolve);SCI.view='science';");
  const pending=h.run('scAsk()');h.run("scShow('maths');$('scReply').textContent='A different view';finishScienceReply('Late answer');");await pending;assert.equal(h.nodes.get('scReply').textContent,'A different view');
 });
+
+test('new illustrated explanations remain hidden until a supported trial and in independent checks',()=>{
+ const h=studio();
+ for(const skill of ['body','heat']){
+  h.run(`SCI.skill='${skill}';SCI.state=MochiScience.copy(MochiScience.defaults[SCI.skill]);SCI.shown=false;scPaintVisual();`);
+  const marker=skill==='body'?'class="sc-route"':'class="sc-chart-detail"';
+  assert.equal(h.nodes.get('scVisual').innerHTML.includes(marker),false);
+  h.nodes.get('scPrediction').value='I predict a connection and will test it.';h.run('scTest();');
+  assert.equal(h.nodes.get('scVisual').innerHTML.includes(marker),true);assert.equal(h.run('SCI.helped'),true);
+  h.run("SCI.mode='assessment';SCI.shown=true;scPaintVisual();scTest();");
+  assert.equal(h.nodes.get('scVisual').innerHTML.includes(marker),false);
+  h.run("SCI.mode='practice';");
+ }
+});
+test('cart force arrows use equal scales for opposing forces and stay clear of the painted image',()=>{
+ const h=studio();
+ for(let push=0;push<=8;push++)for(let friction=0;friction<=5;friction++){
+  const html=h.run(`MochiScienceScenes.figure('forces',{push:${push},friction:${friction}},false)`);
+  const arrows=[...html.matchAll(/<path d="M(\d+) (\d+)h(-?\d+)"[^>]*opacity="(\d)"/g)];
+  assert.equal(arrows.length,2);
+  assert.equal(Number(arrows[0][3]),push*22);assert.equal(Number(arrows[1][3]),-friction*22);
+  assert.equal(Number(arrows[0][4]),push?1:0);assert.equal(Number(arrows[1][4]),friction?1:0);
+  assert.ok(Number(arrows[0][2])+7<86);assert.ok(Number(arrows[1][2])-7>266);
+  assert.equal((html.match(/markerUnits="userSpaceOnUse"/g)||[]).length,3);
+ }
+});

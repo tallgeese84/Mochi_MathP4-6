@@ -59,3 +59,20 @@
 @media(max-width:900px){.sc-practice{display:contents}.sc-practice>.sc-question{grid-row:1}.sc-choices{grid-row:3}}
 
 .sc-guess{display:flex;align-items:center;gap:10px;font-size:15px;color:#725c84}.sc-guess input{width:20px;height:20px;accent-color:#8040b8}.science-active #scKeep[hidden]{display:none!important}
+
+/* Painted studies keep labels and exact scientific overlays in their own space. */
+.sc-art-plate{margin:0;overflow:hidden;border-radius:20px;background:#faf7fc}
+.sc-art-plate>img{display:block;width:100%;height:auto;object-fit:contain}
+.sc-heat-plate>img{max-height:260px}.sc-body-plate>img{max-height:330px}
+.sc-art-plate figcaption{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:12px 14px 17px;text-align:center;color:#634777;font-size:16px;line-height:1.45}
+.sc-art-plate figcaption span{min-width:0}.sc-art-plate figcaption strong{display:block;font-size:22px;margin-top:4px;color:#713fa2;font-variant-numeric:tabular-nums}
+.sc-key{display:inline-block;width:10px;height:10px;border-radius:50%;background:#874acf;margin-right:7px}.sc-key-bare{background:#277e8a}
+.sc-chart-detail{margin-top:12px;padding:0 10px}.sc-chart-detail summary{font-size:16px;color:#745783;cursor:pointer;padding:10px 0;min-height:28px}
+.sc-chart-detail>svg{display:block;width:100%;height:auto;max-height:240px}
+.sc-figure-caption{text-align:center;font-size:17px;line-height:1.5;color:#755c86;margin:14px 10px 8px}
+.sc-model-reading{text-align:center;background:#eaddf8;border-radius:14px;padding:12px;font-size:18px;line-height:1.4;margin:10px 8px;color:#603681;font-weight:600}
+.sc-route{padding:8px 16px 6px}.sc-route h3{font-size:20px;line-height:1.4;color:#653494;margin:16px 0}
+.sc-route ol{list-style:none;padding:0;margin:0;counter-reset:route}.sc-route li{position:relative;counter-increment:route;padding:0 0 20px 40px;line-height:1.55}
+.sc-route li::before{content:counter(route);position:absolute;left:0;top:1px;display:grid;place-items:center;width:27px;height:27px;border-radius:50%;background:#e6d4f6;color:#693a93;font-size:14px;font-weight:700}
+.sc-route strong{display:block;font-size:17px;color:#58396b}.sc-route li span{display:block;font-size:16px;color:#765e85;margin-top:4px}
+@media(max-width:540px){.sc-art-plate figcaption{font-size:15px;padding:9px 10px 14px;gap:10px}.sc-heat-plate>img{max-height:220px}.sc-body-plate>img{max-height:260px}.sc-route{padding:3px 12px}.sc-route h3{font-size:19px}.sc-figure-caption{font-size:16px}}

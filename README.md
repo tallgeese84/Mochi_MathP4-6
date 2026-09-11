@@ -5,7 +5,7 @@ Euna for Primary 6 mathematics and her **September 2027 SPERS-Sec1 planning targ
 with a separate enrichment strand for mathematical thinking. The exact 2027 test
 and application dates must be checked when published.
 
-**v4.0.0 — 11 September 2026.** The existing cat, room, handwriting pad, provider
+**v4.1.0 — 11 September 2026.** The existing cat, room, handwriting pad, provider
 settings and saved coins are preserved. Old topic totals are retained as legacy
 accuracy; they are not treated as new evidence of independent learning.
 
@@ -15,7 +15,7 @@ Use the **Maths / Science / Investigate** switch. Science includes eight illustr
 activity areas, 24 authored practice questions and 8 reserved independent checks.
 Predict before recording a model trial; explain the evidence in the notebook.
 Stylus notes, optional transcription and typed explanations share the existing
-family provider connection and backup controls. Original botanical and pond art
+family provider connection and backup controls. Original botanical, pond, anatomy, cup and cart art
 supports the science diagrams; model assumptions appear below each activity.
 
 This is the first testable science set, not complete syllabus or calibrated NUS High
@@ -45,7 +45,7 @@ handwritten working on the selected problem.
 ## The interactive studio
 
 The GUI uses an open question surface, large question typography, purple
-controls, original nature illustrations and quiet cat watermarks. A vertical rail of floating instruments
+controls, original painted science illustrations and quiet cat watermarks. A vertical rail of floating instruments
 moves to the bottom on phones; **Ask Mochi** has a separate floating control.
 The question, answer and current session progress are immediately available.
 
@@ -199,7 +199,7 @@ node --test tests/*.test.cjs
 Tests independently re-solve 100 visible generated statements per generator (8,800
 questions), reject nearby/wrong answers and units, and cover learning, revision,
 retention, migration, backup validation, custom questions, and multi-part marking.
-The full suite currently contains **147 passing tests**, including concept probes,
+The full suite currently contains **149 passing tests**, including concept probes,
 reasoning traces, route adaptation, lab mathematics and focused-session behavior.
 They are code-level tests using a small event/storage adapter, not browser or iPad
 visual tests. Live AI answer quality and handwriting recognition still need a parent

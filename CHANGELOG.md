@@ -1,3 +1,13 @@
+# v4.1.0 — Illustrated science refresh
+
+- Added original painted organ studies, matching insulated/bare cups and a dynamics cart.
+- Replaced the body flowchart with an illustrated study and readable pathway steps.
+- Gave food-web arrows fixed-size heads and clear gaps around labels. Opposing force
+  arrows occupy separate lanes and share one length scale.
+- Reveal cooling curves and body explanations after a recorded prediction and trial;
+  keep these explanations out of independent checks.
+- Optimised the new art to WebP (about 206 KB combined) and added offline caching.
+
 # v4.0.0 — Maths and science trial
 
 - Added eight illustrated science activity areas with original botanical and pond

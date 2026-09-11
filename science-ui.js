@@ -46,7 +46,7 @@ function scChange(key,value){
  scPaintVisual();$('scObservation').textContent='Make a prediction, then test these settings.';
 }
 function scPaintVisual(){
- $('scVisual').innerHTML=MochiScienceScenes.figure(SCI.skill,SCI.state,SCI.shown);
+ $('scVisual').innerHTML=MochiScienceScenes.figure(SCI.skill,SCI.state,SCI.shown,SCI.mode==='assessment');
  for(const b of $('scVisual').querySelectorAll('[data-sc-part]')){b.disabled=SCI.mode==='assessment';b.onclick=()=>{scChange('part',b.dataset.scPart);const select=$('scControls').querySelector('[data-sc-key="part"]');if(select)select.value=b.dataset.scPart;};}
 }
 function scPaint(){

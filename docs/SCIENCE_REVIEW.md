@@ -1,6 +1,6 @@
 # Maths and science trial — 11 September 2026
 
-Version 4.0.0 is a first testable science release in the existing Euna studio.
+Version 4.1.0 is a first testable science release in the existing Euna studio.
 It retains maths, local progress, input modes, tutor configuration, purple styling,
 Euna's avatar and cat watermarks. No claim of complete science syllabus coverage or
 NUS High difficulty calibration is made.
@@ -10,7 +10,7 @@ NUS High difficulty calibration is made.
 - Maths / Science / Investigate navigation preserves the current maths answer.
 - Eight science areas: circuits, shadows, heat and fair tests, plant systems,
   food webs, forces, states of matter, and human body systems.
-- Original generated botanical and pond illustration plates; original SVG
+- Original generated botanical, pond, organ-study, cup and cart illustration plates; original SVG
   scientific diagrams for the models. No emoji substitutes for science diagrams.
 - Touch/keyboard model controls, a prediction before recorded trials, explanations,
   a notebook, stylus notes and optional inspected handwriting transcription.
@@ -72,7 +72,7 @@ through its separate DSA selection process; preparation is not an admission fore
 
 ## Verification and first user trial
 
-147 Node tests pass, including independent calculations from 8,800 generated maths
+149 Node tests pass, including independent calculations from 8,800 generated maths
 statements. Science checks cover circuit continuity, shadow geometry, cooling
 bounds, balanced/opposing forces, authored item integrity, reserved assessment
 exposure, help/guess handling, revision, trial capture, combined data behavior,
@@ -85,3 +85,19 @@ No browser/device or live provider trial has been performed. Suggested first tri
 3. Write with Stylus; return to Keyboard. Check preservation and transcription.
 4. Save an investigation; inspect it in parent settings and back up learning.
 5. Use Independent check when Euna is ready; items cannot be reset as unseen.
+
+## Illustration refresh (4.1.0)
+
+Three additional original generated plates replace or accompany schematic-only
+views. They are illustrations, not photographs or measurements. Anatomy is an
+organ study, not a labelled clinical atlas: accessory organs appear, the upper
+ends of the oesophagus and airway are outside the study, and organ scales differ.
+The cups depict matching geometry and water levels; numerical temperatures come
+from the explicit cooling model. The cart painting supplies context; its force
+arrows use an equal length-per-newton scale in separate, unobstructed lanes.
+
+SVG arrowheads use fixed drawing units so highlighting a path cannot enlarge its
+head into a label. Food-web arrow endpoints clear the node boxes by 16 drawing
+units. Text labels are separate from the painted art. The body pathway explanation
+and cooling curves appear after a recorded trial, which counts as assistance;
+independent checks cannot expose those explanations.
