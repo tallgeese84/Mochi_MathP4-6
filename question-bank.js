@@ -10,11 +10,11 @@ const q=(skill,topic,stars,question,answer,steps,extra={})=>({skill,topic,stars,
 const generators=[
  function fractionSum(){
    const a=pick([2,3,4]),b=pick([5,6,8]),p=ri(1,a-1),r=ri(1,b-1),n=p*b+r*a,d=a*b;
-   return q('fraction','Fractions',2,`Find ${p}/${a} + ${r}/${b}. Give an exact fraction or mixed number.`,n/d,[`Equal-size parts are needed before adding. Use denominator ${d}.`,`${p}/${a} = ${p*b}/${d} and ${r}/${b} = ${r*a}/${d}.`,`Add the numerators: ${n}/${d} = ${fraction(n,d)}. Check whether the sum should exceed 1.`],{answerLabel:fraction(n,d),hint:'Would adding the denominators keep the pieces the same size? Draw the two fractions using one common whole.'});
+   return q('fraction','Fractions',2,`Find ${p}/${a} + ${r}/${b}. Give your answer as a fraction or mixed number.`,n/d,[`Equal-size parts are needed before adding. Use denominator ${d}.`,`${p}/${a} = ${p*b}/${d} and ${r}/${b} = ${r*a}/${d}.`,`Add the numerators: ${n}/${d} = ${fraction(n,d)}. Check whether the sum should exceed 1.`],{answerLabel:fraction(n,d),hint:'Would adding the denominators keep the pieces the same size? Draw the two fractions using one common whole.'});
  },
  function fractionProduct(){
    const p=ri(1,3),a=4,b=pick([3,5,6]),r=ri(1,b-1),n=p*r,d=a*b;
-   return q('fraction','Fractions',2,`A ribbon is ${p}/${a} m long. You use ${r}/${b} of it. How many metres do you use? Give an exact fraction.`,n/d,[`The whole ribbon is ${p}/${a} m, not 1 m.`,`${r}/${b} of ${p}/${a} = ${n}/${d} = ${fraction(n,d)} m.`,`A proper fraction of the ribbon must be shorter than the ribbon.`],{answerLabel:fraction(n,d),suffix:'m',hint:'Draw the ribbon as a bar. Then take only the stated fraction of that bar.'});
+   return q('fraction','Fractions',2,`A ribbon is ${p}/${a} m long. You use ${r}/${b} of it. How many metres do you use? Give your answer as a fraction.`,n/d,[`The whole ribbon is ${p}/${a} m, not 1 m.`,`${r}/${b} of ${p}/${a} = ${n}/${d} = ${fraction(n,d)} m.`,`A proper fraction of the ribbon must be shorter than the ribbon.`],{answerLabel:fraction(n,d),suffix:'m',hint:'Draw the ribbon as a bar. Then take only the stated fraction of that bar.'});
  },
  function fractionCompare(){
    const a=pick([3,4,5,6,8]),b=a+1;
@@ -26,15 +26,15 @@ const generators=[
  },
  function areaTriangle(){
    const b=ri(4,12)*2,h=ri(3,12);
-   return q('area','Geometry',2,`A triangle has base ${b} cm and perpendicular height ${h} cm. Find its area.`,b*h/2,[`A copy of the triangle makes a parallelogram with area ${b} × ${h}.`,`The triangle has half that area: ${b} × ${h} ÷ 2 = ${b*h/2} cm².`],{suffix:'cm²',fig:svg(`<path d="M60 170 L300 170 L140 30 Z"/><path d="M140 30 V170" stroke-dasharray="5 4"/><path d="M140 158 H152 V170"/>${text(180,198,b+' cm')}${text(102,108,h+' cm')}`,'Triangle with perpendicular height marked'),figDesc:`Triangle with base ${b} cm and perpendicular height ${h} cm.`,hint:'Which two dimensions are perpendicular? Why does a triangle use half a matching parallelogram?'});
+   return q('area','Geometry',2,`A triangle has base ${b} cm and perpendicular height ${h} cm. Find its area.`,b*h/2,[`Joining the triangle to a matching copy forms a parallelogram with area ${b} × ${h}.`,`The triangle has half that area: ${b} × ${h} ÷ 2 = ${b*h/2} cm².`],{suffix:'cm²',fig:svg(`<path d="M60 170 L300 170 L140 30 Z"/><path d="M140 30 V170" stroke-dasharray="5 4"/><path d="M140 158 H152 V170"/>${text(180,198,b+' cm')}${text(102,108,h+' cm')}`,'Triangle with perpendicular height marked'),figDesc:`Triangle with base ${b} cm and perpendicular height ${h} cm.`,hint:'Which two dimensions are perpendicular? Why does a triangle use half a matching parallelogram?'});
  },
  function rectanglePerimeter(){
    const w=ri(3,12),l=w+ri(3,9),per=2*(l+w);
-   return q('area','Geometry',2,`A rectangle has perimeter ${per} cm and width ${w} cm. Find its area.`,l*w,[`Half the perimeter is one length plus one width: ${per} ÷ 2 = ${l+w} cm.`,`Length = ${l+w} − ${w} = ${l} cm.`,`Area = ${l} × ${w} = ${l*w} cm².`],{suffix:'cm²',hint:'Sketch and label all four sides. Does the perimeter give you one length or two?'});
+   return q('area','Geometry',2,`A rectangle has perimeter ${per} cm and breadth ${w} cm. Find its area.`,l*w,[`Half the perimeter is one length plus one breadth: ${per} ÷ 2 = ${l+w} cm.`,`Length = ${l+w} − ${w} = ${l} cm.`,`Area = ${l} × ${w} = ${l*w} cm².`],{suffix:'cm²',hint:'Sketch and label all four sides. Does the perimeter give you one length or two?'});
  },
  function compositeArea(){
    const l=ri(8,14),h=ri(7,12),a=ri(2,5),b=ri(2,5);
-   return q('area','Geometry',3,`An L-shaped card is made by removing a ${a} cm by ${b} cm rectangle from the top-right corner of a ${l} cm by ${h} cm rectangle. Find the area left.`,l*h-a*b,[`Area of the whole rectangle = ${l} × ${h} = ${l*h} cm².`,`Area removed = ${a} × ${b} = ${a*b} cm².`,`Area left = ${l*h} − ${a*b} = ${l*h-a*b} cm². Check by splitting the L into two rectangles.`],{suffix:'cm²',fig:svg(`<path d="M50 35 H225 V95 H310 V175 H50 Z"/>${text(175,201,l+' cm')}${text(24,110,h+' cm')}${text(267,80,a+' cm')}${text(325,63,b+' cm')}`,'L-shaped card; lengths are labelled; not to scale'),figDesc:`A ${l} by ${h} rectangle with a ${a} by ${b} corner removed.`,transfer:true,hint:'Would it be easier to find two rectangles inside the L, or subtract the missing corner? Compare the methods.'});
+   return q('area','Geometry',3,`An L-shaped card is made by removing a ${a} cm by ${b} cm rectangle from the top-right corner of a ${l} cm by ${h} cm rectangle. Find the area left.`,l*h-a*b,[`Area of the whole rectangle = ${l} × ${h} = ${l*h} cm².`,`Area removed = ${a} × ${b} = ${a*b} cm².`,`Area left = ${l*h} − ${a*b} = ${l*h-a*b} cm². Check by splitting the L into two rectangles.`],{suffix:'cm²',fig:svg(`<path d="M50 35 H225 V95 H310 V175 H50 Z"/>${text(175,201,l+' cm')}${text(24,110,h+' cm')}${text(267,24,a+' cm')}${text(330,72,b+' cm')}<path d="M225 30 V12 M310 90 V12 M225 16 H310 M317 35 H348 M317 95 H348 M343 35 V95" stroke-width="1"/>`,'L-shaped card; lengths are labelled; not to scale'),figDesc:`A ${l} by ${h} rectangle with a ${a} by ${b} corner removed.`,transfer:true,hint:'Would it be easier to find two rectangles inside the L, or subtract the missing corner? Compare the methods.'});
  },
  function parallelogramArea(){
    const b=ri(5,14),h=ri(3,8),s=h+ri(2,5);
@@ -42,7 +42,7 @@ const generators=[
  },
  function symmetryCount(){
    const shape=pick(['a non-square rectangle','a square','an equilateral triangle']),n={'a non-square rectangle':2,'a square':4,'an equilateral triangle':3}[shape];
-   return q('spatial','Geometry',2,`How many lines of symmetry does ${shape} have? Explain by imagining folds.`,n,[`A symmetry line folds the shape into two matching halves.`,`Count the folds that make all corners and edges match.`,`${shape} has ${n} lines of symmetry.`],{hint:'Would a diagonal fold make every edge match? Try drawing or folding scrap paper.'});
+   return q('spatial','Geometry',2,`How many lines of symmetry does ${shape} have? Explain by imagining folds.`,n,[`A line of symmetry divides a figure into two parts that match exactly when folded along that line.`,`Count the folds that make all corners and edges match.`,`${shape[0].toUpperCase()+shape.slice(1)} has ${n} lines of symmetry.`],{hint:'Would a diagonal fold make every edge match? Try drawing or folding scrap paper.'});
  },
  function cubeNet(){
    const cells=[[1,0,'A'],[0,1,'B'],[1,1,'C'],[2,1,'D'],[1,2,'E'],[1,3,'F']];
@@ -63,7 +63,7 @@ const generators=[
  },
  function multiPartBudget(){
    const tickets=ri(4,8),price=pick([6,8,10]),fare=ri(2,4),paid=100,cost=tickets*price,change=paid-cost-fare;
-   return q('model','Problem solving',3,`A family buys ${tickets} museum tickets at $${price} each and pays $${fare} for parking. They have $${paid}.`,change,[`(a) Ticket cost = ${tickets} × $${price} = $${cost}.`,`(b) Use (a): money left = $${paid} − $${cost} − $${fare} = $${change}.`,`Check: tickets + parking + money left must total $${paid}.`],{parts:[{label:'(a) What is the total ticket cost, in dollars?',answer:cost},{label:'(b) How much money remains after tickets and parking, in dollars?',answer:change}],hint:'Find one subtotal first. What needs to be included when you calculate the remaining money?',transfer:true});
+   return q('model','Problem solving',3,`A family buys ${tickets} museum tickets at $${price} each and pays $${fare} for parking. They have $${paid}.`,change,[`(a) Ticket cost = ${tickets} × $${price} = $${cost}.`,`(b) Use (a): money left = $${paid} − $${cost} − $${fare} = $${change}.`,`Check: ticket cost + parking fee + money left must total $${paid}.`],{parts:[{label:'(a) What is the total ticket cost, in dollars?',answer:cost},{label:'(b) How much money remains after tickets and parking, in dollars?',answer:change}],hint:'Find one subtotal first. What needs to be included when you calculate the remaining money?',transfer:true});
  },
  function algebraRelationship(){
    const n=ri(3,9),extra=ri(2,8),boxes=ri(3,6);
@@ -83,15 +83,15 @@ const generators=[
  },
  function ratioThreeParts(){
    const a=ri(2,5),b=ri(2,6),c=ri(3,7),k=ri(3,12),total=(a+b+c)*k;
-   return q('ratio','Ratio',2,`Red, blue and green beads are in the ratio ${a}:${b}:${c}. There are ${total} beads altogether. How many are blue?`,b*k,[`Total units = ${a} + ${b} + ${c} = ${a+b+c}.`,`One unit = ${total} ÷ ${a+b+c} = ${k} beads.`,`Blue beads = ${b} × ${k} = ${b*k}.`],{hint:'How many equal units does the total represent? Which part of the ratio is blue?'});
+   return q('ratio','Ratio',2,`The numbers of red, blue and green beads are in the ratio ${a}:${b}:${c}. There are ${total} beads altogether. How many are blue?`,b*k,[`Total units = ${a} + ${b} + ${c} = ${a+b+c}.`,`One unit = ${total} ÷ ${a+b+c} = ${k} beads.`,`Blue beads = ${b} × ${k} = ${b*k}.`],{hint:'How many equal units does the total represent? Which part of the ratio is blue?'});
  },
  function fractionByFraction(){
    const a=ri(1,3),b=4,c=ri(1,4),d=5;
-   return q('fraction','Fractions',3,`Calculate ${a}/${b} ÷ ${c}/${d}. Give an exact fraction or mixed number.`,a*d/(b*c),[`Think: how many groups of ${c}/${d} fit in ${a}/${b}?`,`Express both using denominator ${b*d}: ${a*d}/${b*d} and ${c*b}/${b*d}.`,`Divide their counts of equal-size pieces: ${a*d} ÷ ${c*b} = ${fraction(a*d,b*c)}.`],{answerLabel:fraction(a*d,b*c),hint:'Put both amounts into the same-size pieces, then compare how many pieces each contains.'});
+   return q('fraction','Fractions',3,`Calculate ${a}/${b} ÷ ${c}/${d}. Give your answer as a fraction or mixed number.`,a*d/(b*c),[`Think: how many groups of ${c}/${d} fit in ${a}/${b}?`,`Express both using denominator ${b*d}: ${a*d}/${b*d} and ${c*b}/${b*d}.`,`Divide their counts of equal-size pieces: ${a*d} ÷ ${c*b} = ${fraction(a*d,b*c)}.`],{answerLabel:fraction(a*d,b*c),hint:'Put both amounts into the same-size pieces, then compare how many pieces each contains.'});
  },
  function mixedSubtract(){
    const w=ri(3,8),v=ri(1,w-1),a=pick([3,4,5,6]),n=(w-v)*a-1;
-   return q('fraction','Fractions',3,`Calculate ${w} 1/${a} − ${v} 2/${a}. Give an exact fraction or mixed number.`,n/a,[`Rename one whole from the first number: ${w} 1/${a} = ${w-1} ${a+1}/${a}.`,`Subtract whole parts and fractional parts: ${w-v-1} and ${(a+1)-2}/${a}.`,`The result is ${fraction(n,a)}. Add the amount taken away to check.`],{answerLabel:fraction(n,a),hint:'The first fraction is smaller. Can you rename one whole as fractional parts?'});
+   return q('fraction','Fractions',3,`Calculate ${w} 1/${a} − ${v} 2/${a}. Give your answer as a fraction or mixed number.`,n/a,[`Rename one whole from the first number: ${w} 1/${a} = ${w-1} ${a+1}/${a}.`,`Subtract whole parts and fractional parts: ${w-v-1} and ${(a+1)-2}/${a}.`,`The result is ${fraction(n,a)}. Add the amount taken away to check.`],{answerLabel:fraction(n,a),hint:'The first fraction is smaller. Can you rename one whole as fractional parts?'});
  },
  function timeStart(){
    const end=ri(10,17)*60+pick([10,20,30,45]),duration=pick([45,70,85,95]),start=end-duration;
@@ -104,7 +104,7 @@ const generators=[
  },
  function circleComposite(){
    const d=pick([14,28,42]),l=pick([d,d+7,d+14]);
-   return q('circle','Circles',3,`A semicircle is attached outside one side of a rectangle of length ${l} cm and width ${d} cm. The shared side is the semicircle's diameter. Find the perimeter of the combined shape. Take π = 22/7.`,2*l+d+22*d/14,[`The shared diameter lies inside the shape, so do not count it.`,`The outer rectangle edges total ${l} + ${l} + ${d} = ${2*l+d} cm.`,`The curved edge is half a circumference: 22/7 × ${d} ÷ 2 = ${22*d/14} cm.`,`Total perimeter = ${2*l+d+22*d/14} cm.`],{suffix:'cm',hint:'Trace only the OUTSIDE boundary. Is the shared diameter on that boundary?',transfer:true});
+   return q('circle','Circles',3,`A semicircle is attached outside one side of a rectangle of length ${l} cm and breadth ${d} cm. The shared side has length ${d} cm and is the semicircle's diameter. Find the perimeter of the combined shape. Take π = 22/7.`,2*l+d+22*d/14,[`The shared diameter lies inside the shape, so do not count it.`,`The outer rectangle edges total ${l} + ${l} + ${d} = ${2*l+d} cm.`,`The curved edge is half a circumference: 22/7 × ${d} ÷ 2 = ${22*d/14} cm.`,`Total perimeter = ${2*l+d+22*d/14} cm.`],{suffix:'cm',hint:'Trace only the OUTSIDE boundary. Is the shared diameter on that boundary?',transfer:true});
  },
  function cuboidFace(){
    const area=ri(5,20)*5,length=ri(3,12),v=area*length;
@@ -112,7 +112,7 @@ const generators=[
  },
  function cubeEdge(){
    const edge=ri(2,12),v=edge**3;
-   return q('volume','Volume',2,`A cube has volume ${v} cm³. Find the length of one edge, in centimetres.`,edge,[`For a cube, volume = edge × edge × edge.`,`Find a number whose cube is ${v}: ${edge} × ${edge} × ${edge} = ${v}.`,`The edge is ${edge} cm. Use nearby whole-number cubes to test your result.`],{suffix:'cm',hint:'What whole number multiplied by itself three times gives the volume?'});
+   return q('volume','Volume',2,`A cube has volume ${v} cm³. Find the length of one edge, in centimetres.`,edge,[`For a cube, volume = edge × edge × edge.`,`Find a number that gives ${v} when multiplied by itself twice: ${edge} × ${edge} × ${edge} = ${v}.`,`The edge is ${edge} cm. Use nearby whole-number cubes to test your result.`],{suffix:'cm',hint:'Which whole number, used as three equal factors, gives the volume?'});
  },
  function counterexample(){
    const a=ri(3,8);

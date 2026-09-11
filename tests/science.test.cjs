@@ -87,3 +87,53 @@ test('cart force arrows use equal scales for opposing forces and stay clear of t
   assert.equal((html.match(/markerUnits="userSpaceOnUse"/g)||[]).length,3);
  }
 });
+
+
+test('water trials match starting states, heat direction and displayed final states',()=>{
+ const h=studio();
+ const cases=[['melting','solid','Liquid: water',/gains heat.*melts into liquid water/],['freezing','liquid','Solid: ice',/loses heat.*freezes into ice/],['evaporation','liquid','Gas: water vapour',/gains heat.*evaporates.*water vapour/],['condensation','gas','Liquid: water',/loses heat.*condenses into liquid water/]];
+ for(const [process,state,finalLabel,explanation] of cases){
+  h.run(`SCI.skill='matter';SCI.state={state:'${state}',process:'${process}'};SCI.shown=false;scPaintVisual();`);
+  h.nodes.get('scPrediction').value='I predict a change of state when heat is transferred.';h.run('scTest();');
+  assert.match(h.nodes.get('scObservation').textContent,explanation);
+  assert.ok(h.nodes.get('scVisual').innerHTML.includes(finalLabel));
+  assert.equal(h.run('SCI.trials.at(-1).state.state'),state);
+ }
+ h.run("SCI.state={state:'gas',process:'melting'};scTest();");
+ assert.match(h.nodes.get('scObservation').textContent,/start with ice/);
+ assert.ok(h.nodes.get('scVisual').innerHTML.includes('Gas: water vapour'));
+});
+
+test('unequal-temperature question supplies its actual initial conditions to the trial and graph',()=>{
+ const h=studio();h.run("MochiScience.choose=()=>MochiScience.items.find(q=>q.id==='h-evidence');scNew();");
+ assert.match(h.nodes.get('scVisual').innerHTML,/Start: 60°C/);assert.match(h.nodes.get('scVisual').innerHTML,/Start: 80°C/);
+ h.nodes.get('scPrediction').value='The starting temperatures make this an unfair comparison.';h.run('scTest();');
+ assert.equal(h.run('SCI.trials.at(-1).result.bare'),60);assert.equal(h.run('SCI.trials.at(-1).result.wrapped'),80);
+ const chart=h.nodes.get('scVisual').innerHTML;
+ assert.match(chart,/d="M70 168 /);assert.match(chart,/d="M70 106 /);
+ h.run("scChange('minutes',10);scTest();");
+ assert.match(h.nodes.get('scObservation').textContent,/Starting temperatures: bare cup 60°C; wrapped cup 80°C/);
+ assert.ok(h.run('SCI.trials.at(-1).result.bare')<60);assert.ok(h.run('SCI.trials.at(-1).result.wrapped')<80);
+});
+
+test('water particle illustrations preserve particle count and show ice more open than liquid',()=>{
+ const h=studio(),areas={};
+ for(const state of ['solid','liquid','gas']){
+  const html=h.run(`MochiScienceScenes.figure('matter',{state:'${state}',process:'melting'},false)`);
+  const points=[...html.matchAll(/<circle cx="([\d.]+)" cy="([\d.]+)" r="9"/g)].map(m=>[Number(m[1]),Number(m[2])]);
+  assert.equal(points.length,24);
+  const xs=points.map(p=>p[0]),ys=points.map(p=>p[1]);
+  areas[state]=(Math.max(...xs)-Math.min(...xs))*(Math.max(...ys)-Math.min(...ys));
+ }
+ assert.ok(areas.solid>areas.liquid);assert.ok(areas.gas>areas.solid);
+});
+
+test('maths and science tutor requests carry terminology and alternative-wording guidance',async()=>{
+ const h=studio();h.run("studyInit();renderQuestion();netReady=()=>true;globalThis.sentPrompts=[];callModel=async opts=>{sentPrompts.push(opts.system);return 'Explain your reasoning.';};");
+ await h.run("askMochi('free','Please explain this maths problem.')");
+ await h.run('scAsk()');
+ const prompts=JSON.parse(h.run('JSON.stringify(sentPrompts)'));assert.equal(prompts.length,2);
+ assert.match(prompts[0],/equivalent fractions/);assert.match(prompts[0],/Accept correct alternative terminology/);
+ assert.match(prompts[1],/an AI science tutor/);assert.match(prompts[1],/gullet/);assert.match(prompts[1],/accept it as another name/);assert.match(prompts[1],/water vapour loses heat/);
+ assert.match(prompts[1],/not claim|never claim approval/);
+});

@@ -1,3 +1,16 @@
+# v4.2.0 — MOE terminology and explanation review
+
+- Review all authored questions, explanations, probes, model observations and tutor
+  instructions against the current official primary syllabuses.
+- Use heat gain/loss for changes of state, gullet and digested food for human
+  systems, and clear primary terminology for circuits, plants and food webs.
+- Label science extensions; correct ice particle spacing and unequal starting
+  temperatures in the fair-test activity and graph.
+- Clarify maths terminology, question constraints, captions and worked reasoning;
+  accept correct alternative wording and methods in tutor guidance.
+- Document sources and limits in docs/MOE_LANGUAGE_REVIEW.md. No MOE approval or
+  guarantee of future AI replies is implied. All 153 automated checks pass.
+
 # v4.1.0 — Illustrated science refresh
 
 - Added original painted organ studies, matching insulated/bare cups and a dynamics cart.

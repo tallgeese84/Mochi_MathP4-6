@@ -2,6 +2,7 @@
 (function(root){
 'use strict';
 const DAY=86400000;
+const tutorLanguage='Use Singapore primary Mathematics terminology and British English. Prefer average, breadth for rectangles and cuboids, mass in g or kg, volume in cubic units, capacity in litres or millilitres, perimeter, area, numerator, denominator, equivalent fractions and simplest form. Explain each term through its meaning. Distinguish a digit from its value, an expression from an equation, area from perimeter, and a fraction of the original amount from a fraction of the remainder. Define a positive common multiple explicitly. State units and the relevant whole for percentages. Give complete mathematical statements; do not teach tricks such as moving a decimal point without place-value reasoning. Do not claim that testing one value proves an algebraic identity, or that the average of speeds is never valid: it works for equal time intervals. Identify speed and other beyond-primary content as extension work. Accept correct alternative terminology and reasoning; do not mark by a rigid keyword checklist. You are not MOE or SEAB and must not claim their approval, an official marking scheme, or that your wording is the only accepted wording.';
 const skills={
  number:{label:'Number sense & operations',prereq:[],question:'What does each number represent? Estimate before calculating.',resource:'https://www.mathsisfun.com/numbers/index.html'},
  fraction:{label:'Fraction meaning & operations',prereq:['number'],question:'What is the whole? Can you draw equal parts to explain the operation?',resource:'https://www.mathsisfun.com/fractions.html'},
@@ -131,6 +132,6 @@ function restore(input){
  l.benchmarks=(Array.isArray(src.benchmarks)?src.benchmarks:[]).slice(-50).filter(b=>b&&typeof b.name==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(b.date)).map(b=>({name:b.name.slice(0,160),date:b.date,note:String(b.note||'').slice(0,1000),percentile:typeof b.percentile==='number'&&Number.isFinite(b.percentile)&&b.percentile>=0&&b.percentile<=100?b.percentile:null}));
  return l;
 }
-root.MochiLearning={skills,mapping,fresh,init,evidence,record,catalog,choose,start,summary,backup,restore};
+root.MochiLearning={tutorLanguage,skills,mapping,fresh,init,evidence,record,catalog,choose,start,summary,backup,restore};
 if(typeof module!=='undefined') module.exports=root.MochiLearning;
 })(typeof globalThis!=='undefined'?globalThis:this);

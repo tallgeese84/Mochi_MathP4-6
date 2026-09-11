@@ -76,3 +76,5 @@
 .sc-route li::before{content:counter(route);position:absolute;left:0;top:1px;display:grid;place-items:center;width:27px;height:27px;border-radius:50%;background:#e6d4f6;color:#693a93;font-size:14px;font-weight:700}
 .sc-route strong{display:block;font-size:17px;color:#58396b}.sc-route li span{display:block;font-size:16px;color:#765e85;margin-top:4px}
 @media(max-width:540px){.sc-art-plate figcaption{font-size:15px;padding:9px 10px 14px;gap:10px}.sc-heat-plate>img{max-height:220px}.sc-body-plate>img{max-height:260px}.sc-route{padding:3px 12px}.sc-route h3{font-size:19px}.sc-figure-caption{font-size:16px}}
+
+.sc-art-plate figcaption small{display:block;font-size:14px;margin-top:4px;color:#735887}

@@ -26,7 +26,7 @@ const solve={
  parallelogramAngle(q){return 180-nums(q.text)[0];},
  fractionDivide(q){const [t,a,b]=nums(q.text);return t*b/a;},
  workingBackwards(q){const [a,b,x,y]=nums(q.text);return (x+y)/(1-a/b);},
- placeValue(q){const m=q.text.match(/digit (\d) in ([\d ]+) stand/);const s=m[2].replace(/ /g,'');return +m[1]*10**(s.length-s.indexOf(m[1])-1);},
+ placeValue(q){const m=q.text.match(/digit (\d) in ([\d ]+)/);const s=m[2].replace(/ /g,'');return +m[1]*10**(s.length-s.indexOf(m[1])-1);},
  rounding(q){const n=Number(q.text.match(/Round ([\d ]+) to/)[1].replace(/ /g,'')),p=/thousand/.test(q.text)?1000:/hundred/.test(q.text)?100:10;return Math.floor((n+p/2)/p)*p;},
  factorsMultiples(q){const [a,b]=nums(q.text);if(!b){let count=0;for(let d=1;d<=a;d++)if(a%d===0)count++;return count;}let n=a;while(n%b)n+=a;return n;},
  measureConvert(q){const [n]=nums(q.text);return /in grams|in millilitres/.test(q.text)?n*1000:/in kilometres/.test(q.text)?n/1000:n/100;},

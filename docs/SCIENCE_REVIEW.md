@@ -1,6 +1,6 @@
 # Maths and science trial — 11 September 2026
 
-Version 4.1.0 is a first testable science release in the existing Euna studio.
+Version 4.2.0 is a first testable science release in the existing Euna studio.
 It retains maths, local progress, input modes, tutor configuration, purple styling,
 Euna's avatar and cat watermarks. No claim of complete science syllabus coverage or
 NUS High difficulty calibration is made.
@@ -37,9 +37,12 @@ and [parallel circuits](https://openstax.org/books/physics/pages/19-3-parallel-c
 Shadows use a point source, parallel object/screen planes and similar triangles.
 An extended light source and partial shadows are outside this model.
 
-Cooling uses 20 + 60 exp(-k t), with illustrative rates 0.085 and 0.025 per minute.
-Both cups start at 80 degrees Celsius in a fixed 20 degree room. These are generated
-curves, not real measurements or a comparison of named materials. [Heat transfer](https://openstax.org/books/physics/pages/11-2-heat-specific-heat-and-heat-transfer).
+Cooling uses 20 + (starting temperature − 20) exp(-k t), with illustrative rates
+0.085 and 0.025 per minute in a fixed 20 degree room. Both cups normally start at
+80 degrees Celsius. The unequal-temperature question instead supplies 60 degrees
+for the bare cup and 80 for the wrapped cup; its readings and curves use these
+values. These are generated curves, not real measurements or a comparison of
+named materials. [Heat transfer](https://openstax.org/books/physics/pages/11-2-heat-specific-heat-and-heat-transfer).
 
 Forces describe an instant when a 2 kg cart is already moving right. Positive and
 negative net force indicate acceleration, not necessarily the direction of motion.
@@ -59,6 +62,9 @@ primary-school language. The tutor receives model assumptions, question referenc
 predictions, trials and actual learner text. It cannot browse. AI replies discuss
 reasoning but never award science credit. Family provider settings are reused.
 
+The [MOE terminology review](MOE_LANGUAGE_REVIEW.md) records the 4.2.0 source
+review, wording corrections, extension labels and limits on generated tutor text.
+
 ## Remaining educational work
 
 This first science set does not yet cover classification in depth, reproduction,
@@ -72,7 +78,7 @@ through its separate DSA selection process; preparation is not an admission fore
 
 ## Verification and first user trial
 
-149 Node tests pass, including independent calculations from 8,800 generated maths
+153 Node tests pass, including independent calculations from 8,800 generated maths
 statements. Science checks cover circuit continuity, shadow geometry, cooling
 bounds, balanced/opposing forces, authored item integrity, reserved assessment
 exposure, help/guess handling, revision, trial capture, combined data behavior,

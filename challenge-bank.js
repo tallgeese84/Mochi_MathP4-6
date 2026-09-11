@@ -6,11 +6,11 @@ const make=(text,answer,steps,extra={})=>({skill:'inquiry',topic:'Investigation'
 const generators=[
  function parityInvariant(){
    const start=ri(5,25),target=start+ri(1,12),yes=(target-start)%2===0;
-   return make(`Start at ${start}. A move adds 2 or subtracts 4. Can you reach ${target} after any number of moves? Answer Yes or No, and justify it.`,yes?'Yes':'No',[`Both moves change the number by an even amount, so odd/even status stays the same.`,yes?`${target} is ${target-start} more than ${start}. Adding 2 ${(target-start)/2} times reaches it.`:`${start} and ${target} have different odd/even status. No allowed sequence can change that.`,`An invariant explains all possible move sequences, not just the ones you tried.`],{choices:['Yes','No'],hint:'What property does every allowed move preserve?'});
+   return make(`Start at ${start}. A move adds 2 or subtracts 4. Can you reach ${target} after any number of moves? Answer Yes or No, and justify it.`,yes?'Yes':'No',[`Both moves change the number by an even amount, so odd/even status stays the same.`,yes?`${target} is ${target-start} more than ${start}. Adding 2 ${(target-start)/2} times reaches it.`:`${start} and ${target} have different odd/even status. No allowed sequence can change that.`,`A property that stays unchanged is called an invariant. It helps explain all possible sequences of moves, not just the ones you tried.`],{choices:['Yes','No'],hint:'What property does every allowed move preserve?'});
  },
  function reverseDigits(){
    const a=ri(3,9),b=ri(1,a-1),sum=a+b,diff=9*(a-b),answer=a*10+b;
-   return make(`A two-digit number has digit sum ${sum}. It exceeds the number with its digits reversed by ${diff}. Find the original number.`,answer,[`If the tens digit is a and the ones digit is b, reversing changes 10a + b to 10b + a.`,`The difference is 9(a − b), so the digits differ by ${diff} ÷ 9 = ${a-b}.`,`The digits have sum ${sum} and difference ${a-b}, giving ${a} and ${b}. The number is ${answer}.`,`Check: ${answer} − ${10*b+a} = ${diff}, and ${a} + ${b} = ${sum}.`],{hint:'List digit pairs with the required sum. What does swapping a tens digit and ones digit change?'});
+   return make(`A two-digit number has digits whose sum is ${sum}. It exceeds the number with its digits reversed by ${diff}. Find the original number.`,answer,[`If the tens digit is a and the ones digit is b, reversing changes 10a + b to 10b + a.`,`The difference is 9(a − b), so the digits differ by ${diff} ÷ 9 = ${a-b}.`,`The digits have sum ${sum} and difference ${a-b}, giving ${a} and ${b}. The number is ${answer}.`,`Check: ${answer} − ${10*b+a} = ${diff}, and ${a} + ${b} = ${sum}.`],{hint:'List digit pairs with the required sum. What does swapping a tens digit and ones digit change?'});
  },
  function rectanglesInGrid(){
    const w=ri(2,5),h=ri(2,5),answer=w*(w+1)*h*(h+1)/4;let lines='';
@@ -20,7 +20,7 @@ const generators=[
  },
  function guaranteeSocks(){
    const colors=ri(3,5),match=ri(2,4),answer=colors*(match-1)+1;
-   return make(`A drawer contains ${colors} sock colours, with plenty of each. You draw without looking. What is the smallest number of socks that guarantees at least ${match} of one colour?`,answer,[`Think about the worst possible case, not the most likely case.`,`You could draw ${match-1} of each of ${colors} colours without reaching ${match}: ${colors*(match-1)} socks.`,`The next sock must join one of those colours, so ${answer} guarantees the match.`,`The worst-case example also shows that a smaller number does not guarantee it.`],{hint:'What is the largest draw that could still avoid the required match?'});
+   return make(`A drawer contains socks of ${colors} different colours, with at least ${match} socks of each colour. You draw without looking. What is the smallest number of socks that guarantees at least ${match} of one colour?`,answer,[`Think about the worst possible case, not the most likely case.`,`You could draw ${match-1} of each of ${colors} colours without reaching ${match}: ${colors*(match-1)} socks.`,`The next sock must join one of those colours, so ${answer} guarantees the match.`,`The worst-case example also shows that a smaller number does not guarantee it.`],{hint:'What is the largest draw that could still avoid the required match?'});
  },
  function constrainedCoins(){
    const a=ri(4,12),b=ri(3,10),n=a+b,total=20*a+50*b;
