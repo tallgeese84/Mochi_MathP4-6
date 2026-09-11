@@ -1,3 +1,10 @@
+# v4.2.1 — Visible release tracking
+
+- Show a compact version label below the Mochi brand on phones, tablets and desktop.
+- Put the loaded version, release date and change summary at the top of Parent settings.
+- Correct the stale v3.0.0 build label. Generate visible and runtime versions and
+  offline asset URLs from release.json; add a read-only consistency check.
+
 # v4.2.0 — MOE terminology and explanation review
 
 - Review all authored questions, explanations, probes, model observations and tutor

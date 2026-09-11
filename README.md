@@ -5,7 +5,7 @@ Euna for Primary 6 mathematics and her **September 2027 SPERS-Sec1 planning targ
 with a separate enrichment strand for mathematical thinking. The exact 2027 test
 and application dates must be checked when published.
 
-**v4.2.0 — 11 September 2026.** The existing cat, room, handwriting pad, provider
+**v4.2.1 — 11 September 2026.** The existing cat, room, handwriting pad, provider
 settings and saved coins are preserved. Old topic totals are retained as legacy
 accuracy; they are not treated as new evidence of independent learning.
 
@@ -23,6 +23,18 @@ preparation. Read [the science review and trial checklist](docs/SCIENCE_REVIEW.m
 
 Authored wording and tutor instructions have been reviewed against current MOE
 terminology. Read the [terminology review and its limits](docs/MOE_LANGUAGE_REVIEW.md).
+
+## Tracking the published version
+
+The header shows the version loaded on this device. Parent settings show the same
+version, release date and change summary. Refresh while online to load a newer
+published release. The private preview and GitHub Pages can run different releases;
+compare their displayed numbers.
+
+For each release, update `release.json`, run `node scripts/release.cjs`, and commit
+the generated changes together. Run `node scripts/release.cjs --check` before
+publishing to reject inconsistent labels, runtime metadata and offline asset
+versions. Release numbering uses `major.minor.patch`; this UI update is v4.2.1.
 
 ## What to do first
 
