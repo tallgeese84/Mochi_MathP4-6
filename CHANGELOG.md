@@ -1,3 +1,38 @@
+## v2.0.0 — 2026-09-11
+
+- Rebuild the GUI as a minimal maths studio with a focused problem canvas, floating
+  tutor, movable visual lab, clickable learning map and responsive layouts.
+- Add four reasoning stages with revision history, solution-route observations,
+  concept probes and tutor context drawn from the learner’s actual reasoning.
+- Add interactive fractions/number lines, ratio bars, area/perimeter grids and dot
+  patterns; record predictions, experiments and independent checks.
+- Add 8 original challenge generators (80 total), including invariants, exhaustive
+  counting, worst-case guarantees, constrained cases and optimisation.
+- Adapt difficulty to recent independent evidence; use concept probes to guide
+  repair; support focused practice from the map. Skips do not diagnose mistakes.
+- Tighten transfer evidence: new numbers or a review slot alone do not qualify.
+- Keep reasoning and external assessments in validated local learning backups;
+  do not infer percentiles or guarantee top 1% outcomes.
+- Enable browser zoom, reduced-motion preferences, stage keyboard navigation and
+  accessible panel controls; preserve offline practice and the existing cat room.
+- Validate 113 tests, including 8,000 generated questions. Browser/iPad and live
+  provider checks remain outstanding.
+
+## v1.4.0 — 2026-09-11
+
+- Add a personal learning notebook with 17 core skill checks, 19 evidence groups,
+  adaptive daily sessions, spaced review, extension investigations and local backup.
+- Review the original 42 generators and add 30 original question types; align core
+  versus extension routing with MOE's current primary syllabus.
+- Add responsive, evidence-aware tutoring, a plan/confidence/obstacle record,
+  revision after errors, independent verification and resource-evaluation notes.
+- Add typed learner-supplied problems with unverified AI discussion and no marking.
+- Repair unknown-depth answer leakage, percentage-decrease working, mixed-number
+  parsing, loose answer tolerance, misleading working feedback and async races.
+- Preserve old progress as legacy totals, preserve the cat/room and provider setup,
+  and separate static modules for review without adding runtime dependencies.
+- Update offline cache/version handling, standards audit and executable tests.
+
 # Changelog
 
 ## v1.3.0 - 2026-08-19

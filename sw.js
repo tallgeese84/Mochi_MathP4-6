@@ -1,8 +1,8 @@
 /* Mochi Maths — service worker.
    Bump SHELL when you deploy, and always deploy this file alongside index.html. */
-const SHELL = 'mochi-shell-v11';
+const SHELL = 'mochi-shell-v2.0.0';
 const FONTS = 'mochi-fonts-v1';          // separate bucket: code deploys never evict fonts
-const ASSETS = ['./', './index.html', './manifest.webmanifest',
+const ASSETS = ['./', './index.html', './app.js?v=2.0.0', './learning.js?v=2.0.0', './question-bank.js?v=2.0.0', './study-ui.js?v=2.0.0', './tutor.css?v=2.0.0', './challenge-bank.js?v=2.0.0', './reasoning.js?v=2.0.0', './studio.js?v=2.0.0', './studio.css?v=2.0.0', './manifest.webmanifest',
                 './icon-192.png', './icon-512.png', './icon-maskable-512.png', './apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
@@ -13,14 +13,14 @@ self.addEventListener('install', e => {
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(keys.filter(k => k !== SHELL && k !== FONTS).map(k => caches.delete(k))))
+      .then(keys => Promise.all(keys.filter(k => k.startsWith('mochi-') && k !== SHELL && k !== FONTS).map(k => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });
 
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
-  if (url.hostname.endsWith('anthropic.com')) return;      // never cache the API
+  if (['api.anthropic.com','api.openai.com'].includes(url.hostname)) return;      // never cache the API
   if (e.request.method !== 'GET') return;
 
   // Fonts: cache-first, in their own bucket.

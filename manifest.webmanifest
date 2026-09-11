@@ -1,13 +1,12 @@
 {
-  "name": "Mochi \u2014 Maths with Euna",
+  "name": "Mochi \u00b7 Euna\u2019s maths studio",
   "short_name": "Mochi Maths",
-  "description": "Primary 6 maths practice for the Singapore SPERS-Sec Secondary 1 placement test.",
+  "description": "Explore maths, follow your reasoning and learn with an adaptive tutor.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#FDF2EC",
-  "theme_color": "#FDF2EC",
+  "background_color": "#f3f6fc",
+  "theme_color": "#f3f6fc",
   "icons": [
     {
       "src": "icon-192.png",
