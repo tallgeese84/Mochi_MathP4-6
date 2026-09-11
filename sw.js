@@ -1,9 +1,9 @@
 /* Mochi Maths — service worker.
    Bump SHELL when you deploy, and always deploy this file alongside index.html. */
-const SHELL = 'mochi-shell-v3.2.0';
+const SHELL = 'mochi-shell-v4.0.0';
 const FONTS = 'mochi-fonts-v1';          // separate bucket: code deploys never evict fonts
-const ASSETS = ['./', './index.html', './app.js?v=3.2.0', './input-mode.js?v=3.2.0', './learning.js?v=3.2.0', './question-bank.js?v=3.2.0', './study-ui.js?v=3.2.0', './tutor.css?v=3.2.0', './challenge-bank.js?v=3.2.0', './reasoning.js?v=3.2.0', './studio.js?v=3.2.0', './studio.css?v=3.2.0', './manifest.webmanifest?v=3.2.0', './mochi-watermark.webp', './euna-avatar.webp', './favicon.png?v=3.2.0',
-                './icon-192.png?v=3.2.0', './icon-512.png?v=3.2.0', './icon-maskable-512.png?v=3.2.0', './apple-touch-icon.png?v=3.2.0'];
+const ASSETS = ['./science-core.js?v=4.0.0', './science-scenes.js?v=4.0.0', './science-ui.js?v=4.0.0', './science.css?v=4.0.0', './transfer-bank.js?v=4.0.0', './science-plant.webp', './science-pond.webp', './', './index.html', './app.js?v=4.0.0', './input-mode.js?v=4.0.0', './learning.js?v=4.0.0', './question-bank.js?v=4.0.0', './study-ui.js?v=4.0.0', './tutor.css?v=4.0.0', './challenge-bank.js?v=4.0.0', './reasoning.js?v=4.0.0', './studio.js?v=4.0.0', './studio.css?v=4.0.0', './manifest.webmanifest?v=4.0.0', './mochi-watermark.webp', './euna-avatar.webp', './favicon.png?v=4.0.0',
+                './icon-192.png?v=4.0.0', './icon-512.png?v=4.0.0', './icon-maskable-512.png?v=4.0.0', './apple-touch-icon.png?v=4.0.0'];
 
 self.addEventListener('install', e => {
   self.skipWaiting();

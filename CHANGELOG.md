@@ -1,3 +1,14 @@
+# v4.0.0 — Maths and science trial
+
+- Added eight illustrated science activity areas with original botanical and pond
+  artwork, checked scientific diagrams, prediction-led trials and a saved notebook.
+- Added 24 science practice questions and 8 reserved independent checks with
+  delayed feedback, assistance/guess tracking, review selection and parent evidence.
+- Integrated subject navigation, stylus notes/transcription, the existing tutor
+  connection and combined learning backups. Preserved all existing maths features.
+- Added eight connected maths problem generators (88 total) and independent checks.
+- 147 tests pass; first browser/device and live-provider trial remains outstanding.
+
 ## 3.2.0 — Reading comfort and Euna’s avatar
 
 - Larger question text (24px on phones, 28px on tablets, up to 30px on desktop at default browser size), smaller topic headings and improved spacing.

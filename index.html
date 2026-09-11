@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
-<!-- Mochi Maths v3.2.0 — 2026-09-11 -->
+<!-- Mochi Maths v4.0.0 — 2026-09-11 -->
 <title>Mochi · Euna’s maths studio</title>
 <meta name="description" content="A maths studio for Euna: explore, reason, challenge an idea, and learn with Mochi.">
-<link rel="manifest" href="manifest.webmanifest?v=3.2.0">
+<link rel="manifest" href="manifest.webmanifest?v=4.0.0">
 <meta name="theme-color" content="#f7f5fc">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Mochi Maths">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=3.2.0">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon.png?v=3.2.0">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=4.0.0">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon.png?v=4.0.0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" media="print" onload="this.media=&#39;all&#39;"
@@ -313,8 +313,9 @@
   }
   :focus-visible{outline:3px solid var(--ginger);outline-offset:2px;}
 </style>
-<link rel="stylesheet" href="tutor.css?v=3.2.0">
-<link rel="stylesheet" href="studio.css?v=3.2.0">
+<link rel="stylesheet" href="tutor.css?v=4.0.0">
+<link rel="stylesheet" href="studio.css?v=4.0.0">
+<link rel="stylesheet" href="science.css?v=4.0.0">
 </head>
 <body>
 <div class="mochi-watermarks" aria-hidden="true"><img class="watermark-cat cat-right" src="mochi-watermark.webp" alt="" draggable="false"><img class="watermark-cat cat-left" src="mochi-watermark.webp" alt="" draggable="false"></div>
@@ -328,7 +329,7 @@
         <svg class="ph" id="catPh" viewBox="0 0 24 24" aria-hidden="true" style="display:none"><ellipse cx="6" cy="8" rx="2.6" ry="3.4"/><ellipse cx="11.5" cy="5.4" rx="2.7" ry="3.6"/><ellipse cx="17" cy="7.4" rx="2.6" ry="3.4"/><ellipse cx="20.4" cy="12.8" rx="2.2" ry="2.9"/><path d="M12.4 11.4c4 0 6.7 2.7 6.7 5.5 0 2.4-2 3.9-4.4 3.9-1.6 0-2.3-.6-3.7-.6s-2.1.6-3.7.6c-2.4 0-4.4-1.5-4.4-3.9 0-2.8 2.7-5.5 6.7-5.5z"/></svg>
       </div>
     </div>
-    <a class="studio-brand" id="studioHome" href="#qText" aria-label="Mochi maths studio"><strong>mochi<span class="brand-mark" aria-hidden="true">/</span></strong><span class="brand-descriptor">MATHS STUDIO</span></a>
+    <a class="studio-brand" id="studioHome" href="#qText" aria-label="Mochi maths studio"><strong>mochi<span class="brand-mark" aria-hidden="true">/</span></strong><span class="brand-descriptor">MATHS + SCIENCE</span></a>
     <div class="topmeta">
       <b id="catName">Mochi</b>
       <span class="paws" id="paws" aria-label="Streak"></span>
@@ -339,6 +340,7 @@
     <button class="ibtn" id="adultBtn" title="Grown-ups" aria-label="Open parent settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 17h16M8 4v6M16 14v6"/></svg></button>
   </header>
   <progress id="chicProgress" class="session-line" value="0" max="8" aria-label="Session progress"></progress>
+<nav class="subject-switch" aria-label="Choose a subject"><button id="subjectMaths" type="button" aria-pressed="true">Maths</button><button id="subjectScience" type="button" aria-pressed="false">Science</button><button id="subjectInvestigate" type="button" aria-pressed="false">Investigate</button></nav>
   <main id="viewMaths" class="studio-grid">
 
   <section class="card problem-card" id="problemCard" aria-label="Current maths problem">
@@ -421,6 +423,36 @@ For example: 24 ÷ 3 = 8"></textarea>
   </section>
 
   <div class="session-finish" id="sessionFinish" hidden><span class="overline">SESSION COMPLETE</span><h2>What idea will you take with you?</h2><p id="sessionFinishText"></p><button id="finishInsight" class="btn">Keep one insight</button><button id="finishMap" class="btn quiet">See my learning map</button></div>
+  </main>
+
+
+  <main id="viewScience" hidden aria-label="Science studio">
+    <div class="sc-top"><div><span class="overline" id="scViewLabel">SCIENCE</span><h1 id="scTitle">Electric circuits</h1><p id="scProgress"></p></div><div class="sc-selectors"><label>Topic<select id="scTopic" aria-label="Science topic"></select></label><label id="scModeLabel">Session<select id="scMode"><option value="practice">Practice</option><option value="assessment">Independent check</option></select></label></div></div>
+    <div class="sc-grid">
+      <section class="sc-lab" aria-label="Interactive science illustration">
+        <div id="scVisual" class="sc-visual"></div>
+        <div class="sc-lab-bottom"><label class="sc-field" id="scPredictionField" for="scPrediction">My prediction<textarea id="scPrediction" rows="2" maxlength="1000" placeholder="If I change… I expect… because…"></textarea></label></div>
+        <fieldset id="scControls" class="sc-controls" aria-label="Experiment controls"></fieldset>
+        <div class="sc-lab-bottom"><button class="btn" id="scRun">Test my prediction</button><p class="sc-observation" id="scObservation" role="status" aria-live="polite"></p></div>
+      </section>
+      <section class="sc-compose" aria-label="My science reasoning">
+        <div id="scPractice" class="sc-practice"><p id="scQuestion" class="sc-question"></p><div id="scChoices" class="sc-choices" role="group" aria-label="Answer choices"></div></div>
+        <div id="scInquiry" class="sc-inquiry" hidden><p id="scInquiryQuestion" class="sc-question"></p><p id="scInquiryTask" class="sc-inquiry-task"></p></div>
+        <div class="sc-methods"><span>Work your way</span><div role="group" aria-label="Science input method"><button id="scKeyboard" aria-pressed="true">Keyboard</button><button id="scStylus" aria-pressed="false">Stylus</button></div></div>
+        <div id="scInk" class="sc-ink" hidden><canvas id="scCanvas" class="sc-canvas" aria-label="Draw your science diagram or write your explanation"></canvas><div class="sc-ink-tools"><button id="scUndo">Undo</button><button id="scClear">Clear ink</button><label><input id="scPenOnly" type="checkbox">Pen only</label><button id="scRead">Read my notes</button></div><div id="scReadProposal" hidden><label class="sc-field">Check this transcription<textarea id="scReadResult" rows="3" maxlength="2500"></textarea></label><button id="scUseRead" class="btn quiet">Add to my explanation</button></div></div>
+        <label class="sc-field" for="scExplanation">My explanation<textarea id="scExplanation" rows="3" maxlength="2500" placeholder="The evidence suggests… because… I could check this by…"></textarea></label>
+        <label class="sc-guess" id="scGuessLabel"><input id="scGuess" type="checkbox"> I guessed this answer</label>
+        <div class="sc-actions" id="scAnswerActions"><button id="scCheck" class="btn">Check my answer</button><button id="scNext" class="btn quiet" hidden>Next question</button><button id="scKeep" class="btn quiet">Save investigation</button></div>
+        <p class="sc-feedback" id="scFeedback" role="status" aria-live="polite"></p>
+        <button id="scConcept" class="text-button">Explain the idea</button>
+        <details id="scHelp" class="sc-help"><summary>Discuss with Mochi</summary><textarea id="scChatInput" rows="2" maxlength="1500" aria-label="Ask Mochi about this science activity" placeholder="Ask about a step, a prediction or your explanation…"></textarea><button id="scAsk" class="btn quiet">Ask Mochi</button><p id="scReply" class="sc-reply" role="status" aria-live="polite"></p></details>
+        <div id="scAssessmentResults" class="sc-results" hidden></div>
+      </section>
+    </div>
+    <details class="sc-details" id="scTrialArea"><summary>My experiment notebook</summary><ol id="scTrials" class="sc-trials"></ol><p>Change one variable at a time when testing its effect. A simulation shows what its model predicts; use real observations to test the model.</p></details>
+    <details class="sc-details"><summary>About this model</summary><p id="scAssumptions"></p></details>
+    <details class="sc-details sc-source" id="scSourceArea"><summary>Find, explain, verify</summary><p id="scSearchPhrase"></p><p><a id="scSource" target="_blank" rel="noopener noreferrer">Explore a related resource together</a></p><p>Some linked references are written for older learners: ask an adult to help select a useful section. Who produced it? What evidence does it give? Explain one idea in your own words, then test whether it fits this question. Mochi cannot browse the page for you.</p></details>
+    <details class="sc-details"><summary>My science learning</summary><ul id="scEvidence" class="sc-evidence"></ul><p>Independent choices are recorded separately from supported answers. Explanations need review. This first set samples eight areas; it is not a complete science syllabus or an admissions prediction.</p></details>
   </main>
 
   <main id="viewMap" hidden>
@@ -534,7 +566,7 @@ For example: 24 ÷ 3 = 8"></textarea>
 </div><details class="solution-menu"><summary>Hints &amp; next steps</summary><div class="menu-actions"><button class="btn quiet" id="modelBtn">Draw the model</button><button class="btn quiet" id="workingBtn">Show the working</button><button class="btn quiet" id="skipBtn">Save for later</button></div></details>
 <div class="more-footer"><button id="tabRoom" class="text-button">Mochi’s room ↗</button><span class="coinchip" id="coinChip">✦ <b class="cn" id="coinCount">0</b></span><label class="voice-control">Voice     <button class="ibtn off" id="voiceBtn" title="Silent" aria-label="Toggle voice">&#128263;</button></label></div>    <p id="studyQuestionNote" class="study-note"></p>    <span class="netbadge" id="netBadge"></span></section>
   <aside class="focus-panel coach-card" role="dialog" hidden tabindex="-1" id="coachCard" aria-label="Mochi tutor">
-    <div class="coach-head"><img src="icon-192.png?v=3.2.0" alt="" width="48" height="48"><div><h2>Mochi</h2><span>Your thinking partner</span></div><button id="coachClose" class="icon-button" aria-label="Close tutor">×</button></div>
+    <div class="coach-head"><img src="icon-192.png?v=4.0.0" alt="" width="48" height="48"><div><h2>Mochi</h2><span>Your thinking partner</span></div><button id="coachClose" class="icon-button" aria-label="Close tutor">×</button></div>
     <details class="panel-reference"><summary>See the problem</summary><p id="coachQuestion"></p></details><div class="coach-move"><span class="overline">ONE NEXT STEP</span><h3 id="moveTitle">Follow your idea</h3><p id="movePrompt">Show me where your thinking starts.</p></div>
     <div class="thread" id="thread" role="log" aria-live="polite" aria-label="Conversation"></div>
     <div class="chips">
@@ -552,7 +584,7 @@ For example: 24 ÷ 3 = 8"></textarea>
     <p class="coach-footnote" id="coachConnection">Local hints · connect an AI tutor in parent settings</p>
   </aside>
 <button id="focusBackdrop" class="focus-backdrop" aria-label="Close open panel" tabindex="-1" hidden></button>
-<nav class="floating-dock instrument-rail" id="focusDock" aria-label="Studio navigation"><button id="tabMaths" class="dock-item on" aria-label="Practice" aria-controls="viewMaths" aria-current="page"><span class="dock-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="3"/><path d="M9 8h6M9 12h6M9 16h3"/></svg></span><span class="dock-label">Practice</span></button><button id="focusThink" class="dock-item " aria-label="Think" aria-controls="thinkPanel" aria-expanded="false"><span class="dock-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5 4 4M4 20l4-1 12-12a2.8 2.8 0 0 0-4-4L4 15v5Z"/></svg></span><span class="dock-label">Think</span></button><button id="tabTools" class="dock-item " aria-label="Explore" aria-controls="visualLab" aria-expanded="false"><span class="dock-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h5v18H5zM14 3h5v5h-5zM14 12h5v9h-5zM5 8h5M5 13h5"/></svg></span><span class="dock-label">Explore</span></button><button id="tabMap" class="dock-item " aria-label="My map" aria-controls="viewMap" ><span class="dock-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="18" r="2.5"/><circle cx="19" cy="18" r="2.5"/><path d="m11 7-5 9m7-9 5 9M8 18h8"/></svg></span><span class="dock-label">My map</span></button><button id="focusMore" class="dock-item " aria-label="More" aria-controls="morePanel" aria-expanded="false"><span class="dock-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg></span><span class="dock-label">More</span></button><button id="coachFloat" class="tutor-orb" aria-label="Ask Mochi" aria-controls="coachCard" aria-expanded="false"><span class="tutor-avatar"><img src="icon-192.png?v=3.2.0" alt="" width="44" height="44"></span><span class="tutor-orb-label">Ask Mochi</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4V5Z"/><path d="M8 9h8M8 12h5"/></svg></button></nav>
+<nav class="floating-dock instrument-rail" id="focusDock" aria-label="Studio navigation"><button id="tabMaths" class="dock-item on" aria-label="Practice" aria-controls="viewMaths" aria-current="page"><span class="dock-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="3"/><path d="M9 8h6M9 12h6M9 16h3"/></svg></span><span class="dock-label">Practice</span></button><button id="focusThink" class="dock-item " aria-label="Think" aria-controls="thinkPanel" aria-expanded="false"><span class="dock-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5 4 4M4 20l4-1 12-12a2.8 2.8 0 0 0-4-4L4 15v5Z"/></svg></span><span class="dock-label">Think</span></button><button id="tabTools" class="dock-item " aria-label="Explore" aria-controls="visualLab" aria-expanded="false"><span class="dock-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h5v18H5zM14 3h5v5h-5zM14 12h5v9h-5zM5 8h5M5 13h5"/></svg></span><span class="dock-label">Explore</span></button><button id="tabMap" class="dock-item " aria-label="My map" aria-controls="viewMap" ><span class="dock-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="18" r="2.5"/><circle cx="19" cy="18" r="2.5"/><path d="m11 7-5 9m7-9 5 9M8 18h8"/></svg></span><span class="dock-label">My map</span></button><button id="focusMore" class="dock-item " aria-label="More" aria-controls="morePanel" aria-expanded="false"><span class="dock-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg></span><span class="dock-label">More</span></button><button id="coachFloat" class="tutor-orb" aria-label="Ask Mochi" aria-controls="coachCard" aria-expanded="false"><span class="tutor-avatar"><img src="icon-192.png?v=4.0.0" alt="" width="44" height="44"></span><span class="tutor-orb-label">Ask Mochi</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4V5Z"/><path d="M8 9h8M8 12h5"/></svg></button></nav>
 
 <section id="visualLab" class="visual-lab focus-panel" role="dialog" aria-label="Floating visual maths lab" hidden tabindex="-1">
   <div class="lab-head" id="labHandle"><div><span class="overline">EXPLORE A RELATIONSHIP</span><h2>Visual lab</h2></div><div><button id="labResetPosition" class="icon-button" aria-label="Reset panel position">↺</button><button id="labClose" class="icon-button" aria-label="Close visual lab">×</button></div></div>
@@ -621,8 +653,8 @@ For example: 24 ÷ 3 = 8"></textarea>
       <p class="sect">Learning evidence & target</p>
       <label class="study-field" for="goalMonth">Target month <input id="goalMonth" type="month" value="2027-09"></label>
       <button class="btn quiet" id="goalSave">Save target</button>
-      <p class="study-note">September 2027 is a planning target, not a confirmed test date. NUS High uses a separate DSA route that starts earlier; English and science preparation are outside this maths app.</p>
-      <div id="parentEvidence"></div>
+      <p class="study-note">September 2027 is a planning target, not a confirmed test date. NUS High uses a separate DSA route that starts earlier; English needs separate preparation. Science now has its own starting set and learning evidence.</p>
+      <div id="parentEvidence"></div><details class="study-details"><summary>Science learning and investigations</summary><div id="parentScience"></div></details>
       <div class="study-actions"><button class="btn quiet" id="exportLearning">Back up learning</button><label class="filebtn">Restore backup<input id="importLearning" type="file" accept="application/json,.json" hidden></label></div>
       <p id="backupStatus" class="study-status" role="status">Progress stays on this device. Back it up to move devices; backups contain learning notes, never API keys.</p>
       <details class="study-details"><summary>Standards & preparation plan</summary><div id="standardsPlan"></div></details>
@@ -649,13 +681,17 @@ For example: 24 ÷ 3 = 8"></textarea>
   </div>
 </div>
 
-<script src="reasoning.js?v=3.2.0"></script>
-<script src="learning.js?v=3.2.0"></script>
-<script src="question-bank.js?v=3.2.0"></script>
-<script src="challenge-bank.js?v=3.2.0"></script>
-<script src="app.js?v=3.2.0"></script>
-<script src="input-mode.js?v=3.2.0"></script>
-<script src="study-ui.js?v=3.2.0"></script>
-<script src="studio.js?v=3.2.0"></script>
+<script src="reasoning.js?v=4.0.0"></script>
+<script src="learning.js?v=4.0.0"></script>
+<script src="question-bank.js?v=4.0.0"></script>
+<script src="challenge-bank.js?v=4.0.0"></script>
+<script src="transfer-bank.js?v=4.0.0"></script>
+<script src="app.js?v=4.0.0"></script>
+<script src="input-mode.js?v=4.0.0"></script>
+<script src="study-ui.js?v=4.0.0"></script>
+<script src="science-core.js?v=4.0.0"></script>
+<script src="science-scenes.js?v=4.0.0"></script>
+<script src="science-ui.js?v=4.0.0"></script>
+<script src="studio.js?v=4.0.0"></script>
 </body>
 </html>

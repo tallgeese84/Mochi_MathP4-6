@@ -1,13 +1,25 @@
-# Mochi · Euna’s maths studio
+# Mochi · Euna’s maths and science studio
 
 An offline-capable family maths app with optional conversational AI. It prepares
 Euna for Primary 6 mathematics and her **September 2027 SPERS-Sec1 planning target**,
 with a separate enrichment strand for mathematical thinking. The exact 2027 test
 and application dates must be checked when published.
 
-**v3.0.0 — 11 September 2026.** The existing cat, room, handwriting pad, provider
+**v4.0.0 — 11 September 2026.** The existing cat, room, handwriting pad, provider
 settings and saved coins are preserved. Old topic totals are retained as legacy
 accuracy; they are not treated as new evidence of independent learning.
+
+## New science trial
+
+Use the **Maths / Science / Investigate** switch. Science includes eight illustrated
+activity areas, 24 authored practice questions and 8 reserved independent checks.
+Predict before recording a model trial; explain the evidence in the notebook.
+Stylus notes, optional transcription and typed explanations share the existing
+family provider connection and backup controls. Original botanical and pond art
+supports the science diagrams; model assumptions appear below each activity.
+
+This is the first testable science set, not complete syllabus or calibrated NUS High
+preparation. Read [the science review and trial checklist](docs/SCIENCE_REVIEW.md).
 
 ## What to do first
 
@@ -32,8 +44,8 @@ handwritten working on the selected problem.
 
 ## The interactive studio
 
-The GUI uses an open question surface, oversized topic typography, graphite
-controls and an electric citron accent. A vertical rail of floating instruments
+The GUI uses an open question surface, large question typography, purple
+controls, original nature illustrations and quiet cat watermarks. A vertical rail of floating instruments
 moves to the bottom on phones; **Ask Mochi** has a separate floating control.
 The question, answer and current session progress are immediately available.
 
@@ -63,8 +75,8 @@ Read the [design, adaptation and evaluation notes](docs/STUDIO_REVIEW.md).
 
 ## Learning and tutoring
 
-The bank has **80 generators**: the original 42 reviewed and repaired, plus 30
-primary/reasoning question types and 8 further investigations. Across 19 skill groups, 17 are core and two are extension.
+The bank has **88 generators**: the original 42 reviewed and repaired, plus 30
+primary/reasoning question types 8 further investigations, and 8 connected-problem generators. Across 19 skill groups, 17 are core and two are extension.
 Some individual geometry tasks also carry an extension tag. See the full
 [standards and question audit](docs/CURRICULUM_REVIEW.md).
 
@@ -125,7 +137,7 @@ page. Notes and pasted problems are treated as untrusted learning material.
 
 The 10-question fluency session is **not a full SPERS mock**, and the investigations
 are **not official NUS High questions**. The app cannot assign PSLE ALs, predict
-admission, or replace English, science, written paper practice and teacher review.
+admission, or replace English, comprehensive science study, written paper practice and teacher review.
 
 ## Running and updating
 
@@ -134,7 +146,9 @@ chosen release branch. Keep these files together:
 
 - `index.html`, `app.js`, `learning.js`, `question-bank.js`, `study-ui.js`, `tutor.css`
 - `reasoning.js`, `challenge-bank.js`, `studio.js`, `studio.css`
-- `sw.js`, `manifest.webmanifest` and the existing icons
+- `science-core.js`, `science-scenes.js`, `science-ui.js`, `science.css`, `transfer-bank.js`
+- `science-plant.webp`, `science-pond.webp`, `euna-avatar.webp`, `mochi-watermark.webp`
+- `input-mode.js`, `sw.js`, `manifest.webmanifest` and all app icons
 
 Do not deploy only `index.html`: the JavaScript has been extracted into modules to
 make future review and testing manageable. Bump both script/style query versions
@@ -182,10 +196,10 @@ No runtime dependencies or package installation are required. Node 22+ can run:
 node --test tests/*.test.cjs
 ```
 
-Tests independently re-solve 100 visible generated statements per generator (8,000
+Tests independently re-solve 100 visible generated statements per generator (8,800
 questions), reject nearby/wrong answers and units, and cover learning, revision,
 retention, migration, backup validation, custom questions, and multi-part marking.
-The full suite currently contains **118 passing tests**, including concept probes,
+The full suite currently contains **147 passing tests**, including concept probes,
 reasoning traces, route adaptation, lab mathematics and focused-session behavior.
 They are code-level tests using a small event/storage adapter, not browser or iPad
 visual tests. Live AI answer quality and handwriting recognition still need a parent

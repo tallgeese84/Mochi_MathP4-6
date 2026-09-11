@@ -1166,7 +1166,7 @@ function waterTransfer(){
 /* =========================================================
    STATE
    ========================================================= */
-GEN.push(...MochiBank.generators, ...MochiChallenges.generators);
+GEN.push(...MochiBank.generators, ...MochiChallenges.generators, ...(typeof MochiTransfer!=='undefined'?MochiTransfer.generators:[]));
 const BANK = MochiLearning.catalog(GEN);
 const TOPICS = ['Fractions','Ratio','Percentage','Speed','Rate','Algebra','Circles','Volume','Angles','Average','Whole numbers','Decimals','Measurement','Time','Data','Money','Geometry','Problem solving','Investigation'];
 let S = {
@@ -2477,7 +2477,7 @@ function applyCatName(){
 async function boot(){
   applyCatName();wkInit();paintCoins();
   await hydrate();
-  MochiLearning.init(S);studyInit();if(typeof studioInit==='function')studioInit();renderQuestion();updateNet();
+  MochiLearning.init(S);studyInit();if(typeof studioInit==='function')studioInit();renderQuestion();if(typeof scInit==='function')scInit();updateNet();
 }
 
 /* Storage is a network round-trip. It must never sit in front of a question. */
@@ -2503,5 +2503,5 @@ async function hydrate(){
 }
 
 if('serviceWorker' in navigator){
-  window.addEventListener('load', ()=> navigator.serviceWorker.register('sw.js?v=3.2.0').catch(()=>{}));
+  window.addEventListener('load', ()=> navigator.serviceWorker.register('sw.js?v=4.0.0').catch(()=>{}));
 }

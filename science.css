@@ -1,0 +1,61 @@
+/* A shared, spacious maths and science studio. */
+.subject-switch{display:flex;justify-content:center;gap:5px;padding:6px;background:#eee5f8;border:1px solid #e2d4f3;border-radius:22px;width:max-content;max-width:calc(100% - 32px);margin:22px auto 0}
+.subject-switch button{font:inherit;font-size:16px;font-weight:650;padding:12px 22px;border:0;border-radius:17px;background:transparent;color:#6b577f;cursor:pointer}
+.subject-switch button[aria-pressed=true]{background:#fff;color:#7537b1;box-shadow:0 3px 14px #4e247113}
+.science-active #focusDock,.science-active #coachFloat,.science-active #focusSession,.science-active #chicProgress{display:none!important}
+.science-active #viewMaths{display:none!important}
+#viewScience[hidden]{display:none!important}
+#viewScience{width:min(1240px,calc(100% - 64px));margin:30px auto 100px;color:#352442}
+.sc-top{display:flex;align-items:flex-end;justify-content:space-between;gap:22px;margin-bottom:24px}
+.sc-top h1{font-size:clamp(28px,3vw,40px);line-height:1.16;letter-spacing:-.035em;color:#653198;margin:8px 0}
+.sc-top p{font-size:14px;margin:8px 0;color:#796887}
+.sc-selectors{display:flex;gap:12px;flex-wrap:wrap}
+.sc-selectors label{display:flex;flex-direction:column;gap:6px;font-size:14px;color:#735c83}
+.sc-selectors select,.sc-controls select{background:#fff;border:1px solid #dfd1eb;border-radius:13px;font:inherit;font-size:16px;color:#4c355e;padding:11px 14px;max-width:100%}
+.sc-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:36px;align-items:start}
+.sc-lab{background:linear-gradient(145deg,#faf7ff,#f0e5fc);border:1px solid #e4d5ef;border-radius:28px;overflow:hidden;min-width:0;box-shadow:0 16px 55px #4c24620a}
+.sc-visual{padding:14px;min-height:300px;display:flex;flex-direction:column;justify-content:center;overflow:hidden}
+.sc-visual>svg{width:100%;height:auto;display:block;overflow:visible}
+.sc-controls{display:grid;grid-template-columns:1fr 1fr;gap:18px;border:0;border-top:1px solid #e1d2ef;margin:0;padding:24px}
+.sc-controls>label{font-size:15px;display:flex;flex-direction:column;gap:10px;min-width:0;line-height:1.4}
+.sc-controls label.sc-toggle{flex-direction:row;align-items:center;gap:10px}
+.sc-controls input[type=checkbox]{width:22px;height:22px;accent-color:#8847c5;flex-shrink:0}
+.sc-controls input[type=range]{width:100%;height:28px;accent-color:#8850c3;margin:0;cursor:pointer}
+.sc-controls output{font-weight:650;color:#693c90}
+.sc-controls:disabled{opacity:.55}
+.sc-lab-bottom{padding:0 24px 22px}.sc-lab-bottom>button{width:100%}
+.sc-observation{font-size:17px;line-height:1.55;margin:18px 0 0;color:#593d6b;min-height:2em}
+.sc-botanical{position:relative;width:min(100%,340px);margin:0 auto}.sc-botanical img{width:100%;height:auto;display:block;border-radius:20px}
+.sc-hotspot{position:absolute;transform:translate(-50%,-50%);border:1px solid #8051b4;border-radius:20px;background:#fffffff0;color:#633593;box-shadow:0 3px 15px #40205433;font:inherit;font-size:15px;font-weight:650;padding:8px 13px;cursor:pointer;min-height:40px}
+.sc-hotspot.selected{background:#8042ba;color:#fff}.sc-hotspot:disabled{cursor:default}
+.sc-pond{display:block;width:100%;height:auto;border-radius:20px}.sc-pond+svg{max-height:210px}
+.sc-compose{padding:8px 0;min-width:0}.sc-question{font-size:clamp(23px,2.2vw,28px);line-height:1.5;letter-spacing:-.02em;font-weight:550;margin:0 0 24px;color:#372242}
+.sc-choices{display:flex;flex-direction:column;gap:10px;margin:20px 0}
+.sc-choice{background:#ffffffbb;border:1px solid #ddcde8;padding:16px 19px;border-radius:17px;text-align:left;color:#50365f;font:inherit;font-size:18px;line-height:1.5;cursor:pointer;min-height:56px}
+.sc-choice:hover{border-color:#9a6bc4;background:#faf4ff}.sc-choice[aria-pressed=true]{background:#eee0fc;border:2px solid #8546b7;padding:15px 18px;color:#552586}
+.sc-field{display:flex;flex-direction:column;gap:9px;font-size:16px;font-weight:600;margin:20px 0;color:#684d7a}
+.sc-field textarea,.sc-help textarea{width:100%;box-sizing:border-box;font:inherit;font-size:17px;font-weight:400;line-height:1.55;background:#ffffffb8;border:1px solid #ddcce9;border-radius:17px;padding:14px 16px;resize:vertical;color:#3d2949}
+.sc-actions{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}.sc-actions>.btn{min-height:48px;font-size:16px}
+.sc-methods{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:15px;color:#735987;margin-top:24px}
+.sc-methods div{display:flex;border:1px solid #ded0eb;background:#f3ebfa;border-radius:15px;padding:4px;gap:3px}
+.sc-methods button{border:0;border-radius:11px;padding:9px 13px;font:inherit;background:none;color:#725c84;cursor:pointer}
+.sc-methods button[aria-pressed=true]{background:#fff;box-shadow:0 2px 7px #59397815;color:#7336a4}
+.sc-canvas{width:100%;aspect-ratio:1/.52;display:block;background:#fff;border:1px solid #dbcae7;border-radius:15px;touch-action:none}
+.sc-ink{margin:15px 0}.sc-ink-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:14px;margin:10px 0}.sc-ink-tools button{border:1px solid #decee9;border-radius:10px;padding:9px 12px;background:white;color:#65477a;font:inherit;cursor:pointer}
+.sc-ink-tools label{display:flex;gap:6px;align-items:center}.sc-ink-tools input{accent-color:#8546b7}
+.sc-help{margin-top:24px;border-top:1px solid #dfd0e8;padding-top:18px}.sc-help summary,.sc-details summary{font-size:17px;font-weight:600;cursor:pointer;padding:8px 0;min-height:30px}
+.sc-help textarea{margin:12px 0}.sc-reply{font-size:17px;line-height:1.6;white-space:pre-wrap;color:#533e64}
+.sc-feedback{font-size:17px;line-height:1.6;color:#623783;border-radius:16px;background:#f1e7fa;padding:0}.sc-feedback:not(:empty){padding:16px}
+.sc-details{margin-top:20px;font-size:16px;line-height:1.6;color:#735f83}.sc-details p{margin:10px 0}.sc-details a{color:#7330ae}
+.sc-evidence{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0;margin:12px 0}.sc-evidence li{display:flex;flex-direction:column;gap:5px;padding:14px;background:#ffffffa6;border-radius:14px;font-size:15px}.sc-evidence span{font-size:14px;color:#80678f}
+.sc-results{background:#f2e8fb;padding:24px;border-radius:22px;margin:22px 0;font-size:17px;line-height:1.6}.sc-results h2{font-size:27px}.sc-results summary{padding:12px 0;cursor:pointer}
+.sc-trials{padding-left:22px;font-size:15px;line-height:1.55;max-height:250px;overflow:auto}.sc-trials li{margin:8px 0}.sc-source p{font-size:15px;line-height:1.6}
+.sc-inquiry-task{font-size:18px;line-height:1.65;margin:0 0 20px;color:#725282}
+.science-active .studio-grid{display:none}.science-active #viewScience{display:block}
+@media(max-width:900px){#viewScience{width:calc(100% - 40px);margin-top:24px}.sc-top{align-items:flex-start;flex-direction:column;gap:14px}.sc-selectors{width:100%}.sc-selectors label{flex:1;min-width:120px}.sc-grid{grid-template-columns:1fr;gap:26px}.sc-compose{display:contents}.sc-lab{grid-row:2}.sc-question{font-size:24px}.sc-practice{grid-row:1}.sc-inquiry{grid-row:1}.sc-botanical{max-width:280px}.sc-visual{min-height:230px}.sc-field{margin:12px 0}.sc-methods{margin-top:8px}.sc-help{margin-top:10px}.sc-choices{margin:15px 0}.sc-lab-bottom{padding-bottom:18px}}
+@media(max-width:540px){#viewScience{width:calc(100% - 32px);margin-bottom:40px}.subject-switch{margin-top:16px}.subject-switch button{padding:11px 17px;font-size:16px}.sc-top h1{font-size:30px}.sc-controls{padding:18px;gap:15px}.sc-visual{padding:8px}.sc-lab{border-radius:23px}.sc-lab-bottom{padding:0 18px 20px}.sc-choice{font-size:18px}.sc-actions>.btn{flex:1}.sc-evidence{grid-template-columns:1fr}.sc-grid{gap:20px}.sc-selectors select{width:100%}.sc-methods{font-size:14px}.sc-pond+svg{max-height:none}}
+@media(prefers-reduced-motion:reduce){#viewScience *{scroll-behavior:auto!important}}
+
+@media(max-width:900px){.sc-practice{display:contents}.sc-practice>.sc-question{grid-row:1}.sc-choices{grid-row:3}}
+
+.sc-guess{display:flex;align-items:center;gap:10px;font-size:15px;color:#725c84}.sc-guess input{width:20px;height:20px;accent-color:#8040b8}.science-active #scKeep[hidden]{display:none!important}
