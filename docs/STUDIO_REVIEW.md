@@ -1,14 +1,15 @@
 # Euna’s maths studio — design and teaching review
 
-Version 2.0.0, 11 September 2026. This completes the GUI redesign requested after
+Version 2.1.0, 11 September 2026. This completes the GUI redesign requested after
 the first curriculum review. It includes the previous 1.4.0 improvements, which
 were not yet published to the repository.
 
 ## Experience
 
-The first screen is a working maths surface. A compact session strip sits above
-the problem, with a tutor beside it on wide screens. The main canvas has four
-editable stages: Understand, Connect, Solve and Verify. They are a way to expose
+The first screen is one question sheet with an answer field. A floating icon dock
+opens one panel at a time; session settings live behind Euna’s header button.
+The question remains beside the panel on wide screens, with a collapsible question
+reference inside panels on smaller screens. Think contains four editable stages: Understand, Connect, Solve and Verify. They are a way to expose
 thinking, not a compulsory sequence or a scored checklist. Euna can move backwards
 and revise any stage; earlier submitted edits remain in a bounded revision history.
 The sketch pad is available when useful rather than occupying the entire screen.
@@ -104,7 +105,7 @@ No validated method can promise that this app alone will make Euna a top 1% pupi
 
 ## Verification and remaining validation
 
-113 tests pass. The question tests independently solve 100 visible statements from
+118 tests pass. The question tests independently solve 100 visible statements from
 each of 80 generator families (8,000 questions), with checks for wrong answers.
 Additional tests cover learning, numerical marking, revisions, retention, backups,
 stale provider replies, reasoning traces, concept-probe routing, focused practice,

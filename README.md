@@ -5,21 +5,21 @@ Euna for Primary 6 mathematics and her **September 2027 SPERS-Sec1 planning targ
 with a separate enrichment strand for mathematical thinking. The exact 2027 test
 and application dates must be checked when published.
 
-**v2.0.0 — 11 September 2026.** The existing cat, room, handwriting pad, provider
+**v2.1.0 — 11 September 2026.** The existing cat, room, handwriting pad, provider
 settings and saved coins are preserved. Old topic totals are retained as legacy
 accuracy; they are not treated as new evidence of independent learning.
 
 ## What to do first
 
-1. Open Practice and choose **Discover my starting point**. It samples 17 core skill
+1. Tap **Euna** in the header and choose **Discover my starting point**. It samples 17 core skill
    groups. Break the first look into several sittings if needed. One question per
    group is a starting sample, not a diagnosis or an exam prediction.
-2. Use **My daily practice** for an eight-question session: a warm-up, adaptive
+2. Choose **My daily practice** from that session panel for an eight-question session: a warm-up, adaptive
    foundation/practice questions, delayed review when due, transfer and an
    investigation. Aim for about 20–25 minutes, with understanding setting the pace.
 3. Ask Mochi about the exact step that is unclear. A wrong answer stays open for
    revision. **Show the working** remains available; needing an explanation is fine.
-4. Write a plan and a brief insight. Use **Find a tool, then test it** to learn how
+4. Write a plan and a brief insight. Use **More → Explore a resource** to learn how
    to look up a concept, explain it without copying, and verify it independently.
 5. Once a week, open the grown-ups panel together. Discuss an example of an error,
    a repaired method and an independent solution. Back up learning regularly.
@@ -32,9 +32,12 @@ handwritten working on the selected problem.
 
 ## The interactive studio
 
-The GUI is redesigned around a focused problem canvas, a sticky tutor on wide
-screens and a floating tutor control on smaller screens. Cool white surfaces,
-ink typography, cobalt accents and subtle motion replace the old stacked layout.
+The first screen shows one question and an answer field. A floating icon dock
+opens Practice, Think, Explore, Mochi, My map and More. Reasoning, sketching,
+tutoring and session controls appear in one panel at a time. Warm white surfaces,
+soft green accents, generous spacing and subtle icon motion keep the screen calm.
+On larger screens the question stays beside the open panel; small screens include
+a “See the problem” reference. Tap Euna in the header to change the session.
 The existing cat and room remain part of the app. Zoom is enabled, controls work
 with keyboard/touch, and reduced-motion preferences disable animations.
 
@@ -179,7 +182,7 @@ node --test tests/*.test.cjs
 Tests independently re-solve 100 visible generated statements per generator (8,000
 questions), reject nearby/wrong answers and units, and cover learning, revision,
 retention, migration, backup validation, custom questions, and multi-part marking.
-The full suite currently contains **113 passing tests**, including concept probes,
+The full suite currently contains **118 passing tests**, including concept probes,
 reasoning traces, route adaptation, lab mathematics and focused-session behavior.
 They are code-level tests using a small event/storage adapter, not browser or iPad
 visual tests. Live AI answer quality and handwriting recognition still need a parent

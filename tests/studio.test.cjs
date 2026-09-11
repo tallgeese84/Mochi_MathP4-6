@@ -80,3 +80,34 @@ test('a completed session ends on the learning map instead of silently generatin
  assert.equal(h.run('learning().session.finished'),true);
  const epoch=h.run('questionEpoch');h.run("$('nextBtn').onclick();");assert.equal(h.run('questionEpoch'),epoch);assert.equal(h.run('studioView'),'map');
 });
+
+test('focus layout starts closed and switches one panel at a time without losing reasoning',()=>{
+ const h=studio();assert.equal(h.run('focusPanel'),null);
+ assert.equal(h.run('FOCUS_PANELS.every(id=>$(id).hidden)'),true);
+ h.run("focusOpen('thinkPanel');$('studyPlan').value='I will compare equal-size parts.';studioTutor();");
+ assert.equal(h.run('focusPanel'),'coachCard');assert.equal(h.run("$('thinkPanel').hidden"),true);
+ assert.equal(h.run('studyAttempt.trace.understand'),'I will compare equal-size parts.');
+ h.run("focusOpen('thinkPanel');");assert.equal(h.run("$('studyPlan').value"),'I will compare equal-size parts.');
+ assert.equal(h.run('FOCUS_PANELS.filter(id=>!$(id).hidden).length'),1);
+});
+test('closing a panel restores its opener and releases the small-screen question surface',()=>{
+ const h=studio();h.run("window.innerWidth=390;let focusRestored=false;$('focusThink').focus=()=>{focusRestored=true;};focusOpen('thinkPanel',$('focusThink'));");
+ assert.equal(h.run("$('studioSurface').inert"),true);
+ h.run('focusClose();');assert.equal(h.run('focusRestored'),true);assert.equal(h.run("$('studioSurface').inert"),false);assert.equal(h.run("$('focusBackdrop').hidden"),true);
+});
+test('own thinking is independent work, while reopening a resource records support',()=>{
+ const h=studio();h.run("focusOpen('thinkPanel');focusClose();");assert.equal(h.run('studyAttempt.model'),false);assert.equal(h.run('studyAttempt.hints'),0);
+ h.run("$('resourceDetails').open=true;$('focusResources').onclick();");assert.equal(h.run('studyAttempt.hints'),1);
+ assert.equal(h.run('focusPanel'),'resourcePanel');
+ h.run('studioOpenLab();');assert.equal(h.run('studyAttempt.model'),true);assert.equal(h.run("$('resourcePanel').hidden"),true);
+});
+test('new questions close old tools and reflect shortcut opens the thinking panel after solving',()=>{
+ const h=studio();h.run("studioOpenLab();renderQuestion();");assert.equal(h.run('focusPanel'),null);
+ h.run("$('answerInput').value=String(current.answer);submit();");
+ assert.equal(h.run('settled'),true);assert.match(h.run("$('focusQuestionMore').textContent"),/Reflect/);
+ h.run("$('focusQuestionMore').onclick();");assert.equal(h.run('focusPanel'),'thinkPanel');
+});
+test('restoring UI wiring does not stack the session-start wrapper',()=>{
+ const h=studio();h.run("studioInit();studioInit();$('focusSession').onclick();$('studyMode').value='daily';$('studyStart').onclick();");
+ assert.equal(h.run('focusPanel'),null);assert.equal(h.run('learning().session.done'),0);assert.equal(h.run('learning().session.mode'),'daily');
+});

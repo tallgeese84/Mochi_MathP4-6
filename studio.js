@@ -33,6 +33,7 @@ function studioStageGo(stage,focus=false){
 }
 function studioShow(which){
  if(which==='tools'){studioOpenLab();return;}
+ focusClose(false);
  studioView=which;
  $('viewMap').hidden=which!=='map';
  $('viewMaths').style.display=which==='maths'?'':'none';
@@ -45,9 +46,9 @@ function studioShow(which){
  if(which==='maths')requestAnimationFrame(()=>{wkResize();wkRedraw();});
 }
 function studioTutor(open=true){
- if(open){studioTutorReturn=document.activeElement;if(studioView!=='maths')studioShow('maths');}
- document.body.classList.toggle('coach-open',open);$('coachFloat').setAttribute('aria-expanded',String(open));
- if(open)$('chatInput').focus();else studioTutorReturn?.focus?.();
+ if(!open){focusClose();return;}
+ if(studioView!=='maths')studioShow('maths');
+ focusOpen('coachCard');$('chatInput').focus();
 }
 function studioAsk(text){
  if(!current)return;studioCapture();studioTutor(true);addMsg('kid',text);askMochi('free',text);
@@ -61,10 +62,18 @@ function studioPaint(){
  const conn=netReady()?'Live AI tutor connected':keyReady()?'Offline · local hints available':'Local hints · connect an AI tutor in parent settings';
  $('coachConnection').textContent=conn;
  const s=l.session;$('sessionFinish').hidden=!s?.finished;
+ $('focusQuestionMore').textContent=settled||revealed?'Reflect on my method ↗':'Need a way in? ↗';
+ $('focusQuestionMore').setAttribute('aria-controls',settled||revealed?'thinkPanel':'morePanel');
+ FOCUS_TRIGGERS.focusQuestionMore=settled||revealed?'thinkPanel':'morePanel';
+ for(const id of ['thinkQuestion','coachQuestion','labQuestionRef'])$(id).textContent=current.text;
+ $('focusProgress').textContent=(s?.done||0)+' / '+(s?.total||8);
+ $('focusSession').setAttribute('aria-label','Euna’s practice: '+(s?.done||0)+' of '+(s?.total||8)+' questions. Open session settings.');
+ $('focusContext').textContent=current.custom?'Your own problem · check Mochi’s explanation together.':current.stretch?'Reasoning investigation · explore, explain, test.':'No calculator. Find your own way in.';
  $('nextBtn').textContent=s?.finished?'Finish session':'Next question';
  if(s?.finished){const recent=l.attempts.filter(a=>a.at>=s.started);$('sessionFinishText').textContent=recent.filter(a=>a.independent).length+' independent solutions; '+recent.filter(a=>!a.independent).length+' ideas to revisit. A useful insight matters more than a perfect session.';}
 }
 function studioNewQuestion(){
+ focusClose(false,false);
  studioStage='understand';studyAttempt.trace=MochiReasoning.cleanTrace();studyAttempt.route='unsure';studyAttempt.reasoningHistory=[];studyAttempt.working=[];studyAttempt.probe=null;studyAttempt.toolNotes='';
  studyAttempt.transfer=MochiReasoning.transferEvidence(learning(),current,currentGen?.name,currentSkill());
  $('probeCard').hidden=true;$('probeStart').disabled=false;$('probeFeedback').textContent='';
@@ -119,11 +128,10 @@ function studioMap(){
  $('insightGallery').innerHTML=notes.length?notes.map(n=>'<article class="insight"><small>'+new Date(n.at).toLocaleDateString('en-SG')+'</small><p>'+studyEscape(n.text)+'</p><details><summary>Related problem</summary><p>'+studyEscape(n.question)+'</p></details></article>').join(''):'<p>Your saved reflections and discoveries will appear here.</p>';
 }
 function studioOpenLab(){
- studioLabReturn=document.activeElement;
  if(studyAttempt&&!settled)studyAttempt.model=true;
- $('visualLab').hidden=false;$('labLaunch').setAttribute('aria-expanded','true');studioRenderLab();$('visualLab').focus();
+ focusOpen('visualLab');studioRenderLab();
 }
-function studioCloseLab(){ $('visualLab').hidden=true;$('labLaunch').setAttribute('aria-expanded','false');studioLabReturn?.focus?.(); }
+function studioCloseLab(){focusClose();}
 function studioSlider(id,label,value,min,max){return '<label for="'+id+'">'+label+' <output id="'+id+'Value">'+value+'</output><input type="range" id="'+id+'" min="'+min+'" max="'+max+'" step="1" value="'+value+'"></label>';}
 function studioRenderLab(){
  const t=studioLab.tool,c=$('labControls');
@@ -198,13 +206,68 @@ function studioInit(){
  $('labHandle').onpointermove=e=>{if(!drag)return;const el=$('visualLab'),r=el.getBoundingClientRect();Object.assign(el.style,{left:Math.max(12,Math.min(window.innerWidth-r.width-12,e.clientX-drag.x))+'px',top:Math.max(12,Math.min(window.innerHeight-80,e.clientY-drag.y))+'px',right:'auto',bottom:'auto'});};
  $('labHandle').onpointerup=$('labHandle').onpointercancel=()=>{drag=null;};
  window.addEventListener('resize',()=>{if(window.innerWidth<781)$('labResetPosition').onclick();});
- document.addEventListener('keydown',e=>{if(e.key==='Tab'&&$('ov').classList.contains('show')){const targets=[...$('ov').querySelectorAll('button,input,select,textarea,a[href],summary')].filter(x=>!x.disabled&&x.getClientRects().length);const first=targets[0],last=targets[targets.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}}if(e.key==='Escape'){if($('ov').classList.contains('show')){$('ovClose').click();return;}if(!$('visualLab').hidden)studioCloseLab();else if(document.body.classList.contains('coach-open'))studioTutor(false);}});
- $('finishMap').onclick=()=>studioShow('map');$('finishInsight').onclick=()=>{$('studyReflection').hidden=false;$('reflectionText').focus();};
+ document.addEventListener('keydown',e=>{if(e.key==='Tab'&&$('ov').classList.contains('show')){const targets=[...$('ov').querySelectorAll('button,input,select,textarea,a[href],summary')].filter(x=>!x.disabled&&x.getClientRects().length);const first=targets[0],last=targets[targets.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}}if(e.key==='Escape'){if($('ov').classList.contains('show')){$('ovClose').click();return;}if(focusPanel)focusClose();}});
+ $('finishMap').onclick=()=>studioShow('map');$('finishInsight').onclick=()=>{focusOpen('thinkPanel');$('studyReflection').hidden=false;$('reflectionText').focus();};
  $('benchmarkSave').onclick=()=>{
    const name=$('benchmarkName').value.trim(),date=$('benchmarkDate').value,note=$('benchmarkNote').value.trim(),raw=$('benchmarkPercentile').value;
    const percentile=raw===''?null:Number(raw);
    if(!name||!/^\d{4}-\d{2}-\d{2}$/.test(date)||!note||percentile!==null&&(!Number.isFinite(percentile)||percentile<0||percentile>100)){$('benchmarkStatus').textContent='Add a title/source, date and feedback. Leave percentile blank unless the assessment supplies it.';return;}
    const l=learning();l.benchmarks=l.benchmarks||[];l.benchmarks.push({name:name.slice(0,160),date,note:note.slice(0,1000),percentile});l.benchmarks=l.benchmarks.slice(-50);save(S);studioBenchmarks();$('benchmarkStatus').textContent='Assessment saved. It does not change app mastery.';
  };
+ focusInit();
+}
+let focusPanel=null,focusReturn=null;
+const FOCUS_PANELS=['thinkPanel','sessionPanel','resourcePanel','morePanel','coachCard','visualLab'];
+const FOCUS_TRIGGERS={focusThink:'thinkPanel',focusSession:'sessionPanel',focusMore:'morePanel',focusQuestionMore:'morePanel',coachFloat:'coachCard',tabTools:'visualLab',labLaunch:'visualLab'};
+function focusClose(restore=true,capture=true){
+ if(capture&&studyAttempt){studioCapture();if(studyAttempt.tries)studyCommit(false);}
+ for(const id of FOCUS_PANELS)$(id).hidden=true;
+ for(const id of Object.keys(FOCUS_TRIGGERS))$(id).setAttribute('aria-expanded','false');
+ $('focusBackdrop').hidden=true;$('studioSurface').inert=false;
+ document.body.classList.remove('has-focus-panel','coach-open');focusPanel=null;
+ const returnTarget=focusReturn;focusReturn=null;if(restore)returnTarget?.focus?.();
+}
+function focusOpen(id,opener){
+ if(!FOCUS_PANELS.includes(id))return;
+ const returnTo=opener||focusReturn||document.activeElement||$('focusMore');
+ focusClose(false);focusReturn=returnTo;focusPanel=id;
+ $(id).hidden=false;$('focusBackdrop').hidden=false;
+ document.body.classList.add('has-focus-panel');document.body.classList.toggle('coach-open',id==='coachCard');
+ // These are nonmodal dialogs: desktop learners can keep working on the question;
+ // the floating navigation remains usable at every width.
+ $('studioSurface').inert=window.innerWidth<1200;
+ for(const [trigger,panel] of Object.entries(FOCUS_TRIGGERS))$(trigger).setAttribute('aria-expanded',String(panel===id));
+ $(id).focus();
+ if(id==='thinkPanel')requestAnimationFrame(()=>{wkResize();wkRedraw();});
+}
+function focusToggle(id,opener){if(focusPanel===id)focusClose();else focusOpen(id,opener);}
+function focusInit(){
+ $('focusThink').onclick=()=>focusToggle('thinkPanel',$('focusThink'));
+ $('focusSession').onclick=()=>focusToggle('sessionPanel',$('focusSession'));
+ $('focusMore').onclick=()=>focusToggle('morePanel',$('focusMore'));
+ $('focusQuestionMore').onclick=()=>focusToggle(settled||revealed?'thinkPanel':'morePanel',$('focusQuestionMore'));
+ $('coachFloat').onclick=()=>{if(focusPanel==='coachCard')focusClose();else{focusReturn=$('coachFloat');studioTutor();}};
+ $('tabTools').onclick=()=>{if(focusPanel==='visualLab')focusClose();else{focusReturn=$('tabTools');studioOpenLab();}};
+ $('focusBackdrop').onclick=()=>focusClose();
+ for(const id of ['thinkClose','sessionClose','resourceClose','moreClose'])$(id).onclick=()=>focusClose();
+ $('focusThinkMore').onclick=()=>focusOpen('thinkPanel');
+ $('focusTutorMore').onclick=()=>studioTutor();
+ $('focusResources').onclick=()=>{focusOpen('resourcePanel');if($('resourceDetails').open&&studyAttempt&&!settled)studyAttempt.hints++;$('resourceDetails').open=true;};
+ $('focusPlan').onclick=()=>focusOpen('sessionPanel');
+ // Install wrappers once so restored learning backups cannot stack handlers.
+ for(const id of ['studyStart','ownProblemStart','modelBtn','workingBtn','skipBtn','adultBtn','saveResource']){
+   const original=$(id).onclick?._focusOriginal||$(id).onclick;
+   if(!original)continue;
+   const wrapped=function(...args){
+     if(id==='ownProblemStart'&&!$('ownProblem').value.trim()||id==='saveResource'&&!$('resourceNote').value.trim())return;
+     focusClose(false);original.apply(this,args);
+     if(id==='ownProblemStart'||id==='saveResource')studioTutor();
+     else if(id==='studyStart'){$('qText').focus();}
+     else if(id==='workingBtn'||id==='modelBtn'){$('qText').focus();}
+   };
+   wrapped._focusOriginal=original;$(id).onclick=wrapped;
+ }
+ window.addEventListener('resize',()=>{$('studioSurface').inert=!!focusPanel&&window.innerWidth<1200;});
+ focusClose(false,false);
 }
 boot();

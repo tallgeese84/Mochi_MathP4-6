@@ -1227,7 +1227,7 @@ function isCorrect(input,q){
 
 /* The cat ships inside the markup; this just reads her back out. */
 const BUILTIN_PHOTO = ($('catImg').getAttribute('src') || '');
-const APP_VERSION = '2.0.0';
+const APP_VERSION = '2.1.0';
 const BUILD_KIND  = 'site';
 const BUILD_DATE  = '2026-09-11';
 const BUILD = BUILD_KIND + ' v' + APP_VERSION + ' \u00b7 ' + BUILD_DATE;
@@ -2490,5 +2490,5 @@ async function hydrate(){
 }
 
 if('serviceWorker' in navigator){
-  window.addEventListener('load', ()=> navigator.serviceWorker.register('sw.js?v=2.0.0').catch(()=>{}));
+  window.addEventListener('load', ()=> navigator.serviceWorker.register('sw.js?v=2.1.0').catch(()=>{}));
 }

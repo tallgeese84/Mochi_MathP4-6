@@ -1,3 +1,17 @@
+## v2.1.0 — 2026-09-11
+
+- Simplify the first screen to a single question sheet and answer field.
+- Introduce a floating six-icon dock with persistent labels, soft shadows, subtle
+  motion and reduced-motion support; use warm white and muted green throughout.
+- Move reasoning, sketching, session controls, resources and tutor conversation
+  into one on-demand panel at a time. Preserve working when switching tools.
+- Keep the active question visible beside tools on wide screens; add a collapsible
+  problem reference inside mobile panels. Offer reflection after answering.
+- Maintain focus restoration, Escape dismissal and keyboard-accessible controls.
+- Bump the offline shell and application versions to refresh the deployed UI.
+- Validate all 118 tests, including new panel state and assistance-accounting checks.
+  Browser and live AI-provider testing have not been performed.
+
 ## v2.0.0 — 2026-09-11
 
 - Rebuild the GUI as a minimal maths studio with a focused problem canvas, floating
