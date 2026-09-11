@@ -62,13 +62,14 @@ function studioPaint(){
  const conn=netReady()?'Live AI tutor connected':keyReady()?'Offline · local hints available':'Local hints · connect an AI tutor in parent settings';
  $('coachConnection').textContent=conn;
  const s=l.session;$('sessionFinish').hidden=!s?.finished;
- $('focusQuestionMore').textContent=settled||revealed?'Reflect on my method ↗':'Need a way in? ↗';
+ $('focusQuestionMore').textContent=settled||revealed?'Reflect on my method':'Need a way in?';
  $('focusQuestionMore').setAttribute('aria-controls',settled||revealed?'thinkPanel':'morePanel');
  FOCUS_TRIGGERS.focusQuestionMore=settled||revealed?'thinkPanel':'morePanel';
  for(const id of ['thinkQuestion','coachQuestion','labQuestionRef'])$(id).textContent=current.text;
- $('focusProgress').textContent=(s?.done||0)+' / '+(s?.total||8);
+ $('focusProgress').textContent=(s?.done||0)+' / '+(s?.total||8)+' explored';
+ $('chicProgress').value=Math.min(s?.done||0,s?.total||8);$('chicProgress').max=s?.total||8;
  $('focusSession').setAttribute('aria-label','Euna’s practice: '+(s?.done||0)+' of '+(s?.total||8)+' questions. Open session settings.');
- $('focusContext').textContent=current.custom?'Your own problem · check Mochi’s explanation together.':current.stretch?'Reasoning investigation · explore, explain, test.':'No calculator. Find your own way in.';
+ $('focusContext').textContent=current.custom?'Your own problem · check Mochi’s explanation together.':current.stretch?'Reasoning investigation · explore, explain, test.':'No calculator · Take your time';
  $('nextBtn').textContent=s?.finished?'Finish session':'Next question';
  if(s?.finished){const recent=l.attempts.filter(a=>a.at>=s.started);$('sessionFinishText').textContent=recent.filter(a=>a.independent).length+' independent solutions; '+recent.filter(a=>!a.independent).length+' ideas to revisit. A useful insight matters more than a perfect session.';}
 }
@@ -242,6 +243,7 @@ function focusOpen(id,opener){
 }
 function focusToggle(id,opener){if(focusPanel===id)focusClose();else focusOpen(id,opener);}
 function focusInit(){
+ $('studioHome').onclick=e=>{e.preventDefault();studioShow('maths');$('qText').focus();};
  $('focusThink').onclick=()=>focusToggle('thinkPanel',$('focusThink'));
  $('focusSession').onclick=()=>focusToggle('sessionPanel',$('focusSession'));
  $('focusMore').onclick=()=>focusToggle('morePanel',$('focusMore'));

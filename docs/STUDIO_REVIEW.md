@@ -1,14 +1,17 @@
 # Euna’s maths studio — design and teaching review
 
-Version 2.1.0, 11 September 2026. This completes the GUI redesign requested after
+Version 3.0.0, 11 September 2026. This completes the GUI redesign requested after
 the first curriculum review. It includes the previous 1.4.0 improvements, which
 were not yet published to the repository.
 
 ## Experience
 
-The first screen is one question sheet with an answer field. A floating icon dock
-opens one panel at a time; session settings live behind Euna’s header button.
-The question remains beside the panel on wide screens, with a collapsible question
+The first screen is an unboxed question surface with a prominent topic heading and
+an answer composer. Floating instrument controls run vertically on desktop and
+horizontally on phones; the tutor has its own floating conversation control.
+Graphite and electric citron establish the new visual identity across every view.
+A thin progress line and Euna’s session control carry the real practice count.
+The question remains beside tools on wide screens, with a collapsible question
 reference inside panels on smaller screens. Think contains four editable stages: Understand, Connect, Solve and Verify. They are a way to expose
 thinking, not a compulsory sequence or a scored checklist. Euna can move backwards
 and revise any stage; earlier submitted edits remain in a bounded revision history.

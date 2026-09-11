@@ -5,7 +5,7 @@ Euna for Primary 6 mathematics and her **September 2027 SPERS-Sec1 planning targ
 with a separate enrichment strand for mathematical thinking. The exact 2027 test
 and application dates must be checked when published.
 
-**v2.1.0 — 11 September 2026.** The existing cat, room, handwriting pad, provider
+**v3.0.0 — 11 September 2026.** The existing cat, room, handwriting pad, provider
 settings and saved coins are preserved. Old topic totals are retained as legacy
 accuracy; they are not treated as new evidence of independent learning.
 
@@ -32,14 +32,17 @@ handwritten working on the selected problem.
 
 ## The interactive studio
 
-The first screen shows one question and an answer field. A floating icon dock
-opens Practice, Think, Explore, Mochi, My map and More. Reasoning, sketching,
-tutoring and session controls appear in one panel at a time. Warm white surfaces,
-soft green accents, generous spacing and subtle icon motion keep the screen calm.
-On larger screens the question stays beside the open panel; small screens include
-a “See the problem” reference. Tap Euna in the header to change the session.
-The existing cat and room remain part of the app. Zoom is enabled, controls work
-with keyboard/touch, and reduced-motion preferences disable animations.
+The GUI uses an open question surface, oversized topic typography, graphite
+controls and an electric citron accent. A vertical rail of floating instruments
+moves to the bottom on phones; **Ask Mochi** has a separate floating control.
+The question, answer and current session progress are immediately available.
+
+**Think** opens the reasoning stages and sketchpad. **Explore** opens the visual
+lab. **My map** opens a skill index with an evidence inspector. Tap **Euna’s
+session** to choose practice or bring your own problem. Only one tool panel opens
+at a time; working survives tool switches. The active problem stays alongside
+panels on wide screens and is available through “See the problem” on small screens.
+Zoom, keyboard controls and reduced-motion preferences remain supported.
 
 - **Understand → Connect → Solve → Verify:** write in any order. Each stage keeps
   its own text; revisions and typed working accompany the problem into the tutor.

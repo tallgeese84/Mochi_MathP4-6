@@ -1,3 +1,16 @@
+## v3.0.0 — 2026-09-11
+
+- Completely replace the GUI stylesheet and rebuild the practice hierarchy around
+  an open question surface, large topic typography and a single answer composer.
+- Use graphite, white and electric citron; replace the bottom-only dock with
+  floating desktop instruments and a separate Ask Mochi conversation control.
+- Rework the learning map as a skill index and evidence inspector, and redesign
+  the tutor, reasoning stages, visual lab, session controls and parent settings.
+- Add a subtle session progress line, responsive navigation, enlarged-text
+  navigation overflow and reduced-motion support. Preserve existing learning data.
+- Validate the existing 118 tests and static asset/control checks. Browser visual
+  checks and live-provider tests have not been performed.
+
 ## v2.1.0 — 2026-09-11
 
 - Simplify the first screen to a single question sheet and answer field.
