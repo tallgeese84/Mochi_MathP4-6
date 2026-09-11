@@ -681,3 +681,13 @@ body { isolation: isolate; }
  .dock-item, .instrument-rail .tutor-orb { min-height: 44px; }
  .focus-panel { bottom: calc(70px + env(safe-area-inset-bottom)); max-height: calc(100dvh - 82px - env(safe-area-inset-bottom)); }
 }
+
+/* Release metadata stays visible beside the brand in every subject and viewport. */
+.brand-identity { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.app-version { font-size: .8125rem; line-height: 1.3; font-weight: 600; letter-spacing: .02em; color: #704694; white-space: nowrap; }
+.release-details { margin: 0 0 24px; padding: 16px; border: 1px solid #dfd2ec; border-radius: 16px; background: #f7f1ff; }
+.release-details h4 { margin: 0 0 8px; font-size: 1rem; }
+.release-details p { margin: 8px 0 0; font-size: .9375rem; line-height: 1.6; }
+.release-details .release-number { font-variant-numeric: tabular-nums; }
+.release-number b { color: #704694; }
+.release-details .release-help { color: #6b5d7b; font-size: .875rem; }
