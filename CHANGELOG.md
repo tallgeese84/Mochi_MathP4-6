@@ -1,3 +1,10 @@
+## 3.2.0 — Reading comfort and Euna’s avatar
+
+- Larger question text (24px on phones, 28px on tablets, up to 30px on desktop at default browser size), smaller topic headings and improved spacing.
+- Larger answer fields and choices; full-width Check answer on phones. Side-by-side question and writing on wide screens in Stylus mode.
+- Reused the original Euna avatar from the supplied Pokémon Academy app in her profile and session panel.
+- Purple paw icons throughout, including browser and home-screen icons; versioned URLs avoid stale orange artwork.
+
 ## 3.1.0 — Purple mobile studio
 
 - Purple theme, a single mobile dock and large, faint Mochi cat watermarks.
