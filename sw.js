@@ -1,9 +1,9 @@
 /* Mochi Maths — service worker.
    Bump SHELL when you deploy, and always deploy this file alongside index.html. */
-const SHELL = 'mochi-shell-v11';
+const SHELL = 'mochi-shell-v3.2.0';
 const FONTS = 'mochi-fonts-v1';          // separate bucket: code deploys never evict fonts
-const ASSETS = ['./', './index.html', './manifest.webmanifest',
-                './icon-192.png', './icon-512.png', './icon-maskable-512.png', './apple-touch-icon.png'];
+const ASSETS = ['./', './index.html', './app.js?v=3.2.0', './input-mode.js?v=3.2.0', './learning.js?v=3.2.0', './question-bank.js?v=3.2.0', './study-ui.js?v=3.2.0', './tutor.css?v=3.2.0', './challenge-bank.js?v=3.2.0', './reasoning.js?v=3.2.0', './studio.js?v=3.2.0', './studio.css?v=3.2.0', './manifest.webmanifest?v=3.2.0', './mochi-watermark.webp', './euna-avatar.webp', './favicon.png?v=3.2.0',
+                './icon-192.png?v=3.2.0', './icon-512.png?v=3.2.0', './icon-maskable-512.png?v=3.2.0', './apple-touch-icon.png?v=3.2.0'];
 
 self.addEventListener('install', e => {
   self.skipWaiting();
@@ -13,14 +13,14 @@ self.addEventListener('install', e => {
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(keys.filter(k => k !== SHELL && k !== FONTS).map(k => caches.delete(k))))
+      .then(keys => Promise.all(keys.filter(k => k.startsWith('mochi-') && k !== SHELL && k !== FONTS).map(k => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });
 
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
-  if (url.hostname.endsWith('anthropic.com')) return;      // never cache the API
+  if (['api.anthropic.com','api.openai.com'].includes(url.hostname)) return;      // never cache the API
   if (e.request.method !== 'GET') return;
 
   // Fonts: cache-first, in their own bucket.

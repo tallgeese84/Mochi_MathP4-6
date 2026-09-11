@@ -1,275 +1,193 @@
-# Mochi Maths
-
-Primary 6 maths practice for the Singapore MOE **SPERS-Sec** Secondary 1 placement test.
-
-Questions, marking, bar models, worked solutions and the handwriting page are all
-generated and graded in JavaScript on the device. The model is used for two things
-only: talking to Euna, and reading her handwriting back to her. It never marks and
-never calculates.
-
-## Versions
-
-Semantic versions from v1.1.0 onward: patch for fixes, minor for new features, major for
-anything that resets saved progress. `CHANGELOG.md` records each one.
-
-Open the cog and look under **Build** for the running version, e.g. `site v1.1.0 - 2026-08-19`.
-The same string is a comment in the first lines of `index.html`. Bump `SHELL` in `sw.js`
-to match on every deploy, or a cached worker may keep serving the old build.
-
-## Coins and Mochi's room
-
-Correct answers earn 2 coins, plus 5 more on every fifth in a row. Revealing the worked
-solution first earns nothing, so the reward tracks working it out rather than reading it.
-
-The second tab is the room. She can stroke Mochi, buy cat munch, and buy accessories he
-then wears - six of them across head, eyes and neck, drawn over his photo. Coins are
-earned in the maths tab only; the room is the reward, not another place to grind.
-
-The purr meter rises when she plays and drifts back to calm by itself. There is no hunger,
-no decay, and no way for Mochi to be sad or neglected - deliberately, since a pet that
-guilt-trips a child is the wrong thing to attach to exam revision.
-
-Accessory positions are tuned to the shipped picture. If you swap in a different photo
-they may need nudging; they live in `ACC_SVG` in `index.html`, drawn on a 0-100 square.
-
-## Which build is this
-
-Open the cog and look under **Build**. It reports the build date and the size of the
-question bank, e.g. `site 2026-08-19 - 22 question types - 22 generators across 12 topics`.
-Compare that against whatever you last deployed. The same string is also a comment in the
-first few lines of `index.html`, so you can check it without opening the app.
-
-Remember to bump `SHELL` in `sw.js` when you deploy, or a cached worker may keep serving
-the previous build.
-
-## Deploy to GitHub Pages
-
-1. Put these files in a repo (or a folder inside `tallgeese84.github.io`):
-
-   ```
-   index.html
-   sw.js
-   manifest.webmanifest
-   icon-192.png
-   icon-512.png
-   icon-maskable-512.png
-   ```
-
-2. Settings → Pages → Deploy from branch → `main` / root.
-3. Open the URL, tap the cog, answer the multiplication gate, paste an Anthropic API key.
-4. On the iPad: Share → **Add to Home Screen**. It installs as a standalone app.
-
-## Turning on the ChatGPT tutor
-
-1. Get an **API key** at platform.openai.com -> API keys. This is separate from a
-   ChatGPT Plus subscription; Plus does not include API credit. Add a little billing
-   under Settings -> Billing, and set a monthly limit while you are there.
-2. Open the app on your Pages URL, tap the cog, answer the multiplication.
-3. Under **Tutor**, choose `ChatGPT (OpenAI)`, paste the key, leave the model box empty
-   for the default (`gpt-5.6`) or type another name.
-4. Tap **Test**. It makes one tiny call and tells you exactly what happened - working,
-   key rejected, no such model, or out of credit.
-5. Tap **Save**. The `offline hints` badge next to *Ask Mochi* disappears once it is live.
-
-Switching back to Claude is the same panel; both keys are remembered separately.
-
-## Sound is off by default
-
-Every reply is written out in full in the chat panel under the question, so nothing is
-delivered by voice alone. The speaker button in the top bar turns automatic reading on
-if she wants it; with it off, each reply still carries a small speaker she can tap to
-hear just that one.
-
-## Euna only ever meets Mochi
-
-The engine is invisible to her. No product name, no model id, no "via ChatGPT" appears
-anywhere on her side of the screen; the tutor is simply Mochi. The prompt forbids naming
-the company or model and forbids calling itself an AI or a chatbot.
-
-It stops short of lying to her. If she asks whether Mochi is real, alive, a person, a
-robot, or "are you ChatGPT", she gets a straight answer - *"I am a computer program that
-helps you with maths, drawn as a cat"* - and that reply is generated on the device, so no
-model can get it wrong and it costs nothing.
-
-The one thing she does see is an `offline` chip when there is no connection, so she knows
-why Mochi is only giving short hints.
-
-## How to tell which engine is answering (grown-ups)
-
-Open the cog. Under **This session** it reports what actually answered the last reply,
-rather than what is merely configured:
-
-`Answering: ChatGPT (OpenAI) - gpt-5.6-terra. Replies: 4 from ChatGPT (avg 1.4s), 1 local.
-12 answered, 75% correct, best streak 5.`
-
-If a call fails mid-session it flips to `built-in hints (no model)` on its own, so a silent
-failure cannot be mistaken for a working tutor. Switching provider clears it until the new
-one has actually answered. Her score lives here too rather than on screen - a running
-accuracy percentage in front of a child is discouraging, and a streak of paw prints is not.
-
-For proof independent of anything this app says, open **platform.openai.com/usage** -
-the requests appear there within a minute or two.
-
-## Reading the OpenAI dashboard
-
-The dashboard lists display names; the API wants ids. The app converts them for you, so
-typing `GPT-5.6 Terra` stores `gpt-5.6-terra`. Mapping:
-
-| Dashboard card | Type this | Use it for |
-|---|---|---|
-| GPT-5.6 Sol | `gpt-5.6-sol` | skip - frontier model, slower and dearer for no gain here |
-| GPT-5.6 Terra | `gpt-5.6-terra` | talking, and reading handwriting |
-| GPT-5.6 Luna | `gpt-5.6-luna` | talking, if Terra feels slow |
-| Audio | - | not needed; reading aloud uses the device's own voice, offline and free |
-| Image | - | not needed; that card *generates* images. Reading her handwriting is image *input*, which Terra and Luna already do |
-
-## How the tutor gives help
-
-It will not give Euna the answer to the question she is on, no matter how often she
-asks. Each time she asks it goes one step further:
-
-1. what is the question asking, and what are you told
-2. what has to happen first, phrased as a question
-3. name the tool - bar model, units and parts, working backwards
-4. which step she is stuck on and what kind of operation it needs
-5. try the same idea with small easy numbers first
-6. work through a **similar** question, then ask her to do hers the same way
-
-That similar question is generated by the same generator that produced hers, so it
-is the same shape and its working is correct by construction. It is rejected if it
-shares her answer or reuses her numbers. This runs offline too.
-
-The withholding lifts the moment she submits an answer - then the tutor explains her
-question fully. She also has her own **Show the working** button at any time, so she is
-never stuck with no way out; taking it simply earns no coins.
-
-## Which model to pick
-
-This app never asks a model to do the maths. Questions, answers, working and marking are
-all generated and checked in JavaScript. So raw mathematical ability is not the thing to
-select on; what matters is following the tutoring rules, replying fast enough that an
-11-year-old does not drift off, and reading handwriting.
-
-There are two model boxes for that reason:
-
-- **model for talking** - runs many times a session. Pick for speed.
-  `gpt-5.6-terra` or `claude-sonnet-5` to start. If it feels slow, drop to
-  `gpt-5.6-luna` or `claude-haiku-4-5-20251001`.
-- **model for reading handwriting** - runs rarely and is genuinely hard vision work.
-  Leave it on the stronger model. Blank means "same as the talking model".
-
-Skip the flagship tiers (`gpt-5.6-sol`, `claude-opus-5`) and any high reasoning effort.
-The app already sets `reasoning_effort: low` on OpenAI, because a model that has been
-handed the answer and the worked steps has nothing to deliberate about, and deliberating
-is just waiting.
-
-Cost is not the deciding factor at this scale. A tutoring reply is roughly 1,200 input
-and 200 output tokens - well under a dollar a month on Terra at daily practice, and
-pennies on Luna. Choose on how well it explains and how quickly it answers.
-
-The grown-ups panel shows the average reply time per provider, and the **Test** button
-reports how long a single call took, so you can compare rather than guess.
-
-## Choosing the tutor
-
-Under the cog you can pick **Claude (Anthropic)** or **ChatGPT (OpenAI)**, paste a key for
-whichever you choose, and optionally type a model name to override the default
-(`claude-sonnet-4-6` / `gpt-5.6`). Keys and model names are stored per provider, so you can
-keep both and flip between them to compare.
-
-The request shapes differ and the app handles that for you: Anthropic takes `system` as a
-top-level parameter, OpenAI takes it as the first message; images use `source` for Anthropic
-and `image_url` for OpenAI. For OpenAI it sends `max_completion_tokens` and retries with
-`max_tokens` if the model is an older one that wants the old name.
-
-## The API key
-
-The key is stored in `localStorage` on that one device and is sent only to
-`api.anthropic.com`. Because GitHub Pages is static hosting there is no server to
-hide it behind, so treat it as a key that lives on a family tablet: set a **monthly
-spend cap** in the Anthropic Console, and rotate it if the tablet leaves the house.
-
-If you would rather the key never touched the device, put a Cloudflare Worker or a
-Vercel function in front of the API and point the two `fetch` calls in `index.html`
-at it instead. Nothing else has to change.
-
-**Without a key the app still works.** Questions, marking, bar models, worked
-solutions and the working page all run. Mochi falls back to built-in hints and
-cannot read handwriting.
-
-## Does it need the internet?
-
-For the tutor and for reading handwriting, yes — both go to a hosted model. Everything
-else is generated and graded on the device and keeps working with no connection at all:
-
-- questions, marking, streaks and progress
-- bar models and full worked solutions
-- the working page: tap **Type a line** and every line you enter is still checked
-- an offline hint ladder — asking for help repeatedly walks you through the worked
-  solution one step at a time, so she is never left with nothing
-
-An **offline hints** badge appears next to *Ask Mochi* when it is running that way.
-The service worker caches the whole app, so it opens and runs on a plane.
-
-## Keeping her on the question
-
-Before any request is sent, the message is checked on the device against the current
-question. Anything unrelated is answered locally and never reaches the model, so it
-cannot become a general chatbot and off-topic chat costs nothing. The conversation also
-resets between questions, so nothing carries over. If a message suggests real distress
-it is not treated as off-topic: she gets a short reply pointing her to a trusted adult,
-and it is never sent to a model.
-
-## Redeploying
-
-Always ship `sw.js` next to `index.html`, and bump `SHELL` in `sw.js` when you
-deploy. The page itself is fetched network-first so a new build is never hidden
-behind a stale cache; fonts sit in their own bucket so code deploys do not evict them.
-
-## Grown-ups panel
-
-Triple the cog is not needed — one tap, then answer the two-digit multiplication.
-Inside: cat name, cat photo, API key, per-topic accuracy, and reset.
-
-## What is in the question bank
-
-42 generators across 16 topics, every question built fresh from parameters so the pool
-never runs out:
-
-- **Fractions** - fraction of the remainder, dividing by a fraction, working backwards
-- **Ratio** - units and parts, change in ratio after a transfer
-- **Percentage** - discount, finding the whole, percentage increase and decrease
-- **Speed** - find speed / distance / time, average speed over two legs
-- **Rate** - filling at a constant rate
-- **Algebra** - substitution
-- **Circles** - semicircle and quadrant, area and perimeter, pi = 22/7
-- **Volume** - volume of water in litres, finding the depth from the volume
-- **Angles** - angles on a straight line, angles in a parallelogram
-- **Average** - finding a missing value from the total
-- **Whole numbers** - gap and difference, order of operations
-- **Decimals** - money and change, fraction to decimal
-- **Measurement** - converting between kg/g, km/m, l/ml, m/cm
-- **Time** - duration between two 24-hour times
-- **Data** - pie charts, bar graphs and line graphs
-- **Money** - two coin denominations
-
-### On exam papers
-
-Real papers are used for calibration only - topic spread, difficulty, mark weighting and
-the English register a P6 paper actually uses. No question is copied from any paper.
-Schools' prelim papers are their copyrighted work, and reproducing them, even reworded,
-is not something this project does. Use the PDFs directly for timed paper practice; this
-app is for daily drilling and instant marking.
-
-The bank is calibrated against the standard PSLE shape both papers follow:
-Paper 1 Booklet A (Q1-10 one mark, Q11-15 two marks), Booklet B (Q16-20 one mark,
-Q21-30 two marks), Paper 2 (Q1-5 two marks, Q6-17 three to five marks and multi-part).
-Star ratings map to that: one to two stars for one-mark recall, three for two-mark
-working, four to five for Paper 2 multi-step problems.
-
-Still not covered, and the honest next gap: nets and solid views, symmetry, grid
-geometry and drawing, and multi-part questions where part (b) depends on part (a).
-
-Every answer is verified by a script that re-derives it by parsing the question text,
-independently of the code that generated it, and the marker is mutation-tested against
-wrong answers and against every way a child might type a unit.
+# Mochi · Euna’s maths studio
+
+An offline-capable family maths app with optional conversational AI. It prepares
+Euna for Primary 6 mathematics and her **September 2027 SPERS-Sec1 planning target**,
+with a separate enrichment strand for mathematical thinking. The exact 2027 test
+and application dates must be checked when published.
+
+**v3.0.0 — 11 September 2026.** The existing cat, room, handwriting pad, provider
+settings and saved coins are preserved. Old topic totals are retained as legacy
+accuracy; they are not treated as new evidence of independent learning.
+
+## What to do first
+
+1. Tap **Euna** in the header and choose **Discover my starting point**. It samples 17 core skill
+   groups. Break the first look into several sittings if needed. One question per
+   group is a starting sample, not a diagnosis or an exam prediction.
+2. Choose **My daily practice** from that session panel for an eight-question session: a warm-up, adaptive
+   foundation/practice questions, delayed review when due, transfer and an
+   investigation. Aim for about 20–25 minutes, with understanding setting the pace.
+3. Ask Mochi about the exact step that is unclear. A wrong answer stays open for
+   revision. **Show the working** remains available; needing an explanation is fine.
+4. Write a plan and a brief insight. Use **More → Explore a resource** to learn how
+   to look up a concept, explain it without copying, and verify it independently.
+5. Once a week, open the grown-ups panel together. Discuss an example of an error,
+   a repaired method and an independent solution. Back up learning regularly.
+
+**Bring my own problem** accepts a typed problem, including diagram labels. AI
+can discuss it but there is no verified bank answer, so it does not affect scores
+or learning evidence. Check its proposed solution with a second method or an adult.
+Image upload of an external question is not implemented; the pad supports her
+handwritten working on the selected problem.
+
+## The interactive studio
+
+The GUI uses an open question surface, oversized topic typography, graphite
+controls and an electric citron accent. A vertical rail of floating instruments
+moves to the bottom on phones; **Ask Mochi** has a separate floating control.
+The question, answer and current session progress are immediately available.
+
+**Think** opens the reasoning stages and sketchpad. **Explore** opens the visual
+lab. **My map** opens a skill index with an evidence inspector. Tap **Euna’s
+session** to choose practice or bring your own problem. Only one tool panel opens
+at a time; working survives tool switches. The active problem stays alongside
+panels on wide screens and is available through “See the problem” on small screens.
+Zoom, keyboard controls and reduced-motion preferences remain supported.
+
+- **Understand → Connect → Solve → Verify:** write in any order. Each stage keeps
+  its own text; revisions and typed working accompany the problem into the tutor.
+- **Visual lab:** a movable panel with fraction strips and a number line, ratio
+  bars, rectangle grids and growing dot patterns. Predict, manipulate, reveal the
+  measurements, then explain an observation. Save it or discuss it with Mochi.
+- **Small examples:** 18 checked concept probes cover all 17 core skill groups
+  plus inquiry. Speed uses the rate probe. The result identifies what was checked,
+  rather than diagnosing Euna from a wrong final answer.
+- **Learning map:** select a skill to inspect its evidence, building blocks and
+  attempted solution routes, or start a focused session. Saved insights remain
+  available below the map.
+- **Challenge:** eight added investigations address invariants, systematic
+  counting, worst-case guarantees, constraints and optimisation. A correct value
+  still needs a sound argument; the app does not automatically grade the proof.
+
+Read the [design, adaptation and evaluation notes](docs/STUDIO_REVIEW.md).
+
+## Learning and tutoring
+
+The bank has **80 generators**: the original 42 reviewed and repaired, plus 30
+primary/reasoning question types and 8 further investigations. Across 19 skill groups, 17 are core and two are extension.
+Some individual geometry tasks also carry an extension tag. See the full
+[standards and question audit](docs/CURRICULUM_REVIEW.md).
+
+The learning engine records first-answer correctness, revisions, hints, model and
+solution use, confidence, reported obstacle, plan, reflection, elapsed time and
+question type, reasoning stages, revisions, chosen route, typed working, concept
+checks and visual experiments. The tutor sees recent relevant evidence and the learner’s actual
+working. It must ask for evidence before attributing a misconception and accept
+valid alternative methods. It guides, explains when needed, and asks for a check,
+not just a repeated procedure.
+
+Selection uses prerequisite relationships, recent independent evidence and review
+due dates. Review intervals are 1, 3, 7, 14 and 30 days as independent practice
+accumulates. Three consecutive independent answers invite a harder form; two
+consecutive first-answer misses invite a simpler step. Time is not used to infer
+ability. Concept checks help choose between revisiting a relationship and testing
+a prerequisite. The learner can also focus a session on a chosen skill.
+
+These are transparent design heuristics, not a calibrated learner
+model or a validated educational intervention.
+
+“Independent” requires a correct first answer without hints, model or solution,
+and not identified as a guess. “Retained in practice” additionally requires recent
+independent evidence on at least three calendar days, two question types, a transfer
+question and a written plan, with no more than two recent first-answer misses.
+A transfer observation now also needs an explicitly authored transfer question,
+prior independent evidence in that skill and a generator not used in the last five
+attempts in that skill. A review slot or new numbers alone do not qualify.
+
+**Plan quality is not automatically validated.** Neither label predicts a school
+placement or an admissions result. Same-session success alone cannot satisfy the
+retention rule. Date comparisons for evidence use UTC calendar days.
+
+The tutor uses the bank’s answer and worked steps as its reference. It can still
+make mistakes when explaining; its response is never used to award numerical credit.
+Arithmetic checking cannot prove that a method is valid, complete or relevant.
+Handwriting is a proposed transcription that the learner should inspect and correct.
+
+Resource links point to Maths Is Fun and Cambridge’s NRICH. The model has no web
+search tool: it must not pretend to have visited sources or independently checked a
+page. Notes and pasted problems are treated as untrusted learning material.
+
+## Standards and routes
+
+- **SPERS-Sec1:** P6 topics; 34 MCQs in 30 minutes, followed by 20 short-answer and
+  10–15 open-ended questions in 105 minutes. No calculator; written methods matter.
+  [SEAB test details](https://www.seab.gov.sg/spers-sec/test-details/).
+- **Current primary syllabus:** the 2021 syllabus, updated October 2025, applies to
+  P6 from 2026. Speed is not listed in it; this app keeps speed in enrichment. Simple
+  linear equations are included in P6 and are now practised here.
+  [MOE syllabuses](https://www.moe.gov.sg/primary/curriculum/syllabus).
+- **NUS High:** a separate DSA route, with mathematics and science tests and
+  shortlisted selection activities. Broad reading, problem solving, independence,
+  creativity and communication matter. Its 2026 applications ran May–June and
+  selection took place in July; do not assume September 2027 is the application
+  deadline. [Admissions](https://www.nushigh.edu.sg/admissions/year-1-and-3-admissions/year-1-admissions/)
+  · [Selection qualities](https://www.nushigh.edu.sg/admissions/year-1-and-3-admissions/admissions-faq/).
+
+The 10-question fluency session is **not a full SPERS mock**, and the investigations
+are **not official NUS High questions**. The app cannot assign PSLE ALs, predict
+admission, or replace English, science, written paper practice and teacher review.
+
+## Running and updating
+
+The app remains a buildless GitHub Pages site. Deploy the repository root from the
+chosen release branch. Keep these files together:
+
+- `index.html`, `app.js`, `learning.js`, `question-bank.js`, `study-ui.js`, `tutor.css`
+- `reasoning.js`, `challenge-bank.js`, `studio.js`, `studio.css`
+- `sw.js`, `manifest.webmanifest` and the existing icons
+
+Do not deploy only `index.html`: the JavaScript has been extracted into modules to
+make future review and testing manageable. Bump both script/style query versions
+and the service-worker shell version on a release. External resource links and AI
+need a network connection; bank questions, marking, local hints and progress do not.
+Install on an iPad with Share → Add to Home Screen. Font files use their own cache.
+The service worker only removes this app’s older cache buckets.
+
+## Connecting the AI
+
+The existing OpenAI/Anthropic connection flow is retained. Open the cog, pass the
+parent convenience gate, select the provider, enter an API key/model available to
+your account, then **Test** and **Save**. A ChatGPT subscription is not an API key.
+The app shows “offline” when built-in hints answer, including after an API failure.
+The grown-ups panel reports which provider actually answered and the last connection
+error from the Test action. No live provider request was made during this review;
+there was no configured family API credential in this checkout.
+
+Existing provider defaults are preserved rather than silently migrated. The Test
+button verifies access for your account. The current integration uses Chat
+Completions for OpenAI and Messages for Anthropic. See
+[official OpenAI text generation documentation](https://developers.openai.com/api/docs/guides/text).
+
+**Deployment limitation:** provider API keys remain in device-local storage and
+are sent directly to the selected provider over HTTPS. The parent multiplication
+gate is a convenience, not security. This inherited design is appropriate only for
+a controlled family setup; a public/multi-user release needs an authenticated
+server relay with server-held credentials and usage limits. Never commit API keys
+or learning backups. The model receives the active problem, typed/transcribed
+working and limited relevant learning notes. Handwriting images are sent only when
+checking handwriting. There is no automatic cloud synchronisation of the learning
+record.
+
+## Backup and verification
+
+**Back up learning** downloads JSON containing attempts, notes, reasoning and external assessment records, excluding API
+keys, provider configuration and the cat photo. Restore validates and reconstructs
+allowed fields and recomputes independence. It replaces learning history only after
+confirmation; API settings and Mochi’s room are retained. These files contain the
+child’s work, so keep them private.
+
+No runtime dependencies or package installation are required. Node 22+ can run:
+
+```sh
+node --test tests/*.test.cjs
+```
+
+Tests independently re-solve 100 visible generated statements per generator (8,000
+questions), reject nearby/wrong answers and units, and cover learning, revision,
+retention, migration, backup validation, custom questions, and multi-part marking.
+The full suite currently contains **118 passing tests**, including concept probes,
+reasoning traces, route adaptation, lab mathematics and focused-session behavior.
+They are code-level tests using a small event/storage adapter, not browser or iPad
+visual tests. Live AI answer quality and handwriting recognition still need a parent
+supervised trial with the configured provider. The audit documents remaining
+curriculum gaps and a practical evaluation rubric.
