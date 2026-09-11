@@ -50,7 +50,7 @@ function esc(s){ return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;'
    FIGURE LIBRARY — small SVG helpers
    ========================================================= */
 const FIG = (function(){
-  const INK='#2A1F1A', DIM='#B4560F', LINE='#A08C7E', SHAPE='#E86A2E', ACC='#1F8F6E';
+  const INK='#38214f', DIM='#B4560F', LINE='#A08C7E', SHAPE='#E86A2E', ACC='#1F8F6E';
   const f=n=>Number(n).toFixed(1);
   const unit=(p,q)=>{const dx=q.x-p.x,dy=q.y-p.y,m=Math.hypot(dx,dy)||1;return{x:dx/m,y:dy/m};};
 
@@ -2050,45 +2050,48 @@ function wkInit(){
 function wkResize(){
   const cv = WK.cv, c = WK.ctx; if(!cv || !c) return;
   const r = cv.getBoundingClientRect();
+  if(!r.width || !r.height) return; // Hidden tools must not change the drawing scale.
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   cv.width  = Math.max(1, Math.round((r.width  || 600) * dpr));
   cv.height = Math.max(1, Math.round((r.height || 300) * dpr));
-  c.setTransform(dpr,0,0,dpr,0,0);
+  c.setTransform(cv.width/720,0,0,cv.height/540,0,0);
   c.lineCap = 'round'; c.lineJoin = 'round';
 }
 function wkPos(e){
   const r = WK.cv.getBoundingClientRect();
-  return {x:e.clientX-r.left, y:e.clientY-r.top, p:(e.pressure && e.pressure>0) ? e.pressure : 0.5};
+  return {x:(e.clientX-r.left)*720/r.width, y:(e.clientY-r.top)*540/r.height, p:(e.pressure && e.pressure>0) ? e.pressure : 0.5};
 }
 function wkDown(e){
-  if(!WK.ok) return;
-  if(e.pointerType === 'pen' && !WK.penOnly){ WK.penOnly = true; $('wkPenOnly').classList.add('on'); }
+  if(!WK.ok || WK.cur || (e.button != null && e.button !== 0)) return;
+  if(e.pointerType === 'pen' && !WK.penOnly){ WK.penOnly = true; $('wkPenOnly').classList.add('on'); $('wkPenOnly').setAttribute('aria-pressed','true'); }
   if(WK.penOnly && e.pointerType === 'touch') return;
   e.preventDefault();
   try{ WK.cv.setPointerCapture(e.pointerId); }catch(err){}
+  WK.pointerId = e.pointerId;
+  WK.revision = (WK.revision||0)+1;
   WK.cur = {pts:[wkPos(e)], erase:WK.erase};
   WK.strokes.push(WK.cur);
   wkRedraw();
 }
 function wkMove(e){
-  if(!WK.ok || !WK.cur) return;
+  if(!WK.ok || !WK.cur || WK.pointerId !== e.pointerId) return;
   if(WK.penOnly && e.pointerType === 'touch') return;
   e.preventDefault();
   WK.cur.pts.push(wkPos(e));
   wkRedraw();
 }
 function wkUp(e){
-  if(!WK.cur) return;
-  WK.cur = null;
+  if(!WK.cur || WK.pointerId !== e.pointerId) return;
+  WK.cur = null; WK.pointerId = null;
   try{ WK.cv.releasePointerCapture(e.pointerId); }catch(err){}
 }
 function wkStroke(s){
   const c = WK.ctx;
   c.globalCompositeOperation = s.erase ? 'destination-out' : 'source-over';
-  c.strokeStyle = '#2A1F1A';
+  c.strokeStyle = '#38214f';
   if(s.pts.length === 1){
     c.beginPath(); c.arc(s.pts[0].x, s.pts[0].y, s.erase ? 12 : 1.9, 0, 6.3);
-    c.fillStyle = '#2A1F1A'; c.fill();
+    c.fillStyle = '#38214f'; c.fill();
   }
   for(let i=1;i<s.pts.length;i++){
     const a = s.pts[i-1], b = s.pts[i];
@@ -2104,11 +2107,12 @@ function wkRedraw(){
   WK.strokes.forEach(wkStroke);
 }
 function wkReset(){
-  WK.strokes = []; WK.cur = null; WK.lines = [];
+  WK.strokes = []; WK.cur = null; WK.pointerId = null; WK.lines = []; WK.revision = (WK.revision||0)+1;
+  if(typeof inputReset==='function')inputReset();
   wkRedraw();
   $('wkLines').innerHTML = '';
   $('wkSum').className = 'wksum';
-  $('wkHint').textContent = 'Write out your steps, then I will read them back to you.';
+  $('wkHint').textContent = 'Write your steps and final answer, then tap Read my writing.';
   $('wkCheck').disabled = !WK.ok;
 }
 function wkInk(){ return WK.strokes.reduce((n,s)=> n + (s.erase?0:s.pts.length), 0); }
@@ -2164,7 +2168,7 @@ function wkRenderLines(){
     const inp = document.createElement('input');
     inp.className = 'lnin'; inp.value = r.text;
     inp.setAttribute('aria-label','Working line '+(i+1));
-    inp.addEventListener('input', ()=>{ WK.lines[i] = inp.value; });
+    inp.addEventListener('input', ()=>{ WK.lines[i] = inp.value; if(typeof inputSyncText==='function')inputSyncText(); });
     inp.addEventListener('change', ()=>wkRenderLines());
     row.appendChild(st); row.appendChild(inp); box.appendChild(row);
   });
@@ -2188,11 +2192,13 @@ function wkRenderLines(){
 }
 
 async function wkCheckNow(){
-  if(!WK.ok || busy) return;
+  if(!WK.ok || busy || WK.reading) return;
   if(wkInk() < 6){ $('wkHint').textContent = 'Write some working on the page first.'; return; }
   if(!netReady()){
-    $('wkHint').textContent = 'I need a connection to read handwriting. Tap Type a line and I will still check every line you enter.';
+    $('wkHint').textContent = 'I need a connection to read handwriting. Switch to Keyboard to type and check your steps.';
     return; }
+  WK.reading=true;
+  const inkRevision=WK.revision, lineRevision=JSON.stringify(WK.lines);
   $('wkCheck').disabled = true;
   $('wkHint').textContent = 'Reading your handwriting\u2026';
 
@@ -2212,11 +2218,13 @@ async function wkCheckNow(){
       reading: true
     }, ctrl.signal);
     if(epoch!==questionEpoch)return;
+    if(inkRevision!==WK.revision || lineRevision!==JSON.stringify(WK.lines)){ $('wkHint').textContent='Your working changed while I was reading. Tap Read my writing again.'; return; }
     text = text.replace(/```json/gi,'').replace(/```/g,'').trim();
     const m = text.match(/\{[\s\S]*\}/);
     const parsed = JSON.parse(m ? m[0] : text);
     if(!parsed || !Array.isArray(parsed.lines)) throw new Error('shape');
-    WK.lines = parsed.lines.map(l=>String(l));
+    WK.lines = parsed.lines.slice(0,24).map(l=>String(l).slice(0,500));
+    if(typeof inputSyncText==='function')inputSyncText();
     if(!WK.lines.length){ $('wkHint').textContent = 'I could not find any working on the page.'; return; }
     $('wkHint').textContent = 'Check the transcription before trusting the feedback. Tap a line to correct it.';
     tryCount++;
@@ -2224,10 +2232,14 @@ async function wkCheckNow(){
     const result = wkRenderLines();
 
     // offer the value she reached, but never submit it for her
-    if(!settled && result.final != null && !$('answerInput').value.trim()){
+    if(!settled && !current?.parts && !current?.choices && !current?.custom && result.final != null && !$('answerInput').value.trim()){
       $('answerInput').value = String(result.final);
     }
-    wkTellCat(result);
+    $('wkHint').textContent = current?.parts?'Check the transcription, then enter each part’s final answer below.':current?.choices?'Check the transcription, then select your answer below.':'Check the transcription and final answer below before tapping Check answer.';
+    // Reading ink alone is not mathematical help. Discussing or checking it is.
+    if(studyAttempt&&!settled)studyAttempt.hints++;
+    if(typeof inputSyncText==='function')inputSyncText();
+    // Stay on the writing surface; the learner opens Mochi when ready.
   } catch(err){
     if(epoch!==questionEpoch)return;
     $('wkHint').textContent = (err && err.name === 'AbortError')
@@ -2235,6 +2247,7 @@ async function wkCheckNow(){
       : 'I could not read the page just now. Your working is still here, and you can carry on without me.';
   } finally {
     clearTimeout(timer);
+    WK.reading=false;
     $('wkCheck').disabled = false;
   }
 }
@@ -2318,9 +2331,9 @@ $('wkAdd').onclick = ()=>{                       // works with no connection at 
 };
 $('wkPen').onclick = ()=>{ WK.erase=false; $('wkPen').classList.add('on'); $('wkErase').classList.remove('on'); };
 $('wkErase').onclick = ()=>{ WK.erase=true; $('wkErase').classList.add('on'); $('wkPen').classList.remove('on'); };
-$('wkUndo').onclick = ()=>{ WK.strokes.pop(); wkRedraw(); };
-$('wkClear').onclick = ()=> wkReset();
-$('wkPenOnly').onclick = ()=>{ WK.penOnly=!WK.penOnly; $('wkPenOnly').classList.toggle('on', WK.penOnly); };
+$('wkUndo').onclick = ()=>{ WK.strokes.pop(); WK.cur=null; WK.pointerId=null; WK.revision=(WK.revision||0)+1; wkRedraw(); };
+$('wkClear').onclick = ()=>{ WK.strokes=[]; WK.cur=null; WK.pointerId=null; WK.revision=(WK.revision||0)+1; wkRedraw(); $('wkHint').textContent='Drawing cleared. Your typed steps and answer are kept.'; };
+$('wkPenOnly').onclick = ()=>{ WK.penOnly=!WK.penOnly; $('wkPenOnly').classList.toggle('on', WK.penOnly); $('wkPenOnly').setAttribute('aria-pressed',String(WK.penOnly)); };
 
 /* ---------- grown-ups ---------- */
 let gateAns = 0;
@@ -2490,5 +2503,5 @@ async function hydrate(){
 }
 
 if('serviceWorker' in navigator){
-  window.addEventListener('load', ()=> navigator.serviceWorker.register('sw.js?v=3.0.0').catch(()=>{}));
+  window.addEventListener('load', ()=> navigator.serviceWorker.register('sw.js?v=3.1.0').catch(()=>{}));
 }

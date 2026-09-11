@@ -1,3 +1,12 @@
+## 3.1.0 — Purple mobile studio
+
+- Purple theme, a single mobile dock and large, faint Mochi cat watermarks.
+- Keyboard / Stylus toggle beside the answer; preserve text, ink and answer when switching.
+- Typed step entry and stylus writing with pressure, undo, eraser and palm filtering.
+- Scale ink consistently on resizing; reject stale recognition after edits.
+- Handwriting proposes an answer for learner review; never submits automatically.
+- 125 automated tests pass, including 8,000 generated questions and seven input-flow checks. Actual iPad/Apple Pencil use and live recognition require a device trial.
+
 ## v3.0.0 — 2026-09-11
 
 - Completely replace the GUI stylesheet and rebuild the practice hierarchy around

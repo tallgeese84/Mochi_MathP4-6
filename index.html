@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<!-- Mochi Maths v3.0.0 — 2026-09-11 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
+<!-- Mochi Maths v3.1.0 — 2026-09-11 -->
 <title>Mochi · Euna’s maths studio</title>
 <meta name="description" content="A maths studio for Euna: explore, reason, challenge an idea, and learn with Mochi.">
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#f4f4f5">
+<meta name="theme-color" content="#f7f5fc">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Mochi Maths">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -313,10 +313,11 @@
   }
   :focus-visible{outline:3px solid var(--ginger);outline-offset:2px;}
 </style>
-<link rel="stylesheet" href="tutor.css?v=3.0.0">
-<link rel="stylesheet" href="studio.css?v=3.0.0">
+<link rel="stylesheet" href="tutor.css?v=3.1.0">
+<link rel="stylesheet" href="studio.css?v=3.1.0">
 </head>
 <body>
+<div class="mochi-watermarks" aria-hidden="true"><img class="watermark-cat cat-right" src="mochi-watermark.webp" alt="" draggable="false"><img class="watermark-cat cat-left" src="mochi-watermark.webp" alt="" draggable="false"></div>
 <a class="skip-link" href="#qText">Skip to the problem</a>
 <div class="wrap studio" id="studioSurface">
 
@@ -350,8 +351,45 @@
     <p class="focus-context" id="focusContext">No calculator</p>
     <div class="answer-composer">
 
+    <div class="input-mode-bar">
+      <span class="input-mode-label">Work your way</span>
+      <div class="input-mode-switch" role="group" aria-label="Input method">
+        <button id="inputKeyboard" type="button" aria-pressed="true" aria-controls="workingDrawer"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M6 9h1m3 0h1m3 0h1m3 0h0M6 12h1m3 0h1m3 0h1m3 0h0M7 15h10"/></svg>Keyboard</button>
+        <button id="inputStylus" type="button" aria-pressed="false" aria-controls="workingDrawer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5 4 4M4 20l4-1L20 7a2.8 2.8 0 0 0-4-4L4 15v5Z"/></svg>Stylus</button>
+      </div>
+    </div>
+    <details class="working-drawer" id="workingDrawer"><summary><span id="workingSummary">Show my working</span></summary>
+    <div class="wk" id="wk">
+      <div class="wkhead" id="stylusTools">
+        <span class="wklab">Write here</span>
+        <span class="wksp"></span>
+        <button class="wktool on" id="wkPen" title="Pen" aria-label="Pen">&#9998;</button>
+        <button class="wktool" id="wkErase" title="Eraser" aria-label="Eraser">&#9003;</button>
+        <button class="wktool" id="wkUndo" title="Undo" aria-label="Undo">&#8630;</button>
+        <button class="wktool" id="wkClear" title="Clear the page" aria-label="Clear">&#128465;</button>
+        <button class="wktool" id="wkPenOnly" title="Ignore finger touches" aria-label="Pen only">&#9995;</button>
+      </div>
+      <canvas id="wkCanvas" class="wkcanvas" aria-label="Write your working with a stylus, finger or mouse"></canvas>
+      <div class="keyboard-working" id="keyboardWorking" hidden>
+        <label for="typedWorking">Your working</label>
+        <textarea id="typedWorking" rows="4" maxlength="4000" spellcheck="false" placeholder="Write one step per line.
+For example: 24 ÷ 3 = 8"></textarea>
+        <button class="btn quiet sm" id="typedCheck">Check my steps</button>
+      </div>
+      <div class="wkrow">
+        <button class="btn quiet" id="wkCheck">Read my writing</button>
+        <button class="btn quiet" id="wkAdd">Type a line</button>
+        <span class="wkhint" id="wkHint" role="status" aria-live="polite">Write out your steps, then I will read them back to you.</span>
+      </div>
+      <div class="lines" id="wkLines"></div>
+      <div class="wksum" id="wkSum"></div>
+    </div>
+
+    </details>
+    <p id="inputModeStatus" class="sr-only" role="status" aria-live="polite"></p>
     <div id="studyChoices" class="study-choices" hidden></div>
     <div id="studyParts"></div>
+    <label for="answerInput" class="final-answer-label" id="finalAnswerLabel">Final answer</label>
     <div class="arow" id="answerRow">
       <div class="abox" id="aBox">
         <span class="afix" id="aPre" style="display:none"></span>
@@ -444,28 +482,7 @@
         <select id="studyObstacle"><option value="">Choose if useful</option><option value="meaning">Understanding the question</option><option value="representation">Making a diagram or model</option><option value="strategy">Choosing a method</option><option value="calculation">Doing the calculation</option><option value="checking">Checking or explaining</option></select>
       </label>
     </div>
-    <details class="working-drawer" id="workingDrawer"><summary>Sketch or type your working <span>Pen · eraser · line check</span></summary>
-    <div class="wk" id="wk">
-      <div class="wkhead">
-        <span class="wklab">Your working</span>
-        <span class="wksp"></span>
-        <button class="wktool on" id="wkPen" title="Pen" aria-label="Pen">&#9998;</button>
-        <button class="wktool" id="wkErase" title="Eraser" aria-label="Eraser">&#9003;</button>
-        <button class="wktool" id="wkUndo" title="Undo" aria-label="Undo">&#8630;</button>
-        <button class="wktool" id="wkClear" title="Clear the page" aria-label="Clear">&#128465;</button>
-        <button class="wktool" id="wkPenOnly" title="Ignore finger touches" aria-label="Pen only">&#9995;</button>
-      </div>
-      <canvas id="wkCanvas" class="wkcanvas" aria-label="Write your working here"></canvas>
-      <div class="wkrow">
-        <button class="btn quiet" id="wkCheck">Check my working</button>
-        <button class="btn quiet" id="wkAdd">Type a line</button>
-        <span class="wkhint" id="wkHint">Write out your steps, then I will read them back to you.</span>
-      </div>
-      <div class="lines" id="wkLines"></div>
-      <div class="wksum" id="wkSum"></div>
-    </div>
-
-    </details>
+    <button id="openInputWorking" class="btn quiet">Open my working</button>
     <div id="studyReflection" class="study-reflection" hidden>
       <label class="study-field" for="reflectionText">What did I learn? How can I check it another way?
         <textarea id="reflectionText" maxlength="1200" placeholder="A useful idea, a mistake I repaired, or a test that convinced me…"></textarea>
@@ -532,8 +549,8 @@
     <p class="coach-footnote" id="coachConnection">Local hints · connect an AI tutor in parent settings</p>
   </aside>
 <button id="focusBackdrop" class="focus-backdrop" aria-label="Close open panel" tabindex="-1" hidden></button>
-<nav class="floating-dock instrument-rail" id="focusDock" aria-label="Studio navigation"><button id="tabMaths" class="dock-item on" aria-label="Practice" aria-controls="viewMaths" aria-current="page"><span class="dock-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="3"/><path d="M9 8h6M9 12h6M9 16h3"/></svg></span><span class="dock-label">Practice</span></button><button id="focusThink" class="dock-item " aria-label="Think" aria-controls="thinkPanel" aria-expanded="false"><span class="dock-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5 4 4M4 20l4-1 12-12a2.8 2.8 0 0 0-4-4L4 15v5Z"/></svg></span><span class="dock-label">Think</span></button><button id="tabTools" class="dock-item " aria-label="Explore" aria-controls="visualLab" aria-expanded="false"><span class="dock-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h5v18H5zM14 3h5v5h-5zM14 12h5v9h-5zM5 8h5M5 13h5"/></svg></span><span class="dock-label">Explore</span></button><button id="tabMap" class="dock-item " aria-label="My map" aria-controls="viewMap" ><span class="dock-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="18" r="2.5"/><circle cx="19" cy="18" r="2.5"/><path d="m11 7-5 9m7-9 5 9M8 18h8"/></svg></span><span class="dock-label">My map</span></button><button id="focusMore" class="dock-item " aria-label="More" aria-controls="morePanel" aria-expanded="false"><span class="dock-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg></span><span class="dock-label">More</span></button></nav>
-<button id="coachFloat" class="tutor-orb" aria-label="Ask Mochi" aria-controls="coachCard" aria-expanded="false"><span class="tutor-avatar"><img src="icon-192.png" alt="" width="44" height="44"></span><span class="tutor-orb-label">Ask Mochi</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4V5Z"/><path d="M8 9h8M8 12h5"/></svg></button>
+<nav class="floating-dock instrument-rail" id="focusDock" aria-label="Studio navigation"><button id="tabMaths" class="dock-item on" aria-label="Practice" aria-controls="viewMaths" aria-current="page"><span class="dock-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="3"/><path d="M9 8h6M9 12h6M9 16h3"/></svg></span><span class="dock-label">Practice</span></button><button id="focusThink" class="dock-item " aria-label="Think" aria-controls="thinkPanel" aria-expanded="false"><span class="dock-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5 4 4M4 20l4-1 12-12a2.8 2.8 0 0 0-4-4L4 15v5Z"/></svg></span><span class="dock-label">Think</span></button><button id="tabTools" class="dock-item " aria-label="Explore" aria-controls="visualLab" aria-expanded="false"><span class="dock-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h5v18H5zM14 3h5v5h-5zM14 12h5v9h-5zM5 8h5M5 13h5"/></svg></span><span class="dock-label">Explore</span></button><button id="tabMap" class="dock-item " aria-label="My map" aria-controls="viewMap" ><span class="dock-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="18" r="2.5"/><circle cx="19" cy="18" r="2.5"/><path d="m11 7-5 9m7-9 5 9M8 18h8"/></svg></span><span class="dock-label">My map</span></button><button id="focusMore" class="dock-item " aria-label="More" aria-controls="morePanel" aria-expanded="false"><span class="dock-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg></span><span class="dock-label">More</span></button><button id="coachFloat" class="tutor-orb" aria-label="Ask Mochi" aria-controls="coachCard" aria-expanded="false"><span class="tutor-avatar"><img src="icon-192.png" alt="" width="44" height="44"></span><span class="tutor-orb-label">Ask Mochi</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4V5Z"/><path d="M8 9h8M8 12h5"/></svg></button></nav>
+
 <section id="visualLab" class="visual-lab focus-panel" role="dialog" aria-label="Floating visual maths lab" hidden tabindex="-1">
   <div class="lab-head" id="labHandle"><div><span class="overline">EXPLORE A RELATIONSHIP</span><h2>Visual lab</h2></div><div><button id="labResetPosition" class="icon-button" aria-label="Reset panel position">↺</button><button id="labClose" class="icon-button" aria-label="Close visual lab">×</button></div></div>
   <details class="panel-reference"><summary>See the problem</summary><p id="labQuestionRef"></p></details><div class="lab-tabs" role="group" aria-label="Choose a maths tool"><button data-tool="fraction" aria-pressed="true">Fractions</button><button data-tool="ratio" aria-pressed="false">Ratio</button><button data-tool="area" aria-pressed="false">Area</button><button data-tool="pattern" aria-pressed="false">Patterns</button></div>
@@ -629,12 +646,13 @@
   </div>
 </div>
 
-<script src="reasoning.js?v=3.0.0"></script>
-<script src="learning.js?v=3.0.0"></script>
-<script src="question-bank.js?v=3.0.0"></script>
-<script src="challenge-bank.js?v=3.0.0"></script>
-<script src="app.js?v=3.0.0"></script>
-<script src="study-ui.js?v=3.0.0"></script>
-<script src="studio.js?v=3.0.0"></script>
+<script src="reasoning.js?v=3.1.0"></script>
+<script src="learning.js?v=3.1.0"></script>
+<script src="question-bank.js?v=3.1.0"></script>
+<script src="challenge-bank.js?v=3.1.0"></script>
+<script src="app.js?v=3.1.0"></script>
+<script src="input-mode.js?v=3.1.0"></script>
+<script src="study-ui.js?v=3.1.0"></script>
+<script src="studio.js?v=3.1.0"></script>
 </body>
 </html>

@@ -26,7 +26,7 @@ function studioStageGo(stage,focus=false){
    $(id).setAttribute('aria-selected',String(key===stage));$(id).tabIndex=key===stage?0:-1;
    $(id).classList.toggle('has-thought',!!studyAttempt?.trace?.[key]);
  }
- if(stage==='solve'){$('workingDrawer').open=true;requestAnimationFrame(()=>{wkResize();wkRedraw();});}
+ if(stage==='solve')$('workingDrawer').open=true;
  if(focus)$(STAGE_IDS[stage]).focus();
  const count=Object.values(studyAttempt?.trace||{}).filter(Boolean).length;
  $('traceCount').textContent=count?count+' thinking step'+(count===1?'':'s')+' recorded':'Your route is yours';
@@ -83,6 +83,7 @@ function studioNewQuestion(){
  $('labPrediction').value='';$('labFinding').value='';$('labSave').textContent='Keep in my working';
  $('traceSaved').textContent='';$('routeChoice').textContent='I’m exploring';
  studioStageGo('understand');studioRouteButtons();studioPaint();
+ if(typeof inputQuestion==='function')inputQuestion();
 }
 function studioRouteButtons(){
  const box=$('routeOptions');box.innerHTML='';
@@ -184,6 +185,7 @@ function studioBenchmarks(){
  $('benchmarkList').innerHTML=rows.slice().reverse().map(b=>'<p><b>'+studyEscape(b.name)+'</b> · '+studyEscape(b.date)+'<br>'+studyEscape(b.note)+(b.percentile==null?'':'<br>Percentile '+b.percentile+' (supplied by an adult, not independently verified)')+'</p>').join('')||'<p>No external assessments recorded.</p>';
 }
 function studioInit(){
+ if(typeof inputInit==='function')inputInit();
  $('tabMaths').onclick=()=>studioShow('maths');$('tabRoom').onclick=()=>studioShow('room');$('tabMap').onclick=()=>studioShow('map');$('tabTools').onclick=studioOpenLab;$('mapReturn').onclick=()=>studioShow('maths');
  const advance=()=>{studyCommit(true);if(learning().session?.finished&&!current.custom)studioShow('map');else{renderQuestion();$('qText').focus();}};
  $('nextBtn').onclick=advance;$('skipBtn').onclick=advance;

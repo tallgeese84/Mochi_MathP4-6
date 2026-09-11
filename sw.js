@@ -1,8 +1,8 @@
 /* Mochi Maths — service worker.
    Bump SHELL when you deploy, and always deploy this file alongside index.html. */
-const SHELL = 'mochi-shell-v3.0.0';
+const SHELL = 'mochi-shell-v3.1.0';
 const FONTS = 'mochi-fonts-v1';          // separate bucket: code deploys never evict fonts
-const ASSETS = ['./', './index.html', './app.js?v=3.0.0', './learning.js?v=3.0.0', './question-bank.js?v=3.0.0', './study-ui.js?v=3.0.0', './tutor.css?v=3.0.0', './challenge-bank.js?v=3.0.0', './reasoning.js?v=3.0.0', './studio.js?v=3.0.0', './studio.css?v=3.0.0', './manifest.webmanifest',
+const ASSETS = ['./', './index.html', './app.js?v=3.1.0', './input-mode.js?v=3.1.0', './learning.js?v=3.1.0', './question-bank.js?v=3.1.0', './study-ui.js?v=3.1.0', './tutor.css?v=3.1.0', './challenge-bank.js?v=3.1.0', './reasoning.js?v=3.1.0', './studio.js?v=3.1.0', './studio.css?v=3.1.0', './manifest.webmanifest', './mochi-watermark.webp',
                 './icon-192.png', './icon-512.png', './icon-maskable-512.png', './apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
