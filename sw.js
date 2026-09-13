@@ -1,22 +1,28 @@
 /* Mochi Maths — fast offline shell. */
-const SHELL='mochi-shell-v4.2.9';
+const SHELL='mochi-shell-v4.3.0';
 const FONTS='mochi-fonts-v1';
-const SHELL_PAGE='./__mochi_shell_v4.2.9';
+const SHELL_PAGE='./__mochi_shell_v4.3.0';
 const HOME_CRITICAL=[
-  './baseline-week.js?v=4.2.9',
-  './quest-observer-guard.js?v=4.2.9',
-  './quest-visuals.js?v=4.2.9',
-  './perf-hotfix.js?v=4.2.9',
+  './baseline-week.js?v=4.3.0',
+  './quest-observer-guard.js?v=4.3.0',
+  './quest-visuals.js?v=4.3.0',
+  './perf-hotfix.js?v=4.3.0',
+  './cloud-sync.js?v=4.3.0',
+  './motion-runtime.js?v=4.3.0',
+  './release-marker.js?v=4.3.0',
   './euna-avatar.webp',
   './mochi-watermark.webp'
 ];
 
 function injectFocusScripts(html){
   const scripts=[];
-  if(!html.includes('baseline-week.js'))scripts.push('<script src="baseline-week.js?v=4.2.9"></script>');
-  if(!html.includes('quest-observer-guard.js'))scripts.push('<script src="quest-observer-guard.js?v=4.2.9"></script>');
-  if(!html.includes('quest-visuals.js'))scripts.push('<script src="quest-visuals.js?v=4.2.9"></script>');
-  if(!html.includes('perf-hotfix.js'))scripts.push('<script src="perf-hotfix.js?v=4.2.9"></script>');
+  if(!html.includes('baseline-week.js'))scripts.push('<script src="baseline-week.js?v=4.3.0"></script>');
+  if(!html.includes('quest-observer-guard.js'))scripts.push('<script src="quest-observer-guard.js?v=4.3.0"></script>');
+  if(!html.includes('quest-visuals.js'))scripts.push('<script src="quest-visuals.js?v=4.3.0"></script>');
+  if(!html.includes('perf-hotfix.js'))scripts.push('<script src="perf-hotfix.js?v=4.3.0"></script>');
+  if(!html.includes('cloud-sync.js'))scripts.push('<script src="cloud-sync.js?v=4.3.0"></script>');
+  if(!html.includes('motion-runtime.js'))scripts.push('<script src="motion-runtime.js?v=4.3.0"></script>');
+  if(!html.includes('release-marker.js'))scripts.push('<script src="release-marker.js?v=4.3.0"></script>');
   return scripts.length?html.replace('</body>',scripts.join('\n')+'\n</body>'):html;
 }
 
@@ -60,8 +66,7 @@ self.addEventListener('fetch',e=>{
 
   if(url.hostname.includes('fonts.g')){
     e.respondWith((async()=>{
-      const cache=await caches.open(FONTS);
-      const hit=await cache.match(e.request);
+      const cache=await caches.open(FONTS),hit=await cache.match(e.request);
       if(hit)return hit;
       try{const r=await fetch(e.request);if(r&&r.ok)await cache.put(e.request,r.clone());return r;}catch(err){return Response.error();}
     })());
@@ -70,28 +75,19 @@ self.addEventListener('fetch',e=>{
 
   if(e.request.mode==='navigate'){
     e.respondWith((async()=>{
-      const cache=await caches.open(SHELL);
-      const shell=await cache.match(SHELL_PAGE);
+      const cache=await caches.open(SHELL),shell=await cache.match(SHELL_PAGE);
       if(shell)return shell;
       try{return await buildShell();}
-      catch(err){
-        const fallback=await cache.match('./index.html')||await caches.match('./index.html')||await caches.match('./');
-        return fallback||Response.error();
-      }
+      catch(err){const fallback=await cache.match('./index.html')||await caches.match('./index.html')||await caches.match('./');return fallback||Response.error();}
     })());
     return;
   }
 
   if(url.origin===self.location.origin){
     e.respondWith((async()=>{
-      const cache=await caches.open(SHELL);
-      const hit=await cache.match(e.request);
+      const cache=await caches.open(SHELL),hit=await cache.match(e.request);
       if(hit)return hit;
-      try{
-        const r=await fetch(e.request);
-        if(r&&r.ok)await cache.put(e.request,r.clone());
-        return r;
-      }catch(err){return Response.error();}
+      try{const r=await fetch(e.request);if(r&&r.ok)await cache.put(e.request,r.clone());return r;}catch(err){return Response.error();}
     })());
   }
 });
