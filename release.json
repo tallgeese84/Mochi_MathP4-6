@@ -1,5 +1,5 @@
 {
-  "version": "4.2.8",
+  "version": "4.2.9",
   "releasedOn": "2026-09-13",
-  "summary": "Restored visible home-page motion by making the dashboard state-aware and animating the illustrated maths objects, Euna, Mochi, and current quest cards."
+  "summary": "Performance hotfix: cached home shell, no duplicate startup precache, and lazy caching of Science assets while preserving animated illustrated maths scenes."
 }
