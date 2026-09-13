@@ -1,5 +1,5 @@
 {
-  "version": "4.2.7",
+  "version": "4.2.8",
   "releasedOn": "2026-09-13",
-  "summary": "Illustration-first quest board: original visual scenes for each maths checkpoint, illustrated weekly cards, and less learner-facing text."
+  "summary": "Restored visible home-page motion by making the dashboard state-aware and animating the illustrated maths objects, Euna, Mochi, and current quest cards."
 }
