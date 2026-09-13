@@ -2,7 +2,7 @@
 const SHELL='mochi-shell-v4.2.8';
 const FONTS='mochi-fonts-v1';
 const ASSETS=[
-  './baseline-week.js?v=4.2.8','./quest-visuals.js?v=4.2.8',
+  './baseline-week.js?v=4.2.8','./quest-observer-guard.js?v=4.2.8','./quest-visuals.js?v=4.2.8',
   './science-core.js?v=4.2.1','./science-scenes.js?v=4.2.1','./science-ui.js?v=4.2.1','./science.css?v=4.2.1','./transfer-bank.js?v=4.2.1',
   './science-plant.webp','./science-pond.webp','./science-body.webp','./science-heat.webp','./science-cart.webp',
   './','./index.html','./app.js?v=4.2.1','./input-mode.js?v=4.2.1','./learning.js?v=4.2.1','./question-bank.js?v=4.2.1','./study-ui.js?v=4.2.1','./tutor.css?v=4.2.1','./challenge-bank.js?v=4.2.1','./reasoning.js?v=4.2.1','./studio.js?v=4.2.1','./studio.css?v=4.2.1','./manifest.webmanifest?v=4.2.1',
@@ -15,6 +15,7 @@ function withFocusScripts(response){
   return response.text().then(html=>{
     const scripts=[];
     if(!html.includes('baseline-week.js'))scripts.push('<script src="baseline-week.js?v=4.2.8"></script>');
+    if(!html.includes('quest-observer-guard.js'))scripts.push('<script src="quest-observer-guard.js?v=4.2.8"></script>');
     if(!html.includes('quest-visuals.js'))scripts.push('<script src="quest-visuals.js?v=4.2.8"></script>');
     if(scripts.length)html=html.replace('</body>',scripts.join('\n')+'\n</body>');
     const headers=new Headers(response.headers);headers.delete('content-length');
