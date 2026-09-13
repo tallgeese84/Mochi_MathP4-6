@@ -16,7 +16,7 @@ let lastStatus='Cloud sync not configured.';
 const clone=x=>{try{return JSON.parse(JSON.stringify(x));}catch(e){return null;}};
 function deviceId(){
   let v='';try{v=localStorage.getItem(DEVICE_KEY)||'';}catch(e){}
-  if(!v){v=(crypto&&crypto.randomUUID?crypto.randomUUID():'d-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2));try{localStorage.setItem(DEVICE_KEY,v);}catch(e){}}
+  if(!v){v=(globalThis.crypto&&crypto.randomUUID?crypto.randomUUID():'d-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2));try{localStorage.setItem(DEVICE_KEY,v);}catch(e){}}
   return v;
 }
 function config(){
@@ -90,7 +90,10 @@ function mergeStates(local,remote,remoteNewer){
   base.mastery=mergeMastery(local.mastery,remote.mastery);
   for(const k of ['done','right','best','fed'])base[k]=Math.max(Number(local[k])||0,Number(remote[k])||0);
   if(Array.isArray(local.owned)||Array.isArray(remote.owned))base.owned=[...new Set([...(local.owned||[]),...(remote.owned||[])])];
-  delete base.keys;delete base.provider;delete base.models;delete base.readModels;
+  /* Tutor credentials and provider choices are deliberately device-local. A cloud pull must never remove them. */
+  for(const k of ['keys','provider','models','readModels']){
+    if(local[k]!==undefined)base[k]=clone(local[k]);else delete base[k];
+  }
   return base;
 }
 function sanitizeMerged(s){
