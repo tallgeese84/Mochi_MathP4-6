@@ -1,5 +1,5 @@
 {
-  "version": "4.2.9",
+  "version": "4.3.0",
   "releasedOn": "2026-09-13",
-  "summary": "Performance hotfix: cached home shell, no duplicate startup precache, and lazy caching of Science assets while preserving animated illustrated maths scenes."
+  "summary": "Family Firebase progress sync using the existing cubs_sync configuration, plus reliable Web Animations API motion for the illustrated home quest."
 }
