@@ -1,8 +1,8 @@
 /* Mochi Maths — service worker.
    Bump SHELL when you deploy, and always deploy this file alongside index.html. */
-const SHELL = 'mochi-shell-v4.2.2';
+const SHELL = 'mochi-shell-v4.2.3';
 const FONTS = 'mochi-fonts-v1';          // separate bucket: code deploys never evict fonts
-const ASSETS = ['./baseline-week.js?v=4.2.2', './science-core.js?v=4.2.1', './science-scenes.js?v=4.2.1', './science-ui.js?v=4.2.1', './science.css?v=4.2.1', './transfer-bank.js?v=4.2.1', './science-plant.webp', './science-pond.webp', './science-body.webp', './science-heat.webp', './science-cart.webp', './', './index.html', './app.js?v=4.2.1', './input-mode.js?v=4.2.1', './learning.js?v=4.2.1', './question-bank.js?v=4.2.1', './study-ui.js?v=4.2.1', './tutor.css?v=4.2.1', './challenge-bank.js?v=4.2.1', './reasoning.js?v=4.2.1', './studio.js?v=4.2.1', './studio.css?v=4.2.1', './manifest.webmanifest?v=4.2.1', './mochi-watermark.webp', './euna-avatar.webp', './favicon.png?v=4.2.1',
+const ASSETS = ['./baseline-week.js?v=4.2.3', './science-core.js?v=4.2.1', './science-scenes.js?v=4.2.1', './science-ui.js?v=4.2.1', './science.css?v=4.2.1', './transfer-bank.js?v=4.2.1', './science-plant.webp', './science-pond.webp', './science-body.webp', './science-heat.webp', './science-cart.webp', './', './index.html', './app.js?v=4.2.1', './input-mode.js?v=4.2.1', './learning.js?v=4.2.1', './question-bank.js?v=4.2.1', './study-ui.js?v=4.2.1', './tutor.css?v=4.2.1', './challenge-bank.js?v=4.2.1', './reasoning.js?v=4.2.1', './studio.js?v=4.2.1', './studio.css?v=4.2.1', './manifest.webmanifest?v=4.2.1', './mochi-watermark.webp', './euna-avatar.webp', './favicon.png?v=4.2.1',
                 './icon-192.png?v=4.2.1', './icon-512.png?v=4.2.1', './icon-maskable-512.png?v=4.2.1', './apple-touch-icon.png?v=4.2.1'];
 
 function withBaselineScript(response){
@@ -11,7 +11,7 @@ function withBaselineScript(response){
   if(!type.includes('text/html')) return response;
   return response.text().then(html=>{
     if(!html.includes('baseline-week.js')){
-      html=html.replace('</body>', '<script src="baseline-week.js?v=4.2.2"></script>\n</body>');
+      html=html.replace('</body>', '<script src="baseline-week.js?v=4.2.3"></script>\n</body>');
     }
     const headers=new Headers(response.headers);
     headers.delete('content-length');
@@ -48,7 +48,7 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  // The page itself: network-first, then inject the small baseline-week module.
+  // The page itself: network-first, then inject the learner focus dashboard.
   if (e.request.mode === 'navigate') {
     e.respondWith(
       fetch(e.request)
