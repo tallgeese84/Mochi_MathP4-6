@@ -1,5 +1,5 @@
 {
-  "version": "4.2.5",
+  "version": "4.2.6",
   "releasedOn": "2026-09-13",
-  "summary": "Playful learner dashboard: short Today quest, animated floating shapes, visual weekly quest path, and one clear Start button."
+  "summary": "Visible quest motion: larger drifting shapes, faster orbiting pieces, animated current node, button shimmer, and pointer parallax."
 }
