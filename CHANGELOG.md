@@ -1,3 +1,22 @@
+# v4.3.9 — Follow the reasoning; clear the tablet workspace
+
+- Prioritise targeted follow-ups for percentage wholes, changing remainders and
+  fraction division from existing learning history. Check intermediate steps,
+  practise another context, and schedule recall after one day. Mix in other work
+  after two targeted questions; preserve the sequence through backup/restore.
+- Add 12 mathematically checked generators; avoid exact recent question repeats.
+- Add four fresh circuit/food-chain questions and 16 short authored Science
+  reasoning checks, scored separately from the main
+  choice. Save unsuccessful submissions immediately and preserve revisions.
+  Typed and handwritten explanations still need tutor/adult discussion.
+- Prefer unseen Science items and follow up on missed concepts. Mark familiar
+  questions as repeats and exclude them from new independent evidence.
+- Put navigation in normal page flow on tablets and phones (up to 1199 px), and
+  reserve a separate navigation gutter on desktop. Keep panels within the usable
+  viewport. The website and installed PWA share the same release and offline assets.
+- Include follow-up stages and Science reasoning evidence in the existing learning
+  mirror. Existing progress, provider settings and mirror setup are preserved.
+
 # v4.3.8 — Copy the mirror secret
 
 - Add Show secret / Hide secret and Copy secret controls to the existing mirror setup.

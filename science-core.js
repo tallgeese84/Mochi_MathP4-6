@@ -61,24 +61,102 @@ add('body','b-absorb','In which part of the digestive system is digested food ab
 add('body','b-oxygen','Which sequence shows how oxygen reaches a body cell?', ['Lungs → blood → body cell','Stomach → bones → lungs','Heart → food → stomach'],0,'Oxygen passes from air in the lungs into blood and is transported to body cells.',{level:2,state:{system:'respiratory',part:'lungs'}});
 add('body','b-systems','Why do body cells need both digestive and circulatory systems?', ['Digestion breaks food into simpler substances; blood transports digested food','Blood chews food in the stomach','The heart absorbs all food directly'],0,'The digestive system breaks food into simpler substances that can be absorbed. The circulatory system transports digested food in the blood to all parts of the body.',{level:3});
 add('body','b-assess','A child says food travels through the lungs before reaching the stomach. Which statement correctly describes the two pathways?', ['Swallowed food travels through the gullet; air travels through the windpipe','All food and air follow the same tube throughout','Food is pumped into the stomach by the heart'],0,'Swallowed food passes from the mouth through the gullet to the stomach. Air passes through the windpipe to the lungs. The windpipe does not carry swallowed food to the stomach.',{assessment:true,level:2});
+add('ecosystems','e-energy-route','In a pond, a snail eats algae and a fish eats the snail. Which sequence shows the direction of energy transfer?',['Fish → snail → algae','Algae → snail → fish','Snail → algae → fish'],1,'Energy is transferred from algae to the snail when it eats algae, and from the snail to the fish when it eats the snail.',{level:2});
+add('ecosystems','e-explain-arrow','A pupil draws snail → algae to mean “the snail eats algae”. How should this be shown in a food chain?',['Keep snail → algae','Draw arrows in both directions','Draw algae → snail'],2,'In a food chain the arrow shows energy transfer from food to consumer. The snail eats algae, so the arrow points from algae to snail.',{level:2});
+add('circuits','c-gap','A wire is disconnected in a circuit containing a battery and one bulb. Why does the bulb go out?',['Electric current escapes through the gap','The conducting path is incomplete, so current cannot flow around the circuit','The gap uses up the light'],1,'The disconnected wire makes the circuit open. There is no complete conducting path through the bulb and battery.',{level:1,state:{bulbs:1,closed:false}});
+add('circuits','c-reconnect','A battery, bulb and switch are correctly connected in series. The bulb is unlit with the switch open. What does closing the switch change?',['It forms a complete conducting path through the bulb','It adds another battery','It stores light in the wire'],0,'Closing the switch completes the circuit. Electric current can flow through the bulb, causing it to light up.',{level:2,state:{bulbs:1,closed:false}});
+// These short reasoning checks are marked separately from the main choice.
+// Free text and ink remain ungraded evidence for a tutor or adult to discuss.
+const probes={
+ circuits:[
+  ['c-loop','Which explanation accounts for an unlit bulb when the switch is open?',['The gap breaks the complete conducting path','The battery sends current out through the gap','The bulb uses up all the current'],0,'An open switch breaks the complete conducting path. Current cannot flow around this circuit.'],
+  ['c-terminals','Which connection allows a bulb to light?',['Both bulb contacts connected only to the same battery terminal','A complete conducting path from one battery terminal through the bulb to the other terminal','A wire touching only the glass'],1,'The circuit needs a complete conducting path through the bulb and both battery terminals.']
+ ],
+ ecosystems:[
+  ['e-direction','A snail eats algae. Which direction shows energy transfer?',['Snail → algae','Algae → snail','Energy does not pass from food to consumer'],1,'Energy is transferred from the algae to the snail when the snail eats the algae.'],
+  ['e-food','A fish eats a snail. Complete the explanation: energy is transferred…',['from the fish to the snail it eats','from the snail to the fish that eats it','from the water to both animals without food'],1,'The arrow points from the organism eaten to its consumer.']
+ ],
+ shadows:[
+  ['l-rays','Why is there a dark region behind an opaque object?',['The object gives off darkness','The object bends all light towards itself','The object blocks some light travelling from the source'],2,'Light travels in straight lines. The opaque object blocks some light.'],
+  ['l-screen','With the source and screen fixed, moving the same object towards the screen makes the shadow smaller. What should stay unchanged to test this fairly?',['The object size and the positions of source and screen','Nothing else needs to stay unchanged','The object must also become smaller'],0,'Change only the object position, keeping the other relevant conditions the same.']
+ ],
+ heat:[
+  ['h-flow','A cup of water is hotter than the room. Complete the explanation: the water…',['gains heat from the cooler room','loses heat to the cooler surroundings','turns its temperature into air'],1,'Heat flows from the hotter water to the cooler surroundings.'],
+  ['h-wrap','Why does a poor conductor wrapped around a hot cup slow cooling?',['It makes new heat','It stops all heat transfer forever','It reduces the rate of heat transfer to the cooler surroundings'],2,'A poor conductor slows heat transfer; it does not produce heat.']
+ ],
+ plants:[
+  ['p-water','What do roots absorb from the soil?',['Ready-made food only','Water and mineral salts','Sunlight and sugar'],1,'Roots absorb water and mineral salts. Green leaves make food during photosynthesis.'],
+  ['p-light','What is light used for by a green leaf?',['It supplies energy for making food','It becomes mineral salts','It replaces the need for water'],0,'Green leaves use light energy, water and carbon dioxide to make food.']
+ ],
+ matter:[
+  ['m-heat','Which explanation describes melting?',['Ice loses heat and becomes water vapour','Ice gains heat and becomes liquid water','Liquid water becomes air'],1,'Ice gains heat and melts into liquid water. No new substance is formed.'],
+  ['m-vapour','Which statement distinguishes water vapour from water droplets?',['Both are air','Water vapour is liquid; droplets are gas','Water vapour is a gas; droplets are liquid water'],2,'Water vapour is water in the gaseous state. It is not air.']
+ ],
+ body:[
+  ['b-blood','What happens to digested food at the small intestine?',['It is absorbed into the blood','It passes into the windpipe','It is made by the heart'],0,'Digested food is absorbed through the walls of the small intestine into the blood.'],
+  ['b-transport','How does oxygen reach body cells from the lungs?',['It travels through bones only','It is transported in the blood','It travels through the gullet with food'],1,'Oxygen passes into the blood in the lungs and is transported to body cells.']
+ ],
+ forces:[
+  ['f-opposite','Two forces act in opposite directions. How do we find the overall force?',['Always add their sizes','Subtract the smaller size from the larger and use the direction of the larger force','Ignore friction'],1,'Opposing forces subtract. Net force is extension work.'],
+  ['f-motion','For a cart already moving right, equal opposing forces mean…',['no change in its speed or direction in this model','it must stop instantly','its mass changes'],0,'Balanced forces do not change motion in this model. This is extension work.']
+ ]
+};
+function probeFor(q){const list=items.filter(x=>x.skill===q.skill&&!x.assessment);const raw=probes[q.skill][Math.max(0,list.findIndex(x=>x.id===q.id))%2];return {id:raw[0],prompt:raw[1],choices:raw[2],answer:raw[3],why:raw[4]};}
+function cleanConcept(q,value){if(!value)return null;const p=probeFor(q);if(value.id!==p.id||!Number.isInteger(value.choice)||value.choice<0||value.choice>=p.choices.length)return null;return {id:p.id,choice:value.choice,correct:value.choice===p.answer,firstCorrect:value.firstCorrect===true};}
+function record(data,a){
+ const previous=data.attempts.findIndex(x=>a.id&&x.id===a.id);
+ const others=data.attempts.filter((_,i)=>i!==previous);
+ a.repeated=others.some(x=>x.item===a.item);
+ a.independent=!!(a.correct&&a.firstCorrect&&!a.helped&&!a.guess&&!a.repeated);
+ const q=items.find(q=>q.id===a.item);a.concept=cleanConcept(q,a.concept);
+ a.conceptIndependent=!!(a.concept?.correct&&a.concept.firstCorrect&&!a.helped&&!a.guess&&!others.some(x=>x.concept?.id===a.concept.id));
+ if(previous<0)data.attempts.push(a);else data.attempts[previous]=a;
+ data.attempts=data.attempts.slice(-1000);return a;
+}
 function fresh(){return {version:1,attempts:[],notes:[],drafts:{},seenAssess:[],session:null};}
 const cleanInk=raw=>(Array.isArray(raw)?raw:[]).slice(-80).map(s=>(Array.isArray(s)?s:[]).slice(0,500).filter(p=>Array.isArray(p)&&p.length===2&&p.every(Number.isFinite)).map(p=>p.map(v=>clamp(v,0,1))));
 function validate(raw){const out=fresh();if(!raw||raw.version!==1)return out;
- out.attempts=(Array.isArray(raw.attempts)?raw.attempts:[]).slice(-1000).filter(a=>items.some(q=>q.id===a.item)&&Number.isFinite(a.at)).map(a=>({item:a.item,skill:items.find(q=>q.id===a.item).skill,at:a.at,choice:Number.isInteger(a.choice)?a.choice:-1,correct:a.correct===true&&a.choice===items.find(q=>q.id===a.item).answer,guess:a.guess===true,firstCorrect:a.firstCorrect===true,helped:a.helped===true,assessment:a.assessment===true,explanation:String(a.explanation||'').slice(0,2500),prediction:String(a.prediction||'').slice(0,1000),strokes:cleanInk(a.strokes),independent:a.correct===true&&a.choice===items.find(q=>q.id===a.item).answer&&a.firstCorrect===true&&!a.helped&&!a.guess}));
+ out.attempts=[];
+ for(const a of (Array.isArray(raw.attempts)?raw.attempts:[]).slice(-1000)){
+  const q=items.find(q=>q.id===a.item);if(!q||!Number.isFinite(a.at))continue;
+  record(out,{id:String(a.id||'').slice(0,120),item:q.id,skill:q.skill,at:a.at,choice:Number.isInteger(a.choice)?a.choice:-1,correct:a.correct===true&&a.choice===q.answer,firstCorrect:a.firstCorrect===true,helped:a.helped===true,guess:a.guess===true,assessment:a.assessment===true,concept:cleanConcept(q,a.concept),explanation:String(a.explanation||'').slice(0,2500),prediction:String(a.prediction||'').slice(0,1000),strokes:cleanInk(a.strokes),responses:(Array.isArray(a.responses)?a.responses:[]).slice(-20).map(r=>({choice:Number.isInteger(r.choice)?r.choice:-1,conceptChoice:Number.isInteger(r.conceptChoice)?r.conceptChoice:-1,explanation:String(r.explanation||'').slice(0,2500),at:Number(r.at)||a.at}))});
+ }
  out.notes=(Array.isArray(raw.notes)?raw.notes:[]).slice(-100).filter(n=>Object.hasOwn(skills,n.skill)).map(n=>({skill:n.skill,at:Number(n.at)||0,text:String(n.text||'').slice(0,2500),prediction:String(n.prediction||'').slice(0,1000),strokes:cleanInk(n.strokes),trials:(Array.isArray(n.trials)?n.trials:[]).slice(-12).map(t=>({state:copy(t.state||{}),result:copy(t.result||{})}))}));
  out.seenAssess=(Array.isArray(raw.seenAssess)?raw.seenAssess:[]).filter(id=>items.some(q=>q.id===id&&q.assessment));
  // Drafts are limited to authored fields; imported text is never rendered as HTML.
  for(const skill of Object.keys(skills)){const d=raw.drafts?.[skill];if(!d)continue;out.drafts[skill]={prediction:String(d.prediction||'').slice(0,1000),explanation:String(d.explanation||'').slice(0,2500),strokes:(Array.isArray(d.strokes)?d.strokes:[]).slice(-80).map(s=>(Array.isArray(s)?s:[]).slice(0,500).filter(p=>Array.isArray(p)&&p.length===2&&p.every(Number.isFinite)).map(p=>p.map(v=>clamp(v,0,1))))};}
  return out;
 }
-function evidence(data,skill){const a=data.attempts.filter(x=>x.skill===skill),recent=a.slice(-6),ind=recent.filter(x=>x.independent);return {count:a.length,independent:ind.length,misses:recent.filter(x=>!x.firstCorrect).length,days:new Set(ind.map(x=>new Date(x.at).toISOString().slice(0,10))).size,last:a.at(-1)?.at||0,label:!a.length?'Not checked':ind.length<2?'Building':'Practising'};}
-function choose(data,mode='practice',focus=null){let pool=items.filter(q=>!!q.assessment===(mode==='assessment'));if(focus)pool=pool.filter(q=>q.skill===focus);
- if(mode==='assessment')return pool.find(q=>!data.seenAssess.includes(q.id))||null;
- const skillsIn=[...new Set(pool.map(q=>q.skill))];skillsIn.sort((a,b)=>{const score=k=>{const e=evidence(data,k);return !e.count?100:e.misses*4-e.independent+((Date.now()-e.last)>3*86400000?8:0);};return score(b)-score(a);});
- const skill=skillsIn[0];pool=pool.filter(q=>q.skill===skill);const e=evidence(data,skill),max=e.independent>=2?3:2;
- const manageable=pool.filter(q=>q.level<=max);if(manageable.length)pool=manageable;
- const freshItems=pool.filter(q=>!data.attempts.slice(-3).some(a=>a.item===q.id));return (freshItems.length?freshItems:pool)[0];
+function evidence(data,skill){
+ const a=data.attempts.filter(x=>x.skill===skill),recent=a.slice(-6),ind=recent.filter(x=>x.independent),concept=recent.filter(x=>x.conceptIndependent);
+ return {count:a.length,independent:ind.length,conceptChecks:concept.length,pending:recent.filter(x=>!x.concept).length,misses:a.filter(x=>x.at>(a.filter(r=>r.concept?.correct&&r.concept.firstCorrect&&!r.helped&&!r.guess).at(-1)?.at||0)&&(!x.firstCorrect||x.concept&&!x.concept.firstCorrect)).length,days:new Set(ind.map(x=>new Date(x.at).toISOString().slice(0,10))).size,last:a.at(-1)?.at||0,label:!a.length?'Not checked':concept.length<2?'Building':'Practising'};
 }
-root.MochiScience={tutorLanguage,skills,changes,defaults,items,copy,circuit,shadow,cooling,force,model,fresh,validate,evidence,choose};
+function choose(data,mode='practice',focus=null){
+ let pool=items.filter(q=>!!q.assessment===(mode==='assessment'));if(focus)pool=pool.filter(q=>q.skill===focus);
+ if(mode==='assessment')return pool.find(q=>!data.seenAssess.includes(q.id))||null;
+ const last=data.attempts.at(-1),tail=data.attempts.slice(-2);
+ const needsCheck=a=>a&&(!a.firstCorrect||a.concept&&!a.concept.correct||a.helped||a.guess);
+ const consecutive=tail.length===2&&tail.every(a=>a.skill===last.skill);
+ let target=focus||(!consecutive&&needsCheck(last)?last.skill:null);
+ // Older mistakes and missing concept evidence get a fresh check on the next visit.
+ if(!target){
+  const ids=[...new Set(pool.map(q=>q.skill))];
+  ids.sort((a,b)=>{
+   const score=k=>{const e=evidence(data,k);return e.misses*8+e.pending*2+(e.count?0:4)-e.conceptChecks*2;};
+   return score(b)-score(a);
+  });
+  target=ids.find(id=>(!consecutive||id!==last.skill)&&pool.some(q=>q.skill===id&&!data.attempts.some(a=>a.item===q.id)))||ids[0];
+ }
+ let candidates=pool.filter(q=>q.skill===target),fresh=candidates.filter(q=>!data.attempts.some(a=>a.item===q.id));
+ if(!fresh.length&&!focus){fresh=pool.filter(q=>!data.attempts.some(a=>a.item===q.id));}
+ if(fresh.length)candidates=fresh;
+ else candidates=candidates.slice().sort((a,b)=>{
+  const time=q=>data.attempts.filter(x=>x.item===q.id).at(-1)?.at||0;return time(a)-time(b);
+ });
+ const q=candidates[0];if(!q)return null;
+ const repeated=data.attempts.some(a=>a.item===q.id);
+ return {...q,reason:repeated?'Familiar practice — this repeat is not new independent evidence.':needsCheck(last)&&q.skill===last.skill?'A follow-up to check the idea from your last answer.':'A fresh question with a separate reasoning check.'};
+}
+root.MochiScience={tutorLanguage,skills,changes,defaults,items,copy,circuit,shadow,cooling,force,model,fresh,validate,evidence,choose,probeFor,record};
 if(typeof module!=='undefined')module.exports=root.MochiScience;
 })(typeof globalThis!=='undefined'?globalThis:this);

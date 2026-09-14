@@ -4,6 +4,18 @@ const close=(a,b,msg)=>assert.ok(Math.abs(a-b)<1e-8,`${msg}: ${a} != ${b}`);
 const nums=s=>(s.match(/\d+(?:\.\d+)?/g)||[]).map(Number);
 // Independent calculations from the visible statement (not generator internals).
 const solve={
+ repairWholeCheck(q){return nums(q.text).at(-1)/2*3;},
+ repairWholePractice(q){return nums(q.text).at(-1)/(3/4*1/2);},
+ repairWholeTransfer(q){const n=nums(q.text);return (n.at(-1)+n.at(-2))/(1-n[0]/n[1]);},
+ repairWholeReview(q){return nums(q.text).at(-1)/(2/3*3/4*1/2);},
+ repairPercentCheck(q){const [p,n,total]=nums(q.text);return n*total/p;},
+ repairPercentPractice(q){const [p,n]=nums(q.text);return n/(p/100);},
+ repairPercentTransfer(q){const [discount,paid]=nums(q.text);return paid/(1-discount/100);},
+ repairPercentReview(q){const [filled,added,full]=nums(q.text);return added/((full-filled)/100);},
+ repairDivisionCheck(q){const [a,b]=nums(q.text);return 1/(a*b);},
+ repairDivisionPractice(q){const [a,b,n]=nums(q.text);return `1/${b*n}`;},
+ repairDivisionTransfer(q){const [a,b,n]=nums(q.text);return `1/${b*n}`;},
+ repairDivisionReview(q){const [a,b,n]=nums(q.text);return `1/${b*n}`;},
  fracRemainder(q){const [t,a,b,c,d]=nums(q.text);return t*(1-a/b)*(1-c/d);},
  ratioDiff(q){const [a,b,d]=nums(q.text);return d/(a-b)*(a+b);},
  percentDiscount(q){const [p,d]=nums(q.text);return p*(1-d/100);},
