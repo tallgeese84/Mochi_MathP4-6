@@ -41,8 +41,8 @@ function studyInit(){
  $('goalSave').onclick=()=>{if(/^\d{4}-(0[1-9]|1[0-2])$/.test($('goalMonth').value)){learning().goalMonth=$('goalMonth').value;save(S);studyPaint();studyParent();}};
  $('exportLearning').onclick=()=>{
    studyCommit(false);
-   const data=MochiLearning.backup(learning());
-   if(typeof scDraft==='function'){scDraft();data.science=MochiScience.validate(S.science);}
+   if(typeof scDraft==='function')scDraft();
+   const data=window.MochiReview.build(S,APP_VERSION);
    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');
    a.href=url;a.download='mochi-learning-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
    $('backupStatus').textContent='Learning backup downloaded. It contains personal learning notes; keep it private. API keys are excluded.';
@@ -57,6 +57,7 @@ function studyInit(){
  };
  if(studyClock)clearInterval(studyClock);
  studyClock=setInterval(()=>{
+   if(document.visibilityState==='hidden')return;
    const s=learning().session;
    $('studyTimer').textContent=s&&s.mode==='sprint'&&!s.finished?'Elapsed: '+Math.floor((Date.now()-s.started)/60000)+'m '+String(Math.floor((Date.now()-s.started)/1000)%60).padStart(2,'0')+'s · Try 10 questions in 9 minutes; accuracy first.':'';
  },1000);

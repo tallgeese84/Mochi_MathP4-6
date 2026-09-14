@@ -51,6 +51,14 @@ const w=dom.window,delay=ms=>new Promise(r=>setTimeout(r,ms));
  w.document.getElementById('inputKeyboard').click();
  assert.equal(w.document.body.dataset.inputMode,'keyboard');
  assert.equal(registrations.length,1,'one worker registration after local hydration');
+ assert.ok(w.document.getElementById('downloadLearningReview'));
+ const beforeReview=JSON.parse(w.localStorage.getItem('mochi-tutor-v1')).learning.attempts.length;
+ const exported=w.MochiReviewDownload.make();
+ assert.equal(exported.source.appVersion,version);
+ assert.equal(exported.learning.attempts.length,beforeReview,'export does not complete an unanswered question');
+ assert.equal(exported.review.maths.sampled,0);
+ assert.ok(exported.science);
+ assert.ok(w.MochiLearning.restore(exported));
  await delay(1300); // Let all bounded setup timers finish.
  let releaseMutations=0;
  const observer=new w.MutationObserver(records=>releaseMutations+=records.length);

@@ -13,12 +13,7 @@ function endpoint(){
   const c=cfg();if(!c.ok)return'';
   return `${c.url}/fam/${encodeURIComponent(c.code).replace(/\./g,'%2E')}/mochiBackup/latest.json`;
 }
-function makeBackup(){
-  const data=MochiLearning.backup(MochiLearning.init(S));
-  if(typeof scDraft==='function')try{scDraft();}catch(e){}
-  if(typeof MochiScience!=='undefined'&&S.science)try{data.science=MochiScience.validate(S.science);}catch(e){}
-  return data;
-}
+function makeBackup(){return window.MochiReview.build(S,APP_VERSION);}
 function setStatus(text){
   const b=document.getElementById('backupStatus');if(b)b.textContent=text;
   const c=document.getElementById('cloudBackupStatus');if(c)c.textContent=text;

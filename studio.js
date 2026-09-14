@@ -207,7 +207,7 @@ function studioInit(){
  // Dragging is optional: every control works without it, and Reset restores the panel.
  let drag=null;
  $('labHandle').onpointerdown=e=>{if(e.target.closest('button')||window.innerWidth<781)return;const r=$('visualLab').getBoundingClientRect();drag={x:e.clientX-r.left,y:e.clientY-r.top};$('labHandle').setPointerCapture(e.pointerId);};
- $('labHandle').onpointermove=e=>{if(!drag)return;const el=$('visualLab'),r=el.getBoundingClientRect();Object.assign(el.style,{left:Math.max(12,Math.min(window.innerWidth-r.width-12,e.clientX-drag.x))+'px',top:Math.max(12,Math.min(window.innerHeight-80,e.clientY-drag.y))+'px',right:'auto',bottom:'auto'});};
+ $('labHandle').onpointermove=e=>{if(!drag)return;const el=$('visualLab'),r=el.getBoundingClientRect();Object.assign(el.style,{left:Math.max(12,Math.min(window.innerWidth-r.width-12,e.clientX-drag.x))+'px',top:Math.max(12,Math.min(window.innerHeight-r.height-12,e.clientY-drag.y))+'px',right:'auto',bottom:'auto'});};
  $('labHandle').onpointerup=$('labHandle').onpointercancel=()=>{drag=null;};
  window.addEventListener('resize',()=>{if(window.innerWidth<781)$('labResetPosition').onclick();});
  document.addEventListener('keydown',e=>{if(e.key==='Tab'&&$('ov').classList.contains('show')){const targets=[...$('ov').querySelectorAll('button,input,select,textarea,a[href],summary')].filter(x=>!x.disabled&&x.getClientRects().length);const first=targets[0],last=targets[targets.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}}if(e.key==='Escape'){if($('ov').classList.contains('show')){$('ovClose').click();return;}if(focusPanel)focusClose();}});

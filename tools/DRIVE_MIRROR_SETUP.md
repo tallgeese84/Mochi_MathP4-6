@@ -1,6 +1,6 @@
 # Mochi private Google Drive mirror
 
-This is a one-time setup. Firebase remains Mochi's live cross-device database. The Drive mirror stores the exact same JSON produced by **Back up learning** so ChatGPT can retrieve and analyse Euna's learning history through the connected Google Drive plugin.
+This is a one-time setup. Firebase remains Mochi's live cross-device database. The Drive mirror stores the same versioned learning-backup format used by **Back up learning** and **Download for ChatGPT** so ChatGPT can retrieve and analyse Euna's learning history through the connected Google Drive plugin.
 
 ## Destination folder
 
@@ -43,3 +43,22 @@ With Google Drive connected, ask things such as:
 - “Set next week's Mochi programme from her actual results.”
 
 ChatGPT can locate `euna-mochi-latest.json` in Drive and analyse it on demand.
+
+## Checking freshness and delivery
+
+The app's “request sent” message cannot confirm delivery because the relay returns
+an opaque cross-origin response. Open the folder and verify both the file's
+modified date and its JSON `exported` timestamp. The JSON `source.appVersion`
+identifies the exporting app; `review.maths.latestAttempt` and
+`review.science.latestAttempt` identify the most recent recorded work. A recently
+exported file may still contain old learning records.
+
+The folder was readable but empty during the 14 September 2026 review. If no file
+appears after setup, use **Download for ChatGPT** and attach it directly here.
+Check Apps Script Executions for the failed request, the deployment permissions,
+the folder ID and that the two secrets match. Do not paste the secret into chat.
+Autosave mirroring runs while the app is open; closing a mobile browser is not a
+guaranteed opportunity for a final upload. Use **Mirror now** after a session.
+
+No new Apps Script deployment is needed just for v4.3.7's added metadata: the relay
+already accepts the unchanged `app`/`version` learning-backup envelope.
