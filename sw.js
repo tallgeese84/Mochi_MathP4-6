@@ -1,6 +1,6 @@
-/* Mochi v4.3.4 — simple network-first worker. No cached HTML version ladder. */
-const VERSION='4.3.4';
-const CACHE='mochi-static-v4.3.4';
+/* Mochi v4.3.5 — simple network-first worker. No cached HTML version ladder. */
+const VERSION='4.3.5';
+const CACHE='mochi-static-v4.3.5';
 self.addEventListener('install',event=>{self.skipWaiting();});
 self.addEventListener('activate',event=>{
   event.waitUntil((async()=>{

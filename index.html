@@ -13,7 +13,7 @@ html,body{margin:0;min-height:100%;font-family:system-ui,-apple-system,"Segoe UI
 <div class="boot"><div><div class="paw">🐾</div><p>Opening Mochi…</p></div></div>
 <script>
 (async()=>{
-  const VERSION='4.3.4';
+  const VERSION='4.3.5';
   const MARK='mochi-direct-index-version';
   try{
     if(localStorage.getItem(MARK)!==VERSION){
@@ -35,8 +35,8 @@ html,body{margin:0;min-height:100%;font-family:system-ui,-apple-system,"Segoe UI
              .replaceAll('11 September 2026','13 September 2026')
              .replaceAll('?v=4.2.1','?v='+VERSION);
     const extra=[
-      'baseline-week.js','quest-observer-guard.js','quest-visuals.js','perf-hotfix.js',
-      'cloud-sync.js','cloud-backup.js','drive-mirror.js','motion-runtime.js','release-marker.js','version-lock.js'
+      'baseline-week.js','quest-observer-guard.js','quest-visuals.js',
+      'cloud-sync.js','cloud-backup.js','drive-mirror.js','motion-runtime.js','version-lock.js'
     ].map(x=>'<script src="'+x+'?v='+VERSION+'"></scr'+'ipt>').join('');
     html=html.replace('</body>',extra+'</body>');
     document.open();document.write(html);document.close();

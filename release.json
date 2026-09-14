@@ -1,5 +1,5 @@
 {
-  "version": "4.3.4",
+  "version": "4.3.5",
   "releasedOn": "2026-09-13",
-  "summary": "Direct index loader replaces service-worker HTML injection; current Firebase sync, exact backup JSON, private Drive mirror, and animated illustrated home scenes load from one authoritative version."
+  "summary": "Removed legacy version writers from the direct loader and fixed the observer-guard race so all visible version labels stay on the authoritative current release."
 }
