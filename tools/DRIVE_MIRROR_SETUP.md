@@ -18,7 +18,7 @@ The relay writes:
 2. Replace the default code with `tools/mochi-drive-mirror.gs` from this repository.
 3. Open **Project Settings → Script Properties** and add:
    - `MIRROR_FOLDER_ID` = `1A5A9LZ6vTP2UckVtl5DwdVkc8-ktnlX2`
-   - `MIRROR_SECRET` = the secret generated in Mochi under **Grown-ups → ChatGPT learning mirror**.
+   - `MIRROR_SECRET` = the actual characters generated in Mochi under **Grown-ups → ChatGPT learning mirror**. In v4.3.8, use **Copy secret** or **Show secret**. Do not enter the words “the secret copied from Mochi”.
 4. Click **Deploy → New deployment → Web app**.
    - Execute as: **Me**
    - Who has access: **Anyone**
@@ -62,3 +62,16 @@ guaranteed opportunity for a final upload. Use **Mirror now** after a session.
 
 No new Apps Script deployment is needed just for v4.3.7's added metadata: the relay
 already accepts the unchanged `app`/`version` learning-backup envelope.
+
+## Copying a masked secret (v4.3.8)
+
+**Copy secret** copies the actual characters even when the field shows dots.
+**Show secret** reveals them and becomes **Hide secret**. If the browser blocks
+clipboard access, the app reveals and selects the value for manual copying.
+Paste it into the Google Script Property value for `MIRROR_SECRET`, save those
+properties, and use the identical value in Mochi on the tablet. Do not generate a
+new secret on the tablet after setting a different one in Google. The script ID,
+deployment ID, folder ID and web-app URL are not the secret.
+
+These controls do not change an existing secret. If its web-app URL is already
+entered, **Save settings** preserves the secret on this device before refreshing.

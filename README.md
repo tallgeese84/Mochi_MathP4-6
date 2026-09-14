@@ -5,7 +5,7 @@ Euna for Primary 6 mathematics and her **September 2027 SPERS-Sec1 planning targ
 with a separate enrichment strand for mathematical thinking. The exact 2027 test
 and application dates must be checked when published.
 
-**v4.3.7 — 14 September 2026.** The existing cat, room, handwriting pad, provider
+**v4.3.8 — 14 September 2026.** The existing cat, room, handwriting pad, provider
 settings and saved coins are preserved. Old topic totals are retained as legacy
 accuracy; they are not treated as new evidence of independent learning.
 
@@ -34,7 +34,7 @@ compare their displayed numbers.
 For each release, update `release.json`, run `node scripts/release.cjs`, and commit
 the generated changes together. Run `node scripts/release.cjs --check` before
 publishing to reject inconsistent labels, runtime metadata and offline asset
-versions. Release numbering uses `major.minor.patch`; the current release is v4.3.7.
+versions. Release numbering uses `major.minor.patch`; the current release is v4.3.8.
 
 Run `npm ci --ignore-scripts`, `npm run check:release`, and `npm test` using Node
 24.15 or later before merging. GitHub's **App checks / test** job runs the same
