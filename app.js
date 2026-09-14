@@ -5,23 +5,28 @@
    ========================================================= */
 const $ = id => document.getElementById(id);
 
-/* ---------- storage: window.storage -> memory ----------
-   On the GitHub Pages port, add a localStorage layer between these two. */
+/* Local progress first; optional host storage is bounded and never blocks saves. */
 const MEM = {};
 const KEY = 'mochi-tutor-v1';
 function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
 function lsSet(k,v){ try{ localStorage.setItem(k,v); return true; }catch(e){ return false; } }
 async function save(obj){
   const str = JSON.stringify(obj);
-  try { if(window.storage){ await window.storage.set(KEY, str); return; } } catch(e){}
-  if(lsSet(KEY, str)) return;
-  MEM[KEY] = str;
+  try { if(window.storage) Promise.resolve(window.storage.set(KEY, str)).catch(()=>{}); } catch(e){}
+  if(!lsSet(KEY, str)) MEM[KEY] = str;
+  document.dispatchEvent?.(new Event('mochi:state-saved'));
 }
 async function load(){
-  try { if(window.storage){ const r = await window.storage.get(KEY); if(r && r.value) return JSON.parse(r.value); } } catch(e){}
   const v = lsGet(KEY);
   if(v){ try{ return JSON.parse(v); }catch(e){} }
-  try { return MEM[KEY] ? JSON.parse(MEM[KEY]) : null; } catch(e){ return null; }
+  try { if(MEM[KEY]) return JSON.parse(MEM[KEY]);
+    if(window.storage){ const r=await storageRead(KEY); if(r?.value)return JSON.parse(r.value); }
+  }catch(e){}
+  return null;
+}
+
+function storageRead(key){
+  let timer;return Promise.race([Promise.resolve().then(()=>window.storage.get(key)),new Promise(resolve=>{timer=setTimeout(()=>resolve(null),1500);})]).finally(()=>clearTimeout(timer));
 }
 
 /* ---------- helpers ---------- */
@@ -1228,9 +1233,9 @@ function isCorrect(input,q){
 
 /* The cat ships inside the markup; this just reads her back out. */
 const BUILTIN_PHOTO = ($('catImg').getAttribute('src') || '');
-const APP_VERSION = '4.2.1';
+const APP_VERSION = '4.3.6';
 const BUILD_KIND  = 'site';
-const BUILD_DATE  = '2026-09-11';
+const BUILD_DATE  = '2026-09-14';
 const BUILD = BUILD_KIND + ' v' + APP_VERSION + ' \u00b7 ' + BUILD_DATE;
 const PHOTO_KEY = 'cat-photo-v1';
 
@@ -1257,12 +1262,13 @@ function clearPhoto(){
   $('catPrev').style.display = 'none';
 }
 async function savePhoto(url){
-  try{ if(window.storage){ await window.storage.set(PHOTO_KEY, url); } }catch(e){}
+  try{ if(window.storage) Promise.resolve(window.storage.set(PHOTO_KEY, url)).catch(()=>{}); }catch(e){}
   if(!lsSet(PHOTO_KEY, url)) MEM[PHOTO_KEY] = url;
 }
 async function loadPhoto(){
+  const local=lsGet(PHOTO_KEY)||MEM[PHOTO_KEY];if(local)return local;
   try{
-    if(window.storage){ const r = await window.storage.get(PHOTO_KEY); if(r && r.value) return r.value; }
+    if(window.storage){ const r = await storageRead(PHOTO_KEY); if(r && r.value) return r.value; }
   }catch(e){}
   return lsGet(PHOTO_KEY) || MEM[PHOTO_KEY] || BUILTIN_PHOTO || '';
 }
@@ -2479,9 +2485,11 @@ async function boot(){
   applyCatName();wkInit();paintCoins();
   await hydrate();
   MochiLearning.init(S);studyInit();if(typeof studioInit==='function')studioInit();renderQuestion();if(typeof scInit==='function')scInit();updateNet();
+  window.MochiReady=true;document.dispatchEvent?.(new Event('mochi:ready'));
+  hydratePhoto();
 }
 
-/* Storage is a network round-trip. It must never sit in front of a question. */
+/* Restore local progress before optional cloud sync starts. */
 async function hydrate(){
   let saved = null;
   try{ saved = await load(); }catch(e){}
@@ -2496,6 +2504,8 @@ async function hydrate(){
     paintCoins();
   }
   updateVoiceBtn();
+}
+async function hydratePhoto(){
   try{
     const u = await loadPhoto();
     if(u === '__none__') clearPhoto();
@@ -2504,5 +2514,5 @@ async function hydrate(){
 }
 
 if('serviceWorker' in navigator){
-  window.addEventListener('load', ()=> navigator.serviceWorker.register('sw.js?v=4.2.1').catch(()=>{}));
+  document.addEventListener('mochi:ready', ()=> navigator.serviceWorker.register('sw.js?v=4.3.6',{updateViaCache:'none'}).catch(()=>{}),{once:true});
 }

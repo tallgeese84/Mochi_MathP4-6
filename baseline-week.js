@@ -12,8 +12,6 @@ const BASELINE_STAGES=[
   {end:17,label:'Starting point · Part 4',short:'Volume, angles, data and modelling',detail:'5 questions · record a plan for the hardest one'}
 ];
 const PLAN_KEY='mochi-focus-plan-start-v1';
-const VERSION='4.2.8';
-const RELEASE_SUMMARY='Smooth illustrated quest board: state-aware rendering keeps the home scene alive instead of restarting it every 1.5 seconds.';
 
 function learning(){try{return MochiLearning.init(S);}catch(err){return null;}}
 function localDay(ts){const d=ts?new Date(ts):new Date();return new Date(d.getFullYear(),d.getMonth(),d.getDate());}
@@ -85,11 +83,7 @@ function startTask(){
   setTimeout(()=>{paint(true);const q=document.getElementById('qText')||document.querySelector('.qtext');q?.scrollIntoView({behavior:'smooth',block:'center'});},80);
 }
 
-function applyVersion(){
-  document.querySelectorAll('[data-app-version]').forEach(el=>el.textContent='v'+VERSION);
-  document.querySelectorAll('[data-release-date]').forEach(el=>{el.dateTime='2026-09-13';el.textContent='13 September 2026';});
-  const rn=document.getElementById('releaseNotes');if(rn)rn.textContent=RELEASE_SUMMARY;
-}
+
 function simplifyAdvanced(){
   document.body.classList.add('mochi-focus-mode');
   const own=document.getElementById('ownProblemStart');if(own){const details=own.closest('details');if(details)details.classList.add('mochi-secondary-choice');}
@@ -121,12 +115,12 @@ function style(){
 
 function stateKey(l){
   const t=taskState(l),rows=weekRows(l);
-  return JSON.stringify({phase:t.phase,part:t.part||0,done:t.done,total:t.total,cta:t.cta,session:l?.session?{mode:l.session.mode,done:l.session.done,total:l.session.total,finished:!!l.session.finished}:null,rows:rows.map(r=>[r.done,r.current,isoDay(r.date)])});
+  return JSON.stringify({today:isoDay(localDay()),phase:t.phase,part:t.part||0,done:t.done,total:t.total,cta:t.cta,session:l?.session?{mode:l.session.mode,done:l.session.done,total:l.session.total,finished:!!l.session.finished}:null,rows:rows.map(r=>[r.done,r.current,isoDay(r.date)])});
 }
 
 function mount(){
   if(document.getElementById('mochiFocusHome'))return;
-  style();simplifyAdvanced();applyVersion();
+  style();simplifyAdvanced();
   const host=document.createElement('section');host.id='mochiFocusHome';host.setAttribute('aria-label','Euna’s learning plan');
   const top=document.querySelector('.topbar');if(top)top.insertAdjacentElement('afterend',host);else(document.querySelector('.wrap')||document.body).prepend(host);
   paint(true);
@@ -135,7 +129,7 @@ function mount(){
 function paint(force=false){
   const host=document.getElementById('mochiFocusHome');if(!host)return;const l=learning();if(!l)return;
   const key=stateKey(l);
-  if(!force&&host.dataset.focusKey===key){applyVersion();return;}
+  if(!force&&host.dataset.focusKey===key){return;}
   host.dataset.focusKey=key;
   const t=taskState(l),rows=weekRows(l),pct=Math.max(0,Math.min(100,(t.done/t.total)*100));
   host.innerHTML=`
@@ -145,13 +139,13 @@ function paint(force=false){
       ${t.cta?`<button type="button" class="btn focus-start" id="focusStartTask">${t.cta} →</button>`:`<div class="focus-done">✓ Today’s task is complete</div>`}
     </section>
     <section class="focus-week"><div class="focus-week-head"><h2>This week</h2><span>One main task at a time</span></div><div class="focus-list">${rows.map(r=>`<div class="focus-row ${r.done?'done':''} ${r.current?'current':''}"><span class="focus-check">${r.done?'✓':r.current?'→':''}</span><span class="focus-when">${dateLabel(r.date)}</span><span><b>${r.title}</b><small>${r.detail}</small></span></div>`).join('')}</div></section>
-    <details class="focus-more" id="focusMore"><summary>More things I can do</summary><p class="focus-more-note">Science, learning map, challenges, Mochi’s room and other choices live here. Today’s task above should usually come first.</p></details>`;
+    <details class="focus-more" id="focusMoreChoices"><summary>More things I can do</summary><p class="focus-more-note">Science, learning map, challenges, Mochi’s room and other choices live here. Today’s task above should usually come first.</p></details>`;
   const start=document.getElementById('focusStartTask');if(start)start.onclick=startTask;
-  const more=document.getElementById('focusMore');if(more)more.ontoggle=()=>document.body.classList.toggle('mochi-show-more',more.open);
-  applyVersion();simplifyAdvanced();
+  const more=document.getElementById('focusMoreChoices');if(more)more.ontoggle=()=>document.body.classList.toggle('mochi-show-more',more.open);
+  simplifyAdvanced();
   document.dispatchEvent(new CustomEvent('mochi:focus-rendered',{detail:{phase:t.phase,part:t.part||0}}));
 }
 
-function install(){mount();paint(true);setInterval(()=>paint(false),1500);}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(install,0),{once:true});else setTimeout(install,0);
+function install(){mount();document.addEventListener('mochi:state-saved',()=>paint(false));document.addEventListener('mochi:cloud-merged',()=>paint(false));document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')paint(false);});}
+if(window.MochiReady)install();else document.addEventListener('mochi:ready',install,{once:true});
 })();

@@ -1,5 +1,5 @@
 {
-  "version": "4.3.5",
-  "releasedOn": "2026-09-13",
-  "summary": "Removed legacy version writers from the direct loader and fixed the observer-guard race so all visible version labels stay on the authoritative current release."
+  "version": "4.3.6",
+  "releasedOn": "2026-09-14",
+  "summary": "Fast direct startup, no version-observer loops or forced reloads, and reliable offline recovery."
 }

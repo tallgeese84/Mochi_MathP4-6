@@ -33,9 +33,10 @@ async function mirrorNow(reason='auto'){
   try{
     const body={secret:secret(),reason,backup:backupObject()};
     /* text/plain keeps this a simple cross-origin request and avoids CORS preflight. */
-    await fetch(relayUrl(),{method:'POST',mode:'no-cors',cache:'no-store',keepalive:true,headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)});
+    const payload=JSON.stringify(body);
+    await window.MochiNetwork.request(relayUrl(),{method:'POST',mode:'no-cors',cache:'no-store',keepalive:reason==='pagehide' && new Blob([payload]).size<60000,headers:{'Content-Type':'text/plain;charset=utf-8'},body:payload});
     const at=new Date().toISOString();set(LAST_KEY,at);
-    status('Backup sent to private Drive mirror · '+new Date(at).toLocaleString(), 'ok');paint();
+    status('Drive request sent; delivery cannot be confirmed in this browser · '+new Date(at).toLocaleString(), 'ok');paint();
     return true;
   }catch(err){status('Drive mirror failed · '+err.message,'bad');return false;}
   finally{busy=false;}
@@ -79,5 +80,5 @@ function paint(){
   if(st&&!busy){const last=get(LAST_KEY);st.textContent=lastMessage+(last&&lastMessage==='Drive mirror not configured.'?' Last send: '+new Date(last).toLocaleString():'');}
 }
 function init(){wrapSave();mount();hookBackupButton();document.addEventListener('mochi:cloud-merged',schedule);window.addEventListener('online',schedule);window.addEventListener('pagehide',()=>{if(configured())mirrorNow('pagehide');});setTimeout(()=>{mount();hookBackupButton();},1000);}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+if(window.MochiReady)init();else document.addEventListener('mochi:ready',init,{once:true});
 })();

@@ -1,49 +1,710 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
+<!-- Mochi Maths v4.3.6 — 2026-09-14 -->
 <title>Mochi · Euna’s maths studio</title>
+<meta name="description" content="A maths studio for Euna: explore, reason, challenge an idea, and learn with Mochi.">
+<link rel="manifest" href="manifest.webmanifest?v=4.3.6">
 <meta name="theme-color" content="#f7f5fc">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Mochi Maths">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=4.3.6">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon.png?v=4.3.6">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" media="print" onload="this.media=&#39;all&#39;"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
+<noscript><link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"></noscript>
 <style>
-html,body{margin:0;min-height:100%;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:#FDF2EC;color:#2A1F1A}.boot{min-height:100vh;display:grid;place-items:center}.boot>div{text-align:center}.paw{font-size:42px;animation:b 1.2s ease-in-out infinite}@keyframes b{50%{transform:translateY(-7px)}}.boot p{font-weight:700;color:#806B60}
+  :root{
+    /* A ginger cat, taken apart into colours. */
+    --milk:#FDF2EC;      /* paw pad — page */
+    --card:#FFFFFF;
+    --ink:#2A1F1A;       /* pupil brown-black */
+    --slate:#806B60;     /* tabby undercoat */
+    --ginger:#E86A2E;    /* marmalade fur */
+    --ginger-deep:#B4560F;
+    --ginger-soft:#FBE3D5;
+    --jade:#1F8F6E;      /* eye green */
+    --jade-soft:#DDF0E8;
+    --nose:#EE8FA0;
+    --line:#F2DDD1;
+    --coral:#E86A2E; --gold:#D99000; --mint:#1F8F6E; --sky:#3C7D9E; --berry:#D4607A;
+    --shadow:0 2px 0 var(--line), 0 14px 34px rgba(120,72,40,.10);
+    --r:20px;
+    --body:'Karla',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
+    --disp:'Baloo 2',ui-rounded,'Segoe UI',system-ui,sans-serif;
+    --mono:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{font-family:var(--body);background:var(--milk);color:var(--ink);min-height:100vh;
+    -webkit-tap-highlight-color:transparent;}
+  .wrap{max-width:720px;margin:0 auto;padding:14px 14px 40px;}
+
+  .eyebrow{display:flex;align-items:center;gap:10px;margin:2px 0 12px;}
+  .eyebrow b{font-family:var(--mono);font-weight:700;font-size:.66rem;letter-spacing:1.4px;
+    color:var(--slate);text-transform:uppercase;}
+  .eyebrow .sp{flex:1;}
+  .ibtn{background:var(--card);border:2px solid var(--line);color:var(--slate);width:38px;height:38px;
+    border-radius:12px;font-size:16px;cursor:pointer;display:grid;place-items:center;}
+  .ibtn:hover{border-color:var(--ginger);color:var(--ginger);}
+  .ibtn.off{opacity:.45;}
+
+  .card{background:var(--card);border:2px solid var(--line);border-radius:var(--r);
+    box-shadow:var(--shadow);padding:18px;margin-bottom:14px;}
+
+  /* ---------- THE CAT (compact top bar) ---------- */
+  .topbar{display:flex;gap:11px;align-items:center;margin:2px 0 14px;}
+  .topmeta{min-width:0;}
+  .topmeta b{font-family:var(--disp);font-weight:700;font-size:1.02rem;display:block;line-height:1.15;}
+  .catwrap{width:52px;flex:none;}
+  .catphoto{width:52px;height:52px;border-radius:16px;background:var(--milk);
+    border:3px solid var(--line);display:grid;place-items:center;overflow:hidden;
+    transition:border-color .35s ease, transform .4s cubic-bezier(.2,1.4,.4,1);}
+  .catphoto img{width:100%;height:100%;object-fit:contain;display:block;}
+  .catphoto .ph{width:24px;height:24px;fill:#E3CDBF;}
+  .catwrap.pleased .catphoto{border-color:var(--jade);transform:translateY(-4px) scale(1.05);}
+  .catwrap.unsure  .catphoto{border-color:var(--nose);transform:translateY(3px) rotate(-2.5deg);}
+  .catwrap.curious .catphoto{border-color:var(--ginger);animation:lean 3s ease-in-out infinite;}
+  @keyframes lean{0%,100%{transform:rotate(-2deg);}50%{transform:rotate(2deg);}}
+  .catmood{font-family:var(--mono);font-size:.58rem;letter-spacing:.8px;color:var(--slate);text-transform:uppercase;}
+
+  .dots{display:none;gap:4px;align-items:center;}
+  .msg.pending .dots{display:inline-flex;}
+  .dots i{width:6px;height:6px;border-radius:50%;background:var(--ginger);display:block;
+    animation:blip 1.1s ease-in-out infinite;}
+  .dots i:nth-child(2){animation-delay:.16s;}
+  .dots i:nth-child(3){animation-delay:.32s;}
+  @keyframes blip{0%,100%{opacity:.25;transform:translateY(0);}50%{opacity:1;transform:translateY(-3px);}}
+
+  /* ---------- TABS ---------- */
+  .tabs{display:flex;align-items:center;gap:7px;margin:0 0 14px;}
+  .tab{flex:none;background:var(--card);border:2px solid var(--line);color:var(--slate);
+    font-family:var(--disp);font-weight:700;font-size:.92rem;padding:9px 16px;border-radius:13px;cursor:pointer;}
+  .tab.on{background:var(--ginger);border-color:var(--ginger);color:#fff;box-shadow:0 3px 0 var(--ginger-deep);}
+  .coinchip{margin-left:auto;display:inline-flex;align-items:center;gap:6px;background:#FFF4D6;
+    border:2px solid var(--gold);border-radius:999px;padding:6px 13px;font-family:var(--mono);
+    font-weight:700;font-size:.85rem;color:#7A5200;position:relative;}
+  .coinchip .cn{font-size:.95rem;}
+  .coinpop{position:absolute;right:6px;top:-4px;font-family:var(--disp);font-weight:700;font-size:.85rem;
+    color:var(--jade);pointer-events:none;animation:coinup 1.1s ease-out forwards;}
+  @keyframes coinup{0%{opacity:0;transform:translateY(4px);}20%{opacity:1;}100%{opacity:0;transform:translateY(-22px);}}
+
+  /* ---------- MOCHI'S ROOM ---------- */
+  .room{display:flex;flex-direction:column;align-items:center;}
+  .stage{position:relative;width:200px;height:200px;border-radius:34px;overflow:visible;
+    background:radial-gradient(circle at 50% 40%, #FFF6EE 0%, var(--milk) 70%);
+    border:3px solid var(--line);cursor:pointer;user-select:none;}
+  .stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;border-radius:31px;}
+  .stage .acc{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
+  .stage.pet{animation:petbounce .5s cubic-bezier(.2,1.5,.4,1);}
+  @keyframes petbounce{0%{transform:scale(1);}40%{transform:scale(1.06) rotate(-1.5deg);}100%{transform:scale(1);}}
+  .stage.munch{animation:munch .6s ease-in-out 2;}
+  @keyframes munch{0%,100%{transform:translateY(0);}50%{transform:translateY(3px) scale(.985);}}
+  .heart{position:absolute;font-size:20px;pointer-events:none;animation:heartup 1.3s ease-out forwards;}
+  @keyframes heartup{0%{opacity:0;transform:translateY(0) scale(.5);}
+    25%{opacity:1;}100%{opacity:0;transform:translateY(-70px) scale(1.15);}}
+  .purrwrap{width:200px;margin:14px 0 4px;}
+  .purrbar{height:12px;border-radius:99px;background:var(--line);overflow:hidden;border:2px solid var(--line);}
+  .purrfill{height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--nose),var(--ginger),var(--gold));
+    transition:width .5s cubic-bezier(.2,.9,.3,1);}
+  .purrlab{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.6rem;
+    letter-spacing:.9px;color:var(--slate);text-transform:uppercase;margin-top:6px;}
+  .roomact{display:flex;gap:9px;margin-top:14px;}
+
+  .shopgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:9px;margin-top:4px;}
+  .item{background:var(--milk);border:2px solid var(--line);border-radius:15px;padding:11px 10px;
+    text-align:center;cursor:pointer;transition:border-color .15s ease,transform .1s ease;}
+  .item:hover{border-color:var(--ginger);}
+  .item:active{transform:translateY(2px);}
+  .item.locked{opacity:.5;cursor:default;}
+  .item.worn{border-color:var(--jade);background:var(--jade-soft);}
+  .item .ico{font-size:26px;line-height:1.2;display:block;}
+  .item .ico svg{width:34px;height:34px;}
+  .item .nm{font-weight:700;font-size:.8rem;margin-top:3px;}
+  .item .pr{font-family:var(--mono);font-size:.72rem;color:#7A5200;margin-top:3px;}
+  .item .pr.own{color:var(--jade);}
+  .roomnote{font-size:.82rem;color:var(--slate);line-height:1.55;margin:2px 0 0;text-align:center;}
+
+  /* ---------- QUESTION ---------- */
+  .qhead{display:flex;align-items:center;gap:9px;margin-bottom:13px;flex-wrap:wrap;}
+  .topic{display:inline-flex;align-items:center;gap:6px;background:var(--jade-soft);
+    border:2px solid var(--jade);color:var(--jade);border-radius:999px;padding:3px 12px 3px 9px;
+    font-family:var(--mono);font-weight:700;font-size:.65rem;letter-spacing:1px;text-transform:uppercase;}
+  .topic svg{width:13px;height:13px;fill:var(--jade);}
+  .diff{display:flex;gap:3px;}
+  .diff i{width:8px;height:8px;border-radius:50%;background:var(--line);display:block;}
+  .diff i.on{background:var(--ginger);}
+  .qnum{margin-left:auto;font-family:var(--mono);font-size:.72rem;color:var(--slate);}
+
+  .qtext{font-size:1.14rem;line-height:1.68;font-weight:500;margin:0 0 14px;}
+  .figbox{display:flex;justify-content:center;margin:2px 0 16px;}
+  .figbox svg{max-width:100%;height:auto;}
+
+  .arow{display:flex;gap:10px;}
+  .abox{flex:1;display:flex;align-items:center;background:var(--milk);border:2.5px solid var(--line);
+    border-radius:14px;padding:0 14px;transition:border-color .18s ease;}
+  .abox:focus-within{border-color:var(--ginger);}
+  .abox.ok{border-color:var(--jade);background:var(--jade-soft);}
+  .abox.bad{border-color:var(--nose);background:#FDEEF1;}
+  .afix{font-family:var(--mono);font-weight:700;font-size:.95rem;color:var(--slate);white-space:nowrap;}
+  #answerInput{flex:1;min-width:0;background:transparent;border:0;outline:none;color:var(--ink);
+    font-family:var(--mono);font-weight:700;font-size:1.2rem;padding:14px 6px;}
+  #answerInput::placeholder{font-family:var(--body);font-weight:500;color:#C4AE9F;font-size:1rem;}
+
+  .btn{border:0;border-radius:14px;font-family:var(--disp);font-weight:700;font-size:1rem;
+    padding:13px 22px;cursor:pointer;color:#fff;background:var(--ginger);white-space:nowrap;
+    box-shadow:0 3px 0 var(--ginger-deep);transition:transform .1s ease,box-shadow .1s ease;}
+  .btn:hover{filter:brightness(1.04);}
+  .btn:active{transform:translateY(3px);box-shadow:0 0 0 var(--ginger-deep);}
+  .btn.jade{background:var(--jade);box-shadow:0 3px 0 #14624A;}
+  .btn.quiet{background:var(--card);color:var(--slate);border:2px solid var(--line);box-shadow:none;
+    font-family:var(--body);font-weight:700;font-size:.86rem;padding:9px 15px;border-radius:12px;}
+  .btn.quiet:hover{border-color:var(--ginger);color:var(--ginger);}
+  .btn.sm{font-size:.9rem;padding:10px 16px;}
+
+  .verdict{margin-top:14px;font-family:var(--disp);font-weight:700;font-size:1.02rem;display:none;}
+  .verdict.show{display:block;animation:rise .25s ease;}
+  .verdict.good{color:var(--jade);}
+  .verdict.bad{color:#C74B63;}
+  @keyframes rise{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  .tools{display:flex;gap:8px;margin-top:15px;flex-wrap:wrap;}
+
+  .bm{margin-top:15px;padding:15px;border-radius:16px;background:var(--milk);border:2px solid var(--line);display:none;}
+  .bm.show{display:block;animation:rise .3s ease;}
+  .bm h5{font-family:var(--mono);font-weight:700;font-size:.63rem;margin:0 0 11px;color:var(--slate);
+    letter-spacing:1.3px;text-transform:uppercase;}
+  .strip{display:flex;height:46px;border-radius:10px;overflow:hidden;border:2.5px solid var(--ink);}
+  .seg{display:grid;place-items:center;font-family:var(--body);font-weight:700;font-size:.78rem;
+    color:var(--milk);border-right:2px solid var(--ink);padding:0 4px;text-align:center;overflow:hidden;
+    transform-origin:left;animation:grow .45s cubic-bezier(.2,.9,.3,1) both;}
+  .seg:last-child{border-right:0;}
+  @keyframes grow{from{transform:scaleX(0);opacity:0;}to{transform:scaleX(1);opacity:1;}}
+  .bmcap{margin-top:11px;color:var(--slate);font-size:.86rem;line-height:1.55;font-weight:500;}
+
+  .steps{margin-top:15px;display:none;}
+  .steps.show{display:block;}
+  .step{display:flex;gap:12px;padding:10px 0;border-bottom:1.5px solid var(--line);animation:rise .3s ease both;}
+  .step:last-child{border-bottom:0;}
+  .sn{width:25px;height:25px;border-radius:8px;background:var(--jade);color:#fff;display:grid;
+    place-items:center;font-family:var(--mono);font-weight:700;font-size:.74rem;flex:none;}
+  .st{font-size:.95rem;line-height:1.58;font-weight:500;}
+
+  .netbadge{display:none;margin-left:7px;padding:2px 8px;border-radius:999px;background:var(--ginger-soft);
+    border:1.5px solid var(--ginger);color:var(--ginger-deep);font-size:.58rem;letter-spacing:.6px;}
+  .netbadge.show{display:inline-block;}
+
+  .asklab{font-family:var(--mono);font-weight:700;font-size:.63rem;letter-spacing:1.3px;
+    color:var(--slate);text-transform:uppercase;margin:0 0 11px;}
+  .chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:11px;}
+  .chip{background:var(--milk);border:2px solid var(--line);color:var(--slate);border-radius:999px;
+    padding:7px 14px;font-size:.83rem;font-weight:700;cursor:pointer;font-family:var(--body);}
+  .chip:hover{border-color:var(--ginger);color:var(--ginger);}
+  .crow{display:flex;gap:9px;}
+  #chatInput{flex:1;min-width:0;background:var(--milk);border:2px solid var(--line);border-radius:13px;
+    padding:12px 14px;color:var(--ink);font-family:var(--body);font-weight:500;font-size:.95rem;outline:none;}
+  #chatInput:focus{border-color:var(--ginger);}
+  .thread{display:flex;flex-direction:column;gap:10px;margin:0 0 14px;}
+  .msg{position:relative;padding:12px 15px;border-radius:16px;font-size:.96rem;line-height:1.64;
+    max-width:93%;white-space:pre-wrap;overflow-wrap:break-word;animation:rise .22s ease;}
+  .msg.m-cat{background:var(--ginger-soft);border:1.5px solid var(--ginger);align-self:flex-start;
+    border-bottom-left-radius:5px;padding-right:40px;}
+  .msg.m-kid{background:var(--jade-soft);border:1.5px solid var(--jade);align-self:flex-end;
+    border-bottom-right-radius:5px;}
+  .msg.pending{min-height:24px;display:flex;align-items:center;}
+  .speakbtn{position:absolute;right:9px;top:9px;background:none;border:0;cursor:pointer;
+    font-size:.82rem;opacity:.4;padding:2px;line-height:1;}
+  .speakbtn:hover{opacity:1;}
+
+  .paws{display:flex;gap:4px;align-items:center;margin-top:3px;}
+  .paws svg{width:17px;height:17px;}
+  .paws svg .pw{fill:var(--line);transition:fill .3s ease;}
+  .paws svg.lit .pw{fill:var(--ginger);}
+  .paws svg.pop{animation:pawpop .4s cubic-bezier(.2,1.7,.4,1);}
+  @keyframes pawpop{0%{transform:scale(.4) rotate(-14deg);}100%{transform:scale(1) rotate(0);}}
+
+  .ov{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;
+    padding:18px;background:rgba(42,31,26,.5);}
+  .ov.show{display:flex;}
+  .modal{max-width:470px;width:100%;max-height:86vh;overflow-y:auto;margin:0;}
+  .modal h3{font-family:var(--disp);font-weight:700;margin:0 0 6px;font-size:1.22rem;}
+  .modal p{color:var(--slate);font-size:.88rem;line-height:1.6;margin:0 0 14px;}
+  .sect{font-family:var(--mono);font-weight:700;font-size:.62rem;letter-spacing:1.3px;color:var(--slate);
+    text-transform:uppercase;margin:18px 0 9px;padding-top:14px;border-top:2px solid var(--line);}
+  .sect:first-of-type{border-top:0;padding-top:0;margin-top:6px;}
+  .mast{display:flex;flex-direction:column;gap:8px;margin:4px 0;}
+  .mrow{display:flex;align-items:center;gap:10px;font-size:.85rem;font-weight:700;}
+  .mname{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .mbar{width:88px;height:9px;border-radius:99px;background:var(--line);overflow:hidden;flex:none;}
+  .mfill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--nose),var(--ginger),var(--jade));}
+  .mpct{width:38px;text-align:right;font-family:var(--mono);font-size:.74rem;color:var(--slate);flex:none;}
+  .field{display:flex;gap:9px;margin:9px 0;}
+  .field select{flex:1;min-width:0;background:var(--milk);border:2px solid var(--line);border-radius:12px;
+    padding:11px 13px;font-family:var(--body);font-weight:700;font-size:.95rem;color:var(--ink);outline:none;}
+  .field input[type=password]{flex:1;min-width:0;background:var(--milk);border:2px solid var(--line);
+    border-radius:12px;padding:11px 13px;font-family:var(--mono);font-size:.9rem;color:var(--ink);outline:none;}
+  .field input[type=password]:focus,.field select:focus{border-color:var(--ginger);}
+  .field input[type=text]{flex:1;background:var(--milk);border:2px solid var(--line);border-radius:12px;
+    padding:11px 13px;font-family:var(--body);font-weight:700;font-size:.95rem;color:var(--ink);outline:none;min-width:0;}
+  .field input[type=text]:focus{border-color:var(--ginger);}
+  .photorow{display:flex;gap:9px;align-items:center;flex-wrap:wrap;}
+  .filebtn{display:inline-block;background:var(--ginger);color:#fff;font-family:var(--disp);font-weight:700;
+    font-size:.9rem;padding:10px 16px;border-radius:12px;cursor:pointer;box-shadow:0 3px 0 var(--ginger-deep);}
+  .filebtn:active{transform:translateY(3px);box-shadow:none;}
+  .pnote{font-size:.78rem;color:var(--slate);line-height:1.5;margin:9px 0 0;}
+  .prev{width:56px;height:56px;border-radius:14px;border:2px solid var(--line);background:var(--milk);
+    object-fit:contain;flex:none;display:none;}
+  .note{background:var(--jade-soft);border:2px solid var(--jade);border-radius:14px;padding:13px 15px;
+    font-size:.83rem;line-height:1.6;color:#155F49;margin-top:16px;}
+  .note b{color:#0E4635;}
+
+  /* ---------- WORKING PAD ---------- */
+  .wk{margin:0 0 16px;}
+  .wkhead{display:flex;align-items:center;gap:6px;margin-bottom:8px;}
+  .wklab{font-family:var(--mono);font-weight:700;font-size:.63rem;letter-spacing:1.3px;
+    color:var(--slate);text-transform:uppercase;}
+  .wksp{flex:1;}
+  .wktool{width:34px;height:34px;border-radius:10px;border:2px solid var(--line);background:var(--card);
+    cursor:pointer;font-size:14px;display:grid;place-items:center;padding:0;line-height:1;}
+  .wktool.on{border-color:var(--ginger);background:var(--ginger-soft);}
+  .wktool:hover{border-color:var(--ginger);}
+  .wkcanvas{width:100%;height:300px;display:block;border:2.5px solid var(--line);border-radius:16px;
+    background-color:#fff;touch-action:none;cursor:crosshair;
+    background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 43px,#F2E4DA 43px,#F2E4DA 44px);}
+  .wkrow{display:flex;align-items:center;gap:11px;margin-top:11px;flex-wrap:wrap;}
+  .wkhint{font-size:.8rem;color:var(--slate);font-weight:500;flex:1;min-width:140px;}
+  .lines{margin-top:12px;display:flex;flex-direction:column;gap:7px;}
+  .ln{display:flex;align-items:center;gap:9px;}
+  .lnst{width:26px;height:26px;border-radius:8px;flex:none;display:grid;place-items:center;
+    font-size:.78rem;font-weight:800;color:#fff;}
+  .lnst.ok{background:var(--jade);}
+  .lnst.round{background:var(--gold);}
+  .lnst.wrong{background:#C74B63;}
+  .lnst.unread{background:var(--slate);}
+  .lnst.note{background:var(--line);color:var(--slate);}
+  .lnin{flex:1;min-width:0;background:var(--milk);border:2px solid var(--line);border-radius:11px;
+    padding:9px 12px;font-family:var(--mono);font-size:.92rem;color:var(--ink);outline:none;}
+  .lnin:focus{border-color:var(--ginger);}
+  .ln.bad .lnin{border-color:#C74B63;background:#FDEEF1;}
+  .wksum{margin-top:11px;font-size:.88rem;line-height:1.55;font-weight:700;display:none;}
+  .wksum.show{display:block;}
+  .wksum.good{color:var(--jade);}
+  .wksum.bad{color:#C74B63;}
+  .wksum small{display:block;font-weight:500;color:var(--slate);margin-top:4px;font-size:.82rem;}
+
+  @media (max-width:560px){
+    .qtext{font-size:1.06rem;}
+    .arow{flex-direction:column;}
+    .arow .btn{width:100%;}
+    .wkcanvas{height:240px;}
+    .stage{width:170px;height:170px;}
+    .purrwrap{width:170px;}
+    .catwrap,.catphoto{width:86px;}
+    .catphoto{height:86px;}
+    .bubble{font-size:.95rem;padding:12px 14px;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.05s !important;}
+  }
+  :focus-visible{outline:3px solid var(--ginger);outline-offset:2px;}
 </style>
+<link rel="stylesheet" href="tutor.css?v=4.3.6">
+<link rel="stylesheet" href="studio.css?v=4.3.6">
+<link rel="stylesheet" href="science.css?v=4.3.6">
+<script defer src="reasoning.js?v=4.3.6"></script>
+<script defer src="learning.js?v=4.3.6"></script>
+<script defer src="question-bank.js?v=4.3.6"></script>
+<script defer src="challenge-bank.js?v=4.3.6"></script>
+<script defer src="transfer-bank.js?v=4.3.6"></script>
+<script defer src="app.js?v=4.3.6"></script>
+<script defer src="input-mode.js?v=4.3.6"></script>
+<script defer src="study-ui.js?v=4.3.6"></script>
+<script defer src="science-core.js?v=4.3.6"></script>
+<script defer src="science-scenes.js?v=4.3.6"></script>
+<script defer src="science-ui.js?v=4.3.6"></script>
+<script defer src="studio.js?v=4.3.6"></script>
+<script defer src="baseline-week.js?v=4.3.6"></script>
+<script defer src="quest-visuals.js?v=4.3.6"></script>
+<script defer src="network.js?v=4.3.6"></script>
+<script defer src="cloud-sync.js?v=4.3.6"></script>
+<script defer src="cloud-backup.js?v=4.3.6"></script>
+<script defer src="drive-mirror.js?v=4.3.6"></script>
+<script defer src="motion-runtime.js?v=4.3.6"></script>
 </head>
 <body>
-<div class="boot"><div><div class="paw">🐾</div><p>Opening Mochi…</p></div></div>
-<script>
-(async()=>{
-  const VERSION='4.3.5';
-  const MARK='mochi-direct-index-version';
-  try{
-    if(localStorage.getItem(MARK)!==VERSION){
-      if('serviceWorker' in navigator){
-        const regs=await navigator.serviceWorker.getRegistrations();
-        await Promise.all(regs.map(r=>r.unregister().catch(()=>{})));
-      }
-      if('caches' in window){
-        const keys=await caches.keys();
-        await Promise.all(keys.filter(k=>k.startsWith('mochi-')).map(k=>caches.delete(k)));
-      }
-      localStorage.setItem(MARK,VERSION);
-    }
-    const r=await fetch('legacy-shell.html?app='+VERSION,{cache:'no-store'});
-    if(!r.ok)throw new Error('Could not load app shell');
-    let html=await r.text();
-    html=html.replaceAll('v4.2.1','v'+VERSION)
-             .replaceAll('2026-09-11','2026-09-13')
-             .replaceAll('11 September 2026','13 September 2026')
-             .replaceAll('?v=4.2.1','?v='+VERSION);
-    const extra=[
-      'baseline-week.js','quest-observer-guard.js','quest-visuals.js',
-      'cloud-sync.js','cloud-backup.js','drive-mirror.js','motion-runtime.js','version-lock.js'
-    ].map(x=>'<script src="'+x+'?v='+VERSION+'"></scr'+'ipt>').join('');
-    html=html.replace('</body>',extra+'</body>');
-    document.open();document.write(html);document.close();
-  }catch(err){
-    document.body.innerHTML='<div class="boot"><div><h2>Mochi could not open</h2><p>'+String(err.message||err)+'</p><button onclick="location.reload()">Try again</button></div></div>';
-  }
-})();
-</script>
+<div class="mochi-watermarks" aria-hidden="true"><img decoding="async" class="watermark-cat cat-right" src="mochi-watermark.webp" alt="" draggable="false"><img decoding="async" class="watermark-cat cat-left" src="mochi-watermark.webp" alt="" draggable="false"></div>
+<a class="skip-link" href="#qText">Skip to the problem</a>
+<div class="wrap studio" id="studioSurface">
+
+  <header class="topbar">
+    <div class="catwrap settled" id="catWrap" hidden>
+      <div class="catphoto">
+        <img id="catImg" alt="" src="mochi-builtin.webp" />
+        <svg class="ph" id="catPh" viewBox="0 0 24 24" aria-hidden="true" style="display:none"><ellipse cx="6" cy="8" rx="2.6" ry="3.4"/><ellipse cx="11.5" cy="5.4" rx="2.7" ry="3.6"/><ellipse cx="17" cy="7.4" rx="2.6" ry="3.4"/><ellipse cx="20.4" cy="12.8" rx="2.2" ry="2.9"/><path d="M12.4 11.4c4 0 6.7 2.7 6.7 5.5 0 2.4-2 3.9-4.4 3.9-1.6 0-2.3-.6-3.7-.6s-2.1.6-3.7.6c-2.4 0-4.4-1.5-4.4-3.9 0-2.8 2.7-5.5 6.7-5.5z"/></svg>
+      </div>
+    </div>
+    <a class="studio-brand" id="studioHome" href="#qText" aria-label="Mochi maths and science studio" aria-describedby="appVersion"><span class="brand-identity"><strong>mochi<span class="brand-mark" aria-hidden="true">/</span></strong><span id="appVersion" class="app-version" data-app-version>v4.3.6</span></span><span class="brand-descriptor">MATHS + SCIENCE</span></a>
+    <div class="topmeta">
+      <b id="catName">Mochi</b>
+      <span class="paws" id="paws" aria-label="Streak"></span>
+    </div>
+    <span class="sp" style="flex:1"></span>
+
+    <button class="session-pill" id="focusSession" aria-controls="sessionPanel" aria-expanded="false"><span class="learner-avatar"><img src="euna-avatar.webp" alt="Euna’s avatar" width="64" height="64"></span><span class="learner-session"><span class="learner-name">Euna</span><span id="focusProgress">0 / 8</span></span></button>
+    <button class="ibtn" id="adultBtn" title="Grown-ups" aria-label="Open parent settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 17h16M8 4v6M16 14v6"/></svg></button>
+  </header>
+  <progress id="chicProgress" class="session-line" value="0" max="8" aria-label="Session progress"></progress>
+<nav class="subject-switch" aria-label="Choose a subject"><button id="subjectMaths" type="button" aria-pressed="true">Maths</button><button id="subjectScience" type="button" aria-pressed="false">Science</button><button id="subjectInvestigate" type="button" aria-pressed="false">Investigate</button></nav>
+  <main id="viewMaths" class="studio-grid">
+
+  <section class="card problem-card" id="problemCard" aria-label="Current maths problem">
+    <div class="problem-reading">
+    <div class="practice-heading"><span class="overline" id="challengeLabel">EXPLORE</span><span class="qnum" id="qNum">Q1</span><span class="diff" id="qDiff" hidden aria-hidden="true"></span></div>
+    <div class="qhead"><h1 class="topic" id="qTopicName">Fractions</h1></div>
+    <div class="question-content">
+    <p class="qtext" id="qText" tabindex="-1">Loading…</p>
+    <div class="figbox" id="figBox"></div>
+    </div>
+    <p class="focus-context" id="focusContext">No calculator</p>
+    </div>
+    <div class="answer-composer">
+
+    <div class="input-mode-bar">
+      <span class="input-mode-label">Work your way</span>
+      <div class="input-mode-switch" role="group" aria-label="Input method">
+        <button id="inputKeyboard" type="button" aria-pressed="true" aria-controls="workingDrawer"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M6 9h1m3 0h1m3 0h1m3 0h0M6 12h1m3 0h1m3 0h1m3 0h0M7 15h10"/></svg>Keyboard</button>
+        <button id="inputStylus" type="button" aria-pressed="false" aria-controls="workingDrawer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5 4 4M4 20l4-1L20 7a2.8 2.8 0 0 0-4-4L4 15v5Z"/></svg>Stylus</button>
+      </div>
+    </div>
+    <details class="working-drawer" id="workingDrawer"><summary><span id="workingSummary">Show my working</span></summary>
+    <div class="wk" id="wk">
+      <div class="wkhead" id="stylusTools">
+        <span class="wklab">Write here</span>
+        <span class="wksp"></span>
+        <button class="wktool on" id="wkPen" title="Pen" aria-label="Pen">&#9998;</button>
+        <button class="wktool" id="wkErase" title="Eraser" aria-label="Eraser">&#9003;</button>
+        <button class="wktool" id="wkUndo" title="Undo" aria-label="Undo">&#8630;</button>
+        <button class="wktool" id="wkClear" title="Clear the page" aria-label="Clear">&#128465;</button>
+        <button class="wktool" id="wkPenOnly" title="Ignore finger touches" aria-label="Pen only">&#9995;</button>
+      </div>
+      <canvas id="wkCanvas" class="wkcanvas" aria-label="Write your working with a stylus, finger or mouse"></canvas>
+      <div class="keyboard-working" id="keyboardWorking" hidden>
+        <label for="typedWorking">Your working</label>
+        <textarea id="typedWorking" rows="4" maxlength="4000" spellcheck="false" placeholder="Write one step per line.
+For example: 24 ÷ 3 = 8"></textarea>
+        <button class="btn quiet sm" id="typedCheck">Check my steps</button>
+      </div>
+      <div class="wkrow">
+        <button class="btn quiet" id="wkCheck">Read my writing</button>
+        <button class="btn quiet" id="wkAdd">Type a line</button>
+        <span class="wkhint" id="wkHint" role="status" aria-live="polite">Write out your steps, then I will read them back to you.</span>
+      </div>
+      <div class="lines" id="wkLines"></div>
+      <div class="wksum" id="wkSum"></div>
+    </div>
+
+    </details>
+    <p id="inputModeStatus" class="sr-only" role="status" aria-live="polite"></p>
+    <div id="studyChoices" class="study-choices" hidden></div>
+    <div id="studyParts"></div>
+    <label for="answerInput" class="final-answer-label" id="finalAnswerLabel">Final answer</label>
+    <div class="arow" id="answerRow">
+      <div class="abox" id="aBox">
+        <span class="afix" id="aPre" style="display:none"></span>
+        <input id="answerInput" inputmode="decimal" autocomplete="off" placeholder="Your answer…" aria-label="Your answer" />
+        <span class="afix" id="aSuf" style="display:none"></span>
+      </div>
+      <button class="btn" id="checkBtn">Check answer <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button>
+    </div>
+
+    </div>
+    <div class="verdict" id="verdict" role="status" aria-live="polite"></div>
+
+    <div class="bm" id="bm">
+      <h5>Bar model</h5>
+      <div class="strip" id="strip"></div>
+      <div class="bmcap" id="bmcap"></div>
+    </div>
+
+    <div class="steps" id="steps"></div>
+
+
+    <div class="tools problem-actions"><button id="focusQuestionMore" class="text-button" aria-controls="morePanel" aria-expanded="false">Need a way in? <span aria-hidden="true">↗</span></button>
+
+
+      <button class="btn jade sm" id="nextBtn" style="display:none">Next question</button>
+    </div>
+  </section>
+
+  <div class="session-finish" id="sessionFinish" hidden><span class="overline">SESSION COMPLETE</span><h2>What idea will you take with you?</h2><p id="sessionFinishText"></p><button id="finishInsight" class="btn">Keep one insight</button><button id="finishMap" class="btn quiet">See my learning map</button></div>
+  </main>
+
+
+  <main id="viewScience" hidden aria-label="Science studio">
+    <div class="sc-top"><div><span class="overline" id="scViewLabel">SCIENCE</span><h1 id="scTitle">Electric circuits</h1><p id="scProgress"></p></div><div class="sc-selectors"><label>Topic<select id="scTopic" aria-label="Science topic"></select></label><label id="scModeLabel">Session<select id="scMode"><option value="practice">Practice</option><option value="assessment">Independent check</option></select></label></div></div>
+    <div class="sc-grid">
+      <section class="sc-lab" aria-label="Interactive science illustration">
+        <div id="scVisual" class="sc-visual"></div>
+        <div class="sc-lab-bottom"><label class="sc-field" id="scPredictionField" for="scPrediction">My prediction<textarea id="scPrediction" rows="2" maxlength="1000" placeholder="If I change… I expect… because…"></textarea></label></div>
+        <fieldset id="scControls" class="sc-controls" aria-label="Experiment controls"></fieldset>
+        <div class="sc-lab-bottom"><button class="btn" id="scRun">Test my prediction</button><p class="sc-observation" id="scObservation" role="status" aria-live="polite"></p></div>
+      </section>
+      <section class="sc-compose" aria-label="My science reasoning">
+        <div id="scPractice" class="sc-practice"><p id="scQuestion" class="sc-question"></p><div id="scChoices" class="sc-choices" role="group" aria-label="Answer choices"></div></div>
+        <div id="scInquiry" class="sc-inquiry" hidden><p id="scInquiryQuestion" class="sc-question"></p><p id="scInquiryTask" class="sc-inquiry-task"></p></div>
+        <div class="sc-methods"><span>Work your way</span><div role="group" aria-label="Science input method"><button id="scKeyboard" aria-pressed="true">Keyboard</button><button id="scStylus" aria-pressed="false">Stylus</button></div></div>
+        <div id="scInk" class="sc-ink" hidden><canvas id="scCanvas" class="sc-canvas" aria-label="Draw your science diagram or write your explanation"></canvas><div class="sc-ink-tools"><button id="scUndo">Undo</button><button id="scClear">Clear ink</button><label><input id="scPenOnly" type="checkbox">Pen only</label><button id="scRead">Read my notes</button></div><div id="scReadProposal" hidden><label class="sc-field">Check this transcription<textarea id="scReadResult" rows="3" maxlength="2500"></textarea></label><button id="scUseRead" class="btn quiet">Add to my explanation</button></div></div>
+        <label class="sc-field" for="scExplanation">My explanation<textarea id="scExplanation" rows="3" maxlength="2500" placeholder="The evidence suggests… because… I could check this by…"></textarea></label>
+        <label class="sc-guess" id="scGuessLabel"><input id="scGuess" type="checkbox"> I guessed this answer</label>
+        <div class="sc-actions" id="scAnswerActions"><button id="scCheck" class="btn">Check my answer</button><button id="scNext" class="btn quiet" hidden>Next question</button><button id="scKeep" class="btn quiet">Save investigation</button></div>
+        <p class="sc-feedback" id="scFeedback" role="status" aria-live="polite"></p>
+        <button id="scConcept" class="text-button">Explain the idea</button>
+        <details id="scHelp" class="sc-help"><summary>Discuss with Mochi</summary><textarea id="scChatInput" rows="2" maxlength="1500" aria-label="Ask Mochi about this science activity" placeholder="Ask about a step, a prediction or your explanation…"></textarea><button id="scAsk" class="btn quiet">Ask Mochi</button><p id="scReply" class="sc-reply" role="status" aria-live="polite"></p></details>
+        <div id="scAssessmentResults" class="sc-results" hidden></div>
+      </section>
+    </div>
+    <details class="sc-details" id="scTrialArea"><summary>My experiment notebook</summary><ol id="scTrials" class="sc-trials"></ol><p>Change one variable at a time when testing its effect. A simulation shows what its model predicts; use real observations to test the model.</p></details>
+    <details class="sc-details"><summary>About this model</summary><p id="scAssumptions"></p></details>
+    <details class="sc-details sc-source" id="scSourceArea"><summary>Find, explain, verify</summary><p id="scSearchPhrase"></p><p><a id="scSource" target="_blank" rel="noopener noreferrer">Explore a related resource together</a></p><p>Some linked references are written for older learners: ask an adult to help select a useful section. Who produced it? What evidence does it give? Explain one idea in your own words, then test whether it fits this question. Mochi cannot browse the page for you.</p></details>
+    <details class="sc-details"><summary>My science learning</summary><ul id="scEvidence" class="sc-evidence"></ul><p>Independent choices are recorded separately from supported answers. Explanations need review. This first set samples eight areas and includes clearly labelled extensions. It is not a full syllabus test or an admissions prediction.</p></details>
+  </main>
+
+  <main id="viewMap" hidden>
+    <div class="map-heading"><div><span class="overline">YOUR LEARNING, OVER TIME</span><h1>Ideas connect.</h1><p>Select an idea to see the evidence and its building blocks.</p></div><button id="mapReturn" class="btn">Back to my problem</button></div>
+    <div class="map-layout"><section id="skillConstellation" class="skill-constellation" aria-label="Skills"></section><aside class="card skill-detail" id="skillDetail"></aside></div>
+    <section class="card insights-panel"><h2>Ideas worth keeping</h2><div id="insightGallery"></div></section>
+  </main>
+
+  <!-- ============ MOCHI'S ROOM ============ -->
+  <div id="viewRoom" style="display:none">
+    <section class="card room">
+      <div class="stage" id="stage" role="button" tabindex="0" aria-label="Pet Mochi">
+        <img id="roomImg" alt="" src="mochi-builtin.webp" />
+        <svg class="acc" id="accLayer" viewBox="0 0 100 100" aria-hidden="true"></svg>
+      </div>
+      <div class="purrwrap">
+        <div class="purrbar"><div class="purrfill" id="purrFill"></div></div>
+        <div class="purrlab"><span>Purr</span><span id="purrWord">calm</span></div>
+      </div>
+      <div class="roomact">
+        <button class="btn quiet" id="petBtn">Give him a stroke</button>
+      </div>
+      <p class="roomnote" id="roomNote">Answer maths questions to earn coins, then spoil him.</p>
+    </section>
+
+    <section class="card">
+      <p class="asklab">Cat munch</p>
+      <div class="shopgrid" id="treatGrid"></div>
+    </section>
+
+    <section class="card">
+      <p class="asklab">Accessories</p>
+      <div class="shopgrid" id="wearGrid"></div>
+      <p class="roomnote" id="wearNote" style="text-align:left;margin-top:11px">Tap something he owns to put it on or take it off.</p>
+    </section>
+  </div>
+
+</div>
+
+<section id="thinkPanel" class="focus-panel" role="dialog" aria-labelledby="thinkPanelTitle" hidden tabindex="-1"><header class="panel-heading"><div><span class="overline">YOUR THINKING</span><h2 id="thinkPanelTitle">Your thinking.</h2></div><button class="icon-button" id="thinkClose" aria-label="Close thinking panel">×</button></header>    <details class="panel-reference"><summary>See the problem</summary><p id="thinkQuestion"></p></details><div class="reasoning-workspace">
+      <div class="reasoning-heading"><h2>Follow your idea</h2><span id="traceCount">Your route is yours</span></div>
+      <div class="stage-tabs" role="tablist" aria-label="Reasoning stages">
+        <button role="tab" aria-selected="true" aria-controls="reasonEditor" id="stageUnderstand" data-stage="understand">01 <span>Understand</span></button>
+        <button role="tab" aria-selected="false" aria-controls="reasonEditor" id="stageConnect" data-stage="connect" tabindex="-1">02 <span>Connect</span></button>
+        <button role="tab" aria-selected="false" aria-controls="reasonEditor" id="stageSolve" data-stage="solve" tabindex="-1">03 <span>Solve</span></button>
+        <button role="tab" aria-selected="false" aria-controls="reasonEditor" id="stageVerify" data-stage="verify" tabindex="-1">04 <span>Verify</span></button>
+      </div>
+      <div id="reasonEditor" role="tabpanel" aria-labelledby="stageUnderstand">
+        <label class="study-field" for="studyPlan"><span id="stagePrompt">What do you know, and what are you trying to find?</span>
+          <textarea id="studyPlan" maxlength="1200" placeholder="Start with your own idea. A rough thought is enough."></textarea>
+        </label>
+        <div class="reason-editor-footer"><button id="sendReason" class="text-button">Discuss this step with Mochi ↗</button><span id="traceSaved" role="status"></span></div>
+      </div>
+      <details class="route-picker"><summary>Choose a way in <span id="routeChoice">I’m exploring</span></summary><div id="routeOptions" class="route-options"></div></details>
+    </div>
+    <div class="study-row">
+      <label class="study-field" for="studyConfidence">Before I check, I feel
+        <select id="studyConfidence"><option value="unsure">Still figuring it out</option><option value="sure">Confident — I can explain</option><option value="guess">I am guessing</option></select>
+      </label>
+      <label class="study-field" for="studyObstacle">Where I need help
+        <select id="studyObstacle"><option value="">Choose if useful</option><option value="meaning">Understanding the question</option><option value="representation">Making a diagram or model</option><option value="strategy">Choosing a method</option><option value="calculation">Doing the calculation</option><option value="checking">Checking or explaining</option></select>
+      </label>
+    </div>
+    <button id="openInputWorking" class="btn quiet">Open my working</button>
+    <div id="studyReflection" class="study-reflection" hidden>
+      <label class="study-field" for="reflectionText">What did I learn? How can I check it another way?
+        <textarea id="reflectionText" maxlength="1200" placeholder="A useful idea, a mistake I repaired, or a test that convinced me…"></textarea>
+      </label>
+      <button class="btn quiet" id="saveReflection">Save my insight</button>
+    </div><div class="panel-end"><button id="labLaunch" class="text-button" aria-controls="visualLab" aria-expanded="false">Open visual tools ↗</button></div></section>
+<section id="sessionPanel" class="focus-panel personal-session" role="dialog" aria-labelledby="sessionPanelTitle" hidden tabindex="-1"><header class="panel-heading"><div><span class="overline">EUNA’S PRACTICE</span><h2 id="sessionPanelTitle">My next challenge.</h2></div><button class="icon-button" id="sessionClose" aria-label="Close session settings">×</button></header>  <section class="study-head" aria-label="Euna’s learning plan">
+    <div class="session-portrait" aria-hidden="true"><img src="euna-avatar.webp" alt="" width="112" height="112"></div>
+
+    <p id="studyGoal" class="session-goal"></p>
+    <div class="study-actions">
+      <select id="studyMode" aria-label="Practice mode">
+        <option value="diagnostic">Discover my starting point</option>
+        <option value="daily">My daily practice</option>
+        <option value="review">Revisit earlier ideas</option>
+        <option value="stretch">Reasoning investigations</option>
+        <option value="sprint">10-question fluency practice</option>
+      </select>
+      <button class="btn jade sm" id="studyStart">Start session</button>
+    </div>
+    <p id="studyReason" class="study-summary"></p>
+    <progress id="studyProgress" class="study-progress" value="0" max="8" aria-label="Session progress"></progress>
+    <p id="studySession" class="study-note" role="status"></p>
+    <span id="studyTimer" class="study-timer"></span>
+    <details class="study-details" id="legacyMap" hidden><summary>My learning map</summary>
+      <p>These are clues from practice. Asking for help is useful; later we check what you can do on your own.</p>
+      <div id="studyMap" class="study-map"></div>
+    </details>
+    <details class="study-details" id="ownProblemDetails"><summary>Bring my own problem</summary>
+      <label class="study-field" for="ownProblem">Type a maths problem and any diagram labels<textarea id="ownProblem" maxlength="3000" placeholder="Include the whole question and what you have tried. Do not include names or private information."></textarea></label>
+      <p>For your own problems, Mochi’s explanation needs checking. It will not change your practice record.</p>
+      <button class="btn quiet" id="ownProblemStart">Work through this with Mochi</button>
+    </details>
+  </section></section>
+<section id="resourcePanel" class="focus-panel" role="dialog" aria-labelledby="resourcePanelTitle" hidden tabindex="-1"><header class="panel-heading"><div><span class="overline">EXPLORE A SOURCE</span><h2 id="resourcePanelTitle">Find. Question. Test.</h2></div><button class="icon-button" id="resourceClose" aria-label="Close find. question. test.">×</button></header>    <details class="study-details" id="resourceDetails"><summary>Find a tool, then test it</summary>
+      <p id="studyResourcePrompt"></p>
+      <p><a id="studyResource" target="_blank" rel="noopener noreferrer">Explore a related explanation</a> · <a href="https://nrich.maths.org/curriculum-linked-problems-primary-teachers" target="_blank" rel="noopener noreferrer">NRICH investigations</a></p>
+      <ol><li>Write a precise question you need answered.</li><li>Read an example. Check who wrote it and whether its assumptions match your problem.</li><li>Close it. Explain the idea in your own words and apply it here.</li><li>Try a smaller case, a second method or a counterexample. Sources and Mochi can be wrong.</li></ol>
+      <label class="study-field" for="resourceNote">Source, useful idea, and my check<textarea id="resourceNote" maxlength="1200"></textarea></label>
+      <button class="btn quiet" id="saveResource">Save and discuss my finding</button>
+    </details></section>
+<section id="morePanel" class="focus-panel" role="dialog" aria-labelledby="morePanelTitle" hidden tabindex="-1"><header class="panel-heading"><div><span class="overline">YOUR SPACE</span><h2 id="morePanelTitle">Make it click.</h2></div><button class="icon-button" id="moreClose" aria-label="Close more tools">×</button></header><div class="focus-menu">
+<button id="focusThinkMore"><span>Work through my idea</span><small>A sketch, a method, a way to check</small><b aria-hidden="true">↗</b></button>
+<button id="focusTutorMore"><span>Ask Mochi</span><small>Find a first step together</small><b aria-hidden="true">↗</b></button>
+<button id="focusResources"><span>Explore a resource</span><small>Find an explanation, then test it</small><b aria-hidden="true">↗</b></button>
+<button id="focusPlan"><span>My practice</span><small>Change session or bring a problem</small><b aria-hidden="true">↗</b></button>
+</div><details class="solution-menu"><summary>Hints &amp; next steps</summary><div class="menu-actions"><button class="btn quiet" id="modelBtn">Draw the model</button><button class="btn quiet" id="workingBtn">Show the working</button><button class="btn quiet" id="skipBtn">Save for later</button></div></details>
+<div class="more-footer"><button id="tabRoom" class="text-button">Mochi’s room ↗</button><span class="coinchip" id="coinChip">✦ <b class="cn" id="coinCount">0</b></span><label class="voice-control">Voice     <button class="ibtn off" id="voiceBtn" title="Silent" aria-label="Toggle voice">&#128263;</button></label></div>    <p id="studyQuestionNote" class="study-note"></p>    <span class="netbadge" id="netBadge"></span></section>
+  <aside class="focus-panel coach-card" role="dialog" hidden tabindex="-1" id="coachCard" aria-label="Mochi tutor">
+    <div class="coach-head"><img src="icon-192.png?v=4.3.6" alt="" width="48" height="48"><div><h2>Mochi</h2><span>Your thinking partner</span></div><button id="coachClose" class="icon-button" aria-label="Close tutor">×</button></div>
+    <details class="panel-reference"><summary>See the problem</summary><p id="coachQuestion"></p></details><div class="coach-move"><span class="overline">ONE NEXT STEP</span><h3 id="moveTitle">Follow your idea</h3><p id="movePrompt">Show me where your thinking starts.</p></div>
+    <div class="thread" id="thread" role="log" aria-live="polite" aria-label="Conversation"></div>
+    <div class="chips">
+      <button class="chip" data-ask="I don't know how to start.">I don't know how to start</button>
+      <button class="chip" data-ask="What is this question asking me to find?">What is it asking?</button>
+      <button class="chip" data-ask="Can you explain that in a simpler way?">Explain it more simply</button>
+    <button class="chip" data-ask="Can we test my method another way or find a counterexample?">Help me verify</button>
+      <button class="chip" data-ask="What should I look up to understand this idea, and how can I check the source?">What could I look up?</button>
+    </div>
+    <div class="crow">
+      <input id="chatInput" placeholder="Tell me where you got stuck…" autocomplete="off" aria-label="Ask the tutor" />
+      <button class="btn sm" id="sendBtn">Ask</button>
+    </div>
+    <div class="probe-section"><button id="probeStart" class="text-button">Untangle it with a small example</button><div id="probeCard" hidden><p id="probeQuestion"></p><div id="probeChoices"></div><p id="probeFeedback" role="status"></p></div></div>
+    <p class="coach-footnote" id="coachConnection">Local hints · connect an AI tutor in parent settings</p>
+  </aside>
+<button id="focusBackdrop" class="focus-backdrop" aria-label="Close open panel" tabindex="-1" hidden></button>
+<nav class="floating-dock instrument-rail" id="focusDock" aria-label="Studio navigation"><button id="tabMaths" class="dock-item on" aria-label="Practice" aria-controls="viewMaths" aria-current="page"><span class="dock-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="3"/><path d="M9 8h6M9 12h6M9 16h3"/></svg></span><span class="dock-label">Practice</span></button><button id="focusThink" class="dock-item " aria-label="Think" aria-controls="thinkPanel" aria-expanded="false"><span class="dock-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5 4 4M4 20l4-1 12-12a2.8 2.8 0 0 0-4-4L4 15v5Z"/></svg></span><span class="dock-label">Think</span></button><button id="tabTools" class="dock-item " aria-label="Explore" aria-controls="visualLab" aria-expanded="false"><span class="dock-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h5v18H5zM14 3h5v5h-5zM14 12h5v9h-5zM5 8h5M5 13h5"/></svg></span><span class="dock-label">Explore</span></button><button id="tabMap" class="dock-item " aria-label="My map" aria-controls="viewMap" ><span class="dock-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="18" r="2.5"/><circle cx="19" cy="18" r="2.5"/><path d="m11 7-5 9m7-9 5 9M8 18h8"/></svg></span><span class="dock-label">My map</span></button><button id="focusMore" class="dock-item " aria-label="More" aria-controls="morePanel" aria-expanded="false"><span class="dock-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg></span><span class="dock-label">More</span></button><button id="coachFloat" class="tutor-orb" aria-label="Ask Mochi" aria-controls="coachCard" aria-expanded="false"><span class="tutor-avatar"><img src="icon-192.png?v=4.3.6" alt="" width="44" height="44"></span><span class="tutor-orb-label">Ask Mochi</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4V5Z"/><path d="M8 9h8M8 12h5"/></svg></button></nav>
+
+<section id="visualLab" class="visual-lab focus-panel" role="dialog" aria-label="Floating visual maths lab" hidden tabindex="-1">
+  <div class="lab-head" id="labHandle"><div><span class="overline">EXPLORE A RELATIONSHIP</span><h2>Visual lab</h2></div><div><button id="labResetPosition" class="icon-button" aria-label="Reset panel position">↺</button><button id="labClose" class="icon-button" aria-label="Close visual lab">×</button></div></div>
+  <details class="panel-reference"><summary>See the problem</summary><p id="labQuestionRef"></p></details><div class="lab-tabs" role="group" aria-label="Choose a maths tool"><button data-tool="fraction" aria-pressed="true">Fractions</button><button data-tool="ratio" aria-pressed="false">Ratio</button><button data-tool="area" aria-pressed="false">Area</button><button data-tool="pattern" aria-pressed="false">Patterns</button></div>
+  <p class="lab-question" id="labQuestion"></p>
+  <label class="study-field" for="labPrediction">Predict first<textarea id="labPrediction" rows="2" maxlength="400" placeholder="What will change? What will stay the same?"></textarea></label>
+  <div id="labControls" class="lab-controls"></div>
+  <div id="labVisual" class="lab-visual"></div>
+  <button id="labReveal" class="text-button">Reveal measurements</button><p id="labResult" class="lab-result" role="status" hidden></p>
+  <label class="study-field" for="labFinding">What did you notice?<textarea id="labFinding" rows="2" maxlength="500" placeholder="Explain what the visual supports — and what it does not prove."></textarea></label>
+  <div class="lab-footer"><button id="labDiscuss" class="btn">Discuss my observation</button><button id="labSave" class="btn quiet">Keep in my working</button></div>
+  <p class="lab-note">A separate experiment. Choose your own values; explain how it connects to the question.</p>
+</section>
+<div class="ov" id="ov">
+  <div class="card modal" role="dialog" aria-modal="true" aria-labelledby="ovTitle">
+    <button class="icon-button modal-dismiss" id="parentDismiss" aria-label="Close parent settings">×</button>
+    <h3 id="ovTitle">Grown-ups only</h3>
+    <p id="ovSub">Answer this to continue.</p>
+    <div id="gate">
+      <p class="qtext" id="gateQ" style="font-size:1.15rem;font-family:var(--mono);font-weight:700"></p>
+      <div class="field">
+        <input type="text" id="gateInput" inputmode="numeric" placeholder="Answer" aria-label="Gate answer" />
+        <button class="btn sm" id="gateBtn">Enter</button>
+      </div>
+    </div>
+
+    <div id="panel" style="display:none">
+      <section class="release-details" aria-labelledby="releaseTitle">
+        <h4 id="releaseTitle">Version on this device</h4>
+        <p class="release-number"><b data-app-version>v4.3.6</b> · <time data-release-date datetime="2026-09-14">14 September 2026</time></p>
+        <p id="releaseNotes">Fast direct startup, no version-observer loops or forced reloads, and reliable offline recovery.</p>
+        <p class="release-help">Refresh while online to load a newer published release.</p>
+      </section>
+      <p class="sect">The cat</p>
+      <div class="field">
+        <input type="text" id="catInput" placeholder="Cat's name" aria-label="Cat's name" maxlength="14" />
+        <button class="btn sm" id="catSave">Save</button>
+      </div>
+      <div class="photorow">
+        <img class="prev" id="catPrev" alt="" />
+        <label class="filebtn">Choose a photo
+          <input type="file" id="photoInput" accept="image/png,image/jpeg,image/webp" hidden />
+        </label>
+        <button class="btn quiet" id="photoClear">Remove</button>
+      </div>
+      <p class="pnote" id="photoNote">PNG or JPEG. A cut-out PNG with a transparent background looks best. It is resized to 400px and stored on this device only.</p>
+
+      <p class="sect">Tutor</p>
+      <div class="field">
+        <select id="provSel" aria-label="Model provider">
+          <option value="anthropic">Claude (Anthropic)</option>
+          <option value="openai">ChatGPT (OpenAI)</option>
+        </select>
+      </div>
+      <div class="field">
+        <input type="password" id="keyInput" placeholder="API key" aria-label="API key" autocomplete="off" />
+      </div>
+      <div class="field">
+        <input type="text" id="modelInput" placeholder="model for talking, e.g. gpt-5.6-terra" aria-label="Model for talking" autocomplete="off" />
+      </div>
+      <div class="field">
+        <input type="text" id="readInput" placeholder="model for reading handwriting" aria-label="Model for reading handwriting" autocomplete="off" />
+        <button class="btn quiet" id="tutorTest">Test</button>
+        <button class="btn sm" id="tutorSave">Save</button>
+      </div>
+      <p class="pnote" id="keyNote"></p>
+      <p class="pnote" id="useNote"></p>
+
+      <p class="sect">This session</p>
+      <p class="pnote" id="sessionNote"></p>
+
+      <p class="sect">Learning evidence & target</p>
+      <label class="study-field" for="goalMonth">Target month <input id="goalMonth" type="month" value="2027-09"></label>
+      <button class="btn quiet" id="goalSave">Save target</button>
+      <p class="study-note">September 2027 is a planning target, not a confirmed test date. NUS High uses a separate DSA route that starts earlier; English needs separate preparation. Science now has its own starting set and learning evidence.</p>
+      <div id="parentEvidence"></div><details class="study-details"><summary>Science learning and investigations</summary><div id="parentScience"></div></details>
+      <div class="study-actions"><button class="btn quiet" id="exportLearning">Back up learning</button><label class="filebtn">Restore backup<input id="importLearning" type="file" accept="application/json,.json" hidden></label></div>
+      <p id="backupStatus" class="study-status" role="status">Progress stays on this device. Back it up to move devices; backups contain learning notes, never API keys.</p>
+      <details class="study-details"><summary>Standards & preparation plan</summary><div id="standardsPlan"></div></details>
+      <details class="study-details"><summary>Independent assessment record</summary><p>Use unfamiliar, externally marked assessments to judge the top 1% ambition. App accuracy cannot establish a percentile.</p><label class="study-field">Assessment and source<input id="benchmarkName" maxlength="160" placeholder="Paper title and source"></label><div class="study-row"><label class="study-field">Date<input id="benchmarkDate" type="date"></label><label class="study-field">Published percentile, if supplied<input id="benchmarkPercentile" type="number" min="0" max="100" step="0.1" placeholder="Leave blank if unknown"></label></div><label class="study-field">Score and teacher feedback<textarea id="benchmarkNote" maxlength="1000" placeholder="e.g. 42/60; difficulty with explaining why the model works"></textarea></label><button id="benchmarkSave" class="btn quiet">Save assessment</button><p id="benchmarkStatus" role="status"></p><div id="benchmarkList"></div></details>
+      <p class="sect">Legacy accuracy by topic</p>
+      <p class="study-note">Older totals include helped answers; they are not used as evidence of independent learning.</p>
+      <div class="mast" id="mast"></div>
+
+      <p class="sect">Build</p>
+      <p class="pnote" id="buildNote"></p>
+
+      <div class="tools">
+        <button class="btn quiet" id="resetBtn">Reset progress</button>
+        <button class="btn jade sm" id="ovClose">Close</button>
+      </div>
+
+      <div class="note">
+        <b>How it works.</b> Every question, its answer and its working are generated in JavaScript and
+        appear instantly. The cat is handed all three and only does the talking — he never marks and
+        never calculates, and he is never on the path between tapping Next and seeing the question.
+        If the network drops, the hints, bar models and working still run.
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
