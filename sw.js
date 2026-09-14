@@ -1,28 +1,30 @@
 /* Mochi Maths — fast offline shell. */
-const SHELL='mochi-shell-v4.3.0';
+const SHELL='mochi-shell-v4.3.1';
 const FONTS='mochi-fonts-v1';
-const SHELL_PAGE='./__mochi_shell_v4.3.0';
+const SHELL_PAGE='./__mochi_shell_v4.3.1';
 const HOME_CRITICAL=[
-  './baseline-week.js?v=4.3.0',
-  './quest-observer-guard.js?v=4.3.0',
-  './quest-visuals.js?v=4.3.0',
-  './perf-hotfix.js?v=4.3.0',
-  './cloud-sync.js?v=4.3.0',
-  './motion-runtime.js?v=4.3.0',
-  './release-marker.js?v=4.3.0',
+  './baseline-week.js?v=4.3.1',
+  './quest-observer-guard.js?v=4.3.1',
+  './quest-visuals.js?v=4.3.1',
+  './perf-hotfix.js?v=4.3.1',
+  './cloud-sync.js?v=4.3.1',
+  './cloud-backup.js?v=4.3.1',
+  './motion-runtime.js?v=4.3.1',
+  './release-marker.js?v=4.3.1',
   './euna-avatar.webp',
   './mochi-watermark.webp'
 ];
 
 function injectFocusScripts(html){
   const scripts=[];
-  if(!html.includes('baseline-week.js'))scripts.push('<script src="baseline-week.js?v=4.3.0"></script>');
-  if(!html.includes('quest-observer-guard.js'))scripts.push('<script src="quest-observer-guard.js?v=4.3.0"></script>');
-  if(!html.includes('quest-visuals.js'))scripts.push('<script src="quest-visuals.js?v=4.3.0"></script>');
-  if(!html.includes('perf-hotfix.js'))scripts.push('<script src="perf-hotfix.js?v=4.3.0"></script>');
-  if(!html.includes('cloud-sync.js'))scripts.push('<script src="cloud-sync.js?v=4.3.0"></script>');
-  if(!html.includes('motion-runtime.js'))scripts.push('<script src="motion-runtime.js?v=4.3.0"></script>');
-  if(!html.includes('release-marker.js'))scripts.push('<script src="release-marker.js?v=4.3.0"></script>');
+  if(!html.includes('baseline-week.js'))scripts.push('<script src="baseline-week.js?v=4.3.1"></script>');
+  if(!html.includes('quest-observer-guard.js'))scripts.push('<script src="quest-observer-guard.js?v=4.3.1"></script>');
+  if(!html.includes('quest-visuals.js'))scripts.push('<script src="quest-visuals.js?v=4.3.1"></script>');
+  if(!html.includes('perf-hotfix.js'))scripts.push('<script src="perf-hotfix.js?v=4.3.1"></script>');
+  if(!html.includes('cloud-sync.js'))scripts.push('<script src="cloud-sync.js?v=4.3.1"></script>');
+  if(!html.includes('cloud-backup.js'))scripts.push('<script src="cloud-backup.js?v=4.3.1"></script>');
+  if(!html.includes('motion-runtime.js'))scripts.push('<script src="motion-runtime.js?v=4.3.1"></script>');
+  if(!html.includes('release-marker.js'))scripts.push('<script src="release-marker.js?v=4.3.1"></script>');
   return scripts.length?html.replace('</body>',scripts.join('\n')+'\n</body>'):html;
 }
 
