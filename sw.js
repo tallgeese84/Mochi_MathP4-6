@@ -1,30 +1,32 @@
 /* Mochi Maths — fast offline shell. */
-const SHELL='mochi-shell-v4.3.1';
+const SHELL='mochi-shell-v4.3.2';
 const FONTS='mochi-fonts-v1';
-const SHELL_PAGE='./__mochi_shell_v4.3.1';
+const SHELL_PAGE='./__mochi_shell_v4.3.2';
 const HOME_CRITICAL=[
-  './baseline-week.js?v=4.3.1',
-  './quest-observer-guard.js?v=4.3.1',
-  './quest-visuals.js?v=4.3.1',
-  './perf-hotfix.js?v=4.3.1',
-  './cloud-sync.js?v=4.3.1',
-  './cloud-backup.js?v=4.3.1',
-  './motion-runtime.js?v=4.3.1',
-  './release-marker.js?v=4.3.1',
+  './baseline-week.js?v=4.3.2',
+  './quest-observer-guard.js?v=4.3.2',
+  './quest-visuals.js?v=4.3.2',
+  './perf-hotfix.js?v=4.3.2',
+  './cloud-sync.js?v=4.3.2',
+  './cloud-backup.js?v=4.3.2',
+  './drive-mirror.js?v=4.3.2',
+  './motion-runtime.js?v=4.3.2',
+  './release-marker.js?v=4.3.2',
   './euna-avatar.webp',
   './mochi-watermark.webp'
 ];
 
 function injectFocusScripts(html){
   const scripts=[];
-  if(!html.includes('baseline-week.js'))scripts.push('<script src="baseline-week.js?v=4.3.1"></script>');
-  if(!html.includes('quest-observer-guard.js'))scripts.push('<script src="quest-observer-guard.js?v=4.3.1"></script>');
-  if(!html.includes('quest-visuals.js'))scripts.push('<script src="quest-visuals.js?v=4.3.1"></script>');
-  if(!html.includes('perf-hotfix.js'))scripts.push('<script src="perf-hotfix.js?v=4.3.1"></script>');
-  if(!html.includes('cloud-sync.js'))scripts.push('<script src="cloud-sync.js?v=4.3.1"></script>');
-  if(!html.includes('cloud-backup.js'))scripts.push('<script src="cloud-backup.js?v=4.3.1"></script>');
-  if(!html.includes('motion-runtime.js'))scripts.push('<script src="motion-runtime.js?v=4.3.1"></script>');
-  if(!html.includes('release-marker.js'))scripts.push('<script src="release-marker.js?v=4.3.1"></script>');
+  if(!html.includes('baseline-week.js'))scripts.push('<script src="baseline-week.js?v=4.3.2"></script>');
+  if(!html.includes('quest-observer-guard.js'))scripts.push('<script src="quest-observer-guard.js?v=4.3.2"></script>');
+  if(!html.includes('quest-visuals.js'))scripts.push('<script src="quest-visuals.js?v=4.3.2"></script>');
+  if(!html.includes('perf-hotfix.js'))scripts.push('<script src="perf-hotfix.js?v=4.3.2"></script>');
+  if(!html.includes('cloud-sync.js'))scripts.push('<script src="cloud-sync.js?v=4.3.2"></script>');
+  if(!html.includes('cloud-backup.js'))scripts.push('<script src="cloud-backup.js?v=4.3.2"></script>');
+  if(!html.includes('drive-mirror.js'))scripts.push('<script src="drive-mirror.js?v=4.3.2"></script>');
+  if(!html.includes('motion-runtime.js'))scripts.push('<script src="motion-runtime.js?v=4.3.2"></script>');
+  if(!html.includes('release-marker.js'))scripts.push('<script src="release-marker.js?v=4.3.2"></script>');
   return scripts.length?html.replace('</body>',scripts.join('\n')+'\n</body>'):html;
 }
 
