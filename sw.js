@@ -1,46 +1,40 @@
-/* Mochi Maths — fast offline shell. */
-const SHELL='mochi-shell-v4.3.2';
+/* Mochi Maths — v4.3.3 self-healing service worker. */
+const VERSION='4.3.3';
+const SHELL='mochi-shell-v'+VERSION;
 const FONTS='mochi-fonts-v1';
-const SHELL_PAGE='./__mochi_shell_v4.3.2';
+const CURRENT_SCRIPTS=[
+  'baseline-week.js','quest-observer-guard.js','quest-visuals.js','perf-hotfix.js',
+  'cloud-sync.js','cloud-backup.js','drive-mirror.js','motion-runtime.js','release-marker.js'
+];
 const HOME_CRITICAL=[
-  './baseline-week.js?v=4.3.2',
-  './quest-observer-guard.js?v=4.3.2',
-  './quest-visuals.js?v=4.3.2',
-  './perf-hotfix.js?v=4.3.2',
-  './cloud-sync.js?v=4.3.2',
-  './cloud-backup.js?v=4.3.2',
-  './drive-mirror.js?v=4.3.2',
-  './motion-runtime.js?v=4.3.2',
-  './release-marker.js?v=4.3.2',
-  './euna-avatar.webp',
-  './mochi-watermark.webp'
+  ...CURRENT_SCRIPTS.map(x=>`./${x}?v=${VERSION}`),
+  './euna-avatar.webp','./mochi-watermark.webp'
 ];
 
-function injectFocusScripts(html){
-  const scripts=[];
-  if(!html.includes('baseline-week.js'))scripts.push('<script src="baseline-week.js?v=4.3.2"></script>');
-  if(!html.includes('quest-observer-guard.js'))scripts.push('<script src="quest-observer-guard.js?v=4.3.2"></script>');
-  if(!html.includes('quest-visuals.js'))scripts.push('<script src="quest-visuals.js?v=4.3.2"></script>');
-  if(!html.includes('perf-hotfix.js'))scripts.push('<script src="perf-hotfix.js?v=4.3.2"></script>');
-  if(!html.includes('cloud-sync.js'))scripts.push('<script src="cloud-sync.js?v=4.3.2"></script>');
-  if(!html.includes('cloud-backup.js'))scripts.push('<script src="cloud-backup.js?v=4.3.2"></script>');
-  if(!html.includes('drive-mirror.js'))scripts.push('<script src="drive-mirror.js?v=4.3.2"></script>');
-  if(!html.includes('motion-runtime.js'))scripts.push('<script src="motion-runtime.js?v=4.3.2"></script>');
-  if(!html.includes('release-marker.js'))scripts.push('<script src="release-marker.js?v=4.3.2"></script>');
-  return scripts.length?html.replace('</body>',scripts.join('\n')+'\n</body>'):html;
+function injectCurrent(html){
+  /* Remove any previously injected overlay scripts so only one release runs. */
+  for(const name of CURRENT_SCRIPTS){
+    const esc=name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    html=html.replace(new RegExp(`<script[^>]+src=["']${esc}\\?v=[^"']+["'][^>]*><\\/script>\\s*`,'gi'),'');
+  }
+  const scripts=CURRENT_SCRIPTS.map(name=>`<script src="${name}?v=${VERSION}"></script>`).join('\n');
+  html=html.replace('</body>',scripts+'\n</body>');
+  /* Make the visible parent version correct even before release-marker.js executes. */
+  html=html.replace(/(<b\s+data-app-version[^>]*>)v[^<]*(<\/b>)/i,`$1v${VERSION}$2`);
+  html=html.replace(/(<time\s+data-release-date[^>]*datetime=")[^"]*("[^>]*>)[^<]*(<\/time>)/i,'$12026-09-13$213 September 2026$3');
+  return html;
 }
 
-async function buildShell(){
-  const cache=await caches.open(SHELL);
-  const raw=await fetch('./index.html',{cache:'no-store'});
-  if(!raw.ok)throw new Error('index fetch failed');
-  const html=injectFocusScripts(await raw.text());
-  const headers=new Headers(raw.headers);
-  headers.delete('content-length');
-  headers.set('cache-control','no-store');
-  const shell=new Response(html,{status:raw.status,statusText:raw.statusText,headers});
-  await cache.put(SHELL_PAGE,shell.clone());
-  return shell;
+async function networkPage(request){
+  const raw=await fetch(request,{cache:'no-store'});
+  if(!raw.ok)return raw;
+  const type=raw.headers.get('content-type')||'';
+  if(!type.includes('text/html'))return raw;
+  const html=injectCurrent(await raw.text());
+  const headers=new Headers(raw.headers);headers.delete('content-length');headers.set('cache-control','no-store');
+  const out=new Response(html,{status:raw.status,statusText:raw.statusText,headers});
+  const cache=await caches.open(SHELL);await cache.put('./latest.html',out.clone());
+  return out;
 }
 
 self.addEventListener('install',e=>{
@@ -48,10 +42,8 @@ self.addEventListener('install',e=>{
   e.waitUntil((async()=>{
     const cache=await caches.open(SHELL);
     await Promise.allSettled(HOME_CRITICAL.map(async url=>{
-      const r=await fetch(url,{cache:'no-store'});
-      if(r&&r.ok)await cache.put(url,r);
+      const r=await fetch(url,{cache:'no-store'});if(r&&r.ok)await cache.put(url,r);
     }));
-    try{await buildShell();}catch(err){}
   })());
 });
 
@@ -60,6 +52,14 @@ self.addEventListener('activate',e=>{
     const keys=await caches.keys();
     await Promise.all(keys.filter(k=>k.startsWith('mochi-')&&k!==SHELL&&k!==FONTS).map(k=>caches.delete(k)));
     await self.clients.claim();
+    /* Reload already-open Mochi pages exactly once onto the new worker. */
+    const windows=await self.clients.matchAll({type:'window',includeUncontrolled:true});
+    for(const client of windows){
+      try{
+        const u=new URL(client.url);u.searchParams.set('mochi_version',VERSION);
+        await client.navigate(u.href);
+      }catch(err){}
+    }
   })());
 });
 
@@ -70,28 +70,27 @@ self.addEventListener('fetch',e=>{
 
   if(url.hostname.includes('fonts.g')){
     e.respondWith((async()=>{
-      const cache=await caches.open(FONTS),hit=await cache.match(e.request);
-      if(hit)return hit;
-      try{const r=await fetch(e.request);if(r&&r.ok)await cache.put(e.request,r.clone());return r;}catch(err){return Response.error();}
+      const cache=await caches.open(FONTS),hit=await cache.match(e.request);if(hit)return hit;
+      try{const r=await fetch(e.request);if(r&&r.ok)await cache.put(e.request,r.clone());return r;}catch(err){return hit||Response.error();}
     })());
     return;
   }
 
   if(e.request.mode==='navigate'){
     e.respondWith((async()=>{
-      const cache=await caches.open(SHELL),shell=await cache.match(SHELL_PAGE);
-      if(shell)return shell;
-      try{return await buildShell();}
-      catch(err){const fallback=await cache.match('./index.html')||await caches.match('./index.html')||await caches.match('./');return fallback||Response.error();}
+      try{return await networkPage(e.request);}
+      catch(err){const cache=await caches.open(SHELL);return await cache.match('./latest.html')||await caches.match('./index.html')||Response.error();}
     })());
     return;
   }
 
   if(url.origin===self.location.origin){
+    const isVersioned=url.searchParams.has('v');
     e.respondWith((async()=>{
-      const cache=await caches.open(SHELL),hit=await cache.match(e.request);
-      if(hit)return hit;
-      try{const r=await fetch(e.request);if(r&&r.ok)await cache.put(e.request,r.clone());return r;}catch(err){return Response.error();}
+      const cache=await caches.open(SHELL);
+      if(isVersioned){const hit=await cache.match(e.request);if(hit)return hit;}
+      try{const r=await fetch(e.request);if(r&&r.ok)await cache.put(e.request,r.clone());return r;}
+      catch(err){return await cache.match(e.request)||Response.error();}
     })());
   }
 });
