@@ -1,5 +1,5 @@
 {
-  "version": "4.3.2",
+  "version": "4.3.3",
   "releasedOn": "2026-09-13",
-  "summary": "Private Google Drive learning mirror added alongside Firebase live sync and exact cloud backup JSON, with animated illustrated home scenes preserved."
+  "summary": "Self-healing service-worker update prevents split-version caches; Firebase sync, exact backup JSON, private Google Drive mirror, and animated home scenes remain enabled."
 }
