@@ -1,3 +1,12 @@
+# v4.3.8 — Copy the mirror secret
+
+- Add Show secret / Hide secret and Copy secret controls to the existing mirror setup.
+- Copy the actual field value; preserve the existing secret and saved settings.
+- If clipboard access is unavailable, denied or times out, reveal and select the
+  value for manual copying. Never claim success unless the clipboard write resolves.
+- Clarify that MIRROR_SECRET requires the generated characters, not instructional
+  placeholder text. No Apps Script code change or redeployment is required.
+
 # v4.3.7 — Small windows and learning review
 
 - Keep the toolbar and panels reachable in short desktop windows. Stack narrow

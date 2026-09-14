@@ -1,5 +1,5 @@
 {
-  "version": "4.3.7",
+  "version": "4.3.8",
   "releasedOn": "2026-09-14",
-  "summary": "Narrow-window and mobile keyboard improvements, plus a versioned Maths and Science download for ChatGPT review."
+  "summary": "Show and copy the mirror secret, with a manual-copy fallback when the browser blocks clipboard access."
 }
