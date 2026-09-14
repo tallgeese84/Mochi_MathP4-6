@@ -12,7 +12,7 @@ function loop(el,frames,opts){
   try{el.animate(frames,{duration:opts.duration||3000,iterations:Infinity,direction:opts.direction||'normal',easing:opts.easing||'ease-in-out',delay:opts.delay||0});}catch(e){}
 }
 function animateScene(){
-  if(!enabled())return;
+  if(!enabled()||document.visibilityState==='hidden')return;
   const host=document.getElementById('mochiFocusHome');if(!host)return;
   const scene=host.querySelector('.quest-scene');if(!scene)return;
   loop(scene.querySelector('.quest-euna'),[{transform:'translateY(0) rotate(-1deg)'},{transform:'translateY(-12px) rotate(1.5deg)'},{transform:'translateY(0) rotate(-1deg)'}],{duration:3200});
@@ -46,6 +46,6 @@ function mountToggle(){
   b.onclick=()=>{try{localStorage.setItem(FLAG,enabled()?'off':'on');}catch(e){}paint();if(enabled()){document.querySelectorAll('[data-mochi-waapi]').forEach(el=>delete el.dataset.mochiWaapi);animateScene();}else document.querySelectorAll('#mochiFocusHome *').forEach(el=>{try{el.getAnimations().forEach(a=>a.cancel());}catch(e){}});};
 }
 function run(){mountToggle();requestAnimationFrame(()=>requestAnimationFrame(animateScene));}
-function init(){run();document.addEventListener('mochi:focus-rendered',run);document.addEventListener('mochi:cloud-merged',run);setTimeout(run,600);}
+function init(){run();document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')run();});document.addEventListener('mochi:focus-rendered',run);document.addEventListener('mochi:cloud-merged',run);setTimeout(run,600);}
 if(window.MochiReady)init();else document.addEventListener('mochi:ready',init,{once:true});
 })();

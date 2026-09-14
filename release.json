@@ -1,5 +1,5 @@
 {
-  "version": "4.3.6",
+  "version": "4.3.7",
   "releasedOn": "2026-09-14",
-  "summary": "Fast direct startup, no version-observer loops or forced reloads, and reliable offline recovery."
+  "summary": "Narrow-window and mobile keyboard improvements, plus a versioned Maths and Science download for ChatGPT review."
 }

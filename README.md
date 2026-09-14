@@ -5,7 +5,7 @@ Euna for Primary 6 mathematics and her **September 2027 SPERS-Sec1 planning targ
 with a separate enrichment strand for mathematical thinking. The exact 2027 test
 and application dates must be checked when published.
 
-**v4.3.6 — 14 September 2026.** The existing cat, room, handwriting pad, provider
+**v4.3.7 — 14 September 2026.** The existing cat, room, handwriting pad, provider
 settings and saved coins are preserved. Old topic totals are retained as legacy
 accuracy; they are not treated as new evidence of independent learning.
 
@@ -34,7 +34,7 @@ compare their displayed numbers.
 For each release, update `release.json`, run `node scripts/release.cjs`, and commit
 the generated changes together. Run `node scripts/release.cjs --check` before
 publishing to reject inconsistent labels, runtime metadata and offline asset
-versions. Release numbering uses `major.minor.patch`; the current release is v4.3.6.
+versions. Release numbering uses `major.minor.patch`; the current release is v4.3.7.
 
 Run `npm ci --ignore-scripts`, `npm run check:release`, and `npm test` using Node
 24.15 or later before merging. GitHub's **App checks / test** job runs the same
@@ -43,6 +43,26 @@ rules if you want GitHub to block untested merges; a successful Pages deployment
 alone only confirms that files were published.
 
 See [the v4.3.5 loading review](docs/LOADING_REVIEW.md) for the cause and repair.
+
+## Reviewing Euna’s learning here in ChatGPT
+
+In Parent settings, open **Review Euna’s progress with ChatGPT** and choose
+**Download for ChatGPT**. Attach the JSON in this conversation. It includes the
+app version, export date, Maths reasoning and assistance history, Science records,
+and the text of recorded Science questions. No provider settings or mirror secrets
+are copied. It remains compatible with **Restore learning**.
+
+The existing Google Drive mirror writes `euna-mochi-latest.json` and weekly
+snapshots to the private **Mochi Euna Learning Mirror** folder. Follow
+[the one-time relay setup](tools/DRIVE_MIRROR_SETUP.md). The folder was accessible
+but empty when checked on 14 September 2026; delivery has not been established.
+After a file appears, ask ChatGPT to review that file through connected Google
+Drive. Reviews are on demand, not automatic monitoring. Do not judge progress
+from percentages alone: distinguish independent evidence, help, repeated items,
+written reasoning and missing coverage. Older timing includes idle time.
+
+Responsive behaviour and remaining device checks are documented in
+[the mobile and review notes](docs/MOBILE_REVIEW.md).
 
 ## What to do first
 

@@ -7,6 +7,7 @@ const LAST_KEY='mochi_drive_mirror_last_v1';
 let nativeSave=null;
 let timer=null;
 let busy=false;
+let pending=false;
 let lastMessage='Drive mirror not configured.';
 
 function get(k){try{return localStorage.getItem(k)||'';}catch(e){return'';}}
@@ -18,17 +19,11 @@ function randomSecret(){
   const bytes=new Uint8Array(24);crypto.getRandomValues(bytes);
   return Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');
 }
-function backupObject(){
-  const learning=MochiLearning.init(S);
-  const data=MochiLearning.backup(learning);
-  if(typeof MochiScience!=='undefined'&&S.science){
-    try{data.science=MochiScience.validate(S.science);}catch(e){}
-  }
-  return data;
-}
+function backupObject(){return window.MochiReview.build(S,APP_VERSION);}
 function status(text,kind=''){lastMessage=text;const el=document.getElementById('driveMirrorStatus');if(el){el.textContent=text;el.dataset.kind=kind;}}
 async function mirrorNow(reason='auto'){
-  if(!configured()||busy)return false;
+  if(!configured())return false;
+  if(busy){pending=true;return false;}
   busy=true;status(reason==='manual'?'Sending latest backup to Drive…':'Mirroring learning backup to Drive…');
   try{
     const body={secret:secret(),reason,backup:backupObject()};
@@ -39,7 +34,7 @@ async function mirrorNow(reason='auto'){
     status('Drive request sent; delivery cannot be confirmed in this browser · '+new Date(at).toLocaleString(), 'ok');paint();
     return true;
   }catch(err){status('Drive mirror failed · '+err.message,'bad');return false;}
-  finally{busy=false;}
+  finally{busy=false;if(pending){pending=false;schedule();}}
 }
 function schedule(){
   if(!configured())return;

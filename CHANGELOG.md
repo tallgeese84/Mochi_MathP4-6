@@ -1,3 +1,17 @@
+# v4.3.7 — Small windows and learning review
+
+- Keep the toolbar and panels reachable in short desktop windows. Stack narrow
+  Science controls and keep mobile input text at a readable size.
+- Use the visual viewport to fit panels above mobile keyboards. Preserve pinch
+  zoom and release stale dragged-lab coordinates when a window shrinks.
+- Pause home animation and timer repainting while minimised; retain answers.
+- Add Parent settings → Review Euna’s progress with ChatGPT → Download for ChatGPT,
+  plus a direct link to the existing Drive mirror folder.
+- Share one backup builder across downloads, Firebase backups and Drive mirrors,
+  with app version, timestamps, independent/support counts, reasoning and Science
+  question references. Preserve restore compatibility and exclude app credentials.
+- Retry a queued Drive mirror when a save arrived during the prior request.
+
 # v4.3.6 — Startup and offline recovery
 
 - Remove the self-triggering version observer, competing version writers and the
