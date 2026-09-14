@@ -1,12 +1,12 @@
-/* v4.3.1 visible release marker. */
+/* v4.3.2 visible release marker. */
 (function(){
 'use strict';
-const VERSION='4.3.1', DATE='2026-09-13';
+const VERSION='4.3.2', DATE='2026-09-13';
 function mark(){
   document.querySelectorAll('[data-app-version]').forEach(el=>el.textContent='v'+VERSION);
   document.querySelectorAll('[data-release-date]').forEach(el=>{el.dateTime=DATE;el.textContent='13 September 2026';});
   const n=document.getElementById('releaseNotes');
-  if(n)n.textContent='Firebase family sync, exact cloud copy of the downloadable learning backup JSON, and reliable animated home illustrations.';
+  if(n)n.textContent='Firebase family sync, exact cloud backup JSON, private Google Drive learning mirror, and reliable animated home illustrations.';
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mark,{once:true});else mark();
 document.addEventListener('mochi:focus-rendered',mark);
