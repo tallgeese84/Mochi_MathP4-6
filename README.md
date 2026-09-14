@@ -5,7 +5,7 @@ Euna for Primary 6 mathematics and her **September 2027 SPERS-Sec1 planning targ
 with a separate enrichment strand for mathematical thinking. The exact 2027 test
 and application dates must be checked when published.
 
-**v4.3.9 — 14 September 2026.** The existing cat, room, handwriting pad, provider
+**v4.4.0 — 14 September 2026.** The existing cat, room, handwriting pad, provider
 settings and saved coins are preserved. Old topic totals are retained as legacy
 accuracy; they are not treated as new evidence of independent learning.
 
@@ -24,15 +24,21 @@ explanation revisions are saved immediately. Repeated questions are labelled
 familiar practice, and are not counted as new independent evidence. Free text and
 handwritten explanations remain ungraded and need tutor/adult discussion.
 
-On phones and tablets, navigation sits above the question in normal page flow;
-wide screens reserve a separate navigation gutter. The installed home-screen app
-uses the same version and offline assets as the website. Refresh online after the
-release has been published, then confirm the header reads v4.3.9. Do not clear app
-storage or reinstall to update: existing learning history should be retained.
+The app opens into the current lesson. Switch between Maths and Science in the
+header; open Euna’s avatar for progress, the suggested schedule, practice options
+and parent settings. Maths help sits below the question in normal page flow.
+Science’s **Try an experiment** opens within the current question and preserves
+her selected answer and notes. **Why this question?** explains the recommendation.
+A finished session from a previous day starts the next appropriate practice;
+unfinished sessions retain their place.
+
+The installed home-screen app uses the same version and offline assets as the
+website. Refresh online after publication, then confirm the header reads v4.4.0.
+Do not clear app storage or reinstall to update: retain the existing learning history.
 
 ## New science trial
 
-Use the **Maths / Science / Investigate** switch. Science includes eight illustrated
+Choose **Science**, then open **Try an experiment** to explore the illustrated model. Science includes eight illustrated
 activity areas, 28 authored practice questions and 8 reserved independent checks.
 Predict before recording a model trial; explain the evidence in the notebook.
 Stylus notes, optional transcription and typed explanations share the existing

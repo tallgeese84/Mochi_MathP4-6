@@ -6,20 +6,21 @@ const scText=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>'
 function scDraft(){if(!SCI.state)return;scData().drafts[SCI.skill]={prediction:$('scPrediction').value.slice(0,1000),explanation:$('scExplanation').value.slice(0,2500),strokes:SCI.strokes};save(S);}
 function scAbort(){SCI.epoch++;SCI.controller?.abort();SCI.controller=null;}
 function scShow(view){
+ const experiment=view==='investigate';if(experiment)view='science';
  scDraft();scAbort();focusClose(false);SCI.view=view;
  document.body.classList.toggle('science-active',view!=='maths');
  $('viewScience').hidden=view==='maths';
  $('viewMaths').style.display=view==='maths'?'':'none';$('viewMap').hidden=true;$('viewRoom').style.display='none';
- for(const id of ['Maths','Science','Investigate'])$('subject'+id).setAttribute('aria-pressed',String(view===id.toLowerCase()));
+ for(const id of ['Maths','Science'])$('subject'+id).setAttribute('aria-pressed',String(view===id.toLowerCase()));
  if(view==='maths'){studioShow('maths');return;}
  if(activeTutorController)activeTutorController.abort();questionEpoch++;queue.length=0;
  if(!SCI.state)scNew();
  if(view==='investigate'&&SCI.mode==='assessment'){SCI.mode='practice';SCI.assessment=null;scNew();}
  $('scMode').value=SCI.mode;$('scMode').hidden=view==='investigate';$('scTopic').disabled=SCI.mode==='assessment';
  $('scPractice').hidden=view==='investigate';$('scInquiry').hidden=view!=='investigate';
- $('scModeLabel').hidden=view==='investigate';$('scCheck').hidden=view==='investigate';$('scNext').hidden=view==='investigate'||!SCI.done;$('scKeep').hidden=view!=='investigate';
+ $('scModeLabel').hidden=view==='investigate';$('scCheck').hidden=view==='investigate';$('scNext').hidden=SCI.done||SCI.tries===0;$('scKeep').hidden=view!=='investigate';
  $('scViewLabel').textContent=view==='investigate'?'INVESTIGATE':'SCIENCE';
- scPaint();if(SCI.q)scPaintProbe();if(SCI.shown)$('scObservation').textContent=MochiScienceScenes.observation(SCI.skill,SCI.state);requestAnimationFrame(scDrawInk);
+ scPaint();if(experiment&&SCI.mode!=='assessment')$('scExperiment').open=true;if(SCI.shown)$('scObservation').textContent=MochiScienceScenes.observation(SCI.skill,SCI.state);requestAnimationFrame(scDrawInk);
 }
 function scNew(item){
  scAbort();SCI.q=item||MochiScience.choose(scData(),SCI.mode,$('scTopic').value||null);
@@ -30,6 +31,7 @@ function scNew(item){
  $('scPrediction').value=SCI.view==='investigate'?d.prediction||'':'';$('scExplanation').value=SCI.view==='investigate'?d.explanation||'':'';
  SCI.strokes=SCI.view==='investigate'?d.strokes||[]:[];SCI.revision++;$('scTrials').innerHTML='';
  $('scGuess').checked=false;$('scFeedback').textContent='';$('scReply').textContent='';$('scChatInput').value='';$('scReadResult').value='';$('scReadProposal').hidden=true;
+ $('scExperiment').open=false;$('scConceptCheck').open=false;
  $('scCheck').disabled=false;$('scCheck').textContent=SCI.mode==='assessment'?'Save and continue':'Check my answer';$('scNext').hidden=true;
  $('scAssessmentResults').hidden=true;
  $('scControls').innerHTML=MochiScienceScenes.controls(SCI.skill,SCI.state);
@@ -56,10 +58,12 @@ function scPaint(){
  $('scQuestion').textContent=SCI.q?.prompt||'Choose another topic to continue.';
  $('scInquiryQuestion').textContent=detail.question;$('scInquiryTask').textContent=detail.challenge;
  $('scAssumptions').textContent=detail.limit;
+ $('scExperiment').hidden=assessment;
  $('scControls').disabled=assessment;$('scRun').hidden=assessment;$('scTrialArea').hidden=assessment;$('scPredictionField').hidden=assessment;
  $('scHelp').hidden=assessment;$('scConcept').hidden=assessment;$('scSourceArea').hidden=assessment;
  $('scGuessLabel').hidden=SCI.view==='investigate';$('scKeep').hidden=SCI.view!=='investigate';$('scCheck').hidden=SCI.view==='investigate';$('scObservation').textContent=assessment?'Independent check: use the supplied diagram and your own reasoning. Feedback appears when you finish.':'Change a setting and test your prediction.';
- $('scProgress').textContent=assessment?`Independent check ${Math.min(8,(SCI.assessment?.answers.length||0)+1)} / 8`:(SCI.q.reason||'Choose a topic or follow the recommended question');
+ $('scProgress').textContent=assessment?`Independent check ${Math.min(8,(SCI.assessment?.answers.length||0)+1)} / 8`:'Practice · Take your time';
+ $('scWhy').textContent=SCI.q?.reason||'A question selected from your science learning history.';
  $('scSource').href=MochiScience.skills[SCI.skill].resource;
  $('scSearchPhrase').textContent='Try searching: '+MochiScience.skills[SCI.skill].label+' explanation evidence primary science';
  if(SCI.q?.extension||MochiScience.skills[SCI.skill].extension)$('scProgress').textContent+=' · Extension beyond the primary syllabus';
@@ -89,7 +93,7 @@ function scRecord(correct){
 function scCheck(){
  if(SCI.done||!SCI.q)return;
  if(SCI.choice<0){$('scFeedback').textContent='Choose an answer first.';return;}
- if(SCI.mode!=='assessment'&&SCI.probeChoice<0){$('scFeedback').textContent='Try the short reasoning check too. It helps Mochi choose your next question.';$('scConceptCheck').scrollIntoView({block:'nearest'});return;}
+ if(SCI.mode!=='assessment'&&SCI.probeChoice<0){$('scFeedback').textContent='Try the short reasoning check too. It helps Mochi choose your next question.';$('scConceptCheck').open=true;$('scConceptCheck').scrollIntoView({block:'nearest'});return;}
  if(!$('scExplanation').value.trim()&&SCI.strokes.length===0){$('scFeedback').textContent='Add a short explanation or write one with your stylus. What makes your answer work?';return;}
  const correct=SCI.choice===SCI.q.answer,probe=MochiScience.probeFor(SCI.q),conceptCorrect=SCI.probeChoice===probe.answer;
  SCI.tries++;if(SCI.tries===1){SCI.firstCorrect=correct;SCI.probeFirstCorrect=conceptCorrect;}
@@ -108,7 +112,7 @@ function scCheck(){
  SCI.done=true;
  const brief=$('scExplanation').value.trim().split(/\s+/).length<3;
  $('scFeedback').textContent='Your choice and reasoning check are correct. '+SCI.q.why+(brief?' Add a sentence or a labelled drawing explaining why; your explanation still needs discussion.':' Your explanation is saved separately for discussion, not automatically graded.')+(record.repeated?' This was familiar practice.':'');
- $('scNext').hidden=false;$('scNext').textContent='Next question';$('scCheck').disabled=true;
+ $('scNext').hidden=true;$('scCheck').textContent='Continue';$('scCheck').disabled=false;
 }
 function scFinishAssessment(){
  const answers=SCI.assessment.answers,n=answers.filter(a=>a.correct).length;
@@ -121,7 +125,7 @@ function scEvidence(){
  if($('parentScience'))$('parentScience').innerHTML=`<p>Science records choices and explanations separately. A correct choice does not validate the explanation. ${scData().notes.length} investigations saved.</p><ul class="sc-evidence">${html}</ul><details><summary>Saved investigations</summary>${scData().notes.slice(-12).reverse().map(n=>`<p><strong>${scText(MochiScience.skills[n.skill].label)}</strong><br>Prediction: ${scText(n.prediction)}<br>Explanation: ${scText(n.text)}<br>${n.trials.length} recorded trials</p>${scInkSvg(n.strokes)}`).join('')||'<p>No investigations saved yet.</p>'}</details><details><summary>Recent science reasoning</summary>${scData().attempts.slice(-12).reverse().map(a=>`<p><strong>${scText(MochiScience.skills[a.skill].label)}</strong> — ${a.repeated?'familiar practice':a.independent?'new unassisted choice':a.correct?'supported or revised':'revisit'}<br>Reasoning check: ${a.concept?(a.concept.correct?'correct':'revisit'):'not recorded'} · Explanation needs discussion.<br>${scText(a.explanation)}</p>${scInkSvg(a.strokes)}`).join('')||'<p>No answers recorded yet.</p>'}</details>`;
 }
 function scKeep(){
- if(!$('scExplanation').value.trim()){ $('scFeedback').textContent='Explain what your evidence supports before saving.';return;}
+ if(!$('scExplanation').value.trim()&&!SCI.strokes.length){ $('scFeedback').textContent='Explain what your evidence supports, using the keyboard or stylus, before saving.';return;}
  scData().notes.push({skill:SCI.skill,at:Date.now(),text:$('scExplanation').value.trim(),prediction:$('scPrediction').value.trim(),trials:MochiScience.copy(SCI.trials),strokes:MochiScience.copy(SCI.strokes)});scData().notes=scData().notes.slice(-100);scDraft();scEvidence();$('scFeedback').textContent='Investigation saved. What new case would test your explanation?';
 }
 async function scAsk(){
@@ -153,10 +157,12 @@ async function scRead(){
 }
 function scInit(){
  S.science=MochiScience.validate(S.science);const topic=$('scTopic');topic.innerHTML='<option value="">Recommended</option>'+Object.entries(MochiScience.skills).map(([id,s])=>`<option value="${id}">${scText(s.label)}</option>`).join('');
- for(const name of ['Maths','Science','Investigate'])$('subject'+name).onclick=()=>scShow(name.toLowerCase());
+ for(const name of ['Maths','Science'])$('subject'+name).onclick=()=>scShow(name.toLowerCase());
  topic.onchange=()=>{scDraft();if(SCI.mode==='assessment')return;if(SCI.tries&&!SCI.done)scRecord(SCI.choice===SCI.q.answer);scNew();};
  $('scMode').onchange=()=>{if(SCI.tries&&!SCI.done)scRecord(SCI.choice===SCI.q.answer);scDraft();SCI.mode=$('scMode').value;$('scKeep').hidden=true;topic.disabled=SCI.mode==='assessment';if(SCI.mode==='assessment'){topic.value='';SCI.assessment={started:Date.now(),answers:[]};}else SCI.assessment=null;scNew();};
- $('scSource').onclick=()=>{SCI.helped=true;};$('scRun').onclick=scTest;$('scCheck').onclick=scCheck;$('scNext').onclick=()=>{if(SCI.tries&&!SCI.done)scRecord(SCI.choice===SCI.q.answer);scDraft();scNew();$('scNext').textContent='Next question';};$('scKeep').onclick=scKeep;
+ $('scSource').onclick=()=>{SCI.helped=true;};$('scRun').onclick=scTest;$('scCheck').onclick=()=>{if(SCI.done&&SCI.mode!=='assessment'){scDraft();scNew();}else scCheck();};
+ $('scKeepExperiment').onclick=scKeep;
+ $('scExperiment').ontoggle=()=>{if($('scExperiment').open&&SCI.mode!=='assessment'){SCI.helped=true;scDrawInk();}};$('scNext').onclick=()=>{if(SCI.tries&&!SCI.done)scRecord(SCI.choice===SCI.q.answer);scDraft();scNew();$('scNext').textContent='Next question';};$('scKeep').onclick=scKeep;
  $('scConcept').onclick=()=>{SCI.helped=true;$('scFeedback').textContent=MochiScience.skills[SCI.skill].concept+' '+SCI.q.why;};
  $('scAsk').onclick=scAsk;$('scChatInput').onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();scAsk();}};
  $('scPrediction').oninput=$('scExplanation').oninput=()=>{SCI.revision++;scDraft();};
