@@ -1,5 +1,5 @@
 {
-  "version": "4.3.3",
+  "version": "4.3.4",
   "releasedOn": "2026-09-13",
-  "summary": "Self-healing service-worker update prevents split-version caches; Firebase sync, exact backup JSON, private Google Drive mirror, and animated home scenes remain enabled."
+  "summary": "Direct index loader replaces service-worker HTML injection; current Firebase sync, exact backup JSON, private Drive mirror, and animated illustrated home scenes load from one authoritative version."
 }
