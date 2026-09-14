@@ -1,5 +1,5 @@
 {
-  "version": "4.3.0",
+  "version": "4.3.1",
   "releasedOn": "2026-09-13",
-  "summary": "Family Firebase progress sync using the existing cubs_sync configuration, plus reliable Web Animations API motion for the illustrated home quest."
+  "summary": "Exact Firebase mirror of the downloadable learning backup JSON, on top of v4.3.0 family sync and animated illustrated home scenes."
 }
