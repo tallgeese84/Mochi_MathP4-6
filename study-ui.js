@@ -8,6 +8,10 @@ const studyPlanText=()=>typeof studioPlanText==='function'?studioPlanText():$('s
 function studyInit(){
  const l=learning();
  if(!l.session)MochiLearning.start(l,l.mode);
+ else if(l.session.finished&&new Date(l.session.started).toDateString()!==new Date().toDateString()){
+   const seen=new Set(l.attempts.filter(a=>a.kind==='diagnostic'&&!a.skipped).map(a=>a.skill));
+   MochiLearning.start(l,seen.size>=17?'review':l.mode==='diagnostic'?'diagnostic':'daily');
+ }
  $('studyMode').value=l.mode;
  $('studyStart').onclick=()=>{
    const mode=$('studyMode').value;studyCommit(true);MochiLearning.start(learning(),mode);save(S);renderQuestion();
@@ -95,7 +99,7 @@ function studyNewQuestion(){
  $('studyResourcePrompt').textContent=skill.question;
  $('studyResource').href=skill.resource;
  $('studyResource').textContent='Explore: '+skill.label.toLowerCase();
- $('studyQuestionNote').textContent=current.repair?(selectedStudy?.reason||'Check the idea and show your working.'):current.custom?'Your own problem · AI explanation, not independently marked. Include diagram details if needed.':current.stretch?'Reasoning investigation · original enrichment, not an official NUS High test question or required SPERS topic.':'No calculator · '+skill.label+' · '+(current.parts?'Show how the parts connect.':'A correct answer is a starting point; explain what makes it work.');
+ $('studyQuestionNote').textContent=current.repair?(selectedStudy?.reason||'Check the idea and show your working.'):current.custom?'Your own problem · AI explanation, not independently marked. Include diagram details if needed.':current.stretch?'Reasoning investigation · original enrichment, not an official NUS High test question or required SPERS topic.':'No calculator · '+(selectedStudy?.reason||'Practise '+skill.label.toLowerCase()+'.')+(current.parts?' Show how the parts connect.':' Explain what makes your method work.');
  if(typeof studioNewQuestion==='function')studioNewQuestion();
  studyPaint();
 }

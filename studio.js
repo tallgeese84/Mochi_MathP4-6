@@ -32,7 +32,7 @@ function studioStageGo(stage,focus=false){
  $('traceCount').textContent=count?count+' thinking step'+(count===1?'':'s')+' recorded':'Your route is yours';
 }
 function studioShow(which){
- if(typeof SCI!=='undefined'&&SCI.view!=='maths'){scDraft();scAbort();SCI.view='maths';document.body.classList.remove('science-active');$('viewScience').hidden=true;for(const [id,on] of [['subjectMaths',true],['subjectScience',false],['subjectInvestigate',false]])$(id).setAttribute('aria-pressed',String(on));}
+ if(typeof SCI!=='undefined'&&SCI.view!=='maths'){scDraft();scAbort();SCI.view='maths';document.body.classList.remove('science-active');$('viewScience').hidden=true;for(const [id,on] of [['subjectMaths',true],['subjectScience',false]])$(id).setAttribute('aria-pressed',String(on));}
  if(which==='tools'){studioOpenLab();return;}
  focusClose(false);
  studioView=which;
@@ -44,6 +44,7 @@ function studioShow(which){
  }
  if(which==='map'){studioCapture();studioMap();}
  if(which==='room'){paintShop();paintAcc();setPurr(S.purr||0);}
+ $('focusDock').hidden=which!=='maths'||$('problemCard').hidden;
  if(which==='maths')requestAnimationFrame(()=>{wkResize();wkRedraw();});
 }
 function studioTutor(open=true){
@@ -58,20 +59,20 @@ function studioPaint(){
  if(!current)return;
  const l=learning(),move=MochiReasoning.nextMove(l,currentSkill(),$('studyObstacle').value);
  $('moveTitle').textContent=move.title;$('movePrompt').textContent=move.prompt;
- const b=MochiReasoning.band(l,currentSkill());
- $('challengeLabel').textContent=current.custom?'YOUR QUESTION':current.stretch?'INVESTIGATE':selectedStudy?.kind==='diagnostic'?'FIRST LOOK':b.label.toUpperCase();
  const conn=netReady()?'Live AI tutor connected':keyReady()?'Offline · local hints available':'Local hints · connect an AI tutor in parent settings';
  $('coachConnection').textContent=conn;
- const s=l.session;$('sessionFinish').hidden=!s?.finished;
+ const s=l.session,recorded=l.attempts.some(a=>a.id===studyAttempt?.id);$('sessionFinish').hidden=!s?.finished;
+ $('problemCard').hidden=!!(s?.finished&&!recorded&&!current.custom);$('focusDock').hidden=$('problemCard').hidden||studioView!=='maths';
  $('focusQuestionMore').textContent=settled||revealed?'Reflect on my method':'Need a way in?';
  $('focusQuestionMore').setAttribute('aria-controls',settled||revealed?'thinkPanel':'morePanel');
  FOCUS_TRIGGERS.focusQuestionMore=settled||revealed?'thinkPanel':'morePanel';
  for(const id of ['thinkQuestion','coachQuestion','labQuestionRef'])$(id).textContent=current.text;
  $('focusProgress').textContent=(s?.done||0)+' / '+(s?.total||8)+' explored';
  $('chicProgress').value=Math.min(s?.done||0,s?.total||8);$('chicProgress').max=s?.total||8;
- $('focusSession').setAttribute('aria-label','Euna’s practice: '+(s?.done||0)+' of '+(s?.total||8)+' questions. Open session settings.');
+ $('focusSession').setAttribute('aria-label','Euna’s progress and practice schedule');
  $('focusContext').textContent=current.custom?'Your own problem · check Mochi’s explanation together.':current.stretch?'Reasoning investigation · explore, explain, test.':'No calculator · Take your time';
- $('nextBtn').textContent=s?.finished?'Finish session':'Next question';
+ $('nextBtn').textContent=s?.finished?'Finish session':'Continue';
+ $('challengeLabel').textContent=current.custom?'YOUR QUESTION':`Question ${Math.min((s?.done||0)+(recorded?0:1),s?.total||8)} of ${s?.total||8} · ${current.repair?'Revisiting an idea':selectedStudy?.kind==='diagnostic'?'Starting-point check':'Practice'}`;
  if(s?.finished){const recent=l.attempts.filter(a=>a.at>=s.started);$('sessionFinishText').textContent=recent.filter(a=>a.independent).length+' independent solutions; '+recent.filter(a=>!a.independent).length+' ideas to revisit. A useful insight matters more than a perfect session.';}
 }
 function studioNewQuestion(){
@@ -267,7 +268,7 @@ function focusInit(){
      if(id==='ownProblemStart'&&!$('ownProblem').value.trim()||id==='saveResource'&&!$('resourceNote').value.trim())return;
      focusClose(false);original.apply(this,args);
      if(id==='ownProblemStart'||id==='saveResource')studioTutor();
-     else if(id==='studyStart'){$('qText').focus();}
+     else if(id==='studyStart'){studioShow('maths');$('qText').focus();}
      else if(id==='workingBtn'||id==='modelBtn'){$('qText').focus();}
    };
    wrapped._focusOriginal=original;$(id).onclick=wrapped;

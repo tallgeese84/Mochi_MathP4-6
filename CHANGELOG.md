@@ -1,3 +1,21 @@
+# v4.4.0 — Open into the lesson
+
+- Replace the home review cards and top-level schedule with one lesson surface.
+  Keep Maths and Science in the header; move the suggested schedule, progress,
+  practice options, learning map and parent settings behind Euna’s avatar.
+- Keep Think and Ask Mochi below the maths question in normal document flow,
+  including on phones, tablets and narrow browser windows.
+- Fold Investigate into Science as Try an experiment. Preserve the current
+  question, answer, reasoning choice and notes while exploring. Experiments count
+  as support; independent checks keep them unavailable. Accept handwritten
+  explanations in saved experiment notes.
+- Add expandable Why this question? explanations and reduce repeated labels.
+  Use the Science check button to continue after a correct answer.
+- Start the next appropriate session when returning after a finished prior-day
+  session. Preserve unfinished sessions and existing learning history.
+- Share v4.4.0 and the updated offline assets across the website and installed PWA.
+  Stop loading the retired dashboard animation scripts.
+
 # v4.3.9 — Follow the reasoning; clear the tablet workspace
 
 - Prioritise targeted follow-ups for percentage wholes, changing remainders and

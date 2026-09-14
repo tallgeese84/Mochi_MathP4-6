@@ -1,0 +1,61 @@
+/* One lesson surface. Planning stays in Euna's avatar panel. */
+#studioSurface { width: 100%; max-width: 1240px; margin: 0 auto; padding: max(20px,env(safe-area-inset-top)) 32px max(48px,env(safe-area-inset-bottom)); box-sizing: border-box; }
+#studioSurface .topbar { display: flex; align-items: center; gap: 20px; padding-bottom: 18px; }
+#studioSurface .subject-switch { margin: 0 auto; width: auto; max-width: none; flex: 0 1 auto; }
+#studioSurface .subject-switch button { min-height: 44px; padding: 10px 20px; }
+#studioSurface .studio-brand strong { font-size: 1.8rem; }
+.brand-descriptor,.brand-mark,.learner-session,#chicProgress { display: none; }
+#studioSurface .session-pill { display: flex !important; flex: none; }
+.learner-avatar { width: 48px; height: 48px; border-radius: 17px; }
+#studioSurface .studio-grid,body:not(.has-focus-panel)[data-input-mode=stylus] #studioSurface .studio-grid { width: 100%; max-width: 1100px; margin: 26px auto 0; }
+body.has-focus-panel #studioSurface .studio-grid { width: 100%; max-width: 1100px; margin: 26px auto 0; }
+.topic { font-size: clamp(1.6rem,3vw,2.15rem); margin-bottom: 18px; }
+.practice-heading { margin-bottom: 12px; }
+#qNum,#focusContext { display: none; }
+.qtext { font-size: clamp(1.3rem,2.4vw,1.75rem); line-height: 1.6; }
+#focusDock,body.keyboard-open #focusDock { position: static; transform: none; display: flex; flex-direction: row; justify-content: flex-end; gap: 10px; width: auto; max-width: none; max-height: none; margin: 22px 0 0; padding: 0; border: 0; background: transparent; box-shadow: none; overflow: visible; }
+#focusDock .dock-item,#focusDock .tutor-orb { position: static; transform: none; display: flex; flex-direction: row; flex: none; align-items: center; justify-content: center; width: auto; min-height: 48px; gap: 8px; margin: 0; padding: 8px 16px; border: 1px solid #e0d2ec; border-radius: 22px; background: #fffcff; box-shadow: 0 5px 18px #4c256412; color: #67457e; }
+#focusDock .dock-icon,#focusDock .tutor-avatar { width: 27px; height: 27px; }
+#focusDock .dock-label,#focusDock .tutor-orb-label { display: block; font-size: 14px; line-height: 1.4; }
+#focusDock .tutor-orb>svg { display: none; }
+#focusDock[hidden] { display: none; }
+.plan-links { display: flex; gap: 10px; flex-wrap: wrap; margin: 12px 0 24px; }
+.plan-links .dock-item { width: auto; min-height: 48px; flex: 1 1 90px; border: 1px solid #e3d8ed; border-radius: 16px; background: #faf6fe; padding: 10px; }
+.plan-links .dock-icon { width: 30px; height: 30px; margin: auto; }
+.plan-links .dock-label { display: block; font-size: 13px; }
+.plan-schedule { margin-top: 24px; border-top: 1px solid #e0d3ed; padding-top: 16px; }
+.plan-schedule summary,.question-why summary,.sc-options summary,.sc-experiment summary,.sc-concept-check summary { cursor: pointer; font-weight: 600; padding: 12px 0; min-height: 44px; box-sizing: border-box; color: #714495; }
+.plan-schedule ol { padding-left: 22px; }
+.plan-schedule li { padding: 10px 0; line-height: 1.5; }
+.plan-schedule li span,.plan-schedule li small { display: block; color: #766681; }
+.question-why { margin: 12px 0 20px; font-size: 15px; line-height: 1.6; }
+.question-why p { margin: 8px 0; }
+#viewScience { width: 100%; margin: 26px 0 40px; }
+.sc-top { align-items: center; margin-bottom: 4px; }
+.sc-top h1 { font-size: clamp(1.6rem,3vw,2.15rem); }
+.sc-top .overline { display: none; }
+.sc-options .sc-selectors { padding-top: 8px; }
+.sc-experiment { padding: 0 18px 10px; }
+.sc-experiment .sc-lab-bottom { padding-inline: 0; }
+.sc-experiment .experiment-intro { font-size: 15px; line-height: 1.5; color: #796687; }
+.sc-concept-check { padding: 4px 16px; }
+.sc-concept-check .overline { display: none; }
+.sc-concept-check:not([open]) > :not(summary) { display: none; }
+#scKeep { display: none; }
+.science-active #focusSession { display: flex !important; }
+@media (min-width: 1200px) {
+ body.has-focus-panel #studioSurface .studio-grid { width: calc(100% - 500px); margin-left: 0; }
+ body.has-focus-panel[data-input-mode=stylus] .problem-card { display: block; }
+}
+@media (max-width: 700px) {
+ #studioSurface { padding-inline: max(16px,env(safe-area-inset-left)); }
+ #studioSurface .topbar { gap: 10px; flex-wrap: nowrap; }
+ #studioSurface .subject-switch { padding: 4px; border-radius: 18px; }
+ #studioSurface .subject-switch button { padding: 8px 12px; font-size: 15px; }
+ #studioSurface .studio-brand strong { font-size: 1.5rem; }
+ .learner-avatar { width: 42px; height: 42px; border-radius: 14px; }
+ #studioSurface .studio-grid { margin-top: 20px; }
+ .sc-top { flex-direction: column; align-items: flex-start; gap: 0; }
+ #focusDock { justify-content: center; }
+}
+@media print { #focusDock,.question-why,.plan-links { display: none !important; } }
