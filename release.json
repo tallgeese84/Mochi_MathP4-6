@@ -1,5 +1,5 @@
 {
-  "version": "4.3.1",
+  "version": "4.3.2",
   "releasedOn": "2026-09-13",
-  "summary": "Exact Firebase mirror of the downloadable learning backup JSON, on top of v4.3.0 family sync and animated illustrated home scenes."
+  "summary": "Private Google Drive learning mirror added alongside Firebase live sync and exact cloud backup JSON, with animated illustrated home scenes preserved."
 }
