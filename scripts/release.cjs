@@ -27,7 +27,15 @@ for (const file of ['index.html', 'app.js', 'sw.js', 'manifest.webmanifest']) {
       .replace(/const BUILD_DATE\s*= '[^']+';/, `const BUILD_DATE  = '${release.releasedOn}';`);
     if (!text.includes(`const APP_VERSION = '${release.version}';`)) throw Error('Missing runtime version');
   }
-  if (file === 'sw.js') text = text.replace(/const SHELL = '[^']+';/, `const SHELL = 'mochi-shell-v${release.version}';`);
+  if (file === 'sw.js') {
+    const html = generated.find(f => path.basename(f.filename) === 'index.html').text;
+    const core = ['./index.html', './manifest.webmanifest', './mochi-builtin.webp', './mochi-watermark.webp', './euna-avatar.webp',
+      ...fs.readdirSync(runtime).filter(f => /^science-.*\.webp$/.test(f)).map(f => './' + f),
+      ...Array.from(html.matchAll(/(?:src|href)="([^"]+\.(?:js|css|png)(?:\?[^"]*)?)"/g), m => './' + m[1]).filter(x => !x.includes('://'))];
+    for (const asset of core) if (!fs.existsSync(path.join(runtime, asset.split('?')[0]))) throw Error('Missing offline asset: ' + asset);
+    text = text.replace(/const VERSION = '[^']+';/, `const VERSION = '${release.version}';`)
+      .replace(/const CORE = .*?;[^\n]*/, 'const CORE = ' + JSON.stringify([...new Set(core)]) + '; // Generated from index.html.');
+  }
   generated.push({filename, original, text});
 }
 const changed = generated.filter(f => f.original !== f.text);

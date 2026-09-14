@@ -1,3 +1,20 @@
+# v4.3.6 — Startup and offline recovery
+
+- Remove the self-triggering version observer, competing version writers and the
+  hidden loader that fetched baseline-week.js twice.
+- Serve the full page directly with ordered deferred scripts. Keep legacy-shell.html
+  as a compatibility redirect; remove the cache-clearing document.write bootloader.
+- Initialise cloud sync and home enhancements after local progress hydration.
+  Bound optional storage reads and cloud requests; load custom cat photos separately.
+- Precache the release and illustrations in a scope-specific service-worker cache.
+  Offline navigation has a saved shell; updates never force an open tab to navigate.
+  Cached static assets no longer trigger a background fetch on every use.
+- Extract the two identical embedded cat images into one reusable original asset.
+- Add full-page startup and offline regression checks, release consistency CI and
+  .nojekyll. Repair the duplicate More control ID and inaccurate backup status text.
+- Preserve learning records and settings. See docs/LOADING_REVIEW.md for evidence,
+  remaining cloud limitations and the device acceptance checklist.
+
 # v4.2.1 — Visible release tracking
 
 - Show a compact version label below the Mochi brand on phones, tablets and desktop.

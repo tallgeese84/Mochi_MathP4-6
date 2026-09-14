@@ -54,13 +54,3 @@ function inputInit(){
  $('wkPenOnly').setAttribute('aria-pressed',String(!!WK.penOnly));
  inputSetMode(inputMode,false);
 }
-
-/* v4.2.2: load the starting-point week independently of service-worker injection. */
-(function loadBaselineWeek(){
-  if(document.querySelector('script[data-mochi-baseline]') || document.getElementById('mochiBaselineWeek')) return;
-  const s=document.createElement('script');
-  s.src='baseline-week.js?v=4.2.2';
-  s.dataset.mochiBaseline='true';
-  s.defer=true;
-  document.head.appendChild(s);
-})();

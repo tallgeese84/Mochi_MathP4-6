@@ -25,17 +25,17 @@ function setStatus(text){
 }
 async function saveBackup(data=makeBackup()){
   const ep=endpoint();
-  if(!ep){setStatus('Learning backup downloaded locally. Cloud backup is not configured on this device.');return false;}
+  if(!ep){setStatus('Cloud backup is not configured. Use Back up learning to download a local copy.');return false;}
   if(busy)return false;busy=true;
   try{
     /* Store the exact same JSON object as the downloaded file — no wrapper or credentials. */
-    const r=await fetch(ep,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    const r=await window.MochiNetwork.request(ep,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
     if(!r.ok)throw Error(`Firebase backup write failed (${r.status}).`);
-    setStatus('Learning backup downloaded and the same JSON was saved to Firebase cloud backup.');
+    setStatus('Learning backup saved to Firebase cloud backup.');
     document.dispatchEvent(new CustomEvent('mochi:cloud-backup-saved',{detail:{exported:data.exported||''}}));
     return true;
   }catch(err){
-    setStatus('Local backup downloaded, but cloud backup failed: '+err.message);
+    setStatus('Cloud backup failed; local learning progress is unchanged: '+err.message);
     return false;
   }finally{busy=false;}
 }
@@ -55,5 +55,5 @@ function mount(){
 }
 function init(){mount();setTimeout(mount,500);document.addEventListener('mochi:cloud-merged',mount);}
 window.MochiCloudBackup={save:saveBackup,make:makeBackup};
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+if(window.MochiReady)init();else document.addEventListener('mochi:ready',init,{once:true});
 })();

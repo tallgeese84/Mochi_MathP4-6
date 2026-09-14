@@ -2,8 +2,6 @@
    Loaded after baseline-week.js. The maths engine is untouched. */
 (function(){
 'use strict';
-const VERSION='4.2.8';
-let observer=null;
 
 function addStyle(){
   if(document.getElementById('mochiQuestVisualStyle'))return;
@@ -114,8 +112,7 @@ function miniSvg(i){
   return`<svg viewBox="0 0 118 76" aria-hidden="true"><rect width="118" height="76" rx="13" fill="#fcf9ff"/>${d}</svg>`;
 }
 function applyWeek(host){host.querySelectorAll('.focus-row').forEach((row,i)=>{if(row.querySelector('.week-art'))return;const art=document.createElement('div');art.className='week-art';art.innerHTML=miniSvg(i);const when=row.querySelector('.focus-when');row.insertBefore(art,when||row.firstChild);});}
-function markVersion(){document.querySelectorAll('[data-app-version]').forEach(el=>el.textContent='v'+VERSION);document.querySelectorAll('[data-release-date]').forEach(el=>{el.dateTime='2026-09-13';el.textContent='13 September 2026';});const n=document.getElementById('releaseNotes');if(n)n.textContent='Animated illustration fix: the home board now preserves scenes between state changes, with moving maths objects, Euna, Mochi, and current quest cards.';}
-function apply(){const host=document.getElementById('mochiFocusHome');if(!host)return;addStyle();shortCopy(host);applyScene(host);applyWeek(host);markVersion();}
-function init(){addStyle();apply();document.addEventListener('mochi:focus-rendered',()=>requestAnimationFrame(apply));observer=new MutationObserver(m=>{if(m.some(x=>x.addedNodes&&x.addedNodes.length))requestAnimationFrame(apply);});observer.observe(document.body,{childList:true,subtree:true});}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+function apply(){const host=document.getElementById('mochiFocusHome');if(!host)return;addStyle();shortCopy(host);applyScene(host);applyWeek(host);}
+function init(){addStyle();apply();document.addEventListener('mochi:focus-rendered',apply);}
+if(window.MochiReady)init();else document.addEventListener('mochi:ready',init,{once:true});
 })();

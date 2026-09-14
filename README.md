@@ -5,7 +5,7 @@ Euna for Primary 6 mathematics and her **September 2027 SPERS-Sec1 planning targ
 with a separate enrichment strand for mathematical thinking. The exact 2027 test
 and application dates must be checked when published.
 
-**v4.2.1 — 11 September 2026.** The existing cat, room, handwriting pad, provider
+**v4.3.6 — 14 September 2026.** The existing cat, room, handwriting pad, provider
 settings and saved coins are preserved. Old topic totals are retained as legacy
 accuracy; they are not treated as new evidence of independent learning.
 
@@ -34,7 +34,15 @@ compare their displayed numbers.
 For each release, update `release.json`, run `node scripts/release.cjs`, and commit
 the generated changes together. Run `node scripts/release.cjs --check` before
 publishing to reject inconsistent labels, runtime metadata and offline asset
-versions. Release numbering uses `major.minor.patch`; this UI update is v4.2.1.
+versions. Release numbering uses `major.minor.patch`; the current release is v4.3.6.
+
+Run `npm ci --ignore-scripts`, `npm run check:release`, and `npm test` using Node
+24.15 or later before merging. GitHub's **App checks / test** job runs the same
+checks on pull requests and main. Make this check required in the main branch
+rules if you want GitHub to block untested merges; a successful Pages deployment
+alone only confirms that files were published.
+
+See [the v4.3.5 loading review](docs/LOADING_REVIEW.md) for the cause and repair.
 
 ## What to do first
 
@@ -163,11 +171,13 @@ chosen release branch. Keep these files together:
 - `reasoning.js`, `challenge-bank.js`, `studio.js`, `studio.css`
 - `science-core.js`, `science-scenes.js`, `science-ui.js`, `science.css`, `transfer-bank.js`
 - `science-plant.webp`, `science-pond.webp`, `euna-avatar.webp`, `mochi-watermark.webp`
-- `input-mode.js`, `sw.js`, `manifest.webmanifest` and all app icons
+- `input-mode.js`, `baseline-week.js`, `quest-visuals.js`, `motion-runtime.js`
+- `network.js`, `cloud-sync.js`, `cloud-backup.js`, `drive-mirror.js`
+- `mochi-builtin.webp`, `science-body.webp`, `science-heat.webp`, `science-cart.webp`
+- `sw.js`, `manifest.webmanifest`, `.nojekyll` and all app icons
 
 Do not deploy only `index.html`: the JavaScript has been extracted into modules to
-make future review and testing manageable. Bump both script/style query versions
-and the service-worker shell version on a release. External resource links and AI
+make future review and testing manageable. Use `scripts/release.cjs` to update script/style URLs and the offline cache together. External resource links and AI
 need a network connection; bank questions, marking, local hints and progress do not.
 Install on an iPad with Share → Add to Home Screen. Font files use their own cache.
 The service worker only removes this app’s older cache buckets.

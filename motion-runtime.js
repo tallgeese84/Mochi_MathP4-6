@@ -3,7 +3,6 @@
    because the family explicitly enabled motion for Mochi's home quest. */
 (function(){
 'use strict';
-const VERSION='4.3.0';
 const FLAG='mochi_motion';
 try{if(!localStorage.getItem(FLAG))localStorage.setItem(FLAG,'on');}catch(e){}
 function enabled(){try{return localStorage.getItem(FLAG)!=='off';}catch(e){return true;}}
@@ -48,5 +47,5 @@ function mountToggle(){
 }
 function run(){mountToggle();requestAnimationFrame(()=>requestAnimationFrame(animateScene));}
 function init(){run();document.addEventListener('mochi:focus-rendered',run);document.addEventListener('mochi:cloud-merged',run);setTimeout(run,600);}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+if(window.MochiReady)init();else document.addEventListener('mochi:ready',init,{once:true});
 })();
