@@ -5,14 +5,35 @@ Euna for Primary 6 mathematics and her **September 2027 SPERS-Sec1 planning targ
 with a separate enrichment strand for mathematical thinking. The exact 2027 test
 and application dates must be checked when published.
 
-**v4.3.8 — 14 September 2026.** The existing cat, room, handwriting pad, provider
+**v4.3.9 — 14 September 2026.** The existing cat, room, handwriting pad, provider
 settings and saved coins are preserved. Old topic totals are retained as legacy
 accuracy; they are not treated as new evidence of independent learning.
+
+## Feedback that changes the next practice
+
+Daily and Review sessions now prioritise targeted sequences for original percentage
+wholes, changing remainders and fraction division. Existing answers seed the plan:
+check the concept, practise the relationship, try another context, then revisit
+it after one day. Two targeted questions are followed by mixed practice. Explicit
+assessment, sprint and stretch modes remain separate. Parent settings and the
+learning mirror show the pending follow-ups; no new mirror setup is needed.
+
+Science pairs the main answer with a short authored reasoning check. A missed check
+keeps revision open and guides the next recommendation. Wrong submissions and
+explanation revisions are saved immediately. Repeated questions are labelled
+familiar practice, and are not counted as new independent evidence. Free text and
+handwritten explanations remain ungraded and need tutor/adult discussion.
+
+On phones and tablets, navigation sits above the question in normal page flow;
+wide screens reserve a separate navigation gutter. The installed home-screen app
+uses the same version and offline assets as the website. Refresh online after the
+release has been published, then confirm the header reads v4.3.9. Do not clear app
+storage or reinstall to update: existing learning history should be retained.
 
 ## New science trial
 
 Use the **Maths / Science / Investigate** switch. Science includes eight illustrated
-activity areas, 24 authored practice questions and 8 reserved independent checks.
+activity areas, 28 authored practice questions and 8 reserved independent checks.
 Predict before recording a model trial; explain the evidence in the notebook.
 Stylus notes, optional transcription and typed explanations share the existing
 family provider connection and backup controls. Original botanical, pond, anatomy, cup and cart art
@@ -34,7 +55,7 @@ compare their displayed numbers.
 For each release, update `release.json`, run `node scripts/release.cjs`, and commit
 the generated changes together. Run `node scripts/release.cjs --check` before
 publishing to reject inconsistent labels, runtime metadata and offline asset
-versions. Release numbering uses `major.minor.patch`; the current release is v4.3.8.
+versions. Release numbering uses `major.minor.patch`; the current release is v4.3.9.
 
 Run `npm ci --ignore-scripts`, `npm run check:release`, and `npm test` using Node
 24.15 or later before merging. GitHub's **App checks / test** job runs the same

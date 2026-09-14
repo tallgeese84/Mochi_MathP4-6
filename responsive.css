@@ -39,3 +39,37 @@ body.app-hidden #mochiFocusHome * { animation-play-state: paused !important; }
 @media (max-height: 500px) and (max-width: 780px) {
  .focus-panel { max-height: calc(var(--visible-height) - 82px - env(safe-area-inset-bottom)); }
 }
+
+/* Navigation owns space: never float controls over a tablet question or home card. */
+@media (min-width: 1200px) {
+ #studioSurface { box-sizing: border-box; width: calc(100% - 128px); max-width: 1380px; margin-left: max(112px, calc((100vw - 1380px)/2)); margin-right: 16px; padding-inline: 24px; }
+ #studioSurface .studio-grid { width: min(100%, 1000px); margin-inline: auto; }
+ body:not(.has-focus-panel)[data-input-mode=stylus] #studioSurface .studio-grid { width: 100%; max-width: 1240px; margin-inline: auto; }
+ body.has-focus-panel #studioSurface .studio-grid { width: calc(100% - 510px); margin-left: 0; margin-right: 510px; }
+ #focusDock { left: 16px; width: 80px; box-sizing: border-box; }
+}
+@media (max-width: 1199px) {
+ #studioSurface { box-sizing: border-box; width: 100%; max-width: none; margin: 0; padding: max(16px,env(safe-area-inset-top)) max(20px,env(safe-area-inset-right)) max(32px,env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left)); }
+ #studioSurface .studio-grid, body.has-focus-panel #studioSurface .studio-grid { width: 100%; max-width: 920px; margin: 26px auto 0; }
+ #focusDock, body.keyboard-open #focusDock { position: static; transform: none; display: flex; flex-direction: row; justify-content: center; flex-wrap: wrap; gap: 8px; width: fit-content; max-width: 100%; max-height: none; margin: 20px auto 0; padding: 8px; overflow: visible; border: 1px solid #e6d9f2; border-radius: 24px; background: #fffcfff2; box-shadow: 0 8px 28px #4c256418; box-sizing: border-box; }
+ #focusDock .dock-item, #focusDock .tutor-orb { position: static; transform: none; flex: 0 0 62px; width: 62px; min-width: 0; min-height: 62px; margin: 0; padding: 5px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; border: 0; border-radius: 16px; background: transparent; color: #67457e; box-shadow: none; }
+ #focusDock .dock-icon, #focusDock .tutor-avatar { width: 32px; height: 32px; }
+ #focusDock .tutor-avatar img { width: 100%; height: 100%; }
+ #focusDock .tutor-orb > svg { display: none; }
+ #focusDock .dock-label, #focusDock .tutor-orb-label { display: block; font-size: 12px; line-height: 1.3; }
+ .focus-panel { inset: max(12px,env(safe-area-inset-top)) 12px auto; width: auto; max-width: 620px; margin-inline: auto; max-height: calc(var(--visible-height) - 32px); box-sizing: border-box; }
+ body.keyboard-open .focus-panel { top: calc(var(--visual-top) + 8px); bottom: auto; max-height: calc(var(--visible-height) - 16px); }
+ .focus-backdrop { inset: 0; width: auto; }
+}
+@media (max-width: 540px) {
+ #focusDock { gap: 2px; padding: 6px; }
+ #focusDock .dock-item, #focusDock .tutor-orb { flex-basis: 44px; width: 44px; min-height: 58px; padding: 2px; }
+ #focusDock .dock-label, #focusDock .tutor-orb-label { font-size: 10px; }
+ #studioSurface { padding-inline: max(16px,env(safe-area-inset-left)); }
+}
+.sc-concept-check { border: 1px solid #ded0ed; border-radius: 20px; padding: 18px; background: #f6effc; margin-block: 20px; }
+.sc-concept-check > p:not(.overline) { font-size: 18px; line-height: 1.5; }
+.sc-concept-check .sc-choice { font-size: 16px; }
+.sc-concept-check[hidden] { display: none !important; }
+#studyQuestionNote { overflow-wrap: anywhere; font-size: 1rem; line-height: 1.6; }
+@media print { #focusDock { display: none !important; } }

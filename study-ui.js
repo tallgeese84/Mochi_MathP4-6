@@ -64,7 +64,7 @@ function studyInit(){
 }
 function studyNewQuestion(){
  const meta=selectedStudy||{};
- studyAttempt={id:Date.now().toString(36)+'-'+questionEpoch,at:Date.now(),skill:currentSkill(),generator:currentGen?.name||'custom',kind:current.custom?'custom':meta.kind||'daily',question:current.text,tries:0,hints:0,revealed:false,model:false,firstCorrect:false,correct:false,confidence:'unsure',plan:'',reflection:'',transfer:!!(current.transfer||meta.transfer)};
+ studyAttempt={id:Date.now().toString(36)+'-'+questionEpoch,at:Date.now(),skill:currentSkill(),generator:currentGen?.name||'custom',kind:current.custom?'custom':meta.kind||'daily',question:current.text,tries:0,hints:0,revealed:false,model:false,firstCorrect:false,correct:false,confidence:'unsure',plan:'',reflection:'',repair:MochiRepair.clean(current.repair),transfer:!!(current.transfer||meta.transfer)};
  $('studyPlan').value='';$('studyConfidence').value='unsure';$('studyObstacle').value='';
  $('reflectionText').value='';$('resourceNote').value='';$('studyReflection').hidden=!current.custom;
  $('saveReflection').textContent='Save my insight';$('saveResource').textContent='Save and discuss my finding';
@@ -95,7 +95,7 @@ function studyNewQuestion(){
  $('studyResourcePrompt').textContent=skill.question;
  $('studyResource').href=skill.resource;
  $('studyResource').textContent='Explore: '+skill.label.toLowerCase();
- $('studyQuestionNote').textContent=current.custom?'Your own problem · AI explanation, not independently marked. Include diagram details if needed.':current.stretch?'Reasoning investigation · original enrichment, not an official NUS High test question or required SPERS topic.':'No calculator · '+skill.label+' · '+(current.parts?'Show how the parts connect.':'A correct answer is a starting point; explain what makes it work.');
+ $('studyQuestionNote').textContent=current.repair?(selectedStudy?.reason||'Check the idea and show your working.'):current.custom?'Your own problem · AI explanation, not independently marked. Include diagram details if needed.':current.stretch?'Reasoning investigation · original enrichment, not an official NUS High test question or required SPERS topic.':'No calculator · '+skill.label+' · '+(current.parts?'Show how the parts connect.':'A correct answer is a starting point; explain what makes it work.');
  if(typeof studioNewQuestion==='function')studioNewQuestion();
  studyPaint();
 }
@@ -135,6 +135,7 @@ function studyParent(){
  const obstacles={};for(const a of recent)if(a.obstacle)obstacles[a.obstacle]=(obstacles[a.obstacle]||0)+1;
  $('parentEvidence').innerHTML=`<p class="study-note">${rows.filter(e=>e.attempts).length} of ${rows.length} skill groups sampled. In the last ${recent.length} questions: ${assisted.length} used support; ${highConfidence.length} had a confident first answer that was incorrect. These are discussion prompts, not diagnoses.</p>
  <p class="study-note">Independent means first answer correct without hints, model or solution, and not marked as a guess. “Retained in practice” also requires evidence across 3 days, 2 question types, a transfer task, and a written plan. Plans are recorded, not automatically validated. These thresholds are design choices, not admissions cut-offs.</p>
+ <p class="study-note"><strong>Targeted follow-ups:</strong> ${MochiRepair.pending(l).map(p=>studyEscape(p.label)+': '+(p.ready?['concept check','guided practice','new situation','delayed recall'][p.stage]:'recall scheduled after one day')).join('; ')||'No targeted sequence is pending.'}</p>
  <div class="study-table-wrap"><table class="study-table"><thead><tr><th>Skill</th><th>Evidence</th><th>Next check</th></tr></thead><tbody>${rows.map(e=>`<tr><td>${studyEscape(e.label)}</td><td>${studyEscape(e.level)}<br>${e.attempts} attempts; ${e.independent}/10 recent independent</td><td>${e.attempts?e.overdue?'Review due':new Date(e.due).toLocaleDateString('en-SG'):'First sample'}</td></tr>`).join('')}</tbody></table></div>
  <p class="study-note">Learner-reported obstacles: ${Object.entries(obstacles).map(([k,v])=>studyEscape(k)+': '+v).join('; ')||'none recorded yet'}. Review her words and working before inferring a misconception.</p>
  <details class="study-details"><summary>Recent attempts and insights</summary>${recent.slice().reverse().map(a=>`<p><b>${studyEscape(MochiLearning.skills[a.skill].label)}</b> · ${a.skipped?'saved for later':a.independent?'independent':a.correct?'solved with support or revision':'revisit'}<br>${studyEscape(a.question)}<br>Answer: ${studyEscape(a.response||'skipped')}<br>Plan: ${studyEscape(a.plan||'not recorded')}<br>Insight: ${studyEscape(a.reflection||'not recorded')}</p>`).join('')||'<p>No attempts yet.</p>'}</details>`;

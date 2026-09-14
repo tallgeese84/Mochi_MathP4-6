@@ -59,11 +59,13 @@ function record(l,a){
  if(l.session){l.session.done++; if(l.session.done>=l.session.total) l.session.finished=true;}
  return true;
 }
-function catalog(gens){return gens.map(g=>{const q=g(),skill=q.skill||mapping[g.name]; return {g,id:g.name,skill,topic:q.topic,difficulty:q.stars||2,stretch:!!q.stretch||!!skills[skill]?.stretch||g.name==='parallelAngle'};});}
+function catalog(gens){return gens.map(g=>{const q=g(),skill=q.skill||mapping[g.name]; return {g,id:g.name,skill,topic:q.topic,difficulty:q.stars||2,repairOnly:!!q.repairOnly,stretch:!!q.stretch||!!skills[skill]?.stretch||g.name==='parallelAngle'};});}
 function choose(l,bank,now=Date.now()){
- const core=bank.filter(b=>!b.stretch), session=l.session;
+ const core=bank.filter(b=>!b.stretch&&!b.repairOnly), session=l.session;
  const done=session&&!session.finished?session.done:0;
  const mode=session&&!session.finished?session.mode:l.mode;
+ const repair=root.MochiRepair?.choose(l,bank,mode||'daily',now);
+ if(repair)return repair;
  const base=l.attempts.slice(-1)[0];
  const ev=id=>evidence(l,id,now);
  let pool=core,reason='Mixing skills to keep earlier learning active.',transfer=false;
@@ -78,16 +80,16 @@ function choose(l,bank,now=Date.now()){
    pool=core.filter(b=>b.difficulty<=3);reason='No-calculator fluency practice. Timing is practice, not a placement prediction.';
  } else {
    const due=core.filter(b=>ev(b.skill).overdue);
-   if(mode==='review'&&due.length){pool=due;reason='A delayed check: can you retrieve the idea without a hint?';transfer=true;}
-   else if(done===0){pool=core.filter(b=>b.difficulty<=2);reason='Warm up with one foundation skill.';}
-   else if(done===6){pool=due.length?due:core;transfer=true;reason='Use an earlier idea in a fresh question.';}
-   else if(done===7){pool=bank.filter(b=>b.stretch);transfer=true;reason='Finish by investigating a claim, not just calculating.';}
-   else if(base && !base.skipped && (!base.firstCorrect||base.hints||base.revealed)){
+   if(base && !base.skipped && (!base.firstCorrect||base.hints||base.revealed)){
      const prerequisites=base.probe?[]:skills[base.skill]?.prereq||[];
      const p=prerequisites.find(id=>ev(id).independent<2);
      pool=core.filter(b=>b.skill===(p||base.skill));
      reason=base.probe&&!base.probe.correct?'The concept check suggests revisiting '+base.probe.checks+'.':p?'Let’s check a building block: '+skills[p].label.toLowerCase()+'.':'Try the idea in another form, with less help.';
-   } else if(due.length && done===5){pool=due;transfer=true;reason='A spaced review before it fades.';}
+   } else if(mode==='review'&&due.length){pool=due;reason='A delayed check: can you retrieve the idea without a hint?';transfer=true;}
+   else if(done===0){pool=core.filter(b=>b.difficulty<=2);reason='Warm up with one foundation skill.';}
+   else if(done===6){pool=due.length?due:core;transfer=true;reason='Use an earlier idea in a fresh question.';}
+   else if(done===7){pool=bank.filter(b=>b.stretch);transfer=true;reason='Finish by investigating a claim, not just calculating.';}
+   else if(due.length && done===5){pool=due;transfer=true;reason='A spaced review before it fades.';}
    else {
      const ids=Object.keys(skills).filter(id=>!skills[id].stretch);
      ids.sort((a,b)=>{
@@ -98,7 +100,7 @@ function choose(l,bank,now=Date.now()){
    }
  }
  if(session?.focusSkill && mode!=='diagnostic'){
-   const focused=bank.filter(b=>b.skill===session.focusSkill&&(!b.stretch||mode==='stretch'));
+   const focused=bank.filter(b=>b.skill===session.focusSkill&&!b.repairOnly&&(!b.stretch||mode==='stretch'));
    if(focused.length){pool=focused;reason='A focused session on '+skills[session.focusSkill].label.toLowerCase()+'.';}
  }
  if(!pool.length) pool=core;
@@ -126,7 +128,7 @@ function restore(input){
  if(/^\d{4}-(0[1-9]|1[0-2])$/.test(src.goalMonth)) l.goalMonth=src.goalMonth;
  for(const a of src.attempts){
    if(!a || !Object.hasOwn(skills,a.skill)||typeof a.at!=='number'||!Number.isFinite(a.at)||a.at<0||a.at>8640000000000000) throw Error('Invalid attempt in backup.');
-   record(l,{id:String(a.id).slice(0,120),skill:a.skill,generator:String(a.generator).slice(0,80),at:a.at,kind:modes.includes(a.kind)?a.kind:'daily',skipped:a.skipped===true,firstCorrect:a.firstCorrect===true,correct:a.correct===true,hints:Math.max(0,Number(a.hints)||0),revealed:a.revealed===true,model:a.model===true,confidence:['guess','unsure','sure'].includes(a.confidence)?a.confidence:'unsure',plan:String(a.plan||'').slice(0,1200),reflection:String(a.reflection||'').slice(0,1200),question:String(a.question||'').slice(0,3000),response:String(a.response||'').slice(0,500),obstacle:String(a.obstacle||'').slice(0,100),transfer:a.transfer===true,seconds:Math.max(0,Number(a.seconds)||0),tries:Math.max(1,Number(a.tries)||1),...(root.MochiReasoning?root.MochiReasoning.cleanExtras(a):{})});
+   record(l,{id:String(a.id).slice(0,120),skill:a.skill,generator:String(a.generator).slice(0,80),at:a.at,kind:modes.includes(a.kind)?a.kind:'daily',skipped:a.skipped===true,firstCorrect:a.firstCorrect===true,correct:a.correct===true,hints:Math.max(0,Number(a.hints)||0),revealed:a.revealed===true,model:a.model===true,confidence:['guess','unsure','sure'].includes(a.confidence)?a.confidence:'unsure',plan:String(a.plan||'').slice(0,1200),reflection:String(a.reflection||'').slice(0,1200),question:String(a.question||'').slice(0,3000),response:String(a.response||'').slice(0,500),obstacle:String(a.obstacle||'').slice(0,100),transfer:a.transfer===true,seconds:Math.max(0,Number(a.seconds)||0),tries:Math.max(1,Number(a.tries)||1),repair:root.MochiRepair?.clean(a.repair)||null,...(root.MochiReasoning?root.MochiReasoning.cleanExtras(a):{})});
  }
  l.notes=(Array.isArray(src.notes)?src.notes:[]).slice(-200).map(n=>({at:Number(n.at)||0,question:String(n.question||'').slice(0,3000),text:String(n.text||'').slice(0,2000)}));
  l.benchmarks=(Array.isArray(src.benchmarks)?src.benchmarks:[]).slice(-50).filter(b=>b&&typeof b.name==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(b.date)).map(b=>({name:b.name.slice(0,160),date:b.date,note:String(b.note||'').slice(0,1000),percentile:typeof b.percentile==='number'&&Number.isFinite(b.percentile)&&b.percentile>=0&&b.percentile<=100?b.percentile:null}));

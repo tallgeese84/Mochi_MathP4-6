@@ -1172,7 +1172,7 @@ function waterTransfer(){
 /* =========================================================
    STATE
    ========================================================= */
-GEN.push(...MochiBank.generators, ...MochiChallenges.generators, ...(typeof MochiTransfer!=='undefined'?MochiTransfer.generators:[]));
+GEN.push(...(typeof MochiRepair!=='undefined'?MochiRepair.generators:[]), ...MochiBank.generators, ...MochiChallenges.generators, ...(typeof MochiTransfer!=='undefined'?MochiTransfer.generators:[]));
 const BANK = MochiLearning.catalog(GEN);
 const TOPICS = ['Fractions','Ratio','Percentage','Speed','Rate','Algebra','Circles','Volume','Angles','Average','Whole numbers','Decimals','Measurement','Time','Data','Money','Geometry','Problem solving','Investigation'];
 let S = {
@@ -1233,7 +1233,7 @@ function isCorrect(input,q){
 
 /* The cat ships inside the markup; this just reads her back out. */
 const BUILTIN_PHOTO = ($('catImg').getAttribute('src') || '');
-const APP_VERSION = '4.3.8';
+const APP_VERSION = '4.3.9';
 const BUILD_KIND  = 'site';
 const BUILD_DATE  = '2026-09-14';
 const BUILD = BUILD_KIND + ' v' + APP_VERSION + ' \u00b7 ' + BUILD_DATE;
@@ -1525,6 +1525,10 @@ function renderQuestion(customQuestion){
   queue.length=0;
   currentGen = customQuestion ? null : chooseGenerator();
   current = customQuestion || currentGen();
+  if(!customQuestion){
+    const recent=new Set(learning().attempts.slice(-40).map(a=>a.question));
+    for(let retry=0;retry<16&&recent.has(current.text);retry++)current=currentGen();
+  }
   if(!customQuestion && selectedStudy?.stretch)current.stretch=true;
   settled = false; revealed = false; askCount = 0; tryCount = 0;
   history = [];   // the chat is scoped to the question on screen
@@ -2514,5 +2518,5 @@ async function hydratePhoto(){
 }
 
 if('serviceWorker' in navigator){
-  document.addEventListener('mochi:ready', ()=> navigator.serviceWorker.register('sw.js?v=4.3.8',{updateViaCache:'none'}).catch(()=>{}),{once:true});
+  document.addEventListener('mochi:ready', ()=> navigator.serviceWorker.register('sw.js?v=4.3.9',{updateViaCache:'none'}).catch(()=>{}),{once:true});
 }
