@@ -31,6 +31,7 @@ for (const file of ['index.html', 'app.js', 'sw.js', 'manifest.webmanifest']) {
     const html = generated.find(f => path.basename(f.filename) === 'index.html').text;
     const core = ['./index.html', './manifest.webmanifest', './mochi-builtin.webp', './mochi-watermark.webp', './euna-avatar.webp',
       ...fs.readdirSync(runtime).filter(f => /^science-.*\.webp$/.test(f)).map(f => './' + f),
+      ...fs.readdirSync(path.join(runtime,'course/assets')).filter(f => /\.webp$/.test(f)).map(f => './course/assets/' + f),
       ...Array.from(html.matchAll(/(?:src|href)="([^"]+\.(?:js|css|png)(?:\?[^"]*)?)"/g), m => './' + m[1]).filter(x => !x.includes('://'))];
     for (const asset of core) if (!fs.existsSync(path.join(runtime, asset.split('?')[0]))) throw Error('Missing offline asset: ' + asset);
     text = text.replace(/const VERSION = '[^']+';/, `const VERSION = '${release.version}';`)

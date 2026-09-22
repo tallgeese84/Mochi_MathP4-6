@@ -65,7 +65,7 @@ function choose(l,bank,now=Date.now()){
  const done=session&&!session.finished?session.done:0;
  const mode=session&&!session.finished?session.mode:l.mode;
  const repair=root.MochiRepair?.choose(l,bank,mode||'daily',now);
- if(repair)return repair;
+ if(repair&&(!session?.focusSkill||repair.skill===session.focusSkill))return repair;
  const base=l.attempts.slice(-1)[0];
  const ev=id=>evidence(l,id,now);
  let pool=core,reason='Mixing skills to keep earlier learning active.',transfer=false;
@@ -104,12 +104,9 @@ function choose(l,bank,now=Date.now()){
    if(focused.length){pool=focused;reason='A focused session on '+skills[session.focusSkill].label.toLowerCase()+'.';}
  }
  if(!pool.length) pool=core;
- // Start at a manageable level. A hard template is not evidence of a hard question.
- const candidates=pool.filter(b=>{
-   const band=root.MochiReasoning?root.MochiReasoning.band(l,b.skill):{min:1,max:ev(b.skill).independent>=2?5:3};
-   return b.difficulty>=band.min&&b.difficulty<=band.max;
- });
- if(candidates.length) pool=candidates;
+ // Pick the nearest available tier within each selected skill; gaps do not reopen the whole bank.
+ const distance=b=>Math.abs(b.difficulty-(root.MochiReasoning?.band(l,b.skill).target||1));
+ pool=pool.filter(b=>distance(b)===Math.min(...pool.filter(x=>x.skill===b.skill).map(distance)));
  const unseen=pool.filter(b=>!l.attempts.slice(-6).some(a=>a.generator===b.id));
  if(unseen.length) pool=unseen;
  const item=pool[Math.floor(Math.random()*pool.length)];
@@ -128,7 +125,7 @@ function restore(input){
  if(/^\d{4}-(0[1-9]|1[0-2])$/.test(src.goalMonth)) l.goalMonth=src.goalMonth;
  for(const a of src.attempts){
    if(!a || !Object.hasOwn(skills,a.skill)||typeof a.at!=='number'||!Number.isFinite(a.at)||a.at<0||a.at>8640000000000000) throw Error('Invalid attempt in backup.');
-   record(l,{id:String(a.id).slice(0,120),skill:a.skill,generator:String(a.generator).slice(0,80),at:a.at,kind:modes.includes(a.kind)?a.kind:'daily',skipped:a.skipped===true,firstCorrect:a.firstCorrect===true,correct:a.correct===true,hints:Math.max(0,Number(a.hints)||0),revealed:a.revealed===true,model:a.model===true,confidence:['guess','unsure','sure'].includes(a.confidence)?a.confidence:'unsure',plan:String(a.plan||'').slice(0,1200),reflection:String(a.reflection||'').slice(0,1200),question:String(a.question||'').slice(0,3000),response:String(a.response||'').slice(0,500),obstacle:String(a.obstacle||'').slice(0,100),transfer:a.transfer===true,seconds:Math.max(0,Number(a.seconds)||0),tries:Math.max(1,Number(a.tries)||1),repair:root.MochiRepair?.clean(a.repair)||null,...(root.MochiReasoning?root.MochiReasoning.cleanExtras(a):{})});
+   record(l,{id:String(a.id).slice(0,120),skill:a.skill,generator:String(a.generator).slice(0,80),difficulty:Number.isInteger(a.difficulty)&&a.difficulty>=1&&a.difficulty<=5?a.difficulty:null,at:a.at,kind:modes.includes(a.kind)?a.kind:'daily',skipped:a.skipped===true,firstCorrect:a.firstCorrect===true,correct:a.correct===true,hints:Math.max(0,Number(a.hints)||0),revealed:a.revealed===true,model:a.model===true,confidence:['guess','unsure','sure'].includes(a.confidence)?a.confidence:'unsure',plan:String(a.plan||'').slice(0,1200),reflection:String(a.reflection||'').slice(0,1200),question:String(a.question||'').slice(0,3000),response:String(a.response||'').slice(0,500),obstacle:String(a.obstacle||'').slice(0,100),transfer:a.transfer===true,seconds:Math.max(0,Number(a.seconds)||0),tries:Math.max(1,Number(a.tries)||1),repair:root.MochiRepair?.clean(a.repair)||null,...(root.MochiReasoning?root.MochiReasoning.cleanExtras(a):{})});
  }
  l.notes=(Array.isArray(src.notes)?src.notes:[]).slice(-200).map(n=>({at:Number(n.at)||0,question:String(n.question||'').slice(0,3000),text:String(n.text||'').slice(0,2000)}));
  l.benchmarks=(Array.isArray(src.benchmarks)?src.benchmarks:[]).slice(-50).filter(b=>b&&typeof b.name==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(b.date)).map(b=>({name:b.name.slice(0,160),date:b.date,note:String(b.note||'').slice(0,1000),percentile:typeof b.percentile==='number'&&Number.isFinite(b.percentile)&&b.percentile>=0&&b.percentile<=100?b.percentile:null}));

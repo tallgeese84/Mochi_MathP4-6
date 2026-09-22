@@ -3,10 +3,13 @@ const R=require('../reasoning.js'),L=require('../learning.js'),harness=require('
 const at=Date.UTC(2026,8,12);
 function a(extra={}){return {id:'a',at,skill:'fraction',generator:'fractionSum',kind:'daily',correct:true,firstCorrect:true,hints:0,model:false,revealed:false,confidence:'sure',plan:'Equal-size parts of the same whole',...extra};}
 function studio(){const h=harness(true);h.run('studyInit();studioInit();renderQuestion();');return h;}
-test('difficulty increases after independent work and falls after repeated misses, never from speed',()=>{
- const l=L.fresh();for(let i=0;i<3;i++)L.record(l,a({id:String(i),seconds:900}));assert.equal(R.band(l,'fraction').min,3);
- for(let i=3;i<5;i++)L.record(l,a({id:String(i),firstCorrect:false,correct:false,seconds:1}));assert.equal(R.band(l,'fraction').max,2);
- const assisted=L.fresh();for(let i=0;i<3;i++)L.record(assisted,a({id:String(i),hints:1}));assert.equal(R.band(assisted,'fraction').label,'Explore');
+test('difficulty rises one tier with varied independent work, and falls after repeated misses',()=>{
+ const l=L.fresh();for(let i=0;i<4;i++)L.record(l,a({id:String(i),difficulty:1,generator:'same',seconds:1}));assert.equal(R.band(l,'fraction').target,1);
+ L.record(l,a({id:'other',difficulty:1,generator:'other',seconds:900}));assert.equal(R.band(l,'fraction').target,2);
+ for(let i=0;i<2;i++)L.record(l,a({id:'level2-'+i,difficulty:2,generator:'form'+i,seconds:900}));assert.equal(R.band(l,'fraction').target,3);
+ for(let i=0;i<2;i++)L.record(l,a({id:'miss-'+i,difficulty:3,firstCorrect:false,correct:false,seconds:1}));assert.equal(R.band(l,'fraction').target,2);
+ const assisted=L.fresh();for(let i=0;i<4;i++)L.record(assisted,a({id:String(i),difficulty:2,generator:'form'+i,hints:1}));assert.equal(R.band(assisted,'fraction').target,1);
+ const legacy=L.fresh();for(let i=0;i<4;i++)L.record(legacy,a({id:String(i),generator:'form'+i}));assert.equal(R.band(legacy,'fraction').target,1,'historical records without difficulty cannot justify a tier jump');
 });
 test('concept-probe evidence keeps repair on the tested skill; passing it does not prove mastery',()=>{
  const h=harness(),l=L.fresh();L.start(l,'daily');l.session.done=2;

@@ -1,0 +1,925 @@
+{
+  "sources": {
+    "maths": {
+      "title": "MOE Primary Mathematics syllabus, October 2025",
+      "url": "https://www.moe.gov.sg/api/media/92bff26d-b2b4-4535-b868-b8415c744b91/2021-Primary-Mathematics-Syllabus-P1-to-P6-Updated-October-2025.pdf"
+    },
+    "science": {
+      "title": "MOE Primary Science syllabus, updated January 2026",
+      "url": "https://www.moe.gov.sg/api/media/ba3562d3-5b31-4459-8693-45cde7b97273/Primary-Science-Syllabus-2023_May24.pdf"
+    },
+    "admissions": {
+      "title": "NUS High Year 1 admissions",
+      "url": "https://www.nushigh.edu.sg/admissions/year-1-and-3-admissions/year-1-admissions/"
+    },
+    "faq": {
+      "title": "NUS High admissions FAQ, especially question 11",
+      "url": "https://www.nushigh.edu.sg/admissions/year-1-and-3-admissions/admissions-faq/"
+    }
+  },
+  "units": [
+    {
+      "id": "m-number",
+      "title": "Numbers have structure",
+      "subject": "maths",
+      "strand": "Number and algebra",
+      "skill": "number",
+      "prerequisites": [],
+      "source": "maths",
+      "sourcePages": "P4 p.37; P5 p.41",
+      "goals": [
+        "Explain place value",
+        "Compare and round numbers",
+        "Use an estimate to judge an answer"
+      ],
+      "visual": "place",
+      "art": "maths-workbench",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "m-operations",
+      "title": "Operations and the meaning of a method",
+      "subject": "maths",
+      "strand": "Number and algebra",
+      "skill": "number",
+      "prerequisites": [
+        "m-number"
+      ],
+      "source": "maths",
+      "sourcePages": "P4 p.37; P5 p.41",
+      "goals": [
+        "Choose operations from relationships",
+        "Explain regrouping and distributivity",
+        "Use brackets and inverse checks"
+      ],
+      "visual": "",
+      "art": "maths-workbench",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "m-factors",
+      "title": "Factors, multiples and systematic search",
+      "subject": "maths",
+      "strand": "Number and algebra",
+      "skill": "number",
+      "prerequisites": [
+        "m-operations"
+      ],
+      "source": "maths",
+      "sourcePages": "P4 p.37",
+      "goals": [
+        "Distinguish factors from multiples",
+        "Find common factors and multiples",
+        "Organise a search so no case is missed"
+      ],
+      "visual": "",
+      "art": "maths-workbench",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "m-fractions",
+      "title": "Fractions: name the whole",
+      "subject": "maths",
+      "strand": "Number and algebra",
+      "skill": "fraction",
+      "prerequisites": [
+        "m-factors"
+      ],
+      "source": "maths",
+      "sourcePages": "P1–P4 pp.31–37",
+      "goals": [
+        "Identify equal parts and the reference whole",
+        "Compare and simplify fractions",
+        "Connect mixed numbers with improper fractions"
+      ],
+      "visual": "fractions",
+      "art": "maths-workbench",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "m-fraction-ops",
+      "title": "Adding, subtracting and multiplying fractions",
+      "subject": "maths",
+      "strand": "Number and algebra",
+      "skill": "fraction",
+      "prerequisites": [
+        "m-fractions"
+      ],
+      "source": "maths",
+      "sourcePages": "P4 p.37; P5 p.41",
+      "goals": [
+        "Add equal-sized fraction units",
+        "Regroup mixed numbers",
+        "Explain multiplication as scaling"
+      ],
+      "visual": "fraction-product",
+      "art": "maths-workbench",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "m-fraction-division",
+      "title": "Why fraction division works",
+      "subject": "maths",
+      "strand": "Number and algebra",
+      "skill": "fraction",
+      "prerequisites": [
+        "m-fraction-ops"
+      ],
+      "source": "maths",
+      "sourcePages": "P6 p.43",
+      "goals": [
+        "Distinguish sharing from measuring groups",
+        "Derive fraction division from equal units",
+        "Check a quotient by multiplication"
+      ],
+      "visual": "fraction-divide",
+      "art": "maths-workbench",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "m-remainders",
+      "title": "Fractions when the whole changes",
+      "subject": "maths",
+      "strand": "Number and algebra",
+      "skill": "fractionProblem",
+      "prerequisites": [
+        "m-fraction-division"
+      ],
+      "source": "maths",
+      "sourcePages": "Fraction applications, P4–P6 pp.37,41,43",
+      "goals": [
+        "Label the reference whole at each stage",
+        "Work forwards and backwards",
+        "Distinguish a fraction removed from a fixed amount removed"
+      ],
+      "visual": "remainder",
+      "art": "maths-workbench",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "m-decimals",
+      "title": "Decimals are fractions in place-value clothing",
+      "subject": "maths",
+      "strand": "Number and algebra",
+      "skill": "decimal",
+      "prerequisites": [
+        "m-fractions",
+        "m-operations"
+      ],
+      "source": "maths",
+      "sourcePages": "P4 p.38; P5 p.41",
+      "goals": [
+        "Read and compare decimal places",
+        "Explain decimal operations",
+        "Connect decimals, fractions and measurement"
+      ],
+      "visual": "place",
+      "art": "maths-workbench",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "m-percent",
+      "title": "Percentages describe a part per hundred",
+      "subject": "maths",
+      "strand": "Number and algebra",
+      "skill": "percent",
+      "prerequisites": [
+        "m-decimals"
+      ],
+      "source": "maths",
+      "sourcePages": "P5 p.41",
+      "goals": [
+        "Connect percentages, fractions and decimals",
+        "Calculate discounts and stated taxes",
+        "Distinguish a rate from the amount it produces"
+      ],
+      "visual": "percent",
+      "art": "maths-workbench",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "m-percent-whole",
+      "title": "Reverse percentages and changing bases",
+      "subject": "maths",
+      "strand": "Number and algebra",
+      "skill": "percent",
+      "prerequisites": [
+        "m-percent",
+        "m-remainders"
+      ],
+      "source": "maths",
+      "sourcePages": "P6 p.43",
+      "goals": [
+        "Recover an unknown whole",
+        "Calculate percentage change from the original",
+        "Explain why equal percentage changes may not cancel"
+      ],
+      "visual": "percent",
+      "art": "maths-workbench",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "m-ratio",
+      "title": "Ratios and equal units",
+      "subject": "maths",
+      "strand": "Number and algebra",
+      "skill": "ratio",
+      "prerequisites": [
+        "m-fractions",
+        "m-percent"
+      ],
+      "source": "maths",
+      "sourcePages": "P6 p.43",
+      "goals": [
+        "Read two- and three-part ratios",
+        "Connect a ratio with a fraction of the total",
+        "Track an unchanged quantity"
+      ],
+      "visual": "ratio",
+      "art": "maths-workbench",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "m-rate",
+      "title": "Rates connect different units",
+      "subject": "maths",
+      "strand": "Number and algebra",
+      "skill": "rate",
+      "prerequisites": [
+        "m-decimals",
+        "m-ratio"
+      ],
+      "source": "maths",
+      "sourcePages": "P5 p.41",
+      "goals": [
+        "Interpret per-unit quantities",
+        "Calculate rates and totals",
+        "Check whether a constant-rate assumption is justified"
+      ],
+      "visual": "rate",
+      "art": "maths-workbench",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "m-algebra",
+      "title": "Letters, expressions and balanced equations",
+      "subject": "maths",
+      "strand": "Number and algebra",
+      "skill": "algebra",
+      "prerequisites": [
+        "m-operations"
+      ],
+      "source": "maths",
+      "sourcePages": "P6 p.43",
+      "goals": [
+        "Use a letter for an unknown",
+        "Simplify and substitute",
+        "Solve a linear equation while preserving equality"
+      ],
+      "visual": "balance",
+      "art": "maths-workbench",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "m-measure",
+      "title": "Measurement, units and sensible precision",
+      "subject": "maths",
+      "strand": "Measurement and geometry",
+      "skill": "measure",
+      "prerequisites": [
+        "m-decimals"
+      ],
+      "source": "maths",
+      "sourcePages": "Earlier foundations pp.31–36; P5 p.41",
+      "goals": [
+        "Choose units and apparatus",
+        "Convert by the size of a unit",
+        "Distinguish mass, volume and capacity"
+      ],
+      "visual": "",
+      "art": "maths-workbench",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "m-time",
+      "title": "Time is a number line with a different base",
+      "subject": "maths",
+      "strand": "Measurement and geometry",
+      "skill": "time",
+      "prerequisites": [
+        "m-operations"
+      ],
+      "source": "maths",
+      "sourcePages": "Time foundations pp.33–36; duration applications",
+      "goals": [
+        "Read 12- and 24-hour time",
+        "Calculate elapsed time across boundaries",
+        "Work backwards from an arrival time"
+      ],
+      "visual": "",
+      "art": "maths-workbench",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "m-area",
+      "title": "Area measures inside; perimeter measures around",
+      "subject": "maths",
+      "strand": "Measurement and geometry",
+      "skill": "area",
+      "prerequisites": [
+        "m-measure"
+      ],
+      "source": "maths",
+      "sourcePages": "P4 p.39; P5 p.42",
+      "goals": [
+        "Derive rectangle and triangle areas",
+        "Find missing dimensions",
+        "Trace composite boundaries without internal edges"
+      ],
+      "visual": "area",
+      "art": "maths-workbench",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "m-angles",
+      "title": "Angles and shape properties",
+      "subject": "maths",
+      "strand": "Measurement and geometry",
+      "skill": "angle",
+      "prerequisites": [
+        "m-number"
+      ],
+      "source": "maths",
+      "sourcePages": "P4 p.39; P5 p.42; P6 p.44",
+      "goals": [
+        "Name and measure angles",
+        "Deduce unknown angles from stated properties",
+        "Distinguish evidence from the appearance of a drawing"
+      ],
+      "visual": "angles",
+      "art": "maths-workbench",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "m-solids",
+      "title": "Symmetry, solids and nets",
+      "subject": "maths",
+      "strand": "Measurement and geometry",
+      "skill": "spatial",
+      "prerequisites": [
+        "m-area",
+        "m-angles"
+      ],
+      "source": "maths",
+      "sourcePages": "P4 p.39; P5 p.42",
+      "goals": [
+        "Test reflection symmetry",
+        "Connect faces, edges and vertices",
+        "Reason about folding nets"
+      ],
+      "visual": "net",
+      "art": "maths-workbench",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "m-circles",
+      "title": "Circles and composite boundaries",
+      "subject": "maths",
+      "strand": "Measurement and geometry",
+      "skill": "circle",
+      "prerequisites": [
+        "m-area",
+        "m-fractions"
+      ],
+      "source": "maths",
+      "sourcePages": "P6 p.44",
+      "goals": [
+        "Connect radius and diameter",
+        "Separate circumference from area",
+        "Include straight edges in parts of circles"
+      ],
+      "visual": "circle",
+      "art": "maths-workbench",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "m-volume",
+      "title": "Volume, layers and conserved water",
+      "subject": "maths",
+      "strand": "Measurement and geometry",
+      "skill": "volume",
+      "prerequisites": [
+        "m-area",
+        "m-measure",
+        "m-solids"
+      ],
+      "source": "maths",
+      "sourcePages": "P5 p.42; P6 p.44",
+      "goals": [
+        "Build volume from unit-cube layers",
+        "Recover unknown dimensions",
+        "Use conservation when liquid moves between containers"
+      ],
+      "visual": "volume",
+      "art": "maths-workbench",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "m-data",
+      "title": "Read data, calculate averages, question claims",
+      "subject": "maths",
+      "strand": "Statistics",
+      "skill": "data",
+      "prerequisites": [
+        "m-fractions",
+        "m-decimals"
+      ],
+      "source": "maths",
+      "sourcePages": "P4 p.40; P6 p.44",
+      "goals": [
+        "Read tables, graphs and pie charts",
+        "Connect average with total",
+        "Evaluate what the data can and cannot establish"
+      ],
+      "visual": "data",
+      "art": "maths-workbench",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "m-modelling",
+      "title": "Turn a word problem into a model",
+      "subject": "maths",
+      "strand": "Problem solving",
+      "skill": "model",
+      "prerequisites": [
+        "m-ratio",
+        "m-algebra",
+        "m-remainders"
+      ],
+      "source": "maths",
+      "sourcePages": "Applications across the primary syllabus",
+      "goals": [
+        "Represent the unknown and relationships",
+        "Choose and compare strategies",
+        "Verify a solution against every condition"
+      ],
+      "visual": "bars",
+      "art": "maths-workbench",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "m-proof",
+      "title": "Investigations: explain why a claim holds",
+      "subject": "maths",
+      "strand": "Reasoning enrichment",
+      "skill": "inquiry",
+      "prerequisites": [
+        "m-factors",
+        "m-modelling"
+      ],
+      "source": "faq",
+      "sourcePages": "Enrichment informed by NUS High FAQ Q11; not an official test specification",
+      "goals": [
+        "Use counterexamples",
+        "Count without omissions or duplicates",
+        "Build a general argument from a small case"
+      ],
+      "visual": "counting",
+      "art": "maths-workbench",
+      "extension": true,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "s-inquiry",
+      "title": "Think and work like a scientist",
+      "subject": "science",
+      "strand": "Working scientifically",
+      "skill": "inquiry",
+      "prerequisites": [],
+      "source": "science",
+      "sourcePages": "20–32: inquiry practices",
+      "goals": [
+        "Separate observations from explanations",
+        "Design a fair comparison",
+        "Use evidence with appropriate limits"
+      ],
+      "visual": "fair-test",
+      "art": "inquiry-workbench",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "s-diversity",
+      "title": "Living things and classification",
+      "subject": "science",
+      "strand": "Diversity",
+      "skill": "diversity",
+      "prerequisites": [
+        "s-inquiry"
+      ],
+      "source": "science",
+      "sourcePages": "38: diversity of living and non-living things",
+      "goals": [
+        "Identify living things using several characteristics",
+        "Classify using observable similarities",
+        "Explain the limits of a grouping rule"
+      ],
+      "visual": "",
+      "art": "living-world",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "s-materials",
+      "title": "Materials: choose properties for a purpose",
+      "subject": "science",
+      "strand": "Diversity",
+      "skill": "materials",
+      "prerequisites": [
+        "s-inquiry"
+      ],
+      "source": "science",
+      "sourcePages": "39–40: properties and uses of materials",
+      "goals": [
+        "Distinguish objects from materials",
+        "Compare useful material properties",
+        "Justify a design using evidence"
+      ],
+      "visual": "",
+      "art": "science-bench",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "s-life-cycles",
+      "title": "Life cycles: change and continuity",
+      "subject": "science",
+      "strand": "Cycles",
+      "skill": "life_cycles",
+      "prerequisites": [
+        "s-diversity"
+      ],
+      "source": "science",
+      "sourcePages": "42: life cycles of plants and animals",
+      "goals": [
+        "Compare three-stage and four-stage life cycles",
+        "Describe growth and reproduction",
+        "Use repeated observations to infer stages"
+      ],
+      "visual": "life-cycle",
+      "art": "plant-study",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "s-magnets",
+      "title": "Magnets and magnetic interactions",
+      "subject": "science",
+      "strand": "Interactions",
+      "skill": "magnets",
+      "prerequisites": [
+        "s-materials"
+      ],
+      "source": "science",
+      "sourcePages": "62: magnets",
+      "goals": [
+        "Predict interactions between magnetic poles",
+        "Distinguish magnets from magnetic materials",
+        "Plan a fair comparison of magnetic effects"
+      ],
+      "visual": "",
+      "art": "science-bench",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "s-matter",
+      "title": "Matter: mass, space and states",
+      "subject": "science",
+      "strand": "Cycles",
+      "skill": "matter",
+      "prerequisites": [
+        "s-materials"
+      ],
+      "source": "science",
+      "sourcePages": "48: matter",
+      "goals": [
+        "Describe matter by mass and occupied space",
+        "Compare solids liquids and gases",
+        "Use observations to reason about invisible air"
+      ],
+      "visual": "states",
+      "art": "water-landscape",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "s-heat",
+      "title": "Heat transfer and temperature",
+      "subject": "science",
+      "strand": "Energy",
+      "skill": "heat",
+      "prerequisites": [
+        "s-matter"
+      ],
+      "source": "science",
+      "sourcePages": "76–77: heat",
+      "goals": [
+        "Distinguish heat from temperature",
+        "Predict the direction of heat transfer",
+        "Explain conductors insulators and temperature change"
+      ],
+      "visual": "cooling",
+      "art": "water-landscape",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "s-water",
+      "title": "Water changes state and cycles",
+      "subject": "science",
+      "strand": "Cycles",
+      "skill": "water",
+      "prerequisites": [
+        "s-matter",
+        "s-heat"
+      ],
+      "source": "science",
+      "sourcePages": "49: water and changes of state",
+      "goals": [
+        "Explain melting freezing evaporation boiling and condensation",
+        "Connect state changes to heat gain or loss",
+        "Apply the water cycle to unfamiliar situations"
+      ],
+      "visual": "water-cycle",
+      "art": "water-landscape",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "s-light",
+      "title": "Light, sight and shadows",
+      "subject": "science",
+      "strand": "Energy",
+      "skill": "light",
+      "prerequisites": [
+        "s-materials",
+        "s-inquiry"
+      ],
+      "source": "science",
+      "sourcePages": "76: light",
+      "goals": [
+        "Explain seeing through reflected light",
+        "Predict shadows using straight-line paths",
+        "Design a fair test of shadow size"
+      ],
+      "visual": "shadow",
+      "art": "inquiry-workbench",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "s-plant-parts",
+      "title": "Plant parts work together",
+      "subject": "science",
+      "strand": "Systems",
+      "skill": "plants",
+      "prerequisites": [
+        "s-diversity",
+        "s-life-cycles"
+      ],
+      "source": "science",
+      "sourcePages": "56: plant parts and functions",
+      "goals": [
+        "Connect roots stems and leaves to their functions",
+        "Distinguish food-making from mineral uptake",
+        "Explain a plant as an interacting system"
+      ],
+      "visual": "",
+      "art": "plant-study",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "s-reproduction",
+      "title": "Reproduction in plants and humans",
+      "subject": "science",
+      "strand": "Cycles",
+      "skill": "reproduction",
+      "prerequisites": [
+        "s-life-cycles",
+        "s-plant-parts"
+      ],
+      "source": "science",
+      "sourcePages": "43–45: reproduction; cells",
+      "goals": [
+        "Distinguish pollination fertilisation dispersal and germination",
+        "Describe basic human reproductive cells and organs",
+        "Explain how reproduction continues a kind of organism"
+      ],
+      "visual": "flower-cycle",
+      "art": "plant-study",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "s-body",
+      "title": "Digestion: from food to absorbed nutrients",
+      "subject": "science",
+      "strand": "Systems",
+      "skill": "body",
+      "prerequisites": [
+        "s-diversity"
+      ],
+      "source": "science",
+      "sourcePages": "53: human digestive system",
+      "goals": [
+        "Trace food through the digestive system",
+        "Distinguish digestion absorption and removal of undigested food",
+        "Link organ functions in a sequence"
+      ],
+      "visual": "digestion",
+      "art": "inquiry-workbench",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "s-transport",
+      "title": "Transport and breathing: connected systems",
+      "subject": "science",
+      "strand": "Systems",
+      "skill": "body",
+      "prerequisites": [
+        "s-body",
+        "s-plant-parts"
+      ],
+      "source": "science",
+      "sourcePages": "54 and 57: respiratory circulatory and plant transport systems",
+      "goals": [
+        "Trace air and blood functions without confusing their routes",
+        "Explain connections among human systems",
+        "Distinguish plant water and food transport"
+      ],
+      "visual": "transport",
+      "art": "plant-study",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "s-electricity",
+      "title": "Electric circuits: complete paths and comparisons",
+      "subject": "science",
+      "strand": "Systems",
+      "skill": "electricity",
+      "prerequisites": [
+        "s-materials",
+        "s-inquiry"
+      ],
+      "source": "science",
+      "sourcePages": "59: electrical systems",
+      "goals": [
+        "Build a complete circuit model",
+        "Compare series and parallel bulb arrangements",
+        "Explain fair circuit investigations and safety"
+      ],
+      "visual": "circuit",
+      "art": "science-bench",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "s-photosynthesis",
+      "title": "Photosynthesis and the need for food",
+      "subject": "science",
+      "strand": "Energy",
+      "skill": "plants",
+      "prerequisites": [
+        "s-plant-parts",
+        "s-transport",
+        "s-light"
+      ],
+      "source": "science",
+      "sourcePages": "78: photosynthesis and food; systems links",
+      "goals": [
+        "Identify inputs and products of photosynthesis",
+        "Distinguish food-making from respiration",
+        "Evaluate evidence from plant investigations"
+      ],
+      "visual": "photosynthesis",
+      "art": "inquiry-workbench",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "s-energy",
+      "title": "Energy forms and conversions",
+      "subject": "science",
+      "strand": "Energy",
+      "skill": "energy",
+      "prerequisites": [
+        "s-heat",
+        "s-electricity",
+        "s-photosynthesis"
+      ],
+      "source": "science",
+      "sourcePages": "80: energy forms and conversions",
+      "goals": [
+        "Identify relevant forms of energy",
+        "Trace conversions through a system",
+        "Distinguish energy transfer from material movement"
+      ],
+      "visual": "energy",
+      "art": "science-bench",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "s-forces",
+      "title": "Forces: motion, shape and interactions",
+      "subject": "science",
+      "strand": "Interactions",
+      "skill": "forces",
+      "prerequisites": [
+        "s-magnets",
+        "s-energy"
+      ],
+      "source": "science",
+      "sourcePages": "63–64: forces",
+      "goals": [
+        "Describe effects of forces on motion and shape",
+        "Identify gravity friction magnetic and elastic spring forces",
+        "Explain evidence without overextending the model"
+      ],
+      "visual": "forces",
+      "art": "science-bench",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "s-ecosystems",
+      "title": "Food chains, webs and communities",
+      "subject": "science",
+      "strand": "Interactions",
+      "skill": "ecology",
+      "prerequisites": [
+        "s-diversity",
+        "s-photosynthesis"
+      ],
+      "source": "science",
+      "sourcePages": "67–70: interactions within the environment",
+      "goals": [
+        "Distinguish organism population community and habitat",
+        "Interpret food-chain arrows as energy transfer",
+        "Predict changes with stated ecological assumptions"
+      ],
+      "visual": "food-web",
+      "art": "living-world",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    },
+    {
+      "id": "s-environment",
+      "title": "Adaptations, environmental change and evidence",
+      "subject": "science",
+      "strand": "Interactions",
+      "skill": "ecology",
+      "prerequisites": [
+        "s-ecosystems",
+        "s-inquiry"
+      ],
+      "source": "science",
+      "sourcePages": "67–70: adaptations and human impact; inquiry practices",
+      "goals": [
+        "Connect features and behaviour to survival",
+        "Explain competition and environmental impacts",
+        "Evaluate claims and plan an evidence-based response"
+      ],
+      "visual": "",
+      "art": "living-world",
+      "extension": false,
+      "minutes": "45–75, split across several sittings"
+    }
+  ]
+}

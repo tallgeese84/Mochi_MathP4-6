@@ -49,10 +49,15 @@ function profile(l,skill){
   recentProbe:recent.slice().reverse().map(a=>cleanProbe(a.probe)).find(Boolean)||null};
 }
 function band(l,skill){
- const recent=l.attempts.filter(a=>a.skill===skill&&!a.skipped).slice(-5);
- if(recent.length>=2&&recent.slice(-2).every(a=>!a.firstCorrect))return {min:1,max:2,label:'Rebuild',reason:'Two recent first answers need a revisit. Try a smaller conceptual step.'};
- if(recent.length>=3&&recent.slice(-3).every(a=>a.independent))return {min:3,max:5,label:'Stretch',reason:'Three recent independent answers: try a less familiar, deeper problem.'};
- return {min:1,max:3,label:'Explore',reason:'Build evidence across different forms before increasing complexity.'};
+ const all=l.attempts.filter(a=>a.skill===skill&&!a.skipped&&a.kind!=='custom');
+ let target=1,forms=new Set(),misses=0;
+ for(const a of all){
+  if(!Number.isInteger(a.difficulty)||a.difficulty<1||a.difficulty>5)continue;
+  if(!a.firstCorrect&&a.difficulty>=target){forms.clear();if(++misses>=2){target=Math.max(1,target-1);misses=0;}continue;}
+  if(a.independent&&a.difficulty>=target){forms.add(a.generator);misses=0;if(forms.size>=2){target=Math.min(5,target+1);forms.clear();}}
+ }
+ const rebuild=all.length>=2&&all.slice(-2).every(a=>!a.firstCorrect);
+ return {min:target,max:target,target,label:rebuild?'Rebuild':target>=3?'Stretch':'Explore',reason:rebuild?'Revisit the explanation, then try a smaller conceptual step.':target>=3?'Independent answers in different question forms support a gradual increase.':'Build independent evidence in different forms before increasing difficulty.'};
 }
 function nextMove(l,skill,obstacle=''){
  const p=profile(l,skill),b=band(l,skill);
