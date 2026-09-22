@@ -55,8 +55,10 @@ function studyInit(){
    try{const file=e.target.files[0];if(!file)return;if(file.size>12000000)throw Error('Backup is too large.');
      const raw=JSON.parse(await file.text());const restored=MochiLearning.restore(raw);
      const scienceRestored=typeof MochiScience!=='undefined'?MochiScience.validate(raw.science):null;
+     const courseRestored=typeof MochiCourse!=='undefined'&&raw.course?MochiCourse.validate(raw.course):null;
      if(!confirm('Replace learning history on this device with this backup? API settings and Mochi’s room are kept.'))return;
-     S.learning=restored;if(scienceRestored)S.science=scienceRestored;studyAttempt=null;studyInit();if(typeof studioInit==='function')studioInit();save(S);renderQuestion();studyParent();if(typeof scInit==='function'){SCI.q=null;SCI.state=null;scInit();if(SCI.view!=='maths')scShow(SCI.view);}$('backupStatus').textContent='Learning history restored.';
+     if(typeof coursePause==='function')coursePause();
+     S.learning=restored;if(scienceRestored)S.science=scienceRestored;if(courseRestored)S.course=courseRestored;studyAttempt=null;studyInit();if(typeof studioInit==='function')studioInit();save(S);renderQuestion();studyParent();if(typeof scInit==='function'){SCI.q=null;SCI.state=null;scInit();if(SCI.view!=='maths')scShow(SCI.view);}if(typeof courseRefresh==='function')courseRefresh();$('backupStatus').textContent='Learning history restored.';
    }catch(err){$('backupStatus').textContent='Could not restore: '+err.message;}finally{e.target.value='';}
  };
  if(studyClock)clearInterval(studyClock);
@@ -68,7 +70,7 @@ function studyInit(){
 }
 function studyNewQuestion(){
  const meta=selectedStudy||{};
- studyAttempt={id:Date.now().toString(36)+'-'+questionEpoch,at:Date.now(),skill:currentSkill(),generator:currentGen?.name||'custom',kind:current.custom?'custom':meta.kind||'daily',question:current.text,tries:0,hints:0,revealed:false,model:false,firstCorrect:false,correct:false,confidence:'unsure',plan:'',reflection:'',repair:MochiRepair.clean(current.repair),transfer:!!(current.transfer||meta.transfer)};
+ studyAttempt={id:Date.now().toString(36)+'-'+questionEpoch,at:Date.now(),skill:currentSkill(),generator:currentGen?.name||'custom',kind:current.custom?'custom':meta.kind||'daily',question:current.text,difficulty:current.stars||2,tries:0,hints:0,revealed:false,model:false,firstCorrect:false,correct:false,confidence:'unsure',plan:'',reflection:'',repair:MochiRepair.clean(current.repair),transfer:!!(current.transfer||meta.transfer)};
  $('studyPlan').value='';$('studyConfidence').value='unsure';$('studyObstacle').value='';
  $('reflectionText').value='';$('resourceNote').value='';$('studyReflection').hidden=!current.custom;
  $('saveReflection').textContent='Save my insight';$('saveResource').textContent='Save and discuss my finding';

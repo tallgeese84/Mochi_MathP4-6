@@ -1,0 +1,3530 @@
+[
+  {
+    "id": "m-number-q1",
+    "unit": "m-number",
+    "level": 1,
+    "form": "m-number-f1",
+    "prompt": "What is the value of 7 in 572,406?",
+    "choices": [
+      "7,000",
+      "70,000",
+      "700"
+    ],
+    "answer": 1,
+    "why": "The 7 occupies the ten-thousands place, so its value is 70,000."
+  },
+  {
+    "id": "m-number-q2",
+    "unit": "m-number",
+    "level": 1,
+    "form": "m-number-f2",
+    "prompt": "Which number is greatest?",
+    "choices": [
+      "305,090",
+      "350,009",
+      "305,900"
+    ],
+    "answer": 1,
+    "why": "The hundred-thousands agree; compare ten thousands next."
+  },
+  {
+    "id": "m-number-q3",
+    "unit": "m-number",
+    "level": 2,
+    "form": "m-number-f3",
+    "prompt": "Round 28,650 to the nearest thousand.",
+    "choices": [
+      "28,000",
+      "28,700",
+      "29,000"
+    ],
+    "answer": 2,
+    "why": "28,650 is above the midpoint 28,500."
+  },
+  {
+    "id": "m-number-q4",
+    "unit": "m-number",
+    "level": 2,
+    "form": "m-number-f4",
+    "prompt": "How many hundreds are in 4,000?",
+    "choices": [
+      "4",
+      "40",
+      "400"
+    ],
+    "answer": 1,
+    "why": "4,000 ÷ 100 = 40 hundreds."
+  },
+  {
+    "id": "m-number-q5",
+    "unit": "m-number",
+    "level": 3,
+    "form": "m-number-f5",
+    "prompt": "A calculation 49 × 201 gives 98,490. Which check exposes a size error?",
+    "choices": [
+      "50 × 200 is about 10,000",
+      "49 is odd",
+      "201 has three digits"
+    ],
+    "answer": 0,
+    "why": "An estimate near 10,000 makes 98,490 implausible; the exact product is 9,849."
+  },
+  {
+    "id": "m-number-q6",
+    "unit": "m-number",
+    "level": 3,
+    "form": "m-number-f6",
+    "prompt": "Which whole number rounds to 6,000 to the nearest thousand and 6,400 to the nearest hundred?",
+    "choices": [
+      "6,449",
+      "6,501",
+      "5,949"
+    ],
+    "answer": 0,
+    "why": "6,449 is below 6,500 and below 6,450, so both rounded values fit."
+  },
+  {
+    "id": "m-operations-q1",
+    "unit": "m-operations",
+    "level": 1,
+    "form": "m-operations-f1",
+    "prompt": "Which expression means 5 groups of 8?",
+    "choices": [
+      "5 + 8",
+      "5 × 8",
+      "8 − 5"
+    ],
+    "answer": 1,
+    "why": "Multiplication combines equal groups."
+  },
+  {
+    "id": "m-operations-q2",
+    "unit": "m-operations",
+    "level": 1,
+    "form": "m-operations-f2",
+    "prompt": "Evaluate 30 − 12 ÷ 3.",
+    "choices": [
+      "6",
+      "26",
+      "18"
+    ],
+    "answer": 1,
+    "why": "Divide first: 12 ÷ 3 = 4; then subtract."
+  },
+  {
+    "id": "m-operations-q3",
+    "unit": "m-operations",
+    "level": 2,
+    "form": "m-operations-f3",
+    "prompt": "Evaluate (17 + 7) ÷ 4.",
+    "choices": [
+      "6",
+      "18.75",
+      "24"
+    ],
+    "answer": 0,
+    "why": "The bracketed total is 24; sharing it into four gives 6."
+  },
+  {
+    "id": "m-operations-q4",
+    "unit": "m-operations",
+    "level": 2,
+    "form": "m-operations-f4",
+    "prompt": "A quotient is 23 remainder 2 when dividing by 5. What was the original number?",
+    "choices": [
+      "117",
+      "115",
+      "125"
+    ],
+    "answer": 0,
+    "why": "The original number equals divisor × quotient + remainder: 5 × 23 + 2 = 117. The remainder 2 is less than the divisor 5."
+  },
+  {
+    "id": "m-operations-q5",
+    "unit": "m-operations",
+    "level": 3,
+    "form": "m-operations-f5",
+    "prompt": "95 people travel in vehicles holding at most 6 each. How many vehicles are needed?",
+    "choices": [
+      "15",
+      "16",
+      "17"
+    ],
+    "answer": 1,
+    "why": "15 vehicles hold only 90 people; one more is needed."
+  },
+  {
+    "id": "m-operations-q6",
+    "unit": "m-operations",
+    "level": 3,
+    "form": "m-operations-f6",
+    "prompt": "Which equals 48 × 19 without changing the quantity?",
+    "choices": [
+      "48 × 20 − 1",
+      "48 × 20 − 48",
+      "48 × 18 − 48"
+    ],
+    "answer": 1,
+    "why": "Nineteen groups are twenty groups minus one whole group of 48."
+  },
+  {
+    "id": "m-factors-q1",
+    "unit": "m-factors",
+    "level": 1,
+    "form": "m-factors-f1",
+    "prompt": "Which is a factor of 28?",
+    "choices": [
+      "6",
+      "7",
+      "9"
+    ],
+    "answer": 1,
+    "why": "28 = 7 × 4 with no remainder."
+  },
+  {
+    "id": "m-factors-q2",
+    "unit": "m-factors",
+    "level": 1,
+    "form": "m-factors-f2",
+    "prompt": "Which is a positive multiple of both 3 and 4?",
+    "choices": [
+      "7",
+      "12",
+      "18"
+    ],
+    "answer": 1,
+    "why": "A common multiple must be divisible by both numbers. 12 = 3 × 4 and 12 = 4 × 3, so it satisfies both conditions."
+  },
+  {
+    "id": "m-factors-q3",
+    "unit": "m-factors",
+    "level": 2,
+    "form": "m-factors-f3",
+    "prompt": "What is the greatest common factor of 16 and 24?",
+    "choices": [
+      "4",
+      "8",
+      "16"
+    ],
+    "answer": 1,
+    "why": "The common factors are 1, 2, 4 and 8."
+  },
+  {
+    "id": "m-factors-q4",
+    "unit": "m-factors",
+    "level": 2,
+    "form": "m-factors-f4",
+    "prompt": "What is the smallest positive common multiple of 6 and 8?",
+    "choices": [
+      "14",
+      "24",
+      "48"
+    ],
+    "answer": 1,
+    "why": "The first shared positive value in their multiples lists is 24."
+  },
+  {
+    "id": "m-factors-q5",
+    "unit": "m-factors",
+    "level": 3,
+    "form": "m-factors-f5",
+    "prompt": "All 30 red and 42 blue beads are packed into the greatest number of identical packs, with no beads left over. How many blue beads are in each pack?",
+    "choices": [
+      "6",
+      "7",
+      "12"
+    ],
+    "answer": 1,
+    "why": "The greatest number of packs is 6; 42 ÷ 6 = 7 blue beads per pack."
+  },
+  {
+    "id": "m-factors-q6",
+    "unit": "m-factors",
+    "level": 3,
+    "form": "m-factors-f6",
+    "prompt": "Two bells ring every 9 and 12 minutes, starting together. Which claim is justified?",
+    "choices": [
+      "They next meet after 21 minutes",
+      "They must wait 108 minutes",
+      "They next ring together after 36 minutes"
+    ],
+    "answer": 2,
+    "why": "36 is the first positive common multiple; 108 is a later meeting."
+  },
+  {
+    "id": "m-fractions-q1",
+    "unit": "m-fractions",
+    "level": 1,
+    "form": "m-fractions-f1",
+    "prompt": "In 3/8, what does 8 tell us?",
+    "choices": [
+      "Eight parts are selected",
+      "The whole is divided into eight equal parts",
+      "The whole contains three objects"
+    ],
+    "answer": 1,
+    "why": "The denominator names the equal subdivision of one whole."
+  },
+  {
+    "id": "m-fractions-q2",
+    "unit": "m-fractions",
+    "level": 1,
+    "form": "m-fractions-f2",
+    "prompt": "Which equals 2/3?",
+    "choices": [
+      "3/4",
+      "4/6",
+      "2/6"
+    ],
+    "answer": 1,
+    "why": "Each third can be split into two sixths."
+  },
+  {
+    "id": "m-fractions-q3",
+    "unit": "m-fractions",
+    "level": 2,
+    "form": "m-fractions-f3",
+    "prompt": "Which is greater?",
+    "choices": [
+      "3/5",
+      "7/10",
+      "They are equal"
+    ],
+    "answer": 1,
+    "why": "3/5 = 6/10, which is less than 7/10."
+  },
+  {
+    "id": "m-fractions-q4",
+    "unit": "m-fractions",
+    "level": 2,
+    "form": "m-fractions-f4",
+    "prompt": "What is 11/4 as a mixed number?",
+    "choices": [
+      "2 3/4",
+      "3 1/4",
+      "2 1/4"
+    ],
+    "answer": 0,
+    "why": "Eight quarters make two wholes, leaving three quarters."
+  },
+  {
+    "id": "m-fractions-q5",
+    "unit": "m-fractions",
+    "level": 3,
+    "form": "m-fractions-f5",
+    "prompt": "Half of a 10 cm strip and half of an 18 cm strip are compared. Which is longer?",
+    "choices": [
+      "They must be equal",
+      "The half from the 18 cm strip",
+      "The half from the 10 cm strip"
+    ],
+    "answer": 1,
+    "why": "The wholes differ: the halves are 9 cm and 5 cm."
+  },
+  {
+    "id": "m-fractions-q6",
+    "unit": "m-fractions",
+    "level": 3,
+    "form": "m-fractions-f6",
+    "prompt": "2/7 of 35 counters are red. How many are not red?",
+    "choices": [
+      "10",
+      "25",
+      "30"
+    ],
+    "answer": 1,
+    "why": "One seventh is 5; red is 10; the remaining five sevenths are 25."
+  },
+  {
+    "id": "m-fraction-ops-q1",
+    "unit": "m-fraction-ops",
+    "level": 1,
+    "form": "m-fraction-ops-f1",
+    "prompt": "Find 1/4 + 2/4.",
+    "choices": [
+      "3/8",
+      "3/4",
+      "2/4"
+    ],
+    "answer": 1,
+    "why": "Three quarter-sized pieces make 3/4."
+  },
+  {
+    "id": "m-fraction-ops-q2",
+    "unit": "m-fraction-ops",
+    "level": 1,
+    "form": "m-fraction-ops-f2",
+    "prompt": "What is half of 3/5?",
+    "choices": [
+      "3/10",
+      "3/5",
+      "6/5"
+    ],
+    "answer": 0,
+    "why": "Half of each fifth produces tenths; three tenths remain."
+  },
+  {
+    "id": "m-fraction-ops-q3",
+    "unit": "m-fraction-ops",
+    "level": 2,
+    "form": "m-fraction-ops-f3",
+    "prompt": "Calculate 2/3 + 1/6.",
+    "choices": [
+      "3/9",
+      "5/6",
+      "1/2"
+    ],
+    "answer": 1,
+    "why": "2/3 = 4/6; adding one sixth gives five sixths."
+  },
+  {
+    "id": "m-fraction-ops-q4",
+    "unit": "m-fraction-ops",
+    "level": 2,
+    "form": "m-fraction-ops-f4",
+    "prompt": "Calculate 2 1/5 − 3/5.",
+    "choices": [
+      "1 3/5",
+      "2 2/5",
+      "1 2/5"
+    ],
+    "answer": 0,
+    "why": "Regroup 2 1/5 as 1 6/5, then subtract 3/5."
+  },
+  {
+    "id": "m-fraction-ops-q5",
+    "unit": "m-fraction-ops",
+    "level": 3,
+    "form": "m-fraction-ops-f5",
+    "prompt": "A full recipe uses 3/4 litre of milk. You make 2/3 of the recipe. How much milk is needed?",
+    "choices": [
+      "1/2 litre",
+      "9/8 litre",
+      "5/7 litre"
+    ],
+    "answer": 0,
+    "why": "2/3 × 3/4 = 6/12 = 1/2 litre."
+  },
+  {
+    "id": "m-fraction-ops-q6",
+    "unit": "m-fraction-ops",
+    "level": 3,
+    "form": "m-fraction-ops-f6",
+    "prompt": "Which claim about positive numbers is correct?",
+    "choices": [
+      "Multiplication always increases a number",
+      "Multiplying by 3/4 gives three quarters of the starting number",
+      "Adding fractions requires adding denominators"
+    ],
+    "answer": 1,
+    "why": "Scaling by a proper fraction reduces a positive quantity."
+  },
+  {
+    "id": "m-fraction-division-q1",
+    "unit": "m-fraction-division",
+    "level": 1,
+    "form": "m-fraction-division-f1",
+    "prompt": "1/5 litre is shared equally between 2 cups. Each receives…",
+    "choices": [
+      "1/10 litre",
+      "2/5 litre",
+      "1/7 litre"
+    ],
+    "answer": 0,
+    "why": "A fifth split into two equal parts produces tenths."
+  },
+  {
+    "id": "m-fraction-division-q2",
+    "unit": "m-fraction-division",
+    "level": 1,
+    "form": "m-fraction-division-f2",
+    "prompt": "How many quarters fit in 2 wholes?",
+    "choices": [
+      "2",
+      "4",
+      "8"
+    ],
+    "answer": 2,
+    "why": "Each whole contains four quarters."
+  },
+  {
+    "id": "m-fraction-division-q3",
+    "unit": "m-fraction-division",
+    "level": 2,
+    "form": "m-fraction-division-f3",
+    "prompt": "Calculate 3/5 ÷ 3.",
+    "choices": [
+      "1/5",
+      "9/5",
+      "3/8"
+    ],
+    "answer": 0,
+    "why": "Three fifth-sized pieces shared among three give one fifth each."
+  },
+  {
+    "id": "m-fraction-division-q4",
+    "unit": "m-fraction-division",
+    "level": 2,
+    "form": "m-fraction-division-f4",
+    "prompt": "Calculate 2/3 ÷ 1/6.",
+    "choices": [
+      "1/9",
+      "4",
+      "2"
+    ],
+    "answer": 1,
+    "why": "Two thirds equal four sixths."
+  },
+  {
+    "id": "m-fraction-division-q5",
+    "unit": "m-fraction-division",
+    "level": 3,
+    "form": "m-fraction-division-f5",
+    "prompt": "A 7/8 m ribbon is cut into 1/4 m pieces. How many complete pieces can be cut?",
+    "choices": [
+      "3",
+      "3.5",
+      "4"
+    ],
+    "answer": 0,
+    "why": "7/8 ÷ 1/4 = 3.5 piece-lengths, allowing three complete pieces."
+  },
+  {
+    "id": "m-fraction-division-q6",
+    "unit": "m-fraction-division",
+    "level": 3,
+    "form": "m-fraction-division-f6",
+    "prompt": "A 7/8 m ribbon has three pieces of length 1/4 m cut from it. What length remains?",
+    "choices": [
+      "1/2 m",
+      "1/8 m",
+      "1/4 m"
+    ],
+    "answer": 1,
+    "why": "7/8 − 3/4 = 7/8 − 6/8 = 1/8 m."
+  },
+  {
+    "id": "m-remainders-q1",
+    "unit": "m-remainders",
+    "level": 1,
+    "form": "m-remainders-f1",
+    "prompt": "After using 2/5 of some ribbon, what fraction of the original remains?",
+    "choices": [
+      "2/5",
+      "3/5",
+      "1/5"
+    ],
+    "answer": 1,
+    "why": "The whole is 5/5; subtract 2/5."
+  },
+  {
+    "id": "m-remainders-q2",
+    "unit": "m-remainders",
+    "level": 1,
+    "form": "m-remainders-f2",
+    "prompt": "Half of the remaining money refers to…",
+    "choices": [
+      "Always half of the original",
+      "Half of the amount left at that stage",
+      "A fixed dollar amount"
+    ],
+    "answer": 1,
+    "why": "The reference whole is the current remainder."
+  },
+  {
+    "id": "m-remainders-q3",
+    "unit": "m-remainders",
+    "level": 2,
+    "form": "m-remainders-f3",
+    "prompt": "60 counters lose 1/3, then 1/4 of the remainder. How many remain?",
+    "choices": [
+      "20",
+      "30",
+      "35"
+    ],
+    "answer": 1,
+    "why": "40 remain after the first removal; three quarters of 40 are 30."
+  },
+  {
+    "id": "m-remainders-q4",
+    "unit": "m-remainders",
+    "level": 2,
+    "form": "m-remainders-f4",
+    "prompt": "A final 18 ml is 3/4 of an earlier amount. What was that earlier amount?",
+    "choices": [
+      "24 ml",
+      "13.5 ml",
+      "72 ml"
+    ],
+    "answer": 0,
+    "why": "One quarter is 6 ml; four quarters are 24 ml."
+  },
+  {
+    "id": "m-remainders-q5",
+    "unit": "m-remainders",
+    "level": 3,
+    "form": "m-remainders-f5",
+    "prompt": "1/5 of some money is spent, then half of the remainder. $24 remains. What was the original amount?",
+    "choices": [
+      "$48",
+      "$60",
+      "$120"
+    ],
+    "answer": 1,
+    "why": "The remainder is 4/5 × 1/2 = 2/5 of the original; 24 ÷ 2 × 5 = 60."
+  },
+  {
+    "id": "m-remainders-q6",
+    "unit": "m-remainders",
+    "level": 3,
+    "form": "m-remainders-f6",
+    "prompt": "A bottle loses 1/3 of its water and then 50 ml. It has 150 ml left. What was the original volume?",
+    "choices": [
+      "225 ml",
+      "300 ml",
+      "600 ml"
+    ],
+    "answer": 1,
+    "why": "Add back 50: 200 ml is two thirds. The original is 300 ml."
+  },
+  {
+    "id": "m-decimals-q1",
+    "unit": "m-decimals",
+    "level": 1,
+    "form": "m-decimals-f1",
+    "prompt": "Which equals 0.4?",
+    "choices": [
+      "4/100",
+      "4/10",
+      "4/1000"
+    ],
+    "answer": 1,
+    "why": "The digit 4 is in the tenths place, so 0.4 means four tenths, written as 4/10."
+  },
+  {
+    "id": "m-decimals-q2",
+    "unit": "m-decimals",
+    "level": 1,
+    "form": "m-decimals-f2",
+    "prompt": "Which is larger?",
+    "choices": [
+      "0.9",
+      "0.81",
+      "They are equal"
+    ],
+    "answer": 0,
+    "why": "0.90 has nine tenths; 0.81 has eight."
+  },
+  {
+    "id": "m-decimals-q3",
+    "unit": "m-decimals",
+    "level": 2,
+    "form": "m-decimals-f3",
+    "prompt": "Calculate 2.35 + 0.8.",
+    "choices": [
+      "2.43",
+      "3.15",
+      "10.35"
+    ],
+    "answer": 1,
+    "why": "Align hundredths: 2.35 + 0.80 = 3.15."
+  },
+  {
+    "id": "m-decimals-q4",
+    "unit": "m-decimals",
+    "level": 2,
+    "form": "m-decimals-f4",
+    "prompt": "Calculate 0.36 ÷ 4.",
+    "choices": [
+      "0.9",
+      "0.09",
+      "0.009"
+    ],
+    "answer": 1,
+    "why": "36 hundredths shared in four groups gives 9 hundredths."
+  },
+  {
+    "id": "m-decimals-q5",
+    "unit": "m-decimals",
+    "level": 3,
+    "form": "m-decimals-f5",
+    "prompt": "Round 2.449 directly to one decimal place.",
+    "choices": [
+      "2.4",
+      "2.5",
+      "2.45"
+    ],
+    "answer": 0,
+    "why": "2.449 is below the midpoint 2.45. Do not round twice."
+  },
+  {
+    "id": "m-decimals-q6",
+    "unit": "m-decimals",
+    "level": 3,
+    "form": "m-decimals-f6",
+    "prompt": "Five bottles contain equal volumes of water, 3.75 litres altogether. Each bottle contains…",
+    "choices": [
+      "75 ml",
+      "750 ml",
+      "7,500 ml"
+    ],
+    "answer": 1,
+    "why": "3.75 ÷ 5 = 0.75 litre = 750 ml."
+  },
+  {
+    "id": "m-percent-q1",
+    "unit": "m-percent",
+    "level": 1,
+    "form": "m-percent-f1",
+    "prompt": "25% is equivalent to…",
+    "choices": [
+      "1/4",
+      "1/25",
+      "25/10"
+    ],
+    "answer": 0,
+    "why": "25/100 simplifies to one quarter."
+  },
+  {
+    "id": "m-percent-q2",
+    "unit": "m-percent",
+    "level": 1,
+    "form": "m-percent-f2",
+    "prompt": "In a 20% discount calculation, 100% usually means…",
+    "choices": [
+      "The discount",
+      "The original price",
+      "The sale price"
+    ],
+    "answer": 1,
+    "why": "A discount is calculated relative to the stated original price."
+  },
+  {
+    "id": "m-percent-q3",
+    "unit": "m-percent",
+    "level": 2,
+    "form": "m-percent-f3",
+    "prompt": "Find 30% of 90.",
+    "choices": [
+      "27",
+      "30",
+      "60"
+    ],
+    "answer": 0,
+    "why": "10% is 9; three such parts make 27."
+  },
+  {
+    "id": "m-percent-q4",
+    "unit": "m-percent",
+    "level": 2,
+    "form": "m-percent-f4",
+    "prompt": "12 out of 20 pupils walk to school. What percentage is this?",
+    "choices": [
+      "12%",
+      "40%",
+      "60%"
+    ],
+    "answer": 2,
+    "why": "The whole group is 20 pupils. 12/20 = 3/5 = 60/100, so 60% of the group walk to school."
+  },
+  {
+    "id": "m-percent-q5",
+    "unit": "m-percent",
+    "level": 3,
+    "form": "m-percent-f5",
+    "prompt": "An $80 item has a 25% discount and then a stated 10% tax on its sale price. What is the total?",
+    "choices": [
+      "$68",
+      "$66",
+      "$72"
+    ],
+    "answer": 1,
+    "why": "The discounted price is $60; tax is $6, so pay $66."
+  },
+  {
+    "id": "m-percent-q6",
+    "unit": "m-percent",
+    "level": 3,
+    "form": "m-percent-f6",
+    "prompt": "Simple interest of 4% per year on $150 gives how much interest after one year?",
+    "choices": [
+      "$6",
+      "$154",
+      "$156"
+    ],
+    "answer": 0,
+    "why": "4/100 × 150 = 6; interest is different from the total balance."
+  },
+  {
+    "id": "m-percent-whole-q1",
+    "unit": "m-percent-whole",
+    "level": 1,
+    "form": "m-percent-whole-f1",
+    "prompt": "If 25% is 9, the whole is…",
+    "choices": [
+      "18",
+      "36",
+      "45"
+    ],
+    "answer": 1,
+    "why": "Four quarters make the whole: 9 × 4 = 36."
+  },
+  {
+    "id": "m-percent-whole-q2",
+    "unit": "m-percent-whole",
+    "level": 1,
+    "form": "m-percent-whole-f2",
+    "prompt": "After a 30% discount, the sale price is what percentage of the original?",
+    "choices": [
+      "30%",
+      "70%",
+      "130%"
+    ],
+    "answer": 1,
+    "why": "The original price represents 100%. Removing 30% leaves 100% − 30% = 70% of that original price."
+  },
+  {
+    "id": "m-percent-whole-q3",
+    "unit": "m-percent-whole",
+    "level": 2,
+    "form": "m-percent-whole-f3",
+    "prompt": "A sale price is $56 after 20% off. What was the original price?",
+    "choices": [
+      "$70",
+      "$67.20",
+      "$280"
+    ],
+    "answer": 0,
+    "why": "$56 corresponds to 80%; divide by 0.8."
+  },
+  {
+    "id": "m-percent-whole-q4",
+    "unit": "m-percent-whole",
+    "level": 2,
+    "form": "m-percent-whole-f4",
+    "prompt": "A quantity rises from 80 to 100. What is its percentage increase?",
+    "choices": [
+      "20%",
+      "25%",
+      "125%"
+    ],
+    "answer": 1,
+    "why": "The increase 20 is one quarter of the original 80."
+  },
+  {
+    "id": "m-percent-whole-q5",
+    "unit": "m-percent-whole",
+    "level": 3,
+    "form": "m-percent-whole-f5",
+    "prompt": "A value rises by 10%, then falls by 10% of its new value. What percentage of the original remains?",
+    "choices": [
+      "100%",
+      "99%",
+      "90%"
+    ],
+    "answer": 1,
+    "why": "1.1 × 0.9 = 0.99, with different bases at the two stages."
+  },
+  {
+    "id": "m-percent-whole-q6",
+    "unit": "m-percent-whole",
+    "level": 3,
+    "form": "m-percent-whole-f6",
+    "prompt": "A tank goes from 35% full to 100% full when 26 litres are added. What is its capacity?",
+    "choices": [
+      "40 litres",
+      "74 litres",
+      "65 litres"
+    ],
+    "answer": 0,
+    "why": "26 litres represents 65%; 26 ÷ 0.65 = 40 litres."
+  },
+  {
+    "id": "m-ratio-q1",
+    "unit": "m-ratio",
+    "level": 1,
+    "form": "m-ratio-f1",
+    "prompt": "In red : blue = 2 : 5, red is what fraction of the total?",
+    "choices": [
+      "2/5",
+      "2/7",
+      "5/7"
+    ],
+    "answer": 1,
+    "why": "There are seven equal units altogether."
+  },
+  {
+    "id": "m-ratio-q2",
+    "unit": "m-ratio",
+    "level": 1,
+    "form": "m-ratio-f2",
+    "prompt": "Which equals 3 : 4?",
+    "choices": [
+      "6 : 8",
+      "4 : 5",
+      "3 : 8"
+    ],
+    "answer": 0,
+    "why": "Both terms are multiplied by two."
+  },
+  {
+    "id": "m-ratio-q3",
+    "unit": "m-ratio",
+    "level": 2,
+    "form": "m-ratio-f3",
+    "prompt": "Share 45 in the ratio 2 : 3. What is the smaller share?",
+    "choices": [
+      "15",
+      "18",
+      "27"
+    ],
+    "answer": 1,
+    "why": "Five units total 45, so two units are 18."
+  },
+  {
+    "id": "m-ratio-q4",
+    "unit": "m-ratio",
+    "level": 2,
+    "form": "m-ratio-f4",
+    "prompt": "Two amounts have ratio 4 : 7 and difference 18. What is the larger?",
+    "choices": [
+      "24",
+      "42",
+      "77"
+    ],
+    "answer": 1,
+    "why": "Three units are 18; seven units are 42."
+  },
+  {
+    "id": "m-ratio-q5",
+    "unit": "m-ratio",
+    "level": 3,
+    "form": "m-ratio-f5",
+    "prompt": "A : B changes from 2 : 3 to 5 : 6 by adding only to A. If 8 are added, what is B?",
+    "choices": [
+      "24",
+      "48",
+      "64"
+    ],
+    "answer": 1,
+    "why": "Rewrite 2 : 3 as 4 : 6. One common unit is added, so six units of B are 48."
+  },
+  {
+    "id": "m-ratio-q6",
+    "unit": "m-ratio",
+    "level": 3,
+    "form": "m-ratio-f6",
+    "prompt": "A 2 : 3 : 5 mixture has a middle share of 21 g. What is the total mass?",
+    "choices": [
+      "42 g",
+      "63 g",
+      "70 g"
+    ],
+    "answer": 2,
+    "why": "Three units are 21 g, making ten units 70 g."
+  },
+  {
+    "id": "m-rate-q1",
+    "unit": "m-rate",
+    "level": 1,
+    "form": "m-rate-f1",
+    "prompt": "A rate of 5 litres per minute describes…",
+    "choices": [
+      "Only a volume",
+      "Volume for each unit of time",
+      "Only a duration"
+    ],
+    "answer": 1,
+    "why": "A rate links two quantities with their units."
+  },
+  {
+    "id": "m-rate-q2",
+    "unit": "m-rate",
+    "level": 1,
+    "form": "m-rate-f2",
+    "prompt": "Six identical pens cost $9. What is the unit price?",
+    "choices": [
+      "$1.50",
+      "$3",
+      "$54"
+    ],
+    "answer": 0,
+    "why": "9 ÷ 6 = 1.50 dollars per pen."
+  },
+  {
+    "id": "m-rate-q3",
+    "unit": "m-rate",
+    "level": 2,
+    "form": "m-rate-f3",
+    "prompt": "A pump delivers 4 litres per minute for 7 minutes. How much is delivered?",
+    "choices": [
+      "11 litres",
+      "28 litres",
+      "1.75 litres"
+    ],
+    "answer": 1,
+    "why": "At a constant 4 litres each minute, 7 minutes gives 7 groups of 4 litres: 4 × 7 = 28 litres."
+  },
+  {
+    "id": "m-rate-q4",
+    "unit": "m-rate",
+    "level": 2,
+    "form": "m-rate-f4",
+    "prompt": "120 pages print at 15 pages per minute. How long is needed?",
+    "choices": [
+      "8 minutes",
+      "15 minutes",
+      "1,800 minutes"
+    ],
+    "answer": 0,
+    "why": "Count how many groups of 15 pages make 120: 120 ÷ 15 = 8. Each group takes one minute, so the duration is 8 minutes."
+  },
+  {
+    "id": "m-rate-q5",
+    "unit": "m-rate",
+    "level": 3,
+    "form": "m-rate-f5",
+    "prompt": "A tank holds 10 litres and needs 46 litres. A tap adds 6 litres per minute. How long does adding the water take?",
+    "choices": [
+      "6 minutes",
+      "7 minutes",
+      "9 minutes"
+    ],
+    "answer": 0,
+    "why": "Only 36 litres must be added, taking six minutes."
+  },
+  {
+    "id": "m-rate-q6",
+    "unit": "m-rate",
+    "level": 3,
+    "form": "m-rate-f6",
+    "prompt": "Which relationship is not necessarily proportional?",
+    "choices": [
+      "Cost of identical pens at a fixed price each",
+      "Total fare with a fixed starting fee plus a distance charge",
+      "Water delivered by a constant-flow tap"
+    ],
+    "answer": 1,
+    "why": "The starting fee prevents the total from scaling directly with distance."
+  },
+  {
+    "id": "m-algebra-q1",
+    "unit": "m-algebra",
+    "level": 1,
+    "form": "m-algebra-f1",
+    "prompt": "If n is the price of one pen, 4n means…",
+    "choices": [
+      "4 + n",
+      "4 × n",
+      "A number ending in n"
+    ],
+    "answer": 1,
+    "why": "It describes four copies of the price."
+  },
+  {
+    "id": "m-algebra-q2",
+    "unit": "m-algebra",
+    "level": 1,
+    "form": "m-algebra-f2",
+    "prompt": "Simplify 2a + 5a.",
+    "choices": [
+      "7a",
+      "10a",
+      "7"
+    ],
+    "answer": 0,
+    "why": "Two a-sized quantities and five a-sized quantities make seven."
+  },
+  {
+    "id": "m-algebra-q3",
+    "unit": "m-algebra",
+    "level": 2,
+    "form": "m-algebra-f3",
+    "prompt": "Evaluate 3x + 2 when x = 6.",
+    "choices": [
+      "11",
+      "20",
+      "38"
+    ],
+    "answer": 1,
+    "why": "Replace x with 6, then multiply before adding: 3 × 6 + 2 = 18 + 2 = 20."
+  },
+  {
+    "id": "m-algebra-q4",
+    "unit": "m-algebra",
+    "level": 2,
+    "form": "m-algebra-f4",
+    "prompt": "Solve 4x + 3 = 27.",
+    "choices": [
+      "6",
+      "7.5",
+      "24"
+    ],
+    "answer": 0,
+    "why": "Subtract three on both sides, then divide by four."
+  },
+  {
+    "id": "m-algebra-q5",
+    "unit": "m-algebra",
+    "level": 3,
+    "form": "m-algebra-f5",
+    "prompt": "Four tickets at the same price each, plus one $5 fee, total $37. What is the price of one ticket?",
+    "choices": [
+      "$8",
+      "$9.25",
+      "$10.50"
+    ],
+    "answer": 0,
+    "why": "Four tickets cost 37 − 5 = 32, so each costs eight."
+  },
+  {
+    "id": "m-algebra-q6",
+    "unit": "m-algebra",
+    "level": 3,
+    "form": "m-algebra-f6",
+    "prompt": "Which step preserves 5y − 7 = 18?",
+    "choices": [
+      "Subtract 7 on the right only",
+      "Add 7 to both sides",
+      "Divide only the left side by 5"
+    ],
+    "answer": 1,
+    "why": "Equal operations on both sides preserve equality."
+  },
+  {
+    "id": "m-measure-q1",
+    "unit": "m-measure",
+    "level": 1,
+    "form": "m-measure-f1",
+    "prompt": "Which unit measures mass?",
+    "choices": [
+      "ml",
+      "kg",
+      "cm"
+    ],
+    "answer": 1,
+    "why": "A kilogram (kg) is a unit of mass. Length and volume describe different quantities and use different units."
+  },
+  {
+    "id": "m-measure-q2",
+    "unit": "m-measure",
+    "level": 1,
+    "form": "m-measure-f2",
+    "prompt": "One litre equals…",
+    "choices": [
+      "10 ml",
+      "100 ml",
+      "1,000 ml"
+    ],
+    "answer": 2,
+    "why": "The prefix milli indicates a thousandth."
+  },
+  {
+    "id": "m-measure-q3",
+    "unit": "m-measure",
+    "level": 2,
+    "form": "m-measure-f3",
+    "prompt": "Convert 2.07 m to cm.",
+    "choices": [
+      "20.7 cm",
+      "207 cm",
+      "2,070 cm"
+    ],
+    "answer": 1,
+    "why": "Multiply the number of metres by 100."
+  },
+  {
+    "id": "m-measure-q4",
+    "unit": "m-measure",
+    "level": 2,
+    "form": "m-measure-f4",
+    "prompt": "A ribbon extends from 3 cm to 11.5 cm on a ruler. Its length is…",
+    "choices": [
+      "8.5 cm",
+      "11.5 cm",
+      "14.5 cm"
+    ],
+    "answer": 0,
+    "why": "Length is the difference of endpoint positions."
+  },
+  {
+    "id": "m-measure-q5",
+    "unit": "m-measure",
+    "level": 3,
+    "form": "m-measure-f5",
+    "prompt": "A 1.25 kg mass and an 850 g mass total…",
+    "choices": [
+      "2.1 kg",
+      "9.75 kg",
+      "1.335 kg"
+    ],
+    "answer": 0,
+    "why": "850 g is 0.85 kg; the total is 2.10 kg."
+  },
+  {
+    "id": "m-measure-q6",
+    "unit": "m-measure",
+    "level": 3,
+    "form": "m-measure-f6",
+    "prompt": "A scale shows 200 ml to 500 ml in six equal intervals. Each interval represents…",
+    "choices": [
+      "50 ml",
+      "60 ml",
+      "300 ml"
+    ],
+    "answer": 0,
+    "why": "The 300 ml difference is divided into six equal spaces."
+  },
+  {
+    "id": "m-time-q1",
+    "unit": "m-time",
+    "level": 1,
+    "form": "m-time-f1",
+    "prompt": "1 hour 20 minutes equals…",
+    "choices": [
+      "120 minutes",
+      "80 minutes",
+      "1.2 minutes"
+    ],
+    "answer": 1,
+    "why": "One hour contains 60 minutes. Add the extra 20 minutes: 60 + 20 = 80 minutes."
+  },
+  {
+    "id": "m-time-q2",
+    "unit": "m-time",
+    "level": 1,
+    "form": "m-time-f2",
+    "prompt": "18:30 is…",
+    "choices": [
+      "6:30 a.m.",
+      "6:30 p.m.",
+      "8:30 p.m."
+    ],
+    "answer": 1,
+    "why": "Subtract twelve from an hour after noon."
+  },
+  {
+    "id": "m-time-q3",
+    "unit": "m-time",
+    "level": 2,
+    "form": "m-time-f3",
+    "prompt": "How long is 09:40 to 11:15?",
+    "choices": [
+      "75 minutes",
+      "95 minutes",
+      "135 minutes"
+    ],
+    "answer": 1,
+    "why": "20 minutes to ten, sixty to eleven, then fifteen."
+  },
+  {
+    "id": "m-time-q4",
+    "unit": "m-time",
+    "level": 2,
+    "form": "m-time-f4",
+    "prompt": "An event ends at 17:05 after 50 minutes. When did it start?",
+    "choices": [
+      "16:15",
+      "16:55",
+      "17:55"
+    ],
+    "answer": 0,
+    "why": "Five minutes back reaches 17:00, then forty-five reaches 16:15."
+  },
+  {
+    "id": "m-time-q5",
+    "unit": "m-time",
+    "level": 3,
+    "form": "m-time-f5",
+    "prompt": "A journey runs from 23:50 to 00:35 next day. How long is it?",
+    "choices": [
+      "45 minutes",
+      "85 minutes",
+      "15 minutes"
+    ],
+    "answer": 0,
+    "why": "Ten minutes to midnight plus thirty-five afterwards."
+  },
+  {
+    "id": "m-time-q6",
+    "unit": "m-time",
+    "level": 3,
+    "form": "m-time-f6",
+    "prompt": "Arrive by 10:00, travel 40 minutes, prepare 25 minutes. When must preparation begin?",
+    "choices": [
+      "09:20",
+      "08:55",
+      "09:35"
+    ],
+    "answer": 1,
+    "why": "Departure is 09:20, and preparation begins 25 minutes earlier."
+  },
+  {
+    "id": "m-area-q1",
+    "unit": "m-area",
+    "level": 1,
+    "form": "m-area-f1",
+    "prompt": "Which unit is appropriate for area?",
+    "choices": [
+      "cm",
+      "cm²",
+      "cm³"
+    ],
+    "answer": 1,
+    "why": "Area measures the surface covered and is expressed in square units, such as square centimetres (cm²)."
+  },
+  {
+    "id": "m-area-q2",
+    "unit": "m-area",
+    "level": 1,
+    "form": "m-area-f2",
+    "prompt": "A 7 cm by 4 cm rectangle has area…",
+    "choices": [
+      "11 cm²",
+      "22 cm²",
+      "28 cm²"
+    ],
+    "answer": 2,
+    "why": "Seven squares per row across four rows make 28."
+  },
+  {
+    "id": "m-area-q3",
+    "unit": "m-area",
+    "level": 2,
+    "form": "m-area-f3",
+    "prompt": "A rectangle has area 63 cm² and length 9 cm. Find its breadth.",
+    "choices": [
+      "7 cm",
+      "54 cm",
+      "72 cm"
+    ],
+    "answer": 0,
+    "why": "A rectangle’s area is length × breadth. Undo multiplication by the length: breadth = 63 ÷ 9 = 7 cm. Check 9 × 7 = 63."
+  },
+  {
+    "id": "m-area-q4",
+    "unit": "m-area",
+    "level": 2,
+    "form": "m-area-f4",
+    "prompt": "A triangle has base 12 cm and perpendicular height 5 cm. Find its area.",
+    "choices": [
+      "60 cm²",
+      "30 cm²",
+      "17 cm²"
+    ],
+    "answer": 1,
+    "why": "A triangle has half the area of a rectangle with the same base and perpendicular height: 12 × 5 ÷ 2 = 30 cm²."
+  },
+  {
+    "id": "m-area-q5",
+    "unit": "m-area",
+    "level": 3,
+    "form": "m-area-f5",
+    "prompt": "An 8 by 7 rectangle has a 3 by 2 corner removed. What area remains?",
+    "choices": [
+      "50 square units",
+      "56 square units",
+      "62 square units"
+    ],
+    "answer": 0,
+    "why": "56 − 6 = 50; remove only the missing region."
+  },
+  {
+    "id": "m-area-q6",
+    "unit": "m-area",
+    "level": 3,
+    "form": "m-area-f6",
+    "prompt": "A rectangle has both dimensions doubled. Which statement is true?",
+    "choices": [
+      "Area doubles",
+      "Perimeter quadruples",
+      "Area quadruples and perimeter doubles"
+    ],
+    "answer": 2,
+    "why": "Area uses a product of two lengths, while perimeter is their doubled sum."
+  },
+  {
+    "id": "m-angles-q1",
+    "unit": "m-angles",
+    "level": 1,
+    "form": "m-angles-f1",
+    "prompt": "The vertex of ∠PQR is…",
+    "choices": [
+      "P",
+      "Q",
+      "R"
+    ],
+    "answer": 1,
+    "why": "The middle letter names the vertex."
+  },
+  {
+    "id": "m-angles-q2",
+    "unit": "m-angles",
+    "level": 1,
+    "form": "m-angles-f2",
+    "prompt": "Angles around a point total…",
+    "choices": [
+      "90°",
+      "180°",
+      "360°"
+    ],
+    "answer": 2,
+    "why": "A full turn measures 360 degrees."
+  },
+  {
+    "id": "m-angles-q3",
+    "unit": "m-angles",
+    "level": 2,
+    "form": "m-angles-f3",
+    "prompt": "Two angles make a straight line. One is 73°. Find the other.",
+    "choices": [
+      "107°",
+      "117°",
+      "287°"
+    ],
+    "answer": 0,
+    "why": "Adjacent angles forming a straight line sum to 180°. The other angle is 180° − 73° = 107°."
+  },
+  {
+    "id": "m-angles-q4",
+    "unit": "m-angles",
+    "level": 2,
+    "form": "m-angles-f4",
+    "prompt": "An isosceles triangle has unequal angle 36°. Each equal angle is…",
+    "choices": [
+      "72°",
+      "144°",
+      "36°"
+    ],
+    "answer": 0,
+    "why": "The remaining 144 degrees are shared equally."
+  },
+  {
+    "id": "m-angles-q5",
+    "unit": "m-angles",
+    "level": 3,
+    "form": "m-angles-f5",
+    "prompt": "A parallelogram has an interior angle of 68°. What is an adjacent interior angle?",
+    "choices": [
+      "68°",
+      "112°",
+      "122°"
+    ],
+    "answer": 1,
+    "why": "Adjacent interior angles total 180 degrees."
+  },
+  {
+    "id": "m-angles-q6",
+    "unit": "m-angles",
+    "level": 3,
+    "form": "m-angles-f6",
+    "prompt": "A diagram looks right-angled but has no right-angle mark or supporting information. What should you do?",
+    "choices": [
+      "Assume 90°",
+      "Use only stated or deduced properties",
+      "Measure the screen and treat it as exact"
+    ],
+    "answer": 1,
+    "why": "A schematic appearance is not a valid premise."
+  },
+  {
+    "id": "m-solids-q1",
+    "unit": "m-solids",
+    "level": 1,
+    "form": "m-solids-f1",
+    "prompt": "How many faces does a cube have?",
+    "choices": [
+      "4",
+      "6",
+      "8"
+    ],
+    "answer": 1,
+    "why": "A cube has six square faces."
+  },
+  {
+    "id": "m-solids-q2",
+    "unit": "m-solids",
+    "level": 1,
+    "form": "m-solids-f2",
+    "prompt": "A non-square rectangle has how many lines of reflection symmetry?",
+    "choices": [
+      "2",
+      "4",
+      "0"
+    ],
+    "answer": 0,
+    "why": "Its horizontal and vertical midlines work; diagonals do not."
+  },
+  {
+    "id": "m-solids-q3",
+    "unit": "m-solids",
+    "level": 2,
+    "form": "m-solids-f3",
+    "prompt": "A point is 4 squares left of a vertical mirror. Its reflection is…",
+    "choices": [
+      "4 squares right at the same height",
+      "4 squares above",
+      "On the mirror"
+    ],
+    "answer": 0,
+    "why": "Reflection preserves perpendicular distance to the mirror."
+  },
+  {
+    "id": "m-solids-q4",
+    "unit": "m-solids",
+    "level": 2,
+    "form": "m-solids-f4",
+    "prompt": "Which condition is necessary for a cube net?",
+    "choices": [
+      "It contains six equal squares",
+      "It contains any six shapes",
+      "It is a straight strip"
+    ],
+    "answer": 0,
+    "why": "Six equal square faces are necessary, but their arrangement must also fold correctly."
+  },
+  {
+    "id": "m-solids-q5",
+    "unit": "m-solids",
+    "level": 3,
+    "form": "m-solids-f5",
+    "prompt": "Why can six squares fail to form a cube net?",
+    "choices": [
+      "A cube has eight faces",
+      "Two faces may overlap after folding",
+      "Squares cannot fold"
+    ],
+    "answer": 1,
+    "why": "Correct face count alone does not ensure six distinct folded positions."
+  },
+  {
+    "id": "m-solids-q6",
+    "unit": "m-solids",
+    "level": 3,
+    "form": "m-solids-f6",
+    "prompt": "A drawing shows a stack of unit cubes from the front only. What is justified?",
+    "choices": [
+      "Every hidden cube is known",
+      "There may be different depths giving the same front view",
+      "The total must equal the visible squares"
+    ],
+    "answer": 1,
+    "why": "A front projection may hide cubes behind others."
+  },
+  {
+    "id": "m-circles-q1",
+    "unit": "m-circles",
+    "level": 1,
+    "form": "m-circles-f1",
+    "prompt": "A circle has diameter 18 cm. Its radius is…",
+    "choices": [
+      "9 cm",
+      "18 cm",
+      "36 cm"
+    ],
+    "answer": 0,
+    "why": "The radius is half the diameter."
+  },
+  {
+    "id": "m-circles-q2",
+    "unit": "m-circles",
+    "level": 1,
+    "form": "m-circles-f2",
+    "prompt": "Which formula gives circumference?",
+    "choices": [
+      "πr²",
+      "2πr",
+      "r²"
+    ],
+    "answer": 1,
+    "why": "Circumference is π times the diameter."
+  },
+  {
+    "id": "m-circles-q3",
+    "unit": "m-circles",
+    "level": 2,
+    "form": "m-circles-f3",
+    "prompt": "Find the area for radius 5 cm using π = 3.14.",
+    "choices": [
+      "31.4 cm²",
+      "78.5 cm²",
+      "15.7 cm²"
+    ],
+    "answer": 1,
+    "why": "Circle area is π × radius × radius. Using the supplied value, 3.14 × 5 × 5 = 78.5 cm²."
+  },
+  {
+    "id": "m-circles-q4",
+    "unit": "m-circles",
+    "level": 2,
+    "form": "m-circles-f4",
+    "prompt": "A semicircle has radius 7 cm. Using π = 22/7, find its complete perimeter.",
+    "choices": [
+      "22 cm",
+      "36 cm",
+      "44 cm"
+    ],
+    "answer": 1,
+    "why": "Half circumference is 22; add diameter 14."
+  },
+  {
+    "id": "m-circles-q5",
+    "unit": "m-circles",
+    "level": 3,
+    "form": "m-circles-f5",
+    "prompt": "A quarter circle has radius 4 cm. Using π = 3.14, find its perimeter.",
+    "choices": [
+      "6.28 cm",
+      "14.28 cm",
+      "12.56 cm"
+    ],
+    "answer": 1,
+    "why": "The arc is 6.28 and the two radii total eight."
+  },
+  {
+    "id": "m-circles-q6",
+    "unit": "m-circles",
+    "level": 3,
+    "form": "m-circles-f6",
+    "prompt": "A semicircle is attached to a rectangle along its diameter. Is that shared diameter part of the combined outer perimeter?",
+    "choices": [
+      "Yes, always",
+      "No, it is an internal edge",
+      "Only half of it"
+    ],
+    "answer": 1,
+    "why": "The shared line is inside the union, not on its exposed boundary."
+  },
+  {
+    "id": "m-volume-q1",
+    "unit": "m-volume",
+    "level": 1,
+    "form": "m-volume-f1",
+    "prompt": "Volume is measured in…",
+    "choices": [
+      "cm",
+      "cm²",
+      "cm³"
+    ],
+    "answer": 2,
+    "why": "Volume measures occupied space using cubic units. One cubic centimetre (cm³) is the volume of a cube with 1 cm edges."
+  },
+  {
+    "id": "m-volume-q2",
+    "unit": "m-volume",
+    "level": 1,
+    "form": "m-volume-f2",
+    "prompt": "A cuboid is 3 cm by 4 cm by 5 cm. Its volume is…",
+    "choices": [
+      "12 cm³",
+      "60 cm³",
+      "120 cm³"
+    ],
+    "answer": 1,
+    "why": "Each layer has twelve cubes and there are five layers."
+  },
+  {
+    "id": "m-volume-q3",
+    "unit": "m-volume",
+    "level": 2,
+    "form": "m-volume-f3",
+    "prompt": "A cuboid tank with a horizontal base area of 200 cm² holds 1,000 cm³ of water. Find the water depth.",
+    "choices": [
+      "5 cm",
+      "20 cm",
+      "200,000 cm"
+    ],
+    "answer": 0,
+    "why": "For a cuboid, water volume = base area × water depth. Divide 1,000 cm³ by 200 cm² to obtain a depth of 5 cm."
+  },
+  {
+    "id": "m-volume-q4",
+    "unit": "m-volume",
+    "level": 2,
+    "form": "m-volume-f4",
+    "prompt": "A cube has volume 64 cm³. Find its edge length.",
+    "choices": [
+      "4 cm",
+      "8 cm",
+      "64/3 cm"
+    ],
+    "answer": 0,
+    "why": "A cube has three equal dimensions. An edge of 4 cm gives 4 × 4 × 4 = 64 cm³, matching the stated volume."
+  },
+  {
+    "id": "m-volume-q5",
+    "unit": "m-volume",
+    "level": 3,
+    "form": "m-volume-f5",
+    "prompt": "900 ml of water is poured without loss into an empty cuboid tank with a horizontal base area of 150 cm². Find the water depth.",
+    "choices": [
+      "6 cm",
+      "0.006 cm",
+      "135 cm"
+    ],
+    "answer": 0,
+    "why": "900 ml = 900 cm³; divide by 150."
+  },
+  {
+    "id": "m-volume-q6",
+    "unit": "m-volume",
+    "level": 3,
+    "form": "m-volume-f6",
+    "prompt": "A cuboid has volume 180 cm³ and height 9 cm. What can be determined uniquely?",
+    "choices": [
+      "Its length",
+      "Its breadth",
+      "Its base area"
+    ],
+    "answer": 2,
+    "why": "The base area is 20 cm², but several length–breadth pairs fit."
+  },
+  {
+    "id": "m-data-q1",
+    "unit": "m-data",
+    "level": 1,
+    "form": "m-data-f1",
+    "prompt": "The average of 4, 6 and 8 is…",
+    "choices": [
+      "6",
+      "18",
+      "3"
+    ],
+    "answer": 0,
+    "why": "Their total 18 is shared across three values."
+  },
+  {
+    "id": "m-data-q2",
+    "unit": "m-data",
+    "level": 1,
+    "form": "m-data-f2",
+    "prompt": "A graph scale has 10 objects per interval. Three intervals represent…",
+    "choices": [
+      "3",
+      "13",
+      "30"
+    ],
+    "answer": 2,
+    "why": "Multiply the number of intervals by the scale."
+  },
+  {
+    "id": "m-data-q3",
+    "unit": "m-data",
+    "level": 2,
+    "form": "m-data-f3",
+    "prompt": "Five numbers average 12. Their total is…",
+    "choices": [
+      "17",
+      "60",
+      "2.4"
+    ],
+    "answer": 1,
+    "why": "Average = total ÷ number of values. Undo the division: total = 12 × 5 = 60."
+  },
+  {
+    "id": "m-data-q4",
+    "unit": "m-data",
+    "level": 2,
+    "form": "m-data-f4",
+    "prompt": "Three scores average 14. Two are 10 and 15. Find the third.",
+    "choices": [
+      "17",
+      "14",
+      "3"
+    ],
+    "answer": 0,
+    "why": "The total is 42; remove 25."
+  },
+  {
+    "id": "m-data-q5",
+    "unit": "m-data",
+    "level": 3,
+    "form": "m-data-f5",
+    "prompt": "Two groups have 2 pupils averaging 8 and 4 pupils averaging 14. Find the combined average.",
+    "choices": [
+      "11",
+      "12",
+      "22"
+    ],
+    "answer": 1,
+    "why": "Total = 16 + 56 = 72 across six pupils, giving 12."
+  },
+  {
+    "id": "m-data-q6",
+    "unit": "m-data",
+    "level": 3,
+    "form": "m-data-f6",
+    "prompt": "A survey of ten friends finds eight prefer cats. Which conclusion is supported directly?",
+    "choices": [
+      "80% of all children prefer cats",
+      "Eight of the ten surveyed friends prefer cats",
+      "Cats are objectively better pets"
+    ],
+    "answer": 1,
+    "why": "The data directly describes this sample, not every child."
+  },
+  {
+    "id": "m-modelling-q1",
+    "unit": "m-modelling",
+    "level": 1,
+    "form": "m-modelling-f1",
+    "prompt": "Two amounts have total 30 and difference 8. Which calculation finds two copies of the smaller amount?",
+    "choices": [
+      "30 + 8",
+      "30 − 8",
+      "30 × 8"
+    ],
+    "answer": 1,
+    "why": "Removing the excess leaves two equal smaller amounts."
+  },
+  {
+    "id": "m-modelling-q2",
+    "unit": "m-modelling",
+    "level": 1,
+    "form": "m-modelling-f2",
+    "prompt": "To undo “multiply by 4, then add 3”, first…",
+    "choices": [
+      "Divide by 4",
+      "Subtract 3",
+      "Add 3"
+    ],
+    "answer": 1,
+    "why": "Undo the last transformation first."
+  },
+  {
+    "id": "m-modelling-q3",
+    "unit": "m-modelling",
+    "level": 2,
+    "form": "m-modelling-f3",
+    "prompt": "Two numbers total 50 and differ by 12. Find the smaller.",
+    "choices": [
+      "19",
+      "31",
+      "38"
+    ],
+    "answer": 0,
+    "why": "Remove the extra 12 from the total to leave two equal copies of the smaller number. (50 − 12) ÷ 2 = 19; the larger is 31."
+  },
+  {
+    "id": "m-modelling-q4",
+    "unit": "m-modelling",
+    "level": 2,
+    "form": "m-modelling-f4",
+    "prompt": "A number is doubled then reduced by 5 to give 17. Find it.",
+    "choices": [
+      "6",
+      "11",
+      "24"
+    ],
+    "answer": 1,
+    "why": "Add back five to get 22, then halve."
+  },
+  {
+    "id": "m-modelling-q5",
+    "unit": "m-modelling",
+    "level": 3,
+    "form": "m-modelling-f5",
+    "prompt": "Ten tickets cost $38. Child tickets are $3 and adult tickets $5. How many adult tickets?",
+    "choices": [
+      "4",
+      "6",
+      "8"
+    ],
+    "answer": 0,
+    "why": "All-child cost is 30; each adult replacement adds two, so four are needed."
+  },
+  {
+    "id": "m-modelling-q6",
+    "unit": "m-modelling",
+    "level": 3,
+    "form": "m-modelling-f6",
+    "prompt": "A proposed pair satisfies a stated total but not the stated difference. Is it a solution?",
+    "choices": [
+      "Yes, one condition is enough",
+      "No, every condition must hold",
+      "Only if the arithmetic is neat"
+    ],
+    "answer": 1,
+    "why": "A solution must satisfy the complete problem, not a selected condition."
+  },
+  {
+    "id": "m-proof-q1",
+    "unit": "m-proof",
+    "level": 1,
+    "form": "m-proof-f1",
+    "prompt": "Which would disprove “all multiples of 3 are odd”?",
+    "choices": [
+      "9",
+      "12",
+      "15"
+    ],
+    "answer": 1,
+    "why": "12 is a multiple of three but is even."
+  },
+  {
+    "id": "m-proof-q2",
+    "unit": "m-proof",
+    "level": 1,
+    "form": "m-proof-f2",
+    "prompt": "Four hats and three scarves allow how many unrestricted hat–scarf pairs?",
+    "choices": [
+      "7",
+      "12",
+      "24"
+    ],
+    "answer": 1,
+    "why": "Each of four hats pairs with each of three scarves."
+  },
+  {
+    "id": "m-proof-q3",
+    "unit": "m-proof",
+    "level": 2,
+    "form": "m-proof-f3",
+    "prompt": "Adding 2 repeatedly to an odd number always leaves…",
+    "choices": [
+      "An odd number",
+      "An even number",
+      "A prime number"
+    ],
+    "answer": 0,
+    "why": "Adding an even quantity preserves parity."
+  },
+  {
+    "id": "m-proof-q4",
+    "unit": "m-proof",
+    "level": 2,
+    "form": "m-proof-f4",
+    "prompt": "With two possible colours and enough counters, how many blind draws guarantee a same-colour pair?",
+    "choices": [
+      "2",
+      "3",
+      "4"
+    ],
+    "answer": 1,
+    "why": "Two can differ; the third must match one of the first two."
+  },
+  {
+    "id": "m-proof-q5",
+    "unit": "m-proof",
+    "level": 3,
+    "form": "m-proof-f5",
+    "prompt": "A rectangle has area 18 and positive whole-number sides. Which has the smallest perimeter?",
+    "choices": [
+      "1 by 18",
+      "2 by 9",
+      "3 by 6"
+    ],
+    "answer": 2,
+    "why": "These are all factor pairs; their perimeters are 38, 22 and 18."
+  },
+  {
+    "id": "m-proof-q6",
+    "unit": "m-proof",
+    "level": 3,
+    "form": "m-proof-f6",
+    "prompt": "A pattern works for the first 20 cases. Which conclusion is justified?",
+    "choices": [
+      "It must work forever",
+      "It is a conjecture needing a general argument",
+      "It is false"
+    ],
+    "answer": 1,
+    "why": "Finite agreement supports exploration but does not by itself prove a universal claim."
+  },
+  {
+    "id": "s-inquiry-q1",
+    "unit": "s-inquiry",
+    "level": 1,
+    "form": "s-inquiry-f1",
+    "prompt": "Which statement is an observation?",
+    "choices": [
+      "The seedling is 12 cm tall.",
+      "The seedling needs more minerals.",
+      "The seedling grew because of music."
+    ],
+    "answer": 0,
+    "why": "Height is directly measurable. The other statements are explanations that require evidence."
+  },
+  {
+    "id": "s-inquiry-q2",
+    "unit": "s-inquiry",
+    "level": 1,
+    "form": "s-inquiry-f2",
+    "prompt": "A test changes exposed water surface area. Which outcome is useful?",
+    "choices": [
+      "Container colour only",
+      "Water lost after the same duration",
+      "The name of the room"
+    ],
+    "answer": 1,
+    "why": "Water lost over a fixed time provides evidence about evaporation."
+  },
+  {
+    "id": "s-inquiry-q3",
+    "unit": "s-inquiry",
+    "level": 2,
+    "form": "s-inquiry-f3",
+    "prompt": "Plants A and B receive different light and different water. What can their growth establish?",
+    "choices": [
+      "Light alone caused the difference.",
+      "Water alone caused the difference.",
+      "The test cannot isolate the effect of light."
+    ],
+    "answer": 2,
+    "why": "Both conditions changed, so either or both may account for a difference."
+  },
+  {
+    "id": "s-inquiry-q4",
+    "unit": "s-inquiry",
+    "level": 2,
+    "form": "s-inquiry-f4",
+    "prompt": "A seedling starts at 8 cm and finishes at 14 cm. Another starts at 12 cm and finishes at 16 cm. Which grew more in height?",
+    "choices": [
+      "The first: 6 cm compared with 4 cm",
+      "The second because 16 is larger",
+      "Both grew equally"
+    ],
+    "answer": 0,
+    "why": "Compare changes from the starting values, not final heights alone."
+  },
+  {
+    "id": "s-inquiry-q5",
+    "unit": "s-inquiry",
+    "level": 3,
+    "form": "s-inquiry-f5",
+    "prompt": "An unfair test is repeated ten times with both light and water changed. What improves?",
+    "choices": [
+      "It now isolates light.",
+      "It may show consistency, but still cannot isolate light.",
+      "It proves every plant behaves the same way."
+    ],
+    "answer": 1,
+    "why": "Repetition can reveal consistency but cannot remove a confounding variable."
+  },
+  {
+    "id": "s-inquiry-q6",
+    "unit": "s-inquiry",
+    "level": 3,
+    "form": "s-inquiry-f6",
+    "prompt": "A lamp group grows differently and is also warmer. What is the best next step?",
+    "choices": [
+      "Ignore temperature.",
+      "Conclude light is the only cause.",
+      "Compare groups while controlling temperature."
+    ],
+    "answer": 2,
+    "why": "Control the additional factor so the effect of light can be investigated more fairly."
+  },
+  {
+    "id": "s-diversity-q1",
+    "unit": "s-diversity",
+    "level": 1,
+    "form": "s-diversity-f1",
+    "prompt": "Which feature is strongest evidence that an animal is a bird?",
+    "choices": [
+      "It flies.",
+      "It has feathers.",
+      "It lays eggs."
+    ],
+    "answer": 1,
+    "why": "Feathers distinguish birds. Flying and egg-laying also occur in other groups."
+  },
+  {
+    "id": "s-diversity-q2",
+    "unit": "s-diversity",
+    "level": 1,
+    "form": "s-diversity-f2",
+    "prompt": "An adult insect has how many legs?",
+    "choices": [
+      "Four",
+      "Six",
+      "Eight"
+    ],
+    "answer": 1,
+    "why": "An adult insect has six legs. A spider has eight and is not an insect."
+  },
+  {
+    "id": "s-diversity-q3",
+    "unit": "s-diversity",
+    "level": 2,
+    "form": "s-diversity-f3",
+    "prompt": "Why is “moves by itself” an inadequate rule for living things?",
+    "choices": [
+      "Plants can never respond.",
+      "Movement proves reproduction.",
+      "Machines can move, and some living things show little visible movement."
+    ],
+    "answer": 2,
+    "why": "A combination of characteristics is needed."
+  },
+  {
+    "id": "s-diversity-q4",
+    "unit": "s-diversity",
+    "level": 2,
+    "form": "s-diversity-f4",
+    "prompt": "A fern has no flowers and reproduces by spores. Which group fits?",
+    "choices": [
+      "Non-flowering plant",
+      "Flowering plant",
+      "Mammal"
+    ],
+    "answer": 0,
+    "why": "Ferns are non-flowering plants. This does not mean every non-flowering plant uses spores."
+  },
+  {
+    "id": "s-diversity-q5",
+    "unit": "s-diversity",
+    "level": 3,
+    "form": "s-diversity-f5",
+    "prompt": "A photograph shows a plant with no flowers. What is justified?",
+    "choices": [
+      "It must be non-flowering.",
+      "It must be dead.",
+      "More life-cycle information is needed to classify it this way."
+    ],
+    "answer": 2,
+    "why": "A flowering plant may have no flowers at the time of the photograph."
+  },
+  {
+    "id": "s-diversity-q6",
+    "unit": "s-diversity",
+    "level": 3,
+    "form": "s-diversity-f6",
+    "prompt": "A key uses “lives in water” to classify all fish. A whale exposes which flaw?",
+    "choices": [
+      "Habitat alone does not distinguish the animal group.",
+      "Whales must be fish.",
+      "Fish cannot live in water."
+    ],
+    "answer": 0,
+    "why": "Animals from several groups live in water, so this feature alone is insufficient."
+  },
+  {
+    "id": "s-materials-q1",
+    "unit": "s-materials",
+    "level": 1,
+    "form": "s-materials-f1",
+    "prompt": "Which is a material rather than an object?",
+    "choices": [
+      "Spoon",
+      "Chair",
+      "Wood"
+    ],
+    "answer": 2,
+    "why": "Wood is a material. Spoons and chairs are objects that can be made from different materials."
+  },
+  {
+    "id": "s-materials-q2",
+    "unit": "s-materials",
+    "level": 1,
+    "form": "s-materials-f2",
+    "prompt": "Which property is most relevant to a raincoat outer layer?",
+    "choices": [
+      "Waterproofness",
+      "Absorbing as much water as possible",
+      "Dissolving quickly"
+    ],
+    "answer": 0,
+    "why": "The layer should prevent rain passing through under normal use."
+  },
+  {
+    "id": "s-materials-q3",
+    "unit": "s-materials",
+    "level": 2,
+    "form": "s-materials-f3",
+    "prompt": "Why compare equal-sized strips in a bending test?",
+    "choices": [
+      "Colour then becomes identical.",
+      "Dimensions can affect bending as well as material.",
+      "Every material must bend equally."
+    ],
+    "answer": 1,
+    "why": "Controlling dimensions makes the material comparison fairer."
+  },
+  {
+    "id": "s-materials-q4",
+    "unit": "s-materials",
+    "level": 2,
+    "form": "s-materials-f4",
+    "prompt": "A towel takes up spilled water. Which property is useful?",
+    "choices": [
+      "Water absorption",
+      "Blocking all light",
+      "Being magnetic"
+    ],
+    "answer": 0,
+    "why": "An absorbent material takes water in."
+  },
+  {
+    "id": "s-materials-q5",
+    "unit": "s-materials",
+    "level": 3,
+    "form": "s-materials-f5",
+    "prompt": "A metal boat floats but a solid metal piece sinks. What should change?",
+    "choices": [
+      "Conclude the boat is not metal.",
+      "Conclude all metal floats.",
+      "Reject the rule that every metal object sinks."
+    ],
+    "answer": 2,
+    "why": "The object’s form matters; one rule based only on material is insufficient."
+  },
+  {
+    "id": "s-materials-q6",
+    "unit": "s-materials",
+    "level": 3,
+    "form": "s-materials-f6",
+    "prompt": "Two samples stop drops for one minute. Which conclusion is supported?",
+    "choices": [
+      "They will stop water forever.",
+      "Both prevented passage in this test; longer exposure is untested.",
+      "They have equal strength."
+    ],
+    "answer": 1,
+    "why": "The evidence concerns the tested duration and conditions, not all properties or all durations."
+  },
+  {
+    "id": "s-life-cycles-q1",
+    "unit": "s-life-cycles",
+    "level": 1,
+    "form": "s-life-cycles-f1",
+    "prompt": "Which is the correct butterfly sequence?",
+    "choices": [
+      "Egg → larva → pupa → adult",
+      "Egg → pupa → larva → adult",
+      "Adult → larva → egg → pupa"
+    ],
+    "answer": 0,
+    "why": "A butterfly develops through egg, larva, pupa and adult stages."
+  },
+  {
+    "id": "s-life-cycles-q2",
+    "unit": "s-life-cycles",
+    "level": 1,
+    "form": "s-life-cycles-f2",
+    "prompt": "A grasshopper’s young stage is called a…",
+    "choices": [
+      "Pupa",
+      "Nymph",
+      "Seedling"
+    ],
+    "answer": 1,
+    "why": "The three-stage grasshopper cycle is egg, nymph and adult."
+  },
+  {
+    "id": "s-life-cycles-q3",
+    "unit": "s-life-cycles",
+    "level": 2,
+    "form": "s-life-cycles-f3",
+    "prompt": "Does little visible movement mean a butterfly pupa is non-living?",
+    "choices": [
+      "Yes, movement alone defines life.",
+      "Yes, it is only a shell.",
+      "No, development continues in a living stage."
+    ],
+    "answer": 2,
+    "why": "Visible movement is not a sufficient test for life."
+  },
+  {
+    "id": "s-life-cycles-q4",
+    "unit": "s-life-cycles",
+    "level": 2,
+    "form": "s-life-cycles-f4",
+    "prompt": "Which statement distinguishes germination from reproduction?",
+    "choices": [
+      "Germination begins growth of an already formed seed.",
+      "Germination creates the first egg cell.",
+      "Both mean exactly the same process."
+    ],
+    "answer": 0,
+    "why": "A seed forms before it germinates; these are different stages and processes."
+  },
+  {
+    "id": "s-life-cycles-q5",
+    "unit": "s-life-cycles",
+    "level": 3,
+    "form": "s-life-cycles-f5",
+    "prompt": "A frog and a grasshopper each have a simplified three-stage cycle. What follows?",
+    "choices": [
+      "They belong to the same animal group.",
+      "Equal stage counts do not establish the same animal group.",
+      "Both have a pupal stage."
+    ],
+    "answer": 1,
+    "why": "Classification depends on organism characteristics, not the number of stages chosen in a diagram."
+  },
+  {
+    "id": "s-life-cycles-q6",
+    "unit": "s-life-cycles",
+    "level": 3,
+    "form": "s-life-cycles-f6",
+    "prompt": "One seed fails to germinate. What is the best conclusion?",
+    "choices": [
+      "That species never germinates.",
+      "Water always prevents germination.",
+      "Check viability and conditions before making a broad claim."
+    ],
+    "answer": 2,
+    "why": "A single failed seed does not isolate the cause or establish a species-wide rule."
+  },
+  {
+    "id": "s-magnets-q1",
+    "unit": "s-magnets",
+    "level": 1,
+    "form": "s-magnets-f1",
+    "prompt": "Two north poles brought together will…",
+    "choices": [
+      "Repel",
+      "Attract",
+      "Always melt"
+    ],
+    "answer": 0,
+    "why": "Like magnetic poles repel."
+  },
+  {
+    "id": "s-magnets-q2",
+    "unit": "s-magnets",
+    "level": 1,
+    "form": "s-magnets-f2",
+    "prompt": "Which statement is correct?",
+    "choices": [
+      "All metals are strongly attracted to a classroom magnet.",
+      "Iron is a familiar magnetic material.",
+      "Only plastic is magnetic."
+    ],
+    "answer": 1,
+    "why": "Iron is magnetic; being a metal alone does not guarantee this behaviour."
+  },
+  {
+    "id": "s-magnets-q3",
+    "unit": "s-magnets",
+    "level": 2,
+    "form": "s-magnets-f3",
+    "prompt": "An unknown bar repels a known north pole. What does the tested end behave as?",
+    "choices": [
+      "A south pole",
+      "An unmagnetised wooden end",
+      "A north pole"
+    ],
+    "answer": 2,
+    "why": "Repulsion occurs between like poles, so the tested end behaves as north."
+  },
+  {
+    "id": "s-magnets-q4",
+    "unit": "s-magnets",
+    "level": 2,
+    "form": "s-magnets-f4",
+    "prompt": "An object is attracted to both poles of a magnet. What is established?",
+    "choices": [
+      "It must be a permanent magnet.",
+      "Attraction alone does not prove it is a permanent magnet.",
+      "It has no interaction with magnets."
+    ],
+    "answer": 1,
+    "why": "A magnetic material such as iron can be attracted to either pole."
+  },
+  {
+    "id": "s-magnets-q5",
+    "unit": "s-magnets",
+    "level": 3,
+    "form": "s-magnets-f5",
+    "prompt": "A test changes both magnet type and gap. Why is the result limited?",
+    "choices": [
+      "The separate effect of gap cannot be isolated.",
+      "Gaps never affect magnetic effects.",
+      "Repeating once removes all confounding."
+    ],
+    "answer": 0,
+    "why": "Changing two relevant factors prevents attributing the result to gap alone."
+  },
+  {
+    "id": "s-magnets-q6",
+    "unit": "s-magnets",
+    "level": 3,
+    "form": "s-magnets-f6",
+    "prompt": "Why can a controlled electromagnet release an iron object when switched off?",
+    "choices": [
+      "The object stops being matter.",
+      "Its mass disappears.",
+      "The current producing the magnetic effect stops."
+    ],
+    "answer": 2,
+    "why": "The magnetic effect of the electromagnet depends on the current in its coil."
+  },
+  {
+    "id": "s-matter-q1",
+    "unit": "s-matter",
+    "level": 1,
+    "form": "s-matter-f1",
+    "prompt": "Which is matter?",
+    "choices": [
+      "Air",
+      "Light alone",
+      "Sound alone"
+    ],
+    "answer": 0,
+    "why": "Air has mass and occupies space."
+  },
+  {
+    "id": "s-matter-q2",
+    "unit": "s-matter",
+    "level": 1,
+    "form": "s-matter-f2",
+    "prompt": "A liquid has…",
+    "choices": [
+      "A fixed shape in every container",
+      "A definite volume but no definite shape",
+      "Neither mass nor volume"
+    ],
+    "answer": 1,
+    "why": "A liquid takes the shape of the occupied part of its container while retaining its volume under the stated conditions."
+  },
+  {
+    "id": "s-matter-q3",
+    "unit": "s-matter",
+    "level": 2,
+    "form": "s-matter-f3",
+    "prompt": "The same water is poured without loss into a narrower vessel. What must remain the same?",
+    "choices": [
+      "The water level",
+      "The container shape",
+      "The volume of water"
+    ],
+    "answer": 2,
+    "why": "A different vessel can change water level without changing the amount of water."
+  },
+  {
+    "id": "s-matter-q4",
+    "unit": "s-matter",
+    "level": 2,
+    "form": "s-matter-f4",
+    "prompt": "Why can trapped air keep tissue dry inside an inverted cup?",
+    "choices": [
+      "Air occupies space and prevents water filling that region.",
+      "Air has no volume.",
+      "Water becomes a solid."
+    ],
+    "answer": 0,
+    "why": "The trapped air occupies the space into which water would otherwise move."
+  },
+  {
+    "id": "s-matter-q5",
+    "unit": "s-matter",
+    "level": 3,
+    "form": "s-matter-f5",
+    "prompt": "A pile of sand changes shape when poured. Which explanation is best?",
+    "choices": [
+      "Each grain becomes a gas.",
+      "Individual grains remain solids even though the pile rearranges.",
+      "Anything that can be poured must be liquid."
+    ],
+    "answer": 1,
+    "why": "The collection can rearrange while its individual grains retain solid properties."
+  },
+  {
+    "id": "s-matter-q6",
+    "unit": "s-matter",
+    "level": 3,
+    "form": "s-matter-f6",
+    "prompt": "Which observation establishes a change of state?",
+    "choices": [
+      "A wire bends.",
+      "A solid ice cube becomes liquid water.",
+      "A can is crushed."
+    ],
+    "answer": 1,
+    "why": "Melting changes the state from solid to liquid. Bending and crushing change shape."
+  },
+  {
+    "id": "s-heat-q1",
+    "unit": "s-heat",
+    "level": 1,
+    "form": "s-heat-f1",
+    "prompt": "Heat transfers naturally from…",
+    "choices": [
+      "Lower to higher temperature only",
+      "Higher to lower temperature",
+      "Every object to colder space regardless of temperature"
+    ],
+    "answer": 1,
+    "why": "Net heat transfer due to a temperature difference is from higher to lower temperature."
+  },
+  {
+    "id": "s-heat-q2",
+    "unit": "s-heat",
+    "level": 1,
+    "form": "s-heat-f2",
+    "prompt": "Which instrument measures temperature?",
+    "choices": [
+      "Thermometer",
+      "Ruler",
+      "Compass"
+    ],
+    "answer": 0,
+    "why": "A thermometer measures temperature."
+  },
+  {
+    "id": "s-heat-q3",
+    "unit": "s-heat",
+    "level": 2,
+    "form": "s-heat-f3",
+    "prompt": "Why does an insulated bottle slow the warming of a cold drink?",
+    "choices": [
+      "It produces cold continuously.",
+      "It adds ice automatically.",
+      "It slows heat gain from warmer surroundings."
+    ],
+    "answer": 2,
+    "why": "Insulation slows heat transfer into the colder drink."
+  },
+  {
+    "id": "s-heat-q4",
+    "unit": "s-heat",
+    "level": 2,
+    "form": "s-heat-f4",
+    "prompt": "A metal spoon handle warms faster than a similar plastic one in warm water. Which idea explains this?",
+    "choices": [
+      "Metal generally conducts heat more readily.",
+      "Plastic has no matter.",
+      "The metal creates heat from nothing."
+    ],
+    "answer": 0,
+    "why": "Under comparable conditions, metal generally transfers heat along the handle more readily."
+  },
+  {
+    "id": "s-heat-q5",
+    "unit": "s-heat",
+    "level": 3,
+    "form": "s-heat-f5",
+    "prompt": "A drink cools toward a 25°C room. Can the same simple trend justify predicting −10°C?",
+    "choices": [
+      "Yes, always extend the line.",
+      "No, the physical heat-transfer conditions constrain extrapolation.",
+      "Yes, because all drinks freeze eventually."
+    ],
+    "answer": 1,
+    "why": "Without a colder source or other process, that cooling model approaches the surrounding temperature."
+  },
+  {
+    "id": "s-heat-q6",
+    "unit": "s-heat",
+    "level": 3,
+    "form": "s-heat-f6",
+    "prompt": "Two objects at equal temperature feel different to touch. What is a reasonable explanation?",
+    "choices": [
+      "Touch measures temperature perfectly.",
+      "Their temperatures must differ.",
+      "Their rates of heat transfer to or from the hand can differ."
+    ],
+    "answer": 2,
+    "why": "Touch depends on heat transfer as well as the objects’ temperatures."
+  },
+  {
+    "id": "s-water-q1",
+    "unit": "s-water",
+    "level": 1,
+    "form": "s-water-f1",
+    "prompt": "Melting changes…",
+    "choices": [
+      "Ice into liquid water as it gains heat",
+      "Water vapour into ice only",
+      "Liquid water into a different substance"
+    ],
+    "answer": 0,
+    "why": "Melting changes the state of water from solid to liquid; it remains water."
+  },
+  {
+    "id": "s-water-q2",
+    "unit": "s-water",
+    "level": 1,
+    "form": "s-water-f2",
+    "prompt": "Condensation changes water vapour into liquid water when it…",
+    "choices": [
+      "Gains mass from nowhere",
+      "Loses heat",
+      "Becomes invisible for the first time"
+    ],
+    "answer": 1,
+    "why": "Water vapour condenses to liquid as it loses heat under suitable conditions."
+  },
+  {
+    "id": "s-water-q3",
+    "unit": "s-water",
+    "level": 2,
+    "form": "s-water-f3",
+    "prompt": "Why can a spread-out wet cloth dry faster than the same folded cloth?",
+    "choices": [
+      "It creates extra water.",
+      "Folding always raises its temperature.",
+      "More wet surface is exposed for evaporation."
+    ],
+    "answer": 2,
+    "why": "With other conditions comparable, larger exposed surface area increases evaporation rate."
+  },
+  {
+    "id": "s-water-q4",
+    "unit": "s-water",
+    "level": 2,
+    "form": "s-water-f4",
+    "prompt": "Droplets form outside a sealed cold bottle. A likely source is…",
+    "choices": [
+      "Water vapour in surrounding air",
+      "Liquid passing through intact glass",
+      "The bottle turning into water"
+    ],
+    "answer": 0,
+    "why": "Water vapour in air can lose heat near the cold surface and condense."
+  },
+  {
+    "id": "s-water-q5",
+    "unit": "s-water",
+    "level": 3,
+    "form": "s-water-f5",
+    "prompt": "Water evaporates at 30°C. Does this contradict a normal boiling point of 100°C?",
+    "choices": [
+      "Yes, evaporation requires boiling.",
+      "No, evaporation can occur below the boiling point.",
+      "Yes, the water must be another substance."
+    ],
+    "answer": 1,
+    "why": "Evaporation and boiling are different processes; surface evaporation occurs below the boiling point."
+  },
+  {
+    "id": "s-water-q6",
+    "unit": "s-water",
+    "level": 3,
+    "form": "s-water-f6",
+    "prompt": "A sunny drying spot is also windier. What can a faster drying result establish?",
+    "choices": [
+      "Temperature alone caused it.",
+      "Wind alone caused it.",
+      "The combined conditions helped, but the separate effects are not isolated."
+    ],
+    "answer": 2,
+    "why": "Both temperature and air movement can affect evaporation, so this comparison cannot isolate one."
+  },
+  {
+    "id": "s-light-q1",
+    "unit": "s-light",
+    "level": 1,
+    "form": "s-light-f1",
+    "prompt": "Why can you see a book under a lamp?",
+    "choices": [
+      "Your eyes send visible light to it.",
+      "Light reflected from the book enters your eyes.",
+      "The book always produces its own light."
+    ],
+    "answer": 1,
+    "why": "Light from the lamp reflects from the book into the eyes."
+  },
+  {
+    "id": "s-light-q2",
+    "unit": "s-light",
+    "level": 1,
+    "form": "s-light-f2",
+    "prompt": "A shadow forms when an object…",
+    "choices": [
+      "Blocks light reaching a surface",
+      "Creates darkness as a substance",
+      "Turns light into water"
+    ],
+    "answer": 0,
+    "why": "A shadow is a region receiving less light because paths are blocked."
+  },
+  {
+    "id": "s-light-q3",
+    "unit": "s-light",
+    "level": 2,
+    "form": "s-light-f3",
+    "prompt": "Which sequence explains seeing a non-luminous object?",
+    "choices": [
+      "Eye → object → lamp",
+      "Object → lamp → eye",
+      "Source → object → eye"
+    ],
+    "answer": 2,
+    "why": "Light travels from the source, reflects from the object and enters the eye."
+  },
+  {
+    "id": "s-light-q4",
+    "unit": "s-light",
+    "level": 2,
+    "form": "s-light-f4",
+    "prompt": "With a small source and screen fixed, moving an opaque card nearer the source generally makes its shadow…",
+    "choices": [
+      "Larger",
+      "Smaller in every setup",
+      "Disappear because light curves around it"
+    ],
+    "answer": 0,
+    "why": "The card blocks a wider bundle of straight paths reaching the screen."
+  },
+  {
+    "id": "s-light-q5",
+    "unit": "s-light",
+    "level": 3,
+    "form": "s-light-f5",
+    "prompt": "A shadow experiment changes both card size and card position. What is the limitation?",
+    "choices": [
+      "It proves position has no effect.",
+      "It cannot isolate the effect of position.",
+      "It proves every card is transparent."
+    ],
+    "answer": 1,
+    "why": "Both size and position can affect shadow size."
+  },
+  {
+    "id": "s-light-q6",
+    "unit": "s-light",
+    "level": 3,
+    "form": "s-light-f6",
+    "prompt": "A shadow has blurred edges with a broad lamp. What should the investigator do?",
+    "choices": [
+      "Invent a sharp measurement.",
+      "Discard all light-path reasoning.",
+      "Record the edge uncertainty and use a consistent measuring rule."
+    ],
+    "answer": 2,
+    "why": "A broad source can produce partial shadows; the measurement limitation should be acknowledged."
+  },
+  {
+    "id": "s-plant-parts-q1",
+    "unit": "s-plant-parts",
+    "level": 1,
+    "form": "s-plant-parts-f1",
+    "prompt": "Which part commonly anchors a plant and absorbs water?",
+    "choices": [
+      "Roots",
+      "Petals only",
+      "Fruit skin only"
+    ],
+    "answer": 0,
+    "why": "Roots commonly anchor the plant and absorb water and mineral salts."
+  },
+  {
+    "id": "s-plant-parts-q2",
+    "unit": "s-plant-parts",
+    "level": 1,
+    "form": "s-plant-parts-f2",
+    "prompt": "Which statement about plant food is correct?",
+    "choices": [
+      "Soil is the food plants eat.",
+      "Green plants make food using light energy, water and carbon dioxide.",
+      "Mineral salts are identical to sugar."
+    ],
+    "answer": 1,
+    "why": "Mineral uptake and food-making are different processes."
+  },
+  {
+    "id": "s-plant-parts-q3",
+    "unit": "s-plant-parts",
+    "level": 2,
+    "form": "s-plant-parts-f3",
+    "prompt": "Why can stem damage affect leaves?",
+    "choices": [
+      "Leaves never need roots.",
+      "The stem only changes colour.",
+      "The stem supports transport between plant parts."
+    ],
+    "answer": 2,
+    "why": "Damage can interrupt transport as well as support."
+  },
+  {
+    "id": "s-plant-parts-q4",
+    "unit": "s-plant-parts",
+    "level": 2,
+    "form": "s-plant-parts-f4",
+    "prompt": "A fruit’s useful functions can include…",
+    "choices": [
+      "Protecting seeds and helping dispersal",
+      "Replacing every root",
+      "Absorbing all sunlight for the plant"
+    ],
+    "answer": 0,
+    "why": "Fruits protect seeds and can aid their dispersal."
+  },
+  {
+    "id": "s-plant-parts-q5",
+    "unit": "s-plant-parts",
+    "level": 3,
+    "form": "s-plant-parts-f5",
+    "prompt": "A wilted plant is observed. Which conclusion is justified immediately?",
+    "choices": [
+      "Its roots must be cut.",
+      "Water supply or other stresses may be involved; investigate the cause.",
+      "It is definitely a non-living object."
+    ],
+    "answer": 1,
+    "why": "Wilting is evidence of a problem but does not identify a unique cause."
+  },
+  {
+    "id": "s-plant-parts-q6",
+    "unit": "s-plant-parts",
+    "level": 3,
+    "form": "s-plant-parts-f6",
+    "prompt": "A plant has water and mineral salts but no light for a long period. Why can sustained growth fail?",
+    "choices": [
+      "Light supplies additional soil.",
+      "Water becomes non-matter.",
+      "It cannot maintain photosynthesis without a light source."
+    ],
+    "answer": 2,
+    "why": "Stored food is limited; continued food-making requires suitable light."
+  },
+  {
+    "id": "s-reproduction-q1",
+    "unit": "s-reproduction",
+    "level": 1,
+    "form": "s-reproduction-f1",
+    "prompt": "Pollination is the transfer of…",
+    "choices": [
+      "Pollen from anther to stigma",
+      "Seeds into soil",
+      "Water from root to leaf"
+    ],
+    "answer": 0,
+    "why": "Pollination transfers pollen; it is distinct from fertilisation and dispersal."
+  },
+  {
+    "id": "s-reproduction-q2",
+    "unit": "s-reproduction",
+    "level": 1,
+    "form": "s-reproduction-f2",
+    "prompt": "Where does a developing baby grow?",
+    "choices": [
+      "Stomach",
+      "Womb or uterus",
+      "Lung"
+    ],
+    "answer": 1,
+    "why": "The womb is part of the reproductive system; the stomach is digestive."
+  },
+  {
+    "id": "s-reproduction-q3",
+    "unit": "s-reproduction",
+    "level": 2,
+    "form": "s-reproduction-f3",
+    "prompt": "What is fertilisation?",
+    "choices": [
+      "Movement of a whole fruit",
+      "Evaporation from a leaf",
+      "Fusion of male and female reproductive cells"
+    ],
+    "answer": 2,
+    "why": "Fertilisation joins the reproductive cells and can begin development of a new organism."
+  },
+  {
+    "id": "s-reproduction-q4",
+    "unit": "s-reproduction",
+    "level": 2,
+    "form": "s-reproduction-f4",
+    "prompt": "A fruit has hooks that attach to fur. Which dispersal method fits?",
+    "choices": [
+      "By animals",
+      "Only by photosynthesis",
+      "Only by fertilisation"
+    ],
+    "answer": 0,
+    "why": "Hooks can attach to animals and carry the fruit or seeds elsewhere."
+  },
+  {
+    "id": "s-reproduction-q5",
+    "unit": "s-reproduction",
+    "level": 3,
+    "form": "s-reproduction-f5",
+    "prompt": "Why is pollination not the same as seed dispersal?",
+    "choices": [
+      "Both always move identical structures.",
+      "Pollination moves pollen before seeds form; dispersal moves formed seeds.",
+      "Dispersal happens before every flower exists."
+    ],
+    "answer": 1,
+    "why": "The processes move different structures at different stages."
+  },
+  {
+    "id": "s-reproduction-q6",
+    "unit": "s-reproduction",
+    "level": 3,
+    "form": "s-reproduction-f6",
+    "prompt": "Which statement about germination is most accurate?",
+    "choices": [
+      "Every seed needs bright light to begin germinating.",
+      "A seed can germinate without suitable conditions.",
+      "Water, oxygen and suitable temperature matter; light requirements vary."
+    ],
+    "answer": 2,
+    "why": "Avoid treating light as a universal requirement for the start of germination."
+  },
+  {
+    "id": "s-body-q1",
+    "unit": "s-body",
+    "level": 1,
+    "form": "s-body-f1",
+    "prompt": "Which organ carries food from mouth to stomach?",
+    "choices": [
+      "Gullet",
+      "Windpipe",
+      "Heart"
+    ],
+    "answer": 0,
+    "why": "The gullet carries swallowed food to the stomach."
+  },
+  {
+    "id": "s-body-q2",
+    "unit": "s-body",
+    "level": 1,
+    "form": "s-body-f2",
+    "prompt": "Where is much digested food absorbed into blood?",
+    "choices": [
+      "Lungs",
+      "Small intestine",
+      "Womb"
+    ],
+    "answer": 1,
+    "why": "The small intestine is a major site of digestion and absorption."
+  },
+  {
+    "id": "s-body-q3",
+    "unit": "s-body",
+    "level": 2,
+    "form": "s-body-f3",
+    "prompt": "Which is the correct order for food?",
+    "choices": [
+      "Mouth → stomach → gullet → small intestine",
+      "Mouth → lungs → stomach",
+      "Mouth → gullet → stomach → small intestine"
+    ],
+    "answer": 2,
+    "why": "Food passes from mouth through gullet to stomach and then small intestine."
+  },
+  {
+    "id": "s-body-q4",
+    "unit": "s-body",
+    "level": 2,
+    "form": "s-body-f4",
+    "prompt": "What is a main function of the large intestine?",
+    "choices": [
+      "Absorbing water from remaining contents",
+      "Pumping blood",
+      "Producing light energy"
+    ],
+    "answer": 0,
+    "why": "The large intestine absorbs water as remaining contents are processed."
+  },
+  {
+    "id": "s-body-q5",
+    "unit": "s-body",
+    "level": 3,
+    "form": "s-body-f5",
+    "prompt": "How do digestion and absorption differ?",
+    "choices": [
+      "They are identical words.",
+      "Digestion breaks food down; absorption moves suitable substances into blood.",
+      "Absorption means chewing only."
+    ],
+    "answer": 1,
+    "why": "Breakdown and movement into blood are different connected processes."
+  },
+  {
+    "id": "s-body-q6",
+    "unit": "s-body",
+    "level": 3,
+    "form": "s-body-f6",
+    "prompt": "Why can impaired absorption affect the body even when food intake is adequate?",
+    "choices": [
+      "Eating alone guarantees delivery to all cells.",
+      "The windpipe must digest the food instead.",
+      "Useful substances may not enter blood sufficiently for transport."
+    ],
+    "answer": 2,
+    "why": "Taking in food is not sufficient; digested substances must be absorbed and transported."
+  },
+  {
+    "id": "s-transport-q1",
+    "unit": "s-transport",
+    "level": 1,
+    "form": "s-transport-f1",
+    "prompt": "What does the heart do?",
+    "choices": [
+      "Pump blood",
+      "Produce all oxygen",
+      "Digest food"
+    ],
+    "answer": 0,
+    "why": "The heart pumps blood through blood vessels."
+  },
+  {
+    "id": "s-transport-q2",
+    "unit": "s-transport",
+    "level": 1,
+    "form": "s-transport-f2",
+    "prompt": "Which route carries inhaled air toward the lungs?",
+    "choices": [
+      "Gullet",
+      "Windpipe",
+      "Small intestine"
+    ],
+    "answer": 1,
+    "why": "The windpipe is part of the respiratory route."
+  },
+  {
+    "id": "s-transport-q3",
+    "unit": "s-transport",
+    "level": 2,
+    "form": "s-transport-f3",
+    "prompt": "Which statement about breathed-out air is correct?",
+    "choices": [
+      "It is pure carbon dioxide.",
+      "It contains no oxygen.",
+      "It remains a mixture and still contains oxygen."
+    ],
+    "answer": 2,
+    "why": "Gas proportions change, but breathed-out air is not pure carbon dioxide."
+  },
+  {
+    "id": "s-transport-q4",
+    "unit": "s-transport",
+    "level": 2,
+    "form": "s-transport-f4",
+    "prompt": "How can food made in leaves reach roots?",
+    "choices": [
+      "Through food-carrying tubes",
+      "Only by falling into soil",
+      "It cannot reach roots"
+    ],
+    "answer": 0,
+    "why": "Plants transport food to parts that need it, including roots."
+  },
+  {
+    "id": "s-transport-q5",
+    "unit": "s-transport",
+    "level": 3,
+    "form": "s-transport-f5",
+    "prompt": "Why do breathing and heartbeat commonly increase during exercise?",
+    "choices": [
+      "Muscles no longer need materials.",
+      "Increased energy demand requires faster supply and removal of materials.",
+      "The heart changes into a lung."
+    ],
+    "answer": 1,
+    "why": "The systems support the increased needs of working body parts."
+  },
+  {
+    "id": "s-transport-q6",
+    "unit": "s-transport",
+    "level": 3,
+    "form": "s-transport-f6",
+    "prompt": "Coloured water moves along a plant stem. What does this directly investigate?",
+    "choices": [
+      "Every food-transport pathway",
+      "The number of seeds produced",
+      "Water transport along the coloured paths"
+    ],
+    "answer": 2,
+    "why": "A substance entering with water provides evidence about water transport, not automatically all food transport."
+  },
+  {
+    "id": "s-electricity-q1",
+    "unit": "s-electricity",
+    "level": 1,
+    "form": "s-electricity-f1",
+    "prompt": "A bulb in a simple circuit needs…",
+    "choices": [
+      "One wire touching any part",
+      "A complete conducting path through its contacts",
+      "Only a nearby battery with no connection"
+    ],
+    "answer": 1,
+    "why": "A complete path through the bulb and source is required."
+  },
+  {
+    "id": "s-electricity-q2",
+    "unit": "s-electricity",
+    "level": 1,
+    "form": "s-electricity-f2",
+    "prompt": "Opening a switch in the only path will…",
+    "choices": [
+      "Break the path and stop the current in that circuit",
+      "Create extra energy",
+      "Make every insulator a conductor"
+    ],
+    "answer": 0,
+    "why": "An open switch breaks the complete conducting path."
+  },
+  {
+    "id": "s-electricity-q3",
+    "unit": "s-electricity",
+    "level": 2,
+    "form": "s-electricity-f3",
+    "prompt": "Two bulbs are in series. One bulb breaks the only path. What happens to the other?",
+    "choices": [
+      "It always becomes brighter.",
+      "It works independently of the path.",
+      "It goes off."
+    ],
+    "answer": 2,
+    "why": "Both bulbs share the single path, which is now incomplete."
+  },
+  {
+    "id": "s-electricity-q4",
+    "unit": "s-electricity",
+    "level": 2,
+    "form": "s-electricity-f4",
+    "prompt": "Two bulbs have separate parallel branches. Only one branch opens. The other branch remains complete. What can happen?",
+    "choices": [
+      "The other bulb stays lit.",
+      "Every bulb must go off regardless of paths.",
+      "The battery becomes an insulator."
+    ],
+    "answer": 0,
+    "why": "A separate complete branch can still carry current."
+  },
+  {
+    "id": "s-electricity-q5",
+    "unit": "s-electricity",
+    "level": 3,
+    "form": "s-electricity-f5",
+    "prompt": "Why is “current is used up by the first series bulb” misleading?",
+    "choices": [
+      "Bulbs cannot transfer energy.",
+      "Energy is transferred; current is not consumed this way along the series path.",
+      "Only the first bulb needs a complete path."
+    ],
+    "answer": 1,
+    "why": "Separate the flow of current from energy transfer in components."
+  },
+  {
+    "id": "s-electricity-q6",
+    "unit": "s-electricity",
+    "level": 3,
+    "form": "s-electricity-f6",
+    "prompt": "A circuit test changes battery count and bulb type together. What is the best conclusion?",
+    "choices": [
+      "Battery count alone explains any change.",
+      "Bulb type alone explains any change.",
+      "The test does not isolate either factor."
+    ],
+    "answer": 2,
+    "why": "Both supply and component properties can affect brightness."
+  },
+  {
+    "id": "s-photosynthesis-q1",
+    "unit": "s-photosynthesis",
+    "level": 1,
+    "form": "s-photosynthesis-f1",
+    "prompt": "Which materials are used to make food in photosynthesis?",
+    "choices": [
+      "Water and carbon dioxide",
+      "Oxygen and plastic",
+      "Soil alone"
+    ],
+    "answer": 0,
+    "why": "Plants use water and carbon dioxide with light energy to make food."
+  },
+  {
+    "id": "s-photosynthesis-q2",
+    "unit": "s-photosynthesis",
+    "level": 1,
+    "form": "s-photosynthesis-f2",
+    "prompt": "Which gas is released during photosynthesis?",
+    "choices": [
+      "Only nitrogen",
+      "Oxygen",
+      "Only smoke"
+    ],
+    "answer": 1,
+    "why": "Oxygen is released during photosynthesis."
+  },
+  {
+    "id": "s-photosynthesis-q3",
+    "unit": "s-photosynthesis",
+    "level": 2,
+    "form": "s-photosynthesis-f3",
+    "prompt": "Which statement about plant respiration is correct?",
+    "choices": [
+      "It occurs only at night.",
+      "It is identical to photosynthesis.",
+      "It occurs in living cells during day and night."
+    ],
+    "answer": 2,
+    "why": "Plants need to release energy from food at all times; photosynthesis additionally requires light."
+  },
+  {
+    "id": "s-photosynthesis-q4",
+    "unit": "s-photosynthesis",
+    "level": 2,
+    "form": "s-photosynthesis-f4",
+    "prompt": "Why does fertiliser not replace light?",
+    "choices": [
+      "Mineral supply and light energy serve different roles.",
+      "Fertiliser is always pure sugar.",
+      "Roots photosynthesise in all conditions."
+    ],
+    "answer": 0,
+    "why": "Mineral salts support growth but do not provide the light energy needed for photosynthesis."
+  },
+  {
+    "id": "s-photosynthesis-q5",
+    "unit": "s-photosynthesis",
+    "level": 3,
+    "form": "s-photosynthesis-f5",
+    "prompt": "A dark-grown seedling is taller but pale. What is justified?",
+    "choices": [
+      "Darkness definitely makes healthier plants.",
+      "Height alone does not establish health or sustained food-making.",
+      "Photosynthesis never needs light."
+    ],
+    "answer": 1,
+    "why": "A taller shoot is not sufficient evidence of better health or sustained photosynthesis."
+  },
+  {
+    "id": "s-photosynthesis-q6",
+    "unit": "s-photosynthesis",
+    "level": 3,
+    "form": "s-photosynthesis-f6",
+    "prompt": "A shade box changes light and temperature. How should a light investigation improve?",
+    "choices": [
+      "Ignore temperature because it is inconvenient.",
+      "Use different plant species too.",
+      "Control temperature and other relevant conditions while varying light."
+    ],
+    "answer": 2,
+    "why": "Additional changed factors prevent isolating the effect of light."
+  },
+  {
+    "id": "s-energy-q1",
+    "unit": "s-energy",
+    "level": 1,
+    "form": "s-energy-f1",
+    "prompt": "Which energy is associated with motion?",
+    "choices": [
+      "Kinetic energy",
+      "Only stored elastic energy",
+      "No energy"
+    ],
+    "answer": 0,
+    "why": "Kinetic energy is associated with motion."
+  },
+  {
+    "id": "s-energy-q2",
+    "unit": "s-energy",
+    "level": 1,
+    "form": "s-energy-f2",
+    "prompt": "A stretched spring stores…",
+    "choices": [
+      "Only light energy",
+      "Elastic potential energy",
+      "Only sound energy"
+    ],
+    "answer": 1,
+    "why": "A stretched spring stores elastic potential energy."
+  },
+  {
+    "id": "s-energy-q3",
+    "unit": "s-energy",
+    "level": 2,
+    "form": "s-energy-f3",
+    "prompt": "A battery torch commonly produces which outputs?",
+    "choices": [
+      "Light only, with no other transfer",
+      "Water and soil",
+      "Light and heat"
+    ],
+    "answer": 2,
+    "why": "Electrical energy is converted into light and heat in the torch."
+  },
+  {
+    "id": "s-energy-q4",
+    "unit": "s-energy",
+    "level": 2,
+    "form": "s-energy-f4",
+    "prompt": "A falling raised object can convert…",
+    "choices": [
+      "Gravitational potential energy into kinetic energy",
+      "Sound into soil only",
+      "All matter into nothing"
+    ],
+    "answer": 0,
+    "why": "As height decreases, gravitational potential energy can be converted into movement."
+  },
+  {
+    "id": "s-energy-q5",
+    "unit": "s-energy",
+    "level": 3,
+    "form": "s-energy-f5",
+    "prompt": "A toy stops moving. Which statement is best?",
+    "choices": [
+      "All energy has been destroyed.",
+      "Energy has been transferred, including to the surroundings.",
+      "The toy never had energy."
+    ],
+    "answer": 1,
+    "why": "Stopping motion does not mean energy vanishes."
+  },
+  {
+    "id": "s-energy-q6",
+    "unit": "s-energy",
+    "level": 3,
+    "form": "s-energy-f6",
+    "prompt": "Why do bulb-only and battery-plus-bulb energy chains start differently?",
+    "choices": [
+      "One must always be false.",
+      "Energy depends only on colour.",
+      "They describe systems with different boundaries."
+    ],
+    "answer": 2,
+    "why": "The larger system includes the battery’s stored energy; the bulb-only account starts with electrical input."
+  },
+  {
+    "id": "s-forces-q1",
+    "unit": "s-forces",
+    "level": 1,
+    "form": "s-forces-f1",
+    "prompt": "A force can change an object’s…",
+    "choices": [
+      "Speed, direction or shape",
+      "Name only",
+      "Past history"
+    ],
+    "answer": 0,
+    "why": "Forces can affect motion or shape."
+  },
+  {
+    "id": "s-forces-q2",
+    "unit": "s-forces",
+    "level": 1,
+    "form": "s-forces-f2",
+    "prompt": "Which is a non-contact interaction?",
+    "choices": [
+      "A hand pressing a book",
+      "Earth attracting a falling object",
+      "A shoe rubbing a floor"
+    ],
+    "answer": 1,
+    "why": "Gravity can act without direct contact."
+  },
+  {
+    "id": "s-forces-q3",
+    "unit": "s-forces",
+    "level": 2,
+    "form": "s-forces-f3",
+    "prompt": "For a block sliding across a fixed table, friction acts…",
+    "choices": [
+      "Only upward",
+      "Always in the same direction as sliding",
+      "Against the sliding motion"
+    ],
+    "answer": 2,
+    "why": "In this specified sliding setup, friction opposes relative sliding."
+  },
+  {
+    "id": "s-forces-q4",
+    "unit": "s-forces",
+    "level": 2,
+    "form": "s-forces-f4",
+    "prompt": "Why can friction be useful?",
+    "choices": [
+      "It can provide grip between shoe and floor.",
+      "It removes every force.",
+      "It makes all surfaces frictionless."
+    ],
+    "answer": 0,
+    "why": "Friction supports grip and braking as well as resisting unwanted motion."
+  },
+  {
+    "id": "s-forces-q5",
+    "unit": "s-forces",
+    "level": 3,
+    "form": "s-forces-f5",
+    "prompt": "A spring is stretched far beyond its safe range. What is wrong with assuming its earlier pattern continues forever?",
+    "choices": [
+      "Springs never exert forces.",
+      "Models have limits and the spring can be permanently damaged.",
+      "Distance cannot be measured."
+    ],
+    "answer": 1,
+    "why": "The relationship applies within suitable conditions and material limits."
+  },
+  {
+    "id": "s-forces-q6",
+    "unit": "s-forces",
+    "level": 3,
+    "form": "s-forces-f6",
+    "prompt": "Two sliding trials use different surfaces and different starting pushes. What can be concluded about surface alone?",
+    "choices": [
+      "It alone caused every distance difference.",
+      "It never matters.",
+      "Its separate effect cannot be isolated from starting conditions."
+    ],
+    "answer": 2,
+    "why": "Both surface and initial motion can affect stopping distance."
+  },
+  {
+    "id": "s-ecosystems-q1",
+    "unit": "s-ecosystems",
+    "level": 1,
+    "form": "s-ecosystems-f1",
+    "prompt": "A population consists of…",
+    "choices": [
+      "Organisms of the same kind in an area",
+      "Every non-living object on Earth",
+      "All unrelated communities everywhere"
+    ],
+    "answer": 0,
+    "why": "Population refers to organisms of the same kind in a specified area."
+  },
+  {
+    "id": "s-ecosystems-q2",
+    "unit": "s-ecosystems",
+    "level": 1,
+    "form": "s-ecosystems-f2",
+    "prompt": "In grass → grasshopper, the arrow indicates…",
+    "choices": [
+      "The grass hunts the grasshopper.",
+      "Energy transfer from food to consumer",
+      "The direction of wind"
+    ],
+    "answer": 1,
+    "why": "Food-chain arrows point from what is eaten to the eater."
+  },
+  {
+    "id": "s-ecosystems-q3",
+    "unit": "s-ecosystems",
+    "level": 2,
+    "form": "s-ecosystems-f3",
+    "prompt": "Which role is commonly played by fungi breaking down dead material?",
+    "choices": [
+      "Producer by photosynthesis",
+      "Predator of every animal",
+      "Decomposer"
+    ],
+    "answer": 2,
+    "why": "Decomposers break down dead material and help recycle materials."
+  },
+  {
+    "id": "s-ecosystems-q4",
+    "unit": "s-ecosystems",
+    "level": 2,
+    "form": "s-ecosystems-f4",
+    "prompt": "If a consumer loses one food source but has another, what should a prediction consider?",
+    "choices": [
+      "Availability of the alternative food",
+      "Only the drawing’s colour",
+      "That all consumers must immediately die"
+    ],
+    "answer": 0,
+    "why": "Alternative food sources can affect the consequence of losing one source."
+  },
+  {
+    "id": "s-ecosystems-q5",
+    "unit": "s-ecosystems",
+    "level": 3,
+    "form": "s-ecosystems-f5",
+    "prompt": "Frogs decrease in a stated grass–grasshopper–frog chain. Under otherwise similar conditions, why might grasshoppers increase?",
+    "choices": [
+      "Frogs produce grasshoppers directly.",
+      "Reduced predation can increase survival.",
+      "Arrows prove an exact population doubling."
+    ],
+    "answer": 1,
+    "why": "Fewer predators can mean fewer grasshoppers eaten, but the outcome depends on other factors."
+  },
+  {
+    "id": "s-ecosystems-q6",
+    "unit": "s-ecosystems",
+    "level": 3,
+    "form": "s-ecosystems-f6",
+    "prompt": "Two organisms appear beside each other in a painting. What establishes a feeding relationship?",
+    "choices": [
+      "Being adjacent is enough.",
+      "Matching colours is enough.",
+      "Observation or a reliable source about their feeding"
+    ],
+    "answer": 2,
+    "why": "A contextual illustration does not prove ecological interactions."
+  },
+  {
+    "id": "s-environment-q1",
+    "unit": "s-environment",
+    "level": 1,
+    "form": "s-environment-f1",
+    "prompt": "Which is a behavioural adaptation?",
+    "choices": [
+      "Seeking shade during hot periods",
+      "Having a fixed shell shape",
+      "Having feathers"
+    ],
+    "answer": 0,
+    "why": "Seeking shade is an action; shells and feathers are structural features."
+  },
+  {
+    "id": "s-environment-q2",
+    "unit": "s-environment",
+    "level": 1,
+    "form": "s-environment-f2",
+    "prompt": "Competition occurs when organisms need…",
+    "choices": [
+      "Unlimited unrelated resources",
+      "The same limited resource",
+      "No resources at all"
+    ],
+    "answer": 1,
+    "why": "Competition concerns shared resources that are limited."
+  },
+  {
+    "id": "s-environment-q3",
+    "unit": "s-environment",
+    "level": 2,
+    "form": "s-environment-f3",
+    "prompt": "A useful adaptation explanation connects…",
+    "choices": [
+      "Only the organism’s name and colour",
+      "An animal’s wish to a new inherited body part",
+      "A feature or behaviour to its effect in an environment"
+    ],
+    "answer": 2,
+    "why": "Explain how the feature helps under the stated conditions."
+  },
+  {
+    "id": "s-environment-q4",
+    "unit": "s-environment",
+    "level": 2,
+    "form": "s-environment-f4",
+    "prompt": "Why can clearing vegetation affect animals?",
+    "choices": [
+      "It can remove food sources and habitat.",
+      "Animals never depend on plants.",
+      "It removes gravity."
+    ],
+    "answer": 0,
+    "why": "Vegetation provides resources and habitat directly or through food webs."
+  },
+  {
+    "id": "s-environment-q5",
+    "unit": "s-environment",
+    "level": 3,
+    "form": "s-environment-f5",
+    "prompt": "Insect counts rise after planting, but observation time also doubles. What is the limitation?",
+    "choices": [
+      "The planting alone is proven responsible.",
+      "More observation time may explain some of the count difference.",
+      "Counts can never be useful."
+    ],
+    "answer": 1,
+    "why": "A change in sampling effort can affect counts and should be controlled or accounted for."
+  },
+  {
+    "id": "s-environment-q6",
+    "unit": "s-environment",
+    "level": 3,
+    "form": "s-environment-f6",
+    "prompt": "A science article makes a claim without describing evidence. What is a useful next step?",
+    "choices": [
+      "Memorise it as certain because it is online.",
+      "Reject every scientific source forever.",
+      "Find the underlying study or an authoritative explanation of the evidence."
+    ],
+    "answer": 2,
+    "why": "Investigate the basis of the claim and distinguish evidence from assertion."
+  }
+]

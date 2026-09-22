@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
-<!-- Mochi Maths v4.4.0 — 2026-09-14 -->
-<title>Mochi · Euna’s maths studio</title>
-<meta name="description" content="A maths studio for Euna: explore, reason, challenge an idea, and learn with Mochi.">
-<link rel="manifest" href="manifest.webmanifest?v=4.4.0">
+<!-- Mochi Maths v5.0.0 — 2026-09-22 -->
+<title>Mochi · Euna’s Maths and Science classroom</title>
+<meta name="description" content="Euna’s Maths and Science classroom: illustrated teaching, saved notebooks and adaptive practice.">
+<link rel="manifest" href="manifest.webmanifest?v=5.0.0">
 <meta name="theme-color" content="#f7f5fc">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Mochi Maths">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=4.4.0">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon.png?v=4.4.0">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=5.0.0">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon.png?v=5.0.0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" media="print" onload="this.media=&#39;all&#39;"
@@ -313,32 +313,37 @@
   }
   :focus-visible{outline:3px solid var(--ginger);outline-offset:2px;}
 </style>
-<link rel="stylesheet" href="tutor.css?v=4.4.0">
-<link rel="stylesheet" href="studio.css?v=4.4.0">
-<link rel="stylesheet" href="science.css?v=4.4.0">
-<link rel="stylesheet" href="responsive.css?v=4.4.0">
-<link rel="stylesheet" href="lesson-layout.css?v=4.4.0">
-<script defer src="reasoning.js?v=4.4.0"></script>
-<script defer src="learning.js?v=4.4.0"></script>
-<script defer src="question-bank.js?v=4.4.0"></script>
-<script defer src="challenge-bank.js?v=4.4.0"></script>
-<script defer src="transfer-bank.js?v=4.4.0"></script>
-<script defer src="adaptive-repair.js?v=4.4.0"></script>
-<script defer src="app.js?v=4.4.0"></script>
-<script defer src="input-mode.js?v=4.4.0"></script>
-<script defer src="study-ui.js?v=4.4.0"></script>
-<script defer src="science-core.js?v=4.4.0"></script>
-<script defer src="science-scenes.js?v=4.4.0"></script>
-<script defer src="science-ui.js?v=4.4.0"></script>
-<script defer src="learning-review.js?v=4.4.0"></script>
-<script defer src="studio.js?v=4.4.0"></script>
-<script defer src="baseline-week.js?v=4.4.0"></script>
-<script defer src="responsive.js?v=4.4.0"></script>
-<script defer src="review-ui.js?v=4.4.0"></script>
-<script defer src="network.js?v=4.4.0"></script>
-<script defer src="cloud-sync.js?v=4.4.0"></script>
-<script defer src="cloud-backup.js?v=4.4.0"></script>
-<script defer src="drive-mirror.js?v=4.4.0"></script>
+<link rel="stylesheet" href="tutor.css?v=5.0.0">
+<link rel="stylesheet" href="studio.css?v=5.0.0">
+<link rel="stylesheet" href="science.css?v=5.0.0">
+<link rel="stylesheet" href="responsive.css?v=5.0.0">
+<link rel="stylesheet" href="lesson-layout.css?v=5.0.0">
+<link rel="stylesheet" href="course.css?v=5.0.0">
+<script defer src="course-data.js?v=5.0.0"></script>
+<script defer src="course-core.js?v=5.0.0"></script>
+<script defer src="course-visuals.js?v=5.0.0"></script>
+<script defer src="reasoning.js?v=5.0.0"></script>
+<script defer src="learning.js?v=5.0.0"></script>
+<script defer src="question-bank.js?v=5.0.0"></script>
+<script defer src="challenge-bank.js?v=5.0.0"></script>
+<script defer src="transfer-bank.js?v=5.0.0"></script>
+<script defer src="adaptive-repair.js?v=5.0.0"></script>
+<script defer src="app.js?v=5.0.0"></script>
+<script defer src="input-mode.js?v=5.0.0"></script>
+<script defer src="study-ui.js?v=5.0.0"></script>
+<script defer src="science-core.js?v=5.0.0"></script>
+<script defer src="science-scenes.js?v=5.0.0"></script>
+<script defer src="science-ui.js?v=5.0.0"></script>
+<script defer src="learning-review.js?v=5.0.0"></script>
+<script defer src="studio.js?v=5.0.0"></script>
+<script defer src="baseline-week.js?v=5.0.0"></script>
+<script defer src="responsive.js?v=5.0.0"></script>
+<script defer src="review-ui.js?v=5.0.0"></script>
+<script defer src="network.js?v=5.0.0"></script>
+<script defer src="cloud-sync.js?v=5.0.0"></script>
+<script defer src="cloud-backup.js?v=5.0.0"></script>
+<script defer src="drive-mirror.js?v=5.0.0"></script>
+<script defer src="course-ui.js?v=5.0.0"></script>
 </head>
 <body>
 <div class="mochi-watermarks" aria-hidden="true"><img decoding="async" class="watermark-cat cat-right" src="mochi-watermark.webp" alt="" draggable="false"><img decoding="async" class="watermark-cat cat-left" src="mochi-watermark.webp" alt="" draggable="false"></div>
@@ -352,7 +357,7 @@
         <svg class="ph" id="catPh" viewBox="0 0 24 24" aria-hidden="true" style="display:none"><ellipse cx="6" cy="8" rx="2.6" ry="3.4"/><ellipse cx="11.5" cy="5.4" rx="2.7" ry="3.6"/><ellipse cx="17" cy="7.4" rx="2.6" ry="3.4"/><ellipse cx="20.4" cy="12.8" rx="2.2" ry="2.9"/><path d="M12.4 11.4c4 0 6.7 2.7 6.7 5.5 0 2.4-2 3.9-4.4 3.9-1.6 0-2.3-.6-3.7-.6s-2.1.6-3.7.6c-2.4 0-4.4-1.5-4.4-3.9 0-2.8 2.7-5.5 6.7-5.5z"/></svg>
       </div>
     </div>
-    <a class="studio-brand" id="studioHome" href="#qText" aria-label="Mochi maths and science studio" aria-describedby="appVersion"><span class="brand-identity"><strong>mochi<span class="brand-mark" aria-hidden="true">/</span></strong><span id="appVersion" class="app-version" data-app-version>v4.4.0</span></span><span class="brand-descriptor">MATHS + SCIENCE</span></a>
+    <a class="studio-brand" id="studioHome" href="#qText" aria-label="Mochi maths and science studio" aria-describedby="appVersion"><span class="brand-identity"><strong>mochi<span class="brand-mark" aria-hidden="true">/</span></strong><span id="appVersion" class="app-version" data-app-version>v5.0.0</span></span><span class="brand-descriptor">MATHS + SCIENCE</span></a>
     <div class="topmeta">
       <b id="catName">Mochi</b>
       <span class="paws" id="paws" aria-label="Streak"></span>
@@ -446,7 +451,7 @@ For example: 24 ÷ 3 = 8"></textarea>
     </div>
   </section>
 
-<nav class="floating-dock instrument-rail" id="focusDock" aria-label="Studio navigation"><button id="focusThink" class="dock-item " aria-label="Think" aria-controls="thinkPanel" aria-expanded="false"><span class="dock-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5 4 4M4 20l4-1 12-12a2.8 2.8 0 0 0-4-4L4 15v5Z"/></svg></span><span class="dock-label">Think</span></button><button id="coachFloat" class="tutor-orb" aria-label="Ask Mochi" aria-controls="coachCard" aria-expanded="false"><span class="tutor-avatar"><img src="icon-192.png?v=4.4.0" alt="" width="44" height="44"></span><span class="tutor-orb-label">Ask Mochi</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4V5Z"/><path d="M8 9h8M8 12h5"/></svg></button></nav>
+<nav class="floating-dock instrument-rail" id="focusDock" aria-label="Studio navigation"><button id="focusThink" class="dock-item " aria-label="Think" aria-controls="thinkPanel" aria-expanded="false"><span class="dock-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5 4 4M4 20l4-1 12-12a2.8 2.8 0 0 0-4-4L4 15v5Z"/></svg></span><span class="dock-label">Think</span></button><button id="coachFloat" class="tutor-orb" aria-label="Ask Mochi" aria-controls="coachCard" aria-expanded="false"><span class="tutor-avatar"><img src="icon-192.png?v=5.0.0" alt="" width="44" height="44"></span><span class="tutor-orb-label">Ask Mochi</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4V5Z"/><path d="M8 9h8M8 12h5"/></svg></button></nav>
   <div class="session-finish" id="sessionFinish" hidden><span class="overline">SESSION COMPLETE</span><h2>What idea will you take with you?</h2><p id="sessionFinishText"></p><button id="finishInsight" class="btn">Keep one insight</button><button id="finishMap" class="btn quiet">See my learning map</button></div>
   </main>
 
@@ -592,7 +597,7 @@ For example: 24 ÷ 3 = 8"></textarea>
 </div><details class="solution-menu"><summary>Hints &amp; next steps</summary><div class="menu-actions"><button class="btn quiet" id="modelBtn">Draw the model</button><button class="btn quiet" id="workingBtn">Show the working</button><button class="btn quiet" id="skipBtn">Save for later</button></div></details>
 <div class="more-footer"><button id="tabRoom" class="text-button">Mochi’s room ↗</button><span class="coinchip" id="coinChip">✦ <b class="cn" id="coinCount">0</b></span><label class="voice-control">Voice     <button class="ibtn off" id="voiceBtn" title="Silent" aria-label="Toggle voice">&#128263;</button></label></div>        <span class="netbadge" id="netBadge"></span></section>
   <aside class="focus-panel coach-card" role="dialog" hidden tabindex="-1" id="coachCard" aria-label="Mochi tutor">
-    <div class="coach-head"><img src="icon-192.png?v=4.4.0" alt="" width="48" height="48"><div><h2>Mochi</h2><span>Your thinking partner</span></div><button id="coachClose" class="icon-button" aria-label="Close tutor">×</button></div>
+    <div class="coach-head"><img src="icon-192.png?v=5.0.0" alt="" width="48" height="48"><div><h2>Mochi</h2><span>Your thinking partner</span></div><button id="coachClose" class="icon-button" aria-label="Close tutor">×</button></div>
     <details class="panel-reference"><summary>See the problem</summary><p id="coachQuestion"></p></details><div class="coach-move"><span class="overline">ONE NEXT STEP</span><h3 id="moveTitle">Follow your idea</h3><p id="movePrompt">Show me where your thinking starts.</p></div>
     <div class="thread" id="thread" role="log" aria-live="polite" aria-label="Conversation"></div>
     <div class="chips">
@@ -640,8 +645,8 @@ For example: 24 ÷ 3 = 8"></textarea>
     <div id="panel" style="display:none">
       <section class="release-details" aria-labelledby="releaseTitle">
         <h4 id="releaseTitle">Version on this device</h4>
-        <p class="release-number"><b data-app-version>v4.4.0</b> · <time data-release-date datetime="2026-09-14">14 September 2026</time></p>
-        <p id="releaseNotes">Open directly into the lesson, with progress and schedule behind Euna’s avatar and experiments inside Science. Shared desktop, tablet and installed-app layout.</p>
+        <p class="release-number"><b data-app-version>v5.0.0</b> · <time data-release-date datetime="2026-09-22">22 September 2026</time></p>
+        <p id="releaseNotes">Maths and Science classroom: 42 illustrated teaching units before practice, adaptive checks, saved notebooks and classroom evidence in the learning mirror.</p>
         <p class="release-help">Refresh while online to load a newer published release.</p>
       </section>
       <p class="sect">The cat</p>
@@ -685,7 +690,7 @@ For example: 24 ÷ 3 = 8"></textarea>
       <p class="sect">Learning evidence & target</p>
       <label class="study-field" for="goalMonth">Target month <input id="goalMonth" type="month" value="2027-09"></label>
       <button class="btn quiet" id="goalSave">Save target</button>
-      <p class="study-note">September 2027 is a planning target, not a confirmed test date. NUS High uses a separate DSA route that starts earlier; English needs separate preparation. Science now has its own starting set and learning evidence.</p>
+      <p class="study-note">September 2027 is a planning target, not a confirmed test date. NUS High uses a separate DSA route that starts earlier; English needs separate preparation. The classroom teaches Maths and Science before its checks; completion records exposure, not mastery.</p>
       <div id="parentEvidence"></div><details class="study-details"><summary>Science learning and investigations</summary><div id="parentScience"></div></details>
       <div class="study-actions"><button class="btn quiet" id="exportLearning">Back up learning</button><label class="filebtn">Restore backup<input id="importLearning" type="file" accept="application/json,.json" hidden></label></div>
       <p id="backupStatus" class="study-status" role="status">Progress stays on this device. Back it up to move devices; backups contain learning notes, never API keys.</p>

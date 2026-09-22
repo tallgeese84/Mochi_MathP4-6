@@ -5,51 +5,39 @@ Euna for Primary 6 mathematics and her **September 2027 SPERS-Sec1 planning targ
 with a separate enrichment strand for mathematical thinking. The exact 2027 test
 and application dates must be checked when published.
 
-**v4.4.0 — 14 September 2026.** The existing cat, room, handwriting pad, provider
+**v5.0.0 — 22 September 2026.** The existing cat, room, handwriting pad, provider
 settings and saved coins are preserved. Old topic totals are retained as legacy
 accuracy; they are not treated as new evidence of independent learning.
 
-## Feedback that changes the next practice
+## Classroom before practice
 
-Daily and Review sessions now prioritise targeted sequences for original percentage
-wholes, changing remainders and fraction division. Existing answers seed the plan:
-check the concept, practise the relationship, try another context, then revisit
-it after one day. Two targeted questions are followed by mixed practice. Explicit
-assessment, sprint and stretch modes remain separate. Parent settings and the
-learning mirror show the pending follow-ups; no new mirror setup is needed.
+The app now opens a written **Maths and Science classroom**: 42 sequenced units,
+294 teaching sections, about 25,800 teaching words and 252 initial checks.
+Original illustrations accompany worked explanations, notebook activities and
+labelled interactive models. Switch subjects in the header, choose a unit and
+explore its teaching sections before checking understanding. Keyboard and stylus
+notes are saved. The existing question studio and Science experiments remain
+available through each lesson's additional-practice controls.
 
-Science pairs the main answer with a short authored reasoning check. A missed check
-keeps revision open and guides the next recommendation. Wrong submissions and
-explanation revisions are saved immediately. Repeated questions are labelled
-familiar practice, and are not counted as new independent evidence. Free text and
-handwritten explanations remain ungraded and need tutor/adult discussion.
+Read the [classroom guide](docs/CLASSROOM_GUIDE.md) for a daily teaching routine,
+difficulty decisions and how to review progress. Read the [curriculum audit](docs/CLASSROOM_CURRICULUM_AUDIT.md)
+for official sources, topic mapping, admissions distinctions and validation limits.
+The route is **NUS High DSA-Sec**. This is an original preparation course, not an
+MOE-approved textbook or a calibrated official entrance syllabus.
 
-The app opens into the current lesson. Switch between Maths and Science in the
-header; open Euna’s avatar for progress, the suggested schedule, practice options
-and parent settings. Maths help sits below the question in normal page flow.
-Science’s **Try an experiment** opens within the current question and preserves
-her selected answer and notes. **Why this question?** explains the recommendation.
-A finished session from a previous day starts the next appropriate practice;
-unfinished sessions retain their place.
+Two different first-answer successes without help or guessing advance a classroom
+check by one level. Two misses lower the target. Revisions retain the first answer;
+immediate repetitions do not count as fresh evidence. Delayed familiar retrieval
+is labelled separately. Lesson completion records exposure, not mastery.
 
-The installed home-screen app uses the same version and offline assets as the
-website. Refresh online after publication, then confirm the header reads v4.4.0.
-Do not clear app storage or reinstall to update: retain the existing learning history.
+The existing learning mirror now includes classroom progress, answers, explanations
+and handwriting; no new setup is required. Existing Maths and Science history,
+provider settings, cat customisation and coins are preserved. Parent settings
+show the classroom evidence alongside the earlier question-studio records.
 
-## New science trial
-
-Choose **Science**, then open **Try an experiment** to explore the illustrated model. Science includes eight illustrated
-activity areas, 28 authored practice questions and 8 reserved independent checks.
-Predict before recording a model trial; explain the evidence in the notebook.
-Stylus notes, optional transcription and typed explanations share the existing
-family provider connection and backup controls. Original botanical, pond, anatomy, cup and cart art
-supports the science diagrams; model assumptions appear below each activity.
-
-This is the first testable science set, not complete syllabus or calibrated NUS High
-preparation. Read [the science review and trial checklist](docs/SCIENCE_REVIEW.md).
-
-Authored wording and tutor instructions have been reviewed against current MOE
-terminology. Read the [terminology review and its limits](docs/MOE_LANGUAGE_REVIEW.md).
+The website and installed home-screen app share the same code and release.
+After publication, refresh online and confirm **v5.0.0** in the header. Do not
+clear app storage or reinstall to update: retain the existing learning history.
 
 ## Tracking the published version
 
@@ -61,7 +49,7 @@ compare their displayed numbers.
 For each release, update `release.json`, run `node scripts/release.cjs`, and commit
 the generated changes together. Run `node scripts/release.cjs --check` before
 publishing to reject inconsistent labels, runtime metadata and offline asset
-versions. Release numbering uses `major.minor.patch`; the current release is v4.3.9.
+versions. Release numbering uses `major.minor.patch`; the current release is v5.0.0.
 
 Run `npm ci --ignore-scripts`, `npm run check:release`, and `npm test` using Node
 24.15 or later before merging. GitHub's **App checks / test** job runs the same
@@ -277,3 +265,14 @@ They are code-level tests using a small event/storage adapter, not browser or iP
 visual tests. Live AI answer quality and handwriting recognition still need a parent
 supervised trial with the configured provider. The audit documents remaining
 curriculum gaps and a practical evaluation rubric.
+
+## Editing the course
+
+Edit `course/lessons/*.md`, `course/catalog.json` and `course/questions.json`, then
+run `node scripts/build-course.cjs`. Its generated `course-data.js` is the offline
+runtime source. `npm run check:course` rejects stale generated content. Keep question
+IDs and option identities stable; allocate a new question ID for a materially
+changed question or answer so old learning records are not reinterpreted.
+
+Run `npm run check:course`, `npm run check:release` and `npm test` before publishing.
+Release metadata and offline assets are generated from `release.json` and the page.

@@ -18,6 +18,7 @@ function build(state,version){
  // Supply question text for recorded Science items so a review need not guess from an ID.
  const used=new Set((data.science?.attempts||[]).map(a=>a.item));
  data.scienceQuestions=(root.MochiScience?.items||[]).filter(q=>used.has(q.id)).map(q=>({id:q.id,prompt:q.prompt,choices:[...q.choices]}));
+ if(root.MochiCourse&&state.course){data.course=root.MochiCourse.validate(state.course);data.courseReview=root.MochiCourse.report(data.course);const ids=new Set(data.course.attempts.map(a=>a.question));data.courseQuestions=root.MochiCourse.data.questions.filter(q=>ids.has(q.id));}
  data.source={appVersion:version||'unknown',student:'Euna',timeZone:Intl.DateTimeFormat().resolvedOptions().timeZone||'unknown'};
  data.review={schema:1,maths:{...counts(data.learning.attempts),followUps:root.MochiRepair?.pending(data.learning).map(p=>({key:p.key,label:p.label,stage:p.stage,due:p.due,ready:p.ready}))||[]},science:counts(data.science?.attempts||[],true),
   limits:['Practice and diagnostic samples are not calibrated exam scores or percentiles.',
