@@ -40,6 +40,7 @@ function studioShow(which){
  $('viewMap').hidden=which!=='map';
  $('viewMaths').style.display=which==='maths'?'':'none';
  $('viewRoom').style.display=which==='room'?'':'none';
+ document.dispatchEvent?.(new Event('mochi:activity'));
  for(const [view,id] of [['maths','tabMaths'],['map','tabMap'],['room','tabRoom']]){
    $(id).classList.toggle('on',which===view);$(id).setAttribute('aria-current',which===view?'page':'false');
  }

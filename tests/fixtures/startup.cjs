@@ -172,6 +172,36 @@ const w=dom.window,delay=ms=>new Promise(r=>setTimeout(r,ms));
  assert.equal(exported.review.maths.sampled,0);
  assert.ok(exported.science);
  assert.ok(w.MochiLearning.restore(exported));
+
+ // Weekly plan integration: explicit clocks, real routing and exit evidence.
+ assert.equal(w.document.getElementById('dailyPlan').parentElement.id,'studioSurface');
+ assert.equal(w.document.getElementById('dailyGoals').open,false,'daily detail stays collapsed');
+ click('clock-maths');assert.equal(w.document.getElementById('clock-maths').getAttribute('aria-pressed'),'true');
+ click('clock-science');assert.equal(w.document.getElementById('clock-maths').getAttribute('aria-pressed'),'false');
+ assert.equal(w.document.getElementById('clock-science').getAttribute('aria-pressed'),'true');
+ assert.equal(w.courseCurrent().subject,'science','starting the other subject opens its teaching');
+ click('subjectMaths');assert.equal(w.document.getElementById('clock-science').getAttribute('aria-pressed'),'false','changing subject pauses its clock immediately');
+ click('clock-maths');w.dispatchEvent(new w.Event('blur'));
+ assert.equal(w.document.getElementById('clock-maths').getAttribute('aria-pressed'),'false','inactive windows pause');
+ w.document.getElementById('week-0-maths').value='35';w.document.getElementById('week-6-science').value='0';
+ w.document.getElementById('weeklyPlanForm').dispatchEvent(new w.Event('submit',{cancelable:true}));
+ assert.equal(w.eval('S.planner.schedule.week[0].maths'),35);assert.equal(w.eval('S.planner.schedule.week[6].science'),0);
+ w.document.getElementById('reflection-maths').value='I used a diagram, then checked with an equation.';click('reflect-maths');
+ assert.equal(w.eval('S.planner.days[MochiPlanner.localDay()].maths.reflection'),'I used a diagram, then checked with an equation.');
+ const recommendation=w.eval('MochiPlanner.recommend(S,"maths")');
+ w.eval(`{const u=MochiCourse.unit(${JSON.stringify(recommendation.unit)}),l=MochiCourse.lesson(S.course,u.id);l.visited=u.pages.map((_,i)=>i);l.completedAt=Date.now();}`);
+ w.courseOpen("maths",recommendation.unit);
+ w.document.querySelector('[data-route="check"][data-subject="maths"]').click();
+ const exit=w.eval('S.course.lessons[courseCurrent().unit].draft.id');
+ assert.ok(w.eval('S.planner.days[MochiPlanner.localDay()].maths.exitIds').includes('course:'+exit));
+ const q=w.eval('MochiCourse.question(S.course.lessons[courseCurrent().unit].draft.question)');
+ w.document.querySelector('[data-choice="'+((q.answer+1)%q.choices.length)+'"]').click();click('courseSubmit');
+ assert.equal(w.eval('MochiPlanner.goals(S,"maths").exit'),1,'a wrong exit answer is useful evidence');
+ assert.equal(w.eval('MochiPlanner.goals(S,"maths").exitIndependent'),0);
+ const planBackup=w.MochiReviewDownload.make();assert.ok(planBackup.planner);assert.ok(planBackup.learningPlanReview.thinking.maths);
+ const coins=w.eval('S.coins');click('plannerPet');assert.equal(w.document.getElementById('viewRoom').style.display,'');
+ assert.equal(w.eval('S.coins'),coins,'growth does not spend existing coins');assert.ok(w.document.getElementById('mochiGrowth').textContent.includes('Rest days'));
+ assert.ok(w.document.getElementById('roomImg').src.endsWith('mochi-builtin.webp'),'original cat illustration remains');
  await delay(1300); // Let all bounded setup timers finish.
  let releaseMutations=0;
  const observer=new w.MutationObserver(records=>releaseMutations+=records.length);
@@ -180,6 +210,10 @@ const w=dom.window,delay=ms=>new Promise(r=>setTimeout(r,ms));
  await delay(1700); // Exercises the former 1.5-second version writer too.
  assert.equal(releaseMutations,0,'version is static, never rewritten by background modules');
  assert.deepEqual([...w.document.querySelectorAll('[data-app-version]')].map(n=>n.textContent),['v'+version,'v'+version]);
+ const oldScience=w.eval('SCI.recordId');w.confirm=()=>true;click('resetBtn');
+ assert.equal(w.eval('S.science.attempts.length'),0);assert.notEqual(w.eval('SCI.recordId'),oldScience,'explicit reset clears the in-memory Science attempt too');
+ assert.equal(w.eval('Object.keys(S.planner.milestones).length'),0);assert.equal(w.eval('S.planner.schedule.week[0].maths'),25);
+ assert.equal(w.eval('S.planner.sessions.length'),0,'a running or paused clock cannot restore reset timing records');
  assert.deepEqual(errors,[]);
  observer.disconnect();dom.window.close();
  console.log('Full-page startup, textbook-to-original-practice flow, saved work, input toggle, stable release and stalled-cloud checks passed.');

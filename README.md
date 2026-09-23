@@ -5,7 +5,7 @@ Euna for Primary 6 mathematics and her **September 2027 SPERS-Sec1 planning targ
 with a separate enrichment strand for mathematical thinking. The exact 2027 test
 and application dates must be checked when published.
 
-**v5.0.1 — 23 September 2026.** The existing cat, room, handwriting pad, provider
+**v5.1.0 — 23 September 2026.** The existing cat, room, handwriting pad, provider
 settings and saved coins are preserved. Old topic totals are retained as legacy
 accuracy; they are not treated as new evidence of independent learning.
 
@@ -46,8 +46,27 @@ provider settings, cat customisation and coins are preserved. Parent settings
 show the classroom evidence alongside the earlier question-studio records.
 
 The website and installed home-screen app share the same code and release.
-After publication, refresh online and confirm **v5.0.1** in the header. Do not
+After publication, refresh online and confirm **v5.1.0** in the header. Do not
 clear app storage or reinstall to update: retain the existing learning history.
+
+## Weekly learning and Mochi’s growth
+
+The compact Today panel adds separate Maths and Science clocks and optional daily
+goals: study an idea, practise, try one exit check and reflect. Edit Monday–Sunday
+minutes in Euna’s avatar panel. The starting routine totals 145 minutes per subject
+per week, with a light Sunday and no missed-day penalties. Clocks pause when the
+app is hidden or inactive; minutes measure foreground time, not mastery.
+
+Next-topic recommendations connect existing course and practice evidence to
+prerequisite repair, delayed review and the next available challenge. The parent
+view gives cautious thinking observations with example IDs. Mochi’s original
+illustration grows through five stages based on independent work across both
+subjects and delayed retrieval. Existing coins and accessories are kept.
+
+The learning mirror and backups include the schedule, active-time estimates,
+reflections, recommendations and growth milestones. No new mirror setup is needed.
+Read [the learning-plan guide](docs/LEARNING_PLAN.md) for the default week,
+daily workflow, timing/merge rules and evidence limits.
 
 ## Tracking the published version
 

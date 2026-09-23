@@ -11,6 +11,7 @@ const KEY = 'mochi-tutor-v1';
 function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
 function lsSet(k,v){ try{ localStorage.setItem(k,v); return true; }catch(e){ return false; } }
 async function save(obj){
+  if(window.MochiPlanner)window.MochiPlanner.grow(obj);
   const str = JSON.stringify(obj);
   try { if(window.storage) Promise.resolve(window.storage.set(KEY, str)).catch(()=>{}); } catch(e){}
   if(!lsSet(KEY, str)) MEM[KEY] = str;
@@ -1233,7 +1234,7 @@ function isCorrect(input,q){
 
 /* The cat ships inside the markup; this just reads her back out. */
 const BUILTIN_PHOTO = ($('catImg').getAttribute('src') || '');
-const APP_VERSION = '5.0.1';
+const APP_VERSION = '5.1.0';
 const BUILD_KIND  = 'site';
 const BUILD_DATE  = '2026-09-23';
 const BUILD = BUILD_KIND + ' v' + APP_VERSION + ' \u00b7 ' + BUILD_DATE;
@@ -2471,6 +2472,10 @@ $('parentDismiss').onclick=()=> $('ovClose').click();
 $('resetBtn').onclick = ()=>{
   if(!confirm('Reset all learning progress and coins on this device? Back up first if you want to keep them.'))return;
   S.learning=MochiLearning.fresh();
+  if(window.MochiScience)S.science=MochiScience.fresh();
+  if(window.MochiPlanner)S.planner=MochiPlanner.fresh();
+  if(window.MochiCourse)S.course=MochiCourse.fresh();
+  if(typeof scNew==='function'){SCI.mode='practice';SCI.assessment=null;scNew();}
   S.done=0; S.right=0; S.streak=0; S.best=0; S.tick=0;
   S.coins=0; S.owned=[]; S.worn={head:null,eyes:null,neck:null}; S.purr=0; S.fed=0; S.pets=0;
   TOPICS.forEach(t=>{ S.mastery[t]={a:0,c:0}; S.lastSeen[t]=-1; });
@@ -2518,5 +2523,5 @@ async function hydratePhoto(){
 }
 
 if('serviceWorker' in navigator){
-  document.addEventListener('mochi:ready', ()=> navigator.serviceWorker.register('sw.js?v=5.0.1',{updateViaCache:'none'}).catch(()=>{}),{once:true});
+  document.addEventListener('mochi:ready', ()=> navigator.serviceWorker.register('sw.js?v=5.1.0',{updateViaCache:'none'}).catch(()=>{}),{once:true});
 }

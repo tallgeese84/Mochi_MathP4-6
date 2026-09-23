@@ -16,7 +16,7 @@ function complete(c,id,now=Date.now()){const u=unit(id),l=lesson(c,id);if(l.visi
 function cleanAttempt(a){
  const q=question(a?.question);if(!q||typeof a.id!=='string'||!stamp(a.at))return null;
  const choices=(Array.isArray(a.responses)?a.responses:[]).filter(n=>Number.isInteger(n)&&n>=0&&n<q.choices.length).slice(0,20);if(!choices.length)return null;
- return {id:a.id.slice(0,120),at:stamp(a.at),unit:q.unit,question:q.id,level:q.level,form:q.form,responses:choices,
+ return {id:a.id.slice(0,120),at:stamp(a.at),answeredAt:stamp(a.answeredAt)||stamp(a.at),unit:q.unit,question:q.id,level:q.level,form:q.form,responses:choices,
   correct:choices[choices.length-1]===q.answer,firstCorrect:choices[0]===q.answer,helped:!!a.helped,guess:!!a.guess,repeated:!!a.repeated,
   explanation:String(a.explanation||'').slice(0,6000),strokes:ink(a.strokes)};
 }
