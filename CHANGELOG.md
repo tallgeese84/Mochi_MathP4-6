@@ -1,3 +1,14 @@
+# v5.2.0 — Mochi’s 3D room
+
+- Integrate the approved bright-eyed kitten with a continuous body and leg mesh,
+  planted paws, walking, sitting, blinking and petting reactions.
+- Connect petting, treats, growth milestones and six accessories to existing
+  progress and purchases. Keep custom artwork in the Picture view.
+- Initialise 3D on the first room visit; suspend rendering when the room or tab
+  is hidden. Honour reduced motion and preserve Pause when returning to the room.
+- Include Three.js locally and cache the complete scene for offline use. Fall
+  back to the picture when 3D is unavailable, with a retry after context loss.
+
 # v4.4.0 — Open into the lesson
 
 - Replace the home review cards and top-level schedule with one lesson surface.
