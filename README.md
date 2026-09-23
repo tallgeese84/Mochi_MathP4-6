@@ -5,8 +5,18 @@ Euna for Primary 6 mathematics and her **September 2027 SPERS-Sec1 planning targ
 with a separate enrichment strand for mathematical thinking. The exact 2027 test
 and application dates must be checked when published.
 
-**v5.1.0 — 23 September 2026.** The existing cat, room, handwriting pad, provider
-settings and saved coins are preserved. Old topic totals are retained as legacy
+**v5.2.0 — 23 September 2026.** Mochi’s room now opens the approved 3D kitten with
+large bright eyes and a continuous body and leg mesh. Visit Mochi from the daily
+plan or More → Mochi’s room. Walk, sit, stroke, turn the view or tap the rug to
+choose a destination. Treats and all six owned accessories use the existing shop
+and coin balance. The Picture button retains custom cat artwork.
+
+The renderer initialises only when the room opens and pauses away from it.
+Three.js r180 is included locally with its MIT licence; the service worker saves
+the scene and renderer for offline use after the release finishes downloading.
+Reduced motion starts with a still cat. Browsers without WebGL use the picture
+view, and a lost graphics context offers a retry. Learning history, handwriting,
+provider settings and saved coins are preserved. Old topic totals remain legacy
 accuracy; they are not treated as new evidence of independent learning.
 
 ## Classroom before practice
@@ -46,7 +56,7 @@ provider settings, cat customisation and coins are preserved. Parent settings
 show the classroom evidence alongside the earlier question-studio records.
 
 The website and installed home-screen app share the same code and release.
-After publication, refresh online and confirm **v5.1.0** in the header. Do not
+After publication, refresh online and confirm **v5.2.0** in the header. Do not
 clear app storage or reinstall to update: retain the existing learning history.
 
 ## Weekly learning and Mochi’s growth
@@ -78,7 +88,7 @@ compare their displayed numbers.
 For each release, update `release.json`, run `node scripts/release.cjs`, and commit
 the generated changes together. Run `node scripts/release.cjs --check` before
 publishing to reject inconsistent labels, runtime metadata and offline asset
-versions. Release numbering uses `major.minor.patch`; the current release is v5.0.0.
+versions. Release numbering uses `major.minor.patch`; the current release is v5.2.0.
 
 Run `npm ci --ignore-scripts`, `npm run check:release`, and `npm test` using Node
 24.15 or later before merging. GitHub's **App checks / test** job runs the same

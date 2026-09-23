@@ -1,0 +1,32 @@
+
+#mochi3d{padding:16px 0;color-scheme:light;font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+#mochi3d *{box-sizing:border-box}
+#mochi3d .mp-room{max-width:760px;margin:0 auto;border:1px solid #e9dff0;border-radius:28px;background:#fcfaff;overflow:hidden;color:#412e53;box-shadow:0 18px 54px #4c276010}
+#mochi3d .mp-header{padding:24px 28px 0;display:flex;justify-content:space-between;align-items:center;gap:12px;position:relative;z-index:2}
+#mochi3d .mp-eyebrow{margin:0 0 5px;font-size:11px;letter-spacing:.16em;font-weight:500;color:#8a719d}
+#mochi3d h2{margin:0;font-size:28px;line-height:1.2;font-weight:500;letter-spacing:-.045em;color:#412e53}
+#mochi3d .mp-badge{font-size:11px;letter-spacing:.04em;border:1px solid #e4d5ed;border-radius:30px;padding:7px 11px;white-space:nowrap;color:#805d97;background:#f6effa}
+#mochi3d .mp-stage{height:450px;position:relative;background:radial-gradient(ellipse at 50% 36%,#fff 8%,#faf6fd 50%,#f3ebf8 100%);touch-action:pan-y}
+#mochi3d .mp-stage canvas{display:block;width:100%;height:100%;touch-action:pan-y;cursor:grab}
+#mochi3d .mp-stage canvas:active{cursor:grabbing}
+#mochi3d .mp-loading{position:absolute;inset:0;display:grid;place-content:center;color:#805d97;padding:30px;text-align:center;z-index:2;background:#fcfaff}
+#mochi3d .mp-loading[hidden]{display:none}
+#mochi3d .mp-turn{display:flex;gap:7px;position:absolute;right:23px;top:17px;z-index:2}
+#mochi3d .mp-view{display:grid;place-content:center;width:40px;height:40px;border:1px solid #e3d5ec;border-radius:50%;color:#86689b;background:#fff9;backdrop-filter:blur(8px)}
+#mochi3d .mp-view svg{width:16px;height:16px}
+#mochi3d .mp-gesture{position:absolute;bottom:9px;left:0;width:100%;text-align:center;font-size:11px;letter-spacing:.03em;color:#967aa6;pointer-events:none}
+#mochi3d .mp-footer{padding:0 24px 24px;background:#fcfaff}
+#mochi3d .mp-mood{text-align:center;color:#80678f;min-height:22px;margin:6px 0 16px;font-size:14px;line-height:1.6}
+#mochi3d .mp-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+#mochi3d .mp-action{display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;border:1px solid #e4d6ed;border-radius:16px;background:#fff;color:#755687;font:inherit;font-size:14px;font-weight:500;transition:background .2s,color .2s,transform .2s}
+#mochi3d .mp-action[aria-pressed=true]{background:#8863a7;border-color:#8863a7;color:#fff;box-shadow:0 5px 15px #8863a722}
+#mochi3d .mp-action:not(:disabled):hover{transform:translateY(-2px)}
+#mochi3d .mp-action:disabled{opacity:.4}
+#mochi3d .mp-action svg{width:17px;height:17px}
+@media(max-width:480px){#mochi3d{padding:6px 0}#mochi3d .mp-header{padding:21px 19px 0}#mochi3d h2{font-size:25px}#mochi3d .mp-stage{height:390px}#mochi3d .mp-footer{padding:0 14px 18px}#mochi3d .mp-actions{gap:7px}#mochi3d .mp-action{flex-direction:column;gap:5px;min-height:62px;font-size:12px;border-radius:14px}#mochi3d .mp-turn{right:15px;top:14px}#mochi3d .mp-view{width:44px;height:44px}#mochi3d .mp-badge{font-size:11px;padding:6px 8px}}
+@media(prefers-reduced-motion:reduce){#mochi3d .mp-action{transition:none}}
+
+#mochi3d{width:100%;padding:0}#mochi3d[hidden],#stage[hidden],#viewRoom .roomact[hidden]{display:none!important}
+#mochi3d .mp-room{border:0;border-radius:24px;box-shadow:none}#mochi3d .mp-action,#mochi3d .mp-view{cursor:pointer}
+.room-mode{display:flex;gap:8px;justify-content:center;margin:0 0 12px}.room-mode button{min-height:44px;padding:8px 18px;border:1px solid #e4d6ed;border-radius:20px;background:#fff;color:#755687;font:inherit;cursor:pointer}.room-mode button[aria-pressed="true"]{background:#8863a7;color:#fff}.room-3d-status{margin:0;text-align:center;color:var(--slate);font-size:.9rem}.room-3d-status:empty{display:none}
+#viewRoom .card.room{padding:16px;min-width:0}#mochi3d .mp-view{font-size:22px}#mochi3d .mp-footer{padding-top:5px}

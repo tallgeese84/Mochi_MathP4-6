@@ -1234,7 +1234,7 @@ function isCorrect(input,q){
 
 /* The cat ships inside the markup; this just reads her back out. */
 const BUILTIN_PHOTO = ($('catImg').getAttribute('src') || '');
-const APP_VERSION = '5.1.0';
+const APP_VERSION = '5.2.0';
 const BUILD_KIND  = 'site';
 const BUILD_DATE  = '2026-09-23';
 const BUILD = BUILD_KIND + ' v' + APP_VERSION + ' \u00b7 ' + BUILD_DATE;
@@ -1398,6 +1398,7 @@ function hearts(n){
   }
 }
 function petCat(){
+  document.dispatchEvent(new Event('mochi:pet'));
   const st = $('stage');
   st.classList.remove('pet'); void st.offsetWidth; st.classList.add('pet');
   hearts(2);
@@ -1410,6 +1411,7 @@ function petCat(){
 }
 function feed(t){
   if(coins() < t.cost){ $('roomNote').textContent = 'That costs ' + t.cost + ' coins. Answer a few more questions first.'; return; }
+  document.dispatchEvent(new CustomEvent('mochi:fed',{detail:{id:t.id,name:t.name}}));
   S.coins = coins() - t.cost;
   S.fed = (S.fed||0) + 1;
   const st = $('stage');
@@ -2523,5 +2525,5 @@ async function hydratePhoto(){
 }
 
 if('serviceWorker' in navigator){
-  document.addEventListener('mochi:ready', ()=> navigator.serviceWorker.register('sw.js?v=5.1.0',{updateViaCache:'none'}).catch(()=>{}),{once:true});
+  document.addEventListener('mochi:ready', ()=> navigator.serviceWorker.register('sw.js?v=5.2.0',{updateViaCache:'none'}).catch(()=>{}),{once:true});
 }
