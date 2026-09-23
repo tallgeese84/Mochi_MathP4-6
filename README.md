@@ -5,7 +5,7 @@ Euna for Primary 6 mathematics and her **September 2027 SPERS-Sec1 planning targ
 with a separate enrichment strand for mathematical thinking. The exact 2027 test
 and application dates must be checked when published.
 
-**v5.0.0 — 22 September 2026.** The existing cat, room, handwriting pad, provider
+**v5.0.1 — 23 September 2026.** The existing cat, room, handwriting pad, provider
 settings and saved coins are preserved. Old topic totals are retained as legacy
 accuracy; they are not treated as new evidence of independent learning.
 
@@ -16,8 +16,18 @@ The app now opens a written **Maths and Science classroom**: 42 sequenced units,
 Original illustrations accompany worked explanations, notebook activities and
 labelled interactive models. Switch subjects in the header, choose a unit and
 explore its teaching sections before checking understanding. Keyboard and stylus
-notes are saved. The existing question studio and Science experiments remain
-available through each lesson's additional-practice controls.
+notes are saved. **Finish & start practice** opens the original adaptive Maths
+questions or related Science questions and experiments directly. **Practice
+questions** is a main action for an explored textbook, while **Quick lesson check**
+offers the short authored checks separately. Science units without a matching
+original bank use their own lesson questions; the primary forces unit keeps its
+core checks, with the original forces extension available in the wider bank.
+
+**All Maths practice / All Science practice** is always visible above the lesson
+for review of earlier work, even before a new textbook is explored. It restores
+the full subject bank, without the textbook's topic filter. Returning to the
+textbook and resuming the same practice session preserves the question, answer
+and working. Reading related teaching during an unfinished attempt records help.
 
 Read the [classroom guide](docs/CLASSROOM_GUIDE.md) for a daily teaching routine,
 difficulty decisions and how to review progress. Read the [curriculum audit](docs/CLASSROOM_CURRICULUM_AUDIT.md)
@@ -36,7 +46,7 @@ provider settings, cat customisation and coins are preserved. Parent settings
 show the classroom evidence alongside the earlier question-studio records.
 
 The website and installed home-screen app share the same code and release.
-After publication, refresh online and confirm **v5.0.0** in the header. Do not
+After publication, refresh online and confirm **v5.0.1** in the header. Do not
 clear app storage or reinstall to update: retain the existing learning history.
 
 ## Tracking the published version

@@ -1,4 +1,4 @@
-# Euna’s classroom — v5.0.0
+# Euna’s classroom — v5.0.1
 
 This release adds a substantial written teaching course: **23 Maths units and 19 Science units**, each with seven teaching sections, worked reasoning, notebook activities and six initial checks. It contains about **25,800 words of original teaching**, six original raster illustrations and labelled teaching models. The existing generated Maths questions, Science experiments, tutor, progress history and family backup remain available.
 
@@ -6,12 +6,13 @@ The admissions route is **NUS High DSA-Sec**, not “DTA”. The course uses the
 
 ## Start a class
 
-1. Open Maths or Science in the header. Choose a unit in **Your classroom**. Start with the stated prerequisites if they are unfamiliar.
+1. Open Maths or Science in the header. Choose a unit in **Textbook topic**. Start with the stated prerequisites if they are unfamiliar.
 2. Read one or two sections, explain the idea aloud, and work through the examples in the notebook. Use **Explore a model** to predict, manipulate and explain. Take as many sittings as needed; the course does not infer understanding from time spent reading.
 3. Use Keyboard or Stylus in **My notebook**. “Pen only” ignores finger input on the drawing pad; scroll beside the pad. Typed notes and normalised ink coordinates are saved with the unit. Turning a page or changing subjects preserves them.
-4. After exploring all seven sections, select **Finish teaching sections**, then **Check my understanding**. The check starts with a fresh notebook, so the lesson notes do not reveal answers during an independent attempt.
-5. If an answer is wrong, explain the feedback and revise. **Revisit the teaching** records support for an unfinished check. A revision cannot overwrite the first answer.
-6. Use **Next recommendation** for an unfinished unit, the next unit, or a delayed review. Use the avatar for parent settings and the classroom evidence table. The old question studio is available through **Sources and additional practice** after the unit’s teaching has been explored.
+4. After exploring all seven sections, select **Finish & start practice**. Maths opens the original generated questions focused on the lesson's skill group. Science opens related questions and experiments where a matching original bank exists; other units use their own authored questions. The primary forces unit uses its core questions, while the older forces extension remains in the wider Science bank. On a later visit, use the main **Practice questions** button.
+5. For a brief concept check alongside the original bank, choose **Quick lesson check**. These six authored questions per unit supplement the existing questions. Each check starts with a fresh notebook, so lesson notes do not reveal answers. If an answer is wrong, explain the feedback and revise. Revisiting the textbook records support for an unfinished related question, and a revision cannot overwrite the first answer.
+6. For review across the subject, use **All Maths practice** or **All Science practice** above the textbook. These controls are available immediately and remove the lesson's topic filter. Reading pages is not required again to access earlier practice. Use **Back to textbook** and **Practice questions** to move between the lesson and the same unfinished topic question; answer entries, working and drawings remain in place during that round-trip. Starting a different practice session or changing its topic can open a new question.
+7. Use **Next recommendation** for an unfinished unit, the next unit, or a delayed review. Use the avatar for parent settings and the classroom evidence table. **Sources and course scope** contains references, not the practice controls.
 
 Lesson completion records **exposure**, not mastery. A child can click through pages; the app cannot establish that she understood or performed the practical activity. A parent or teacher should listen to explanations and inspect working before treating a topic as secure.
 
