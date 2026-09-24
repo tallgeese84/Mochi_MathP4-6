@@ -7,7 +7,7 @@ function init(){
  const modeKey='mochi-room-view-v1',script=document.querySelector('script[src*="mochi-room.js"]');
  const version=new URL(script.src,document.baseURI).searchParams.get('v');
  const moduleURL=new URL('mochi-room-scene.js',script.src);moduleURL.searchParams.set('v',version);
- let api=null,pending=null,failed=false,forwarding=false,preferPicture=false;
+ let api=null,pending=null,failed=false,forwarding=false,preferPicture=false,quality=/Android/i.test(navigator.userAgent)?'lite':'full',failure='',retry=0;
  try{preferPicture=localStorage.getItem(modeKey)==='picture';}catch(_){}
  const visible=()=>view.style.display!=='none'&&!view.hidden;
  function saveMode(){try{localStorage.setItem(modeKey,preferPicture?'picture':'3d');}catch(_){} }
@@ -23,7 +23,7 @@ function init(){
   $('room3dMode').setAttribute('aria-pressed',String(active));
   $('roomPictureMode').setAttribute('aria-pressed',String(!active));
   $('petBtn').parentElement.hidden=active&&!!api;
-  $('room3dStatus').textContent=failed?'The 3D room is unavailable here. You can still play with Mochi’s picture.':pending?'Mochi is waking up…':'';
+  $('room3dStatus').textContent=failed?'3D could not start: '+failure+' You can still play with Mochi’s picture.':pending?'Mochi is waking up…':'';
   $('room3dRetry').hidden=!failed;
   api?.setVisible(active&&visible());
  }
@@ -33,19 +33,20 @@ function init(){
    try{
     const scene=await import(moduleURL.href);
     api=await scene.mountMochiRoom(host,{
+     quality,
      level:root.MochiPlanner?.pet(root.MochiPlanner.init(S)).level||0,
      onPet(){forwarding=true;try{petCat();}finally{forwarding=false;}},
-     onError(){failed=true;paint();}
+     onError(error){failure=error?.message||'The browser reset the 3D view.';failed=true;paint();}
     });
     sync();
-   }catch(error){failed=true;console.warn('Mochi room unavailable:',error.message);}
+   }catch(error){failed=true;failure=error.message||'The 3D files could not load.';console.warn('Mochi room unavailable:',error.message);}
    finally{pending=null;paint();}
   })();
   paint();await pending;
  }
  $('room3dMode').onclick=()=>{preferPicture=false;saveMode();paint();ensure();};
  $('roomPictureMode').onclick=()=>{preferPicture=true;saveMode();paint();};
- $('room3dRetry').onclick=()=>{api?.dispose();api=null;host.querySelectorAll('canvas').forEach(n=>n.remove());failed=false;preferPicture=false;saveMode();ensure();};
+ $('room3dRetry').onclick=()=>{api?.dispose();api=null;host.querySelectorAll('canvas').forEach(n=>n.remove());failed=false;failure='';quality='lite';moduleURL.searchParams.set('retry',String(++retry));preferPicture=false;saveMode();ensure();};
  document.addEventListener('mochi:pet',()=>{if(!forwarding&&api&&!preferPicture&&!failed)api.pet();});
  document.addEventListener('mochi:fed',e=>{if(api&&!preferPicture&&!failed)api.feed(e.detail?.name);});
  document.addEventListener('mochi:state-saved',sync);
