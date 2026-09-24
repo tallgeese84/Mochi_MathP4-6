@@ -85,6 +85,31 @@ test('both subjects and delayed independent retrieval grow Mochi without a strea
 test('course evidence ignores a forged independent flag and requires the marked answer',()=>{
  const s=state();const a=answer(s,'bad','m-number-q1',false);a.independent=true;a.correct=true;P.grow(s);assert.equal(P.pet(s.planner).maths,0);
 });
+test('the five growth stages require breadth in both subjects and spaced successful revisits',()=>{
+ const s=state();assert.equal(P.pet(s.planner).level,0);
+ const maths=['number','fraction','decimal','ratio','percentage','measurement','geometry','data'];
+ const sciences=['electricity','light','ecology','forces','energy','matter','plants','human'];
+ const add=(from,to,at=now)=>{
+  for(let i=from;i<to;i++){
+   s.learning.attempts.push(math('m'+i+'-'+at,{skill:maths[i],at}));
+   s.science.attempts.push(science('s'+i+'-'+at,{skill:sciences[i],at}));
+  }P.grow(s);
+ };
+ add(0,1);assert.equal(P.pet(s.planner).level,0);
+ s.learning.attempts.push(math('m-form2',{generator:'compare',at:now+1}));P.grow(s);
+ assert.equal(P.pet(s.planner).level,0,'one subject alone cannot unlock growth');
+ s.science.attempts.push(science('s-form2',{skill:sciences[0],item:'circuit-2',at:now+1}));P.grow(s);
+ assert.equal(P.pet(s.planner).level,1);
+ add(1,3);assert.equal(P.pet(s.planner).level,2);
+ add(3,5);assert.equal(P.pet(s.planner).level,2,'breadth alone cannot replace retained ideas');
+ add(0,2,now+2*DAY);assert.equal(P.pet(s.planner).level,2,'two days is too soon');
+ add(0,2,now+4*DAY);assert.equal(P.pet(s.planner).level,3);
+ add(5,8);assert.equal(P.pet(s.planner).level,3);
+ add(2,5,now+4*DAY);const grown=P.pet(s.planner);
+ assert.equal(grown.level,4);assert.equal(grown.retained,10);assert.equal(grown.name,P.growthStages[4].name);
+ s.learning.attempts.push(math('later-mistake',{at:now+30*DAY,correct:false,firstCorrect:false}));P.grow(s);
+ assert.equal(P.pet(P.validate(s.planner)).level,4,'mistakes, rest and restoring progress preserve earned growth');
+});
 test('review and backup include the plan, reflections and examples, excluding settings',()=>{
  const s=state();P.day(s.planner,'science',now).reflection='I changed one variable.';s.keys={api:'PRIVATE_API_KEY'};s.mirrorSecret='PRIVATE_SECRET';
  const ctx={MochiLearning:require('../learning.js'),MochiCourse:C,MochiPlanner:P,Intl};vm.runInNewContext(fs.readFileSync(require.resolve('../learning-review.js'),'utf8'),ctx);

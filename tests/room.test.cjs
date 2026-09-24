@@ -18,7 +18,7 @@ function room({fail=false,picture=false}={}){
  w.MochiReady=true;
  w.eval(fs.readFileSync(path.join(root,'mochi-room.js'),'utf8').replace('import(moduleURL.href)','window.loadMochiScene(moduleURL.href)'));
  const flush=()=>new Promise(r=>setTimeout(r,0));
- return{w,state,flush,dom,get counts(){return{loads,mounts,disposed}},stroke:()=>options.onPet(),fail:value=>fail=value,contextLost:()=>options.onError()};
+ return{w,state,flush,dom,get options(){return options},get counts(){return{loads,mounts,disposed}},stroke:()=>options.onPet(),fail:value=>fail=value,contextLost:()=>options.onError()};
 }
 test('3D opens once on a room visit, credits one stroke, and preserves purchases and learning',async()=>{
  const h=room(),{w,state}=h;
@@ -49,4 +49,15 @@ test('unavailable 3D and context loss fall back without charging coins, and retr
 });
 test('saved picture preference does not load or initialise the 3D renderer',async()=>{
  const h=room({picture:true});try{h.w.$('viewRoom').style.display='';await h.flush();assert.equal(h.counts.loads,0);assert.equal(h.w.$('stage').hidden,false);}finally{h.dom.window.close();}
+});
+test('earned growth is applied at mount and refreshed after local saves and cloud merges',async()=>{
+ const h=room(),{w}=h;let level=2;
+ w.MochiPlanner={init:s=>s.planner,pet:()=>({level})};
+ try{
+  w.$('viewRoom').style.display='';await h.flush();
+  assert.equal(h.options.level,2);assert.equal(h.state.growth,2);
+  level=3;w.save();assert.equal(h.state.growth,3);
+  level=4;w.document.dispatchEvent(new w.Event('mochi:cloud-merged'));assert.equal(h.state.growth,4);
+  assert.equal(h.counts.mounts,1,'growth updates the living scene without replacing it');
+ }finally{h.dom.window.close();}
 });

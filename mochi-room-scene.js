@@ -198,6 +198,8 @@ ic.fillStyle='rgba(248,255,220,.88)';ic.beginPath();ic.ellipse(178,349,12,9,-.35
 const irisTex=new T.CanvasTexture(irisCanvas);irisTex.colorSpace=T.SRGBColorSpace;
 const irisMat=new T.MeshPhysicalMaterial({map:irisTex,roughness:.19,clearcoat:1,clearcoatRoughness:.12});
 function faceDepth(x,y){const ny=y/.57,widen=1+.065*Math.exp(-Math.pow((ny+.2)*2.4,2)),nx=x/(.65*widen);return .55*Math.sqrt(Math.max(.001,1-nx*nx-ny*ny))*(1+.025*Math.sin(ny*3));}
+// Keep the earned stage bounded: a companion grows a little at each milestone.
+let growthLevel=-1,bodyScale=1,eyeScale=1;
 const eyes=[];
 for(const side of [-1,1]){
  const cx=side*.279,cy=.052,rx=.219,rings=12,segments=64,positions=new Float32Array((1+rings*segments)*3),uv=new Float32Array((1+rings*segments)*2),index=[];
@@ -212,14 +214,14 @@ for(const side of [-1,1]){
   const geo=new T.BufferGeometry();geo.setAttribute('position',new T.BufferAttribute(p,3));geo.setAttribute('uv',new T.BufferAttribute(u,2));geo.setIndex(indices);
   const lid=new T.Mesh(geo,upper?plainFur:whiteFur);lid.name=upper?'Soft upper eyelid':'Soft lower eyelid';lid.frustumCulled=false;headRig.add(lid);lids.push({mesh:lid,upper,count,rows});
  }
- let lastOpen=-1,lastX=0,lastY=0;
+ let lastOpen=-1,lastX=0,lastY=0,lastScale=0;
  function update(open,gazeX=0,gazeY=0){
-  open=Math.max(.018,Math.min(1,open));if(Math.abs(open-lastOpen)<.0001&&gazeX===lastX&&gazeY===lastY)return;lastOpen=open;lastX=gazeX;lastY=gazeY;
-  function vertex(i,r,a){const px=rx*r*Math.cos(a),s=Math.sin(a),centre=-.016*(1-open)*Math.sqrt(Math.max(0,1-px*px/(rx*rx))),py=centre+(s>=0?.224:.201)*open*r*s,x=cx+px,y=cy+py;positions[i*3]=x;positions[i*3+1]=y;positions[i*3+2]=faceDepth(x,y)+.012+.030*(1-r*r);uv[i*2]=.5+(px-gazeX*.020)/.452;uv[i*2+1]=.5+(py-gazeY*.018)/.452;}
+  open=Math.max(.018,Math.min(1,open));if(Math.abs(open-lastOpen)<.0001&&gazeX===lastX&&gazeY===lastY&&eyeScale===lastScale)return;lastOpen=open;lastX=gazeX;lastY=gazeY;lastScale=eyeScale;
+  function vertex(i,r,a){const px=rx*r*Math.cos(a),s=Math.sin(a),centre=-.016*(1-open)*Math.sqrt(Math.max(0,1-px*px/(rx*rx))),py=centre+(s>=0?.224:.201)*open*r*s,x=cx+px*eyeScale,y=cy+py*eyeScale;positions[i*3]=x;positions[i*3+1]=y;positions[i*3+2]=faceDepth(x,y)+.012+.030*(1-r*r);uv[i*2]=.5+(px-gazeX*.020)/.452;uv[i*2+1]=.5+(py-gazeY*.018)/.452;}
   vertex(0,0,0);for(let r=1;r<=rings;r++)for(let j=0;j<segments;j++)vertex(1+(r-1)*segments+j,r/rings,j/segments*Math.PI*2);
   geometry.attributes.position.needsUpdate=true;geometry.attributes.uv.needsUpdate=true;geometry.computeVertexNormals();
   for(const {mesh,upper,count,rows} of lids){const p=mesh.geometry.attributes.position.array;
-   for(let row=0;row<rows;row++)for(let j=0;j<count;j++){const spread=row/(rows-1),a=(j/(count-1)+(upper?0:1))*Math.PI,x=cx+(rx+.014*spread)*Math.cos(a),height=upper?.224*open-.016*(1-open)+.024*spread:.201*open+.016*(1-open)+.020*spread,y=cy+height*Math.sin(a),i=(row*count+j)*3;p[i]=x;p[i+1]=y;p[i+2]=faceDepth(x,y)+.003+.010*(1-spread);}
+   for(let row=0;row<rows;row++)for(let j=0;j<count;j++){const spread=row/(rows-1),a=(j/(count-1)+(upper?0:1))*Math.PI,x=cx+(rx+.014*spread)*eyeScale*Math.cos(a),height=upper?.224*open-.016*(1-open)+.024*spread:.201*open+.016*(1-open)+.020*spread,y=cy+height*eyeScale*Math.sin(a),i=(row*count+j)*3;p[i]=x;p[i+1]=y;p[i+2]=faceDepth(x,y)+.003+.010*(1-spread);}
    mesh.geometry.attributes.position.needsUpdate=true;mesh.geometry.computeVertexNormals();
   }
  }
@@ -260,21 +262,27 @@ for(let i=0;i<5;i++){
  const point=new T.Mesh(new T.ConeGeometry(.065,.15,6),gold);point.position.set(x,.62,z);wardrobe.crown.add(point);
  ellipsoid(wardrobe.crown,[x,.70,z],[.025,.025,.025],gold,smallSphere);
 }
+const eyewearRims=[];
 for(const id of ['specs','shades']){
  for(const side of [-1,1]){
-  const g=new T.Group();g.position.set(side*.279,.052,.55);g.rotation.y=side*.45;wardrobe[id].add(g);
+  const g=new T.Group();g.position.set(side*.279,.052,.55);g.rotation.y=side*.45;wardrobe[id].add(g);eyewearRims.push(g);
   const rim=new T.Mesh(new T.TorusGeometry(.231,.014,10,64),frameMat);rim.scale.y=1.025;g.add(rim);
   if(id==='shades'){const lens=new T.Mesh(new T.CircleGeometry(.220,64),mat('#262334',.23,{metalness:.2}));lens.position.z=.006;g.add(lens);}
  }
  tube(wardrobe[id],[[-.065,.055,.647],[0,.075,.650],[.065,.055,.647]],.014,frameMat);
 }
-let growthLevel=0,lastWear='';
+let lastWear='';
 function setWear(worn={}){
  const signature=JSON.stringify([worn.head,worn.eyes,worn.neck]);if(signature===lastWear)return;lastWear=signature;
  for(const [id,g] of Object.entries(wardrobe))g.visible=Object.values(worn).includes(id);
  draw(0);
 }
-function setGrowth(level){const next=T.MathUtils.clamp(Number(level)||0,0,4);if(next===growthLevel)return;growthLevel=next;draw(0);}
+function setGrowth(level){
+ const value=Number(level),next=Number.isFinite(value)?T.MathUtils.clamp(Math.floor(value),0,4):0;
+ if(next===growthLevel)return;growthLevel=next;bodyScale=1+next*.045;eyeScale=1+next*.04;
+ cat.scale.setScalar(bodyScale);eyewearRims.forEach(g=>g.scale.setScalar(eyeScale));
+ resetSteps();draw(0);
+}
 
 const padMaterial=mat('#d298a5',.78),toeXs=[-.115,-.039,.041,.119],toeZs=[.078,.112,.116,.078],limbs=[];
 for(const data of catSkinData.binds){
@@ -329,13 +337,13 @@ const heartShape=new T.Shape();heartShape.moveTo(0,-.10);heartShape.bezierCurveT
 const heartGeo=new T.ExtrudeGeometry(heartShape,{depth:.025,bevelEnabled:true,bevelSize:.009,bevelThickness:.006,bevelSegments:3,curveSegments:12});
 const hearts=[];for(let i=0;i<3;i++){const mesh=new T.Mesh(heartGeo,new T.MeshStandardMaterial({color:['#b393ce','#d0accf','#b29bcf'][i],roughness:.55,transparent:true,opacity:0}));mesh.visible=false;scene.add(mesh);hearts.push(mesh);}
 const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-let mode=reducedMotion?'sit':'walk',sit=reducedMotion?1:0,walkMix=reducedMotion?0:1,sim=0,last=null,lastPaint=-Infinity,frame=null,petUntil=-1,petAt=-1,petStrength=0,gait=0;
+let mode='sit',sit=1,walkMix=0,sim=0,last=null,lastPaint=-Infinity,frame=null,petUntil=-1,petAt=-1,petStrength=0,gait=0;
 let suspended=false,inView=true,dead=false,playing=!reducedMotion,route=null,routeLength=1,routeTravel=0,manualGoal=false,touring=false,tourAngle=2.38;
 const SPEED=.67,STEP_RATE=1.15,SWING=.38,PAW_Y=.12;
 const TOUR_RADIUS=.91;
 const goal=new T.Vector3(),velocity=new T.Vector3(),previousPosition=new T.Vector3(),rest=new T.Vector3(),landing=new T.Vector3(),reachLocal=new T.Vector3(),bendDirection=new T.Vector3(),limbDirection=new T.Vector3();
-const ray=new T.Raycaster(),pointer=new T.Vector2(),look={x:0,y:0};let dragging=null;
-cat.position.set(Math.cos(tourAngle)*TOUR_RADIUS,0,Math.sin(tourAngle)*TOUR_RADIUS);cat.rotation.y=Math.atan2(Math.sin(tourAngle),-Math.cos(tourAngle));
+const ray=new T.Raycaster(),pointer=new T.Vector2(),viewer=new T.Vector3(),look={x:0,y:0};let dragging=null;
+cat.position.set(0,0,0);cat.rotation.y=orbit;
 function setMood(text){mood.textContent=text;}
 function wrapAngle(a){return Math.atan2(Math.sin(a),Math.cos(a));}
 function updateControls(){
@@ -370,16 +378,16 @@ renderer.domElement.addEventListener('pointermove',e=>{
  if(dragging&&dragging.id===e.pointerId){const dx=e.clientX-dragging.old,dy=e.clientY-dragging.oldY;dragging.moved+=Math.hypot(dx,dy);orbitGoal-=dx*.009;orbit=orbitGoal;if(e.pointerType!=='touch')elevation=T.MathUtils.clamp(elevation-dy*.004,-.035,.68);dragging.old=e.clientX;dragging.oldY=e.clientY;draw(0);}else if(!playing)draw(0);
 });
 renderer.domElement.addEventListener('pointerup',e=>{if(dragging&&dragging.id===e.pointerId&&dragging.moved<8&&Math.abs(e.clientY-dragging.y)<12)tapScene(e);dragging=null;});
-renderer.domElement.addEventListener('pointercancel',()=>{dragging=null;});renderer.domElement.addEventListener('pointerleave',()=>{look.x=look.y=0;});
+renderer.domElement.addEventListener('pointercancel',()=>{dragging=null;});renderer.domElement.addEventListener('pointerleave',()=>{look.x=look.y=0;if(!playing)draw(0);});
 for(const b of root.querySelectorAll('[data-turn]'))b.onclick=()=>{inView=true;orbitGoal+=Number(b.dataset.turn)*.55;if(!playing)orbit=orbitGoal;draw(0);wake();};
 for(const b of root.querySelectorAll('[data-action]')){b.disabled=false;b.onclick=()=>setAction(b.dataset.action);}
-function positionCamera(){const w=Math.max(1,stage.clientWidth),h=Math.max(1,stage.clientHeight);camera.aspect=w/h;const distance=Math.max(7.8-growthLevel*.16,2.4/(Math.tan(camera.fov*Math.PI/360)*camera.aspect));camera.position.set(Math.sin(orbit)*distance,1.30+Math.sin(elevation)*distance,Math.cos(orbit)*distance);camera.lookAt(0,1.18,0);camera.updateProjectionMatrix();}
+function positionCamera(){const w=Math.max(1,stage.clientWidth),h=Math.max(1,stage.clientHeight);camera.aspect=w/h;const distance=Math.max(7.8,2.4/(Math.tan(camera.fov*Math.PI/360)*camera.aspect));camera.position.set(Math.sin(orbit)*distance,1.30+Math.sin(elevation)*distance,Math.cos(orbit)*distance);camera.lookAt(0,1.18,0);camera.updateProjectionMatrix();}
 function resize(){if(stage.clientWidth&&stage.clientHeight){renderer.setSize(stage.clientWidth,stage.clientHeight,false);positionCamera();draw(0);}}
 function pawRest(limb,out,standing=false){return out.set(limb.side*(limb.front?.29:.39),PAW_Y,(limb.front?.48:-.43)+(standing?0:sit*(limb.front?.05:.20)));}
 function startStep(limb){
  limb.swinging=true;limb.swingStart=gait;limb.swingProgress=0;do{limb.nextStep+=1;}while(limb.nextStep<=gait);limb.from.copy(limb.footWorld);
  cat.localToWorld(pawRest(limb,limb.to,true));
- limb.to.addScaledVector(velocity,(SWING+(1-SWING)*.5)/STEP_RATE);limb.to.y=PAW_Y;
+ limb.to.addScaledVector(velocity,(SWING+(1-SWING)*.5)/STEP_RATE);limb.to.y=PAW_Y*bodyScale;
  limb.landingYaw=cat.rotation.y;
 }
 function posePaws(dt,bob){
@@ -393,10 +401,10 @@ function posePaws(dt,bob){
    if(!limb.swinging&&(gait>=limb.nextStep||reachLocal.length()>.78))startStep(limb);
    if(limb.swinging){
     swingProgress=T.MathUtils.clamp((gait-limb.swingStart)/SWING,0,1);limb.swingProgress=swingProgress;
-    cat.localToWorld(pawRest(limb,landing,true));landing.addScaledVector(velocity,((1-swingProgress)*SWING+(1-SWING)*.5)/STEP_RATE);landing.y=PAW_Y;
+    cat.localToWorld(pawRest(limb,landing,true));landing.addScaledVector(velocity,((1-swingProgress)*SWING+(1-SWING)*.5)/STEP_RATE);landing.y=PAW_Y*bodyScale;
     limb.to.copy(landing);limb.landingYaw=cat.rotation.y;
     limb.footWorld.lerpVectors(limb.from,limb.to,smooth(0,1,swingProgress));
-    limb.footWorld.y=PAW_Y+Math.sin(swingProgress*Math.PI)*.245;
+    limb.footWorld.y=(PAW_Y+Math.sin(swingProgress*Math.PI)*.245)*bodyScale;
     if(swingProgress>=1){limb.swinging=false;limb.footWorld.copy(limb.to);limb.plantedYaw=limb.landingYaw;}
    }
   }else if(mode!=='walk'){
@@ -418,6 +426,7 @@ function posePaws(dt,bob){
 function draw(dt){
  if(dead||suspended)return;if(!playing)dt=0;
  if(dt>0){sim+=dt;sit=T.MathUtils.damp(sit,mode==='sit'?1:0,5,dt);walkMix=T.MathUtils.damp(walkMix,mode==='walk'?1:0,7,dt);petStrength=T.MathUtils.damp(petStrength,sim<petUntil?1:0,5,dt);orbit=T.MathUtils.damp(orbit,orbitGoal,8,dt);}
+ positionCamera();
  if(mode==='walk'&&dt>0){
   if(!touring&&!route)chooseGoal();previousPosition.copy(cat.position);let angle,u=0;
   if(touring){tourAngle-=SPEED*(1-sit)*dt/TOUR_RADIUS;cat.position.set(Math.cos(tourAngle)*TOUR_RADIUS,0,Math.sin(tourAngle)*TOUR_RADIUS);angle=Math.atan2(Math.sin(tourAngle),-Math.cos(tourAngle));}
@@ -425,23 +434,36 @@ function draw(dt){
   cat.rotation.y+=T.MathUtils.clamp(wrapAngle(angle-cat.rotation.y),-dt*2.4,dt*2.4);velocity.subVectors(cat.position,previousPosition).divideScalar(dt);
   gait+=dt*STEP_RATE*(1-sit);
   if(u>=1){if(manualGoal){mode='sit';destination.visible=false;setMood('Here I am.');updateControls();}else{tourAngle=Math.atan2(cat.position.z,cat.position.x);touring=true;}}
- }else if(dt>0){velocity.set(0,0,0);cat.rotation.y+=wrapAngle(.08-cat.rotation.y)*Math.min(1,dt*2.4);}
+ }else if(mode!=='walk'){
+  velocity.set(0,0,0);
+  const turn=dt>0?Math.min(1,dt*2.4):(!playing||last===null?1:0);
+  cat.rotation.y+=wrapAngle(Math.atan2(camera.position.x-cat.position.x,camera.position.z-cat.position.z)-cat.rotation.y)*turn;
+  if(turn===1)resetSteps();
+ }
  const bob=Math.sin(gait*Math.PI*4)*.024*walkMix;torso.position.y=bob;torso.rotation.z=Math.sin(gait*Math.PI*2)*.025*walkMix;
  poseBody(sit,bob);
 
  headRig.position.set(0,1.44+sit*.025+bob,.46-sit*.008);
- headRig.rotation.z=Math.sin(sim*2.8)*.028+petStrength*(.13+Math.sin(sim*4)*.025);headRig.rotation.x=Math.sin(sim*1.1)*.018+petStrength*.08;headRig.rotation.y=look.x*.23;
+ // The viewer is the virtual camera. No webcam or person tracking is used.
+ cat.updateMatrixWorld(true);cat.worldToLocal(viewer.copy(camera.position));viewer.sub(headRig.position);
+ const yaw=T.MathUtils.clamp(Math.atan2(viewer.x,viewer.z)+look.x*.12,-.65,.65);
+ const pitch=T.MathUtils.clamp(-Math.atan2(viewer.y,Math.hypot(viewer.x,viewer.z))-look.y*.08,-.35,.20);
+ headRig.rotation.z=Math.sin(sim*2.8)*.028+petStrength*(.13+Math.sin(sim*4)*.025);
+ headRig.rotation.x=dt>0?T.MathUtils.damp(headRig.rotation.x,pitch+petStrength*.08,7,dt):pitch+petStrength*.08;
+ headRig.rotation.y=dt>0?T.MathUtils.damp(headRig.rotation.y,yaw,7,dt):yaw;
+ headRig.updateWorldMatrix(true,false);headRig.worldToLocal(viewer.copy(camera.position));
+ const gazeX=T.MathUtils.clamp(Math.atan2(viewer.x,viewer.z)*2+look.x,-1.3,1.3),gazeY=T.MathUtils.clamp(Math.atan2(viewer.y,Math.hypot(viewer.x,viewer.z))*2+look.y,-1,1);
  
  const phase=sim%4.9,blink=phase>4.66?Math.sin((phase-4.66)/.24*Math.PI):0,closed=Math.max(blink*.96,petStrength*.83);
- for(const eye of eyes)eye.update(1-closed,look.x,look.y);
+ for(const eye of eyes)eye.update(1-closed,gazeX,gazeY);
  ears.forEach((ear,i)=>{const side=i===0?-1:1;ear.rotation.z=-side*.24+Math.sin(sim*1.7+i)*.023+petStrength*side*.08;ear.rotation.x=Math.sin(sim*.8+i)*.03;});
  tag.rotation.z=Math.sin(gait*Math.PI*2)*.12*walkMix;
  posePaws(dt,bob);skinBody();
  poseTail(sim,sit,petStrength);
  tailFuzz.update();
- hearts.forEach((heart,i)=>{const age=sim-petAt-i*.45,show=petAt>=0&&age>=0&&age<2.8;heart.visible=show;if(show){heart.position.set(cat.position.x+Math.sin(i*2+age)*.23,2.28+age*.29,cat.position.z+.35);heart.rotation.y=orbit;heart.rotation.z=Math.sin(age*2+i)*.15;heart.scale.setScalar(.56+Math.min(age,.4)*.25);heart.material.opacity=Math.min(1,age*5)*(1-smooth(1.5,2.8,age));}});
- positionCamera();renderer.render(scene,camera);
- root.dataset.mochiMode=mode;root.dataset.mochiMotion=playing?'on':'paused';root.dataset.mochiReady='true';
+ hearts.forEach((heart,i)=>{const age=sim-petAt-i*.45,show=petAt>=0&&age>=0&&age<2.8;heart.visible=show;if(show){heart.position.set(cat.position.x+Math.sin(i*2+age)*.23,2.28*bodyScale+age*.29,cat.position.z+.35);heart.rotation.y=orbit;heart.rotation.z=Math.sin(age*2+i)*.15;heart.scale.setScalar(.56+Math.min(age,.4)*.25);heart.material.opacity=Math.min(1,age*5)*(1-smooth(1.5,2.8,age));}});
+ renderer.render(scene,camera);
+ root.dataset.mochiGrowth=String(growthLevel);root.dataset.mochiMode=mode;root.dataset.mochiMotion=playing?'on':'paused';root.dataset.mochiReady='true';
 }
 function animate(now){
  frame=null;if(dead||!root.isConnected){dispose();return;}if(suspended||!playing||!inView||document.hidden){last=null;return;}
@@ -453,7 +475,7 @@ const io=new IntersectionObserver(entries=>{inView=entries[0].isIntersecting;if(
 const visibility=()=>{if(document.hidden)halt();else wake();};document.addEventListener('visibilitychange',visibility);
 renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();playing=false;halt();updateControls();setMood('The 3D view paused.');options.onError?.();});
 function dispose(){if(dead)return;dead=true;halt();ro.disconnect();io.disconnect();document.removeEventListener('visibilitychange',visibility);scene.traverse(o=>{o.geometry?.dispose();if(o.material){const ms=Array.isArray(o.material)?o.material:[o.material];ms.forEach(m=>m.dispose());}});furTex.dispose();furHeight.dispose();irisTex.dispose();renderer.dispose();}
-if(mode==='walk')chooseGoal();updateControls();resize();loading.hidden=true;clearTimeout(delay);
+setGrowth(options.level);updateControls();resize();loading.hidden=true;clearTimeout(delay);setMood('Right here with you.');
 if(!playing)setMood('Reduced motion is on. Press Walk to let Mochi explore.');
 wake();
 return {

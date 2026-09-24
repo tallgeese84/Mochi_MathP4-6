@@ -58,7 +58,8 @@ function paint(){
   $('plan-notes-'+s).textContent=(P.observations(S,s).signals[0]?.action||'Before you answer, choose a representation. Afterwards, explain why it works and how you checked.');
  }
  $('plannerPetName').textContent=pet.name;$('plannerPet').setAttribute('aria-label','Visit Mochi · '+pet.name);
- const room=$('mochiGrowth');room.dataset.level=pet.level;room.innerHTML=`<p class="plan-eyebrow">GROWING TOGETHER · STAGE ${pet.level+1}/5</p><h2>${esc(pet.name)}</h2><p>${pet.maths} Maths ideas · ${pet.science} Science ideas · ${pet.retained} revisited after three days</p><p>${esc(pet.next)}</p><small>Independent answers, different question forms and delayed retrieval earn milestones. Time, speed and repeated guesses do not. Rest days never shrink Mochi.</small>`;
+ const room=$('mochiGrowth');room.dataset.level=pet.level;room.querySelector('[data-growth-summary]').innerHTML=`<p class="plan-eyebrow">GROWING TOGETHER · STAGE ${pet.level+1}/5</p><h2>${esc(pet.name)}</h2><p>In 3D: ${esc(pet.appearance)}</p><p>${pet.maths} Maths ideas · ${pet.science} Science ideas · ${pet.retained} revisited after three days</p><p>${esc(pet.next)}</p>`;
+ room.querySelectorAll('[data-growth-step]').forEach(el=>{if(Number(el.dataset.growthStep)===pet.level)el.setAttribute('aria-current','step');else el.removeAttribute('aria-current');});
  $('stage').dataset.growth=pet.level;$('stage').style.setProperty('--growth-scale',String(.76+pet.level*.06));
  $('plannerPetImage').src=$('roomImg').src;
  paintClocks();if($('plannerEvidence').open)paintEvidence();
@@ -81,7 +82,9 @@ function init(){
  for(const s of P.subjects){$('clock-'+s).onclick=()=>start(s);$('learned-'+s).onchange=()=>{const d=P.day(data(),s);d.learnedAt=$('learned-'+s).checked?Date.now():0;d.updatedAt=Date.now();save(S);};$('reflect-'+s).onclick=()=>{const d=P.day(data(),s);d.reflection=$('reflection-'+s).value.trim();d.updatedAt=Date.now();save(S);$('plannerStatus').textContent=d.reflection?'Reflection saved for your next learning review.':'Add a thought first, or use your lesson notebook.';};}
  for(const b of host.querySelectorAll('[data-route]'))b.onclick=()=>route(b.dataset.subject,b.dataset.route);
  $('plannerPet').onclick=()=>{pause('Time for a break with Mochi.');studioShow('room');$('mochiGrowth').scrollIntoView({block:'nearest'});};
- const growth=document.createElement('section');growth.id='mochiGrowth';growth.className='mochi-growth';growth.setAttribute('aria-label','Mochi’s learning milestones');$('viewRoom').prepend(growth);
+ const growth=document.createElement('section');growth.id='mochiGrowth';growth.className='mochi-growth';growth.setAttribute('aria-label','Mochi’s learning milestones');
+ growth.innerHTML='<div data-growth-summary></div><details class="mochi-growth-guide"><summary>How Mochi grows</summary><p>His body and eyes grow a little at each stage. Each milestone builds on the previous one, and he keeps his friendly kitten face.</p><ol>'+P.growthStages.map((s,i)=>`<li data-growth-step="${i}"><strong>${esc(s.name)}</strong><span>${esc(s.unlock)}</span><small>${esc(s.appearance)}</small></li>`).join('')+'</ol><p>Revisited ideas count across both subjects together. An independent answer is correct without recorded help or retries.</p><small>Independent answers, different question forms and delayed retrieval earn milestones. Time, speed and repeated guesses do not. Rest days and mistakes never shrink Mochi.</small></details>';
+ $('viewRoom').prepend(growth);
  const evidence=document.createElement('details');evidence.id='plannerEvidence';evidence.className='study-details';evidence.innerHTML='<summary>Thinking patterns & next learning steps</summary><div id="plannerEvidenceBody"></div>';$('parentEvidence').after(evidence);evidence.ontoggle=()=>{if(evidence.open)paintEvidence();};
  for(const ev of ['pointerdown','keydown','input','scroll'])document.addEventListener(ev,()=>clock.touch(performance.now()),{passive:true,capture:true});
  document.addEventListener('mochi:state-saved',()=>{clearTimeout(renderTimer);renderTimer=setTimeout(paint,80);});
