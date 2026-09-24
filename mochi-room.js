@@ -33,6 +33,7 @@ function init(){
    try{
     const scene=await import(moduleURL.href);
     api=await scene.mountMochiRoom(host,{
+     level:root.MochiPlanner?.pet(root.MochiPlanner.init(S)).level||0,
      onPet(){forwarding=true;try{petCat();}finally{forwarding=false;}},
      onError(){failed=true;paint();}
     });

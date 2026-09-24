@@ -106,15 +106,21 @@ function grow(s){
   for(const kind of ['idea',...(forms.size>=2?['variety']:[]),...(retained?['retained']:[])]){const k=key+':'+kind;if(p.milestones[k])continue;p.milestones[k]={subject:a[0].subject,skill:a[0].skill,kind,earnedAt:a.at(-1).at,evidence:[a[0].id,...a.slice(-3).map(x=>x.id)].filter((x,i,v)=>v.indexOf(x)===i)};changed=true;}}
  return changed;
 }
+const growthStages=[
+ {name:'Little companion',appearance:'A small kitten with round green eyes.',unlock:'Your companion from the start.',next:'Explore two different question forms in each subject.'},
+ {name:'Curious companion',appearance:'A little taller, with slightly bigger eyes.',unlock:'Answer two different question forms independently in a topic in each subject.',next:'Build independent evidence in three topics in each subject.'},
+ {name:'Explorer',appearance:'A growing kitten with larger, bright eyes.',unlock:'Build on the first milestone with independent answers in three topics in each subject.',next:'Build five topics in each subject and revisit four ideas successfully after three days.'},
+ {name:'Thoughtful explorer',appearance:'A taller young cat, keeping his soft kitten face.',unlock:'Reach five topics in each subject, and successfully revisit four ideas after at least three days.',next:'Build eight topics in each subject and retain ten ideas over time.'},
+ {name:'Learning companion',appearance:'Fully grown for this adventure, with his biggest, roundest eyes.',unlock:'Reach eight topics in each subject, and successfully revisit ten ideas after at least three days.',next:'Keep exploring new ideas together. This is a learning milestone, not an exam grade.'}
+];
 function pet(p){
  const badges=Object.values(p.milestones),ideas=s=>badges.filter(x=>x.subject===s&&x.kind==='idea').length,maths=ideas('maths'),science=ideas('science'),variety=badges.filter(x=>x.kind==='variety').length,retained=badges.filter(x=>x.kind==='retained').length;
- const stages=[{name:'Little companion',next:'Explore two different question forms in each subject.'},{name:'Curious companion',next:'Build independent evidence in three topics in each subject.'},{name:'Explorer',next:'Build five topics in each subject and revisit four ideas successfully after three days.'},{name:'Thoughtful explorer',next:'Build eight topics in each subject and retain ten ideas over time.'},{name:'Learning companion',next:'Keep exploring new ideas together. This is a learning milestone, not an exam grade.'}];
  let level=0;if(maths>=1&&science>=1&&subjects.every(s=>badges.some(x=>x.subject===s&&x.kind==='variety')))level=1;if(level&&maths>=3&&science>=3)level=2;if(level===2&&maths>=5&&science>=5&&retained>=4)level=3;if(level===3&&maths>=8&&science>=8&&retained>=10)level=4;
- return {...stages[level],level,maths,science,variety,retained,badges:badges.length};
+ return {...growthStages[level],level,maths,science,variety,retained,badges:badges.length};
 }
 function report(s,now=Date.now()){
  const p=validate(init(s));return {generatedAt:new Date(now).toISOString(),timeZone:Intl.DateTimeFormat().resolvedOptions().timeZone,schedule:p.schedule,days:Object.keys(p.days).sort().slice(-14).map(date=>({date,activeMs:elapsed(p,date),goals:p.days[date]})),today:Object.fromEntries(subjects.map(subject=>[subject,goals(s,subject,now)])),next:Object.fromEntries(subjects.map(subject=>[subject,recommend(s,subject,now)])),thinking:Object.fromEntries(subjects.map(subject=>[subject,observations(s,subject,now)])),mochi:pet(p),limits:['Minutes are editable starting goals, not a prescribed educational dose.','Foreground time is an estimate; reading, reasoning and learning quality cannot be inferred from a clock.','Studied-idea ticks and reflections are self-reported. An exit answer is evidence, not a pass/fail gate.','Mochi milestones are retained celebrations, not grades, percentiles or admissions predictions.','Original checks are finite and uncalibrated. Familiar questions do not establish novel transfer.']};
 }
-root.MochiPlanner={fresh,init,validate,merge,day,days,defaults,subjects,localDay,weekday,minutes,elapsed,clock,records,observations,recommend,goals,grow,pet,report};
+root.MochiPlanner={fresh,init,validate,merge,day,days,defaults,subjects,localDay,weekday,minutes,elapsed,clock,records,observations,recommend,goals,grow,pet,growthStages,report};
 if(typeof module!=='undefined')module.exports=root.MochiPlanner;
 })(typeof window!=='undefined'?window:globalThis);
