@@ -2,13 +2,18 @@
 export async function mountMochiRoom(root,options={}){
 const stage=root.querySelector('.mp-stage'),loading=root.querySelector('.mp-loading'),mood=root.querySelector('.mp-mood');
 const delay=setTimeout(()=>{if(!loading.hidden)loading.textContent='The 3D room is taking a moment to load…';},12000);
+let cleanup=()=>{};
 try{
 const T=await import('./vendor/three-r180/three.module.js');
 const scene=new T.Scene();
-const renderer=new T.WebGLRenderer({antialias:true,alpha:true,powerPreference:'low-power'});
-renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));renderer.setClearColor(0x000000,0);
+const lite=options.quality==='lite'||/Android/i.test(navigator.userAgent);
+const renderer=new T.WebGLRenderer({antialias:!lite,alpha:true,powerPreference:'default'});
+cleanup=()=>{renderer.dispose();renderer.forceContextLoss();renderer.domElement.remove();};
+renderer.debug.onShaderError=()=>{throw Error('The graphics driver could not draw Mochi (shader compilation).');};
+root.dataset.mochiQuality=lite?'lite':'full';
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,lite?1:1.5));renderer.setClearColor(0x000000,0);
 renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;
-renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
+renderer.shadowMap.enabled=!lite;renderer.shadowMap.type=T.PCFSoftShadowMap;
 renderer.domElement.setAttribute('role','img');renderer.domElement.setAttribute('aria-label','A rounded 3D tabby kitten with green eyes and a blue collar. Use Walk, Sit and Stroke to interact.');
 stage.prepend(renderer.domElement);
 const camera=new T.PerspectiveCamera(34,1,.1,60);
@@ -25,9 +30,9 @@ const floorMat=mat('#eadff2',.92),cushionMat=mat('#c4a5d6',.98),seamMat=mat('#df
 let seed=27;const random=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};
 const furCanvas=document.createElement('canvas');furCanvas.width=1024;furCanvas.height=512;const fc=furCanvas.getContext('2d');fc.fillStyle='#f9f5ed';fc.fillRect(0,0,1024,512);
 for(let i=0;i<32000;i++){const x=random()*1024,y=random()*512,len=5+random()*17,curve=Math.sin(x*.018+y*.026)*3;fc.strokeStyle=i%3?`rgba(112,91,73,${.035+random()*.14})`:`rgba(255,255,247,${.15+random()*.3})`;fc.lineWidth=.45+random()*.8;fc.beginPath();fc.moveTo(x,y);fc.quadraticCurveTo(x+curve,y+len*.45,x+curve*1.5+(random()-.5)*2,y+len);fc.stroke();}
-const furTex=new T.CanvasTexture(furCanvas);furTex.colorSpace=T.SRGBColorSpace;furTex.wrapS=T.RepeatWrapping;furTex.wrapT=T.RepeatWrapping;furTex.anisotropy=4;
+const furTex=new T.CanvasTexture(furCanvas);furTex.colorSpace=T.SRGBColorSpace;furTex.wrapS=T.RepeatWrapping;furTex.wrapT=T.RepeatWrapping;furTex.anisotropy=lite?1:4;
 const furHeight=furTex.clone();furHeight.colorSpace=T.NoColorSpace;furHeight.needsUpdate=true;
-const coat={map:furTex,bumpMap:furHeight,bumpScale:.013,roughness:.96,sheen:.65,sheenRoughness:.9,sheenColor:new T.Color('#f0d5b7'),specularIntensity:.18};
+const coat={map:furTex,bumpMap:lite?null:furHeight,bumpScale:.013,roughness:.96,sheen:lite?0:.65,sheenRoughness:.9,sheenColor:new T.Color('#f0d5b7'),specularIntensity:.18};
 const furMaterial=new T.MeshPhysicalMaterial({...coat,color:0xffffff,vertexColors:true});
 const whiteFur=new T.MeshPhysicalMaterial({...coat,color:'#fff5e5',sheenColor:new T.Color('#fff5e7')});
 const plainFur=new T.MeshPhysicalMaterial({...coat,color:'#ca9b76'});
@@ -65,6 +70,7 @@ function tube(parent,points,radius,material,segments=20){const path=new T.Catmul
 const fibreMaterial=new T.MeshStandardMaterial({vertexColors:true,roughness:1,side:T.DoubleSide});
 const ribbonCorners=[[0,-1],[0,1],[1,-1],[1,-1],[0,1],[1,1]];
 function addFuzz(mesh,count,length,options={}){
+ count=Math.ceil(count*(lite?.16:1));
  const source=mesh.geometry,p=source.attributes.position,n=source.attributes.normal,c=source.attributes.color,groom=source.attributes.groom,index=source.index;
  const faces=index?index.count/3:p.count/3,weights=[],ids=[],a=new T.Vector3(),b=new T.Vector3(),d=new T.Vector3();let total=0;
  for(let f=0;f<faces;f++){const tri=index?[index.getX(f*3),index.getX(f*3+1),index.getX(f*3+2)]:[f*3,f*3+1,f*3+2];a.fromBufferAttribute(p,tri[0]);b.fromBufferAttribute(p,tri[1]).sub(a);d.fromBufferAttribute(p,tri[2]).sub(a);total+=b.cross(d).length();weights.push(total);ids.push(tri);}
@@ -467,14 +473,15 @@ function draw(dt){
 }
 function animate(now){
  frame=null;if(dead||!root.isConnected){dispose();return;}if(suspended||!playing||!inView||document.hidden){last=null;return;}
- if(now-lastPaint>=1000/30-1){const dt=last===null?0:Math.min((now-last)/1000,.08);last=now;lastPaint=now;draw(dt);}frame=requestAnimationFrame(animate);
+ if(now-lastPaint>=1000/(lite?24:30)-1){const dt=last===null?0:Math.min((now-last)/1000,.08);last=now;lastPaint=now;try{draw(dt);}catch(error){playing=false;options.onError?.(error);return;}}frame=requestAnimationFrame(animate);
 }
 function wake(){if(frame===null&&!suspended&&playing&&inView&&!document.hidden&&!dead){last=null;lastPaint=-Infinity;frame=requestAnimationFrame(animate);}}
 const ro=new ResizeObserver(resize);ro.observe(stage);
 const io=new IntersectionObserver(entries=>{inView=entries[0].isIntersecting;if(inView)wake();else halt();},{threshold:0,rootMargin:'80px'});io.observe(stage);
 const visibility=()=>{if(document.hidden)halt();else wake();};document.addEventListener('visibilitychange',visibility);
-renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();playing=false;halt();updateControls();setMood('The 3D view paused.');options.onError?.();});
-function dispose(){if(dead)return;dead=true;halt();ro.disconnect();io.disconnect();document.removeEventListener('visibilitychange',visibility);scene.traverse(o=>{o.geometry?.dispose();if(o.material){const ms=Array.isArray(o.material)?o.material:[o.material];ms.forEach(m=>m.dispose());}});furTex.dispose();furHeight.dispose();irisTex.dispose();renderer.dispose();}
+renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();playing=false;halt();updateControls();setMood('The 3D view paused.');if(!dead)options.onError?.(Error('The browser reset the 3D graphics context.'));});
+function dispose(){if(dead)return;dead=true;halt();ro.disconnect();io.disconnect();document.removeEventListener('visibilitychange',visibility);scene.traverse(o=>{o.geometry?.dispose();if(o.material){const ms=Array.isArray(o.material)?o.material:[o.material];ms.forEach(m=>m.dispose());}});furTex.dispose();furHeight.dispose();irisTex.dispose();renderer.dispose();renderer.forceContextLoss();renderer.domElement.remove();}
+cleanup=dispose;
 setGrowth(options.level);updateControls();resize();loading.hidden=true;clearTimeout(delay);setMood('Right here with you.');
 if(!playing)setMood('Reduced motion is on. Press Walk to let Mochi explore.');
 wake();
@@ -484,5 +491,5 @@ return {
  setWear,setGrowth,dispose,
  setVisible(visible){suspended=!visible;root.dataset.mochiActive=String(visible);if(suspended)halt();else{resize();wake();}}
 };
-}catch(error){clearTimeout(delay);throw error;}
+}catch(error){clearTimeout(delay);cleanup();throw error;}
 }
