@@ -6,6 +6,7 @@ let cleanup=()=>{};
 try{
 const T=await import('./vendor/three-r180/three.module.js');
 const scene=new T.Scene();
+let friends=null,friendsSignature='';
 const lite=options.quality==='lite'||/Android/i.test(navigator.userAgent);
 const renderer=new T.WebGLRenderer({antialias:!lite,alpha:true,powerPreference:'default'});
 cleanup=()=>{renderer.dispose();renderer.forceContextLoss();renderer.domElement.remove();};
@@ -342,6 +343,9 @@ poseTail(0,0,0);const tailFuzz=addFuzz(tail,150,.030,{flow:[0,1,0]});
 const heartShape=new T.Shape();heartShape.moveTo(0,-.10);heartShape.bezierCurveTo(-.20,.02,-.13,.18,0,.085);heartShape.bezierCurveTo(.13,.18,.20,.02,0,-.10);
 const heartGeo=new T.ExtrudeGeometry(heartShape,{depth:.025,bevelEnabled:true,bevelSize:.009,bevelThickness:.006,bevelSegments:3,curveSegments:12});
 const hearts=[];for(let i=0;i<3;i++){const mesh=new T.Mesh(heartGeo,new T.MeshStandardMaterial({color:['#b393ce','#d0accf','#b29bcf'][i],roughness:.55,transparent:true,opacity:0}));mesh.visible=false;scene.add(mesh);hearts.push(mesh);}
+friends=window.MochiCatFriendsScene?.mount(T,scene,{lite,onPet:info=>setMood(info.name+' leans into your hand. Prrr…')});
+friends?.set(options.friends||[]);
+function setFriends(ids=[]){const next=JSON.stringify(ids);if(next===friendsSignature)return;friendsSignature=next;friends?.set(ids);draw(0);}
 const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 let mode='sit',sit=1,walkMix=0,sim=0,last=null,lastPaint=-Infinity,frame=null,petUntil=-1,petAt=-1,petStrength=0,gait=0;
 let suspended=false,inView=true,dead=false,playing=!reducedMotion,route=null,routeLength=1,routeTravel=0,manualGoal=false,touring=false,tourAngle=2.38;
@@ -377,7 +381,7 @@ function setAction(action,notify=true){
  if(!playing)halt();updateControls();draw(0);wake();if(action==='pet'&&notify)options.onPet?.();
 }
 function walkTo(point){inView=true;mode='walk';playing=true;petUntil=-1;resetSteps();makeRoute(point,true);setMood('Coming over!');updateControls();draw(0);wake();}
-function tapScene(event){const r=renderer.domElement.getBoundingClientRect();pointer.set((event.clientX-r.left)/r.width*2-1,-(event.clientY-r.top)/r.height*2+1);ray.setFromCamera(pointer,camera);if(ray.intersectObject(cat,true).length){setAction('pet');return;}const hit=ray.intersectObject(rug)[0];if(hit)walkTo(hit.point);}
+function tapScene(event){const r=renderer.domElement.getBoundingClientRect();pointer.set((event.clientX-r.left)/r.width*2-1,-(event.clientY-r.top)/r.height*2+1);ray.setFromCamera(pointer,camera);if(friends?.hit(ray)){draw(0);wake();return;}if(ray.intersectObject(cat,true).length){setAction('pet');return;}const hit=ray.intersectObject(rug)[0];if(hit)walkTo(hit.point);}
 renderer.domElement.addEventListener('pointerdown',e=>{dragging={id:e.pointerId,x:e.clientX,y:e.clientY,old:e.clientX,oldY:e.clientY,moved:0};renderer.domElement.setPointerCapture(e.pointerId);});
 renderer.domElement.addEventListener('pointermove',e=>{
  const r=renderer.domElement.getBoundingClientRect();look.x=T.MathUtils.clamp((e.clientX-r.left-r.width/2)/r.width,-.3,.3);look.y=T.MathUtils.clamp(-(e.clientY-r.top-r.height*.4)/r.height,-.25,.25);
@@ -387,7 +391,7 @@ renderer.domElement.addEventListener('pointerup',e=>{if(dragging&&dragging.id===
 renderer.domElement.addEventListener('pointercancel',()=>{dragging=null;});renderer.domElement.addEventListener('pointerleave',()=>{look.x=look.y=0;if(!playing)draw(0);});
 for(const b of root.querySelectorAll('[data-turn]'))b.onclick=()=>{inView=true;orbitGoal+=Number(b.dataset.turn)*.55;if(!playing)orbit=orbitGoal;draw(0);wake();};
 for(const b of root.querySelectorAll('[data-action]')){b.disabled=false;b.onclick=()=>setAction(b.dataset.action);}
-function positionCamera(){const w=Math.max(1,stage.clientWidth),h=Math.max(1,stage.clientHeight);camera.aspect=w/h;const distance=Math.max(7.8,2.4/(Math.tan(camera.fov*Math.PI/360)*camera.aspect));camera.position.set(Math.sin(orbit)*distance,1.30+Math.sin(elevation)*distance,Math.cos(orbit)*distance);camera.lookAt(0,1.18,0);camera.updateProjectionMatrix();}
+function positionCamera(){const w=Math.max(1,stage.clientWidth),h=Math.max(1,stage.clientHeight);camera.aspect=w/h;const distance=Math.max(friends?.count?9:7.8,(friends?.count?3.2:2.4)/(Math.tan(camera.fov*Math.PI/360)*camera.aspect));camera.position.set(Math.sin(orbit)*distance,1.30+Math.sin(elevation)*distance,Math.cos(orbit)*distance);camera.lookAt(0,1.18,0);camera.updateProjectionMatrix();}
 function resize(){if(stage.clientWidth&&stage.clientHeight){renderer.setSize(stage.clientWidth,stage.clientHeight,false);positionCamera();draw(0);}}
 function pawRest(limb,out,standing=false){return out.set(limb.side*(limb.front?.29:.39),PAW_Y,(limb.front?.48:-.43)+(standing?0:sit*(limb.front?.05:.20)));}
 function startStep(limb){
@@ -468,6 +472,9 @@ function draw(dt){
  poseTail(sim,sit,petStrength);
  tailFuzz.update();
  hearts.forEach((heart,i)=>{const age=sim-petAt-i*.45,show=petAt>=0&&age>=0&&age<2.8;heart.visible=show;if(show){heart.position.set(cat.position.x+Math.sin(i*2+age)*.23,2.28*bodyScale+age*.29,cat.position.z+.35);heart.rotation.y=orbit;heart.rotation.z=Math.sin(age*2+i)*.15;heart.scale.setScalar(.56+Math.min(age,.4)*.25);heart.material.opacity=Math.min(1,age*5)*(1-smooth(1.5,2.8,age));}});
+ friends?.tick(dt,camera);
+ root.dataset.catFriends=String(friends?.count||0);
+ renderer.domElement.setAttribute('aria-label','Mochi and '+(friends?.count||0)+' companion cats. Use Walk, Sit and Stroke to interact with Mochi; tap a friend to stroke it.');
  renderer.render(scene,camera);
  root.dataset.mochiGrowth=String(growthLevel);root.dataset.mochiMode=mode;root.dataset.mochiMotion=playing?'on':'paused';root.dataset.mochiReady='true';
 }
@@ -480,7 +487,7 @@ const ro=new ResizeObserver(resize);ro.observe(stage);
 const io=new IntersectionObserver(entries=>{inView=entries[0].isIntersecting;if(inView)wake();else halt();},{threshold:0,rootMargin:'80px'});io.observe(stage);
 const visibility=()=>{if(document.hidden)halt();else wake();};document.addEventListener('visibilitychange',visibility);
 renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();playing=false;halt();updateControls();setMood('The 3D view paused.');if(!dead)options.onError?.(Error('The browser reset the 3D graphics context.'));});
-function dispose(){if(dead)return;dead=true;halt();ro.disconnect();io.disconnect();document.removeEventListener('visibilitychange',visibility);scene.traverse(o=>{o.geometry?.dispose();if(o.material){const ms=Array.isArray(o.material)?o.material:[o.material];ms.forEach(m=>m.dispose());}});furTex.dispose();furHeight.dispose();irisTex.dispose();renderer.dispose();renderer.forceContextLoss();renderer.domElement.remove();}
+function dispose(){if(dead)return;dead=true;halt();friends?.dispose();ro.disconnect();io.disconnect();document.removeEventListener('visibilitychange',visibility);scene.traverse(o=>{o.geometry?.dispose();if(o.material){const ms=Array.isArray(o.material)?o.material:[o.material];ms.forEach(m=>m.dispose());}});furTex.dispose();furHeight.dispose();irisTex.dispose();renderer.dispose();renderer.forceContextLoss();renderer.domElement.remove();}
 cleanup=dispose;
 setGrowth(options.level);updateControls();resize();loading.hidden=true;clearTimeout(delay);setMood('Right here with you.');
 if(!playing)setMood('Reduced motion is on. Press Walk to let Mochi explore.');
@@ -488,7 +495,7 @@ wake();
 return {
  pet:()=>setAction('pet',false),
  feed(name){setAction('pet',false);setMood(name?'Yum! '+name+'.':'That was delicious.');},
- setWear,setGrowth,dispose,
+ setWear,setGrowth,setFriends,petFriend(id){const ok=friends?.pet(id)||false;if(ok){draw(0);wake();}return ok;},dispose,
  setVisible(visible){suspended=!visible;root.dataset.mochiActive=String(visible);if(suspended)halt();else{resize();wake();}}
 };
 }catch(error){clearTimeout(delay);cleanup();throw error;}

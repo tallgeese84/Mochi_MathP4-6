@@ -1,3 +1,15 @@
+# v5.5.0 — Cat friends for Mochi
+
+- Add four distinct breed-inspired companions with coat, face, ear and tail differences.
+- Keep Mochi as the main cat; invite up to three friends without spending coins.
+- Unlock companions from 2, 8, 18 and 32 already-earned learning milestones.
+  Existing progress counts immediately; mistakes and rest days do not remove friends.
+- Share the original 3D renderer and animation clock, including pause, visibility
+  and reduced-motion behaviour. Keep companions accessible in picture mode.
+- Preserve earned unlocks across cloud merges and save deliberate room selections
+  across device sync, exports and imports. Older backups remain supported.
+- Add core, Three.js model and real-page roster tests. No learner records are bundled.
+
 # v5.4.0 — Teach before another numerical variant
 
 - Add short GST-direction, cube-layer and complete-circuit-path mini-lessons.

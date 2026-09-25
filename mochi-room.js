@@ -13,6 +13,7 @@ function init(){
  function saveMode(){try{localStorage.setItem(modeKey,preferPicture?'picture':'3d');}catch(_){} }
  function sync(){
   if(!api)return;
+  api.setFriends?.(root.MochiCatFriends?.sync(S).selected||[]);
   api.setWear(S.worn||{});
   const pet=root.MochiPlanner?.pet(root.MochiPlanner.init(S));
   api.setGrowth(pet?.level||0);
@@ -34,6 +35,7 @@ function init(){
     const scene=await import(moduleURL.href);
     api=await scene.mountMochiRoom(host,{
      quality,
+     friends:root.MochiCatFriends?.sync(S).selected||[],
      level:root.MochiPlanner?.pet(root.MochiPlanner.init(S)).level||0,
      onPet(){forwarding=true;try{petCat();}finally{forwarding=false;}},
      onError(error){failure=error?.message||'The browser reset the 3D view.';failed=true;paint();}
@@ -49,13 +51,14 @@ function init(){
  $('room3dRetry').onclick=()=>{api?.dispose();api=null;host.querySelectorAll('canvas').forEach(n=>n.remove());failed=false;failure='';quality='lite';moduleURL.searchParams.set('retry',String(++retry));preferPicture=false;saveMode();ensure();};
  document.addEventListener('mochi:pet',()=>{if(!forwarding&&api&&!preferPicture&&!failed)api.pet();});
  document.addEventListener('mochi:fed',e=>{if(api&&!preferPicture&&!failed)api.feed(e.detail?.name);});
+ document.addEventListener('mochi:cat-friends-changed',sync);
  document.addEventListener('mochi:state-saved',sync);
  document.addEventListener('mochi:cloud-merged',sync);
  document.addEventListener('mochi:activity',ensure);
  const observer=new MutationObserver(()=>{paint();if(visible())ensure();});
  observer.observe(view,{attributes:true,attributeFilter:['style','hidden']});
  paint();if(visible())ensure();
- root.MochiRoom={refresh:sync,open:ensure};
+ root.MochiRoom={refresh:sync,open:ensure,petFriend:id=>!preferPicture&&!failed&&!!api?.petFriend(id)};
 }
 if(root.MochiReady)init();else document.addEventListener('mochi:ready',init,{once:true});
 })(window);
