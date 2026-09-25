@@ -10,10 +10,11 @@ function room({fail=false,picture=false,android=false}={}){
  // Use the real room purchase, pet and wear functions with the normal DOM.
  const app=fs.readFileSync(path.join(root,'app.js'),'utf8');
  w.eval(app.slice(app.indexOf('const TREATS ='),app.indexOf('function showView(which)')));
- let loads=0,mounts=0,options,disposed=0;const state={visible:false,pets:0,feeds:[],wear:{}};
- w.loadMochiScene=async url=>{loads++;assert.equal(new URL(url).searchParams.get('v'),version);if(fail)throw Error('No WebGL');return{mountMochiRoom:async(host,opts)=>{
+ let loads=0,mounts=0,options,disposed=0;const state={visible:false,pets:0,feeds:[],wear:{},friends:[]};
+ w.MochiCatFriends={sync:()=>({selected:[]})};w.MochiCatFriendsScene={mount(){}};
+ w.loadMochiScene=async url=>{loads++;assert.equal(new URL(url).searchParams.get('v'),version);if(fail)throw Error('No WebGL');return{CAT_FRIENDS_VERSION:1,mountMochiRoom:async(host,opts)=>{
   mounts++;options=opts;host.prepend(w.document.createElement('canvas'));
-  return{setVisible:v=>state.visible=v,setWear:v=>state.wear={...v},setGrowth:v=>state.growth=v,pet:()=>state.pets++,feed:n=>state.feeds.push(n),dispose:()=>disposed++};
+  return{setFriends:ids=>state.friends=[...ids],getFriendCount:()=>state.friends.length,setVisible:v=>state.visible=v,setWear:v=>state.wear={...v},setGrowth:v=>state.growth=v,pet:()=>state.pets++,feed:n=>state.feeds.push(n),dispose:()=>disposed++};
  }}};
  if(picture)w.localStorage.setItem('mochi-room-view-v1','picture');
  w.MochiReady=true;

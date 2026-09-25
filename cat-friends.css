@@ -18,3 +18,9 @@
 @media(min-width:900px){.cf-cards{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:480px){.cat-friends summary{padding:15px 12px;font-size:16px}.cf-cards{padding:0 10px 12px;gap:8px}.cf-card{padding:11px 8px}.cf-intro,.cf-status,.cf-note{margin-left:14px;margin-right:14px}.cf-portrait{width:85px;height:85px}#catFriendsCount{font-size:11px}.cf-description{font-size:12px}}
 @media(prefers-reduced-motion:reduce){.cf-picture-cat:active{transform:none}}
+
+/* A visible, renderer-independent roster precedes the room; no hidden unlock requirement. */
+.cf-room-welcome{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:4px 0 8px;text-align:left}
+.cf-room-welcome strong{font-size:17px;color:#493453}.cf-room-welcome p{font-size:13px;line-height:1.5;margin:5px 0;color:#786584}
+.cf-room-welcome .cf-toggle{flex:0 0 auto;width:auto;min-width:112px}.cf-room-welcome+ .cf-picture-room{margin:0 auto 14px}
+@media(max-width:480px){.cf-room-welcome{align-items:flex-start}.cf-room-welcome .cf-toggle{min-width:98px;padding:9px;font-size:12px}.cf-room-welcome strong{font-size:16px}}

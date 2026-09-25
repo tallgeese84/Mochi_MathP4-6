@@ -1,0 +1,46 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Cat Friends saved-state recovery test</title>
+<style>body{margin:0;background:#faf8fc;font:14px system-ui}iframe{border:0;width:100%;height:1700px}#result{padding:8px;white-space:pre-wrap}</style>
+<pre id="result">Running…</pre><iframe title="Synthetic saved-state Cat Friends test" src="about:blank"></iframe>
+<script>
+(async()=>{
+ const frame=document.querySelector('iframe'),sleep=ms=>new Promise(r=>setTimeout(r,ms)),check=(ok,m)=>{if(!ok)throw Error(m);};
+ try{
+  check(['localhost','127.0.0.1','[::1]'].includes(location.hostname),'Use a local test server.');
+  check(!localStorage.getItem('mochi-tutor-v1')&&!localStorage.getItem('cubs_sync'),'Use an empty temporary browser profile; existing progress is never overwritten.');
+  const milestones={};for(let i=0;i<40;i++)milestones['maths:synthetic'+i+':idea']={subject:'maths',skill:'synthetic'+i,kind:'idea',earnedAt:1790330000000,evidence:['synthetic-'+i]};
+  localStorage.setItem('mochi-tutor-v1',JSON.stringify({mastery:{},coins:42,owned:['bow'],worn:{neck:'bow'},planner:{version:1,schedule:{updatedAt:0,week:Array.from({length:7},()=>({maths:25,science:20}))},sessions:[],days:{},milestones}}));
+  frame.src='../../index.html';
+  for(let n=0;n<160&&!frame.contentWindow.MochiReady;n++)await sleep(50);
+  const w=frame.contentWindow,d=w.document;check(w.MochiReady,'App did not start');
+  const errors=[];w.addEventListener('error',e=>errors.push(e.message));
+  check(w.eval('S.catFriends.unlocked.length')===4,'Saved milestones unlock all friends without new answers.');
+  check(w.eval('S.catFriends.selected.length')===3,'Default visitors restored.');
+  const before=w.eval('JSON.stringify({learning:S.learning,science:S.science,coins:S.coins,worn:S.worn,planner:S.planner})');
+  // Simulate the companion graphics request not being available after an update.
+  // v5.5.0 silently mounted only Mochi here; recovery must run before mounting.
+  w.MochiCatFriendsScene=undefined;w.studioShow('room');
+  for(let n=0;n<200&&d.getElementById('mochi3d').dataset.mochiReady!=='true';n++)await sleep(50);
+  const room=d.getElementById('mochi3d');check(room.dataset.mochiReady==='true',d.getElementById('room3dStatus').textContent||'3D did not start');
+  check(room.dataset.catFriends==='3','Three companion models must be present after recovery.');
+  check(room.querySelectorAll('canvas').length===1,'Exactly one renderer.');
+  check(!d.getElementById('catFriendsPictures').hidden,'Selected portraits also remain visible in 3D.');
+  check(d.getElementById('catFriendsRoomSummary').textContent.includes('Miso, Suki, Kumo'),'Names visible above the room.');
+  check(w.eval('JSON.stringify({learning:S.learning,science:S.science,coins:S.coins,worn:S.worn,planner:S.planner})')===before,'Recovery preserves progress and rewards.');
+  d.getElementById('catFriendsManage').click();check(d.getElementById('catFriends').open,'Direct roster control.');
+  for(const id of ['miso','suki','kumo'])d.querySelector('[data-friend="'+id+'"] button').click();
+  check(w.eval('S.catFriends.selected.length')===0,'Deliberate empty roster.');
+  check(d.getElementById('catFriendsRoomSummary').textContent.includes('resting'),'An empty roster is explained.');
+  w.MochiRoom.refresh();check(w.eval('S.catFriends.selected.length')===0,'Do not silently undo a deliberate empty roster.');
+  for(const id of ['miso','suki','yuki'])d.querySelector('[data-friend="'+id+'"] button').click();
+  check(room.dataset.catFriends==='3','Reinvite updates the same scene.');
+  d.getElementById('roomPictureMode').click();await sleep(20);check(!d.getElementById('catFriendsPictures').hidden,'All visitors remain in picture mode.');
+  check(w.MochiReviewDownload.make().catFriends.selected.join(',')==='miso,suki,yuki','Backup preserves current roster.');
+  d.getElementById('room3dMode').click();await sleep(20);check(room.querySelectorAll('canvas').length===1,'Mode switch keeps one renderer.');
+  frame.style.width='375px';await sleep(60);check(d.documentElement.scrollWidth<=375,'375px layout fits.');frame.style.width='100%';
+  const pause=room.querySelector('[data-action="pause"]');if(pause.getAttribute('aria-pressed')!=='true')pause.click();
+  check(!errors.length,'Page errors: '+errors.join('; '));
+  document.body.dataset.result='passed';document.getElementById('result').textContent=JSON.stringify({passed:true,savedState:true,missingRendererRecovery:true,threeCats:true,visibleNames:true,preservedProgress:true,pictureMode:true,rosterEdits:true,backup:true,narrowScreen:true,errors});
+  d.getElementById('viewRoom').scrollIntoView();
+ }catch(error){document.body.dataset.result='failed';document.getElementById('result').textContent=error.stack||error.message;}
+})();
+</script></html>

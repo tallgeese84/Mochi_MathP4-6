@@ -31,3 +31,16 @@ checks the actual page/renderer, roster controls, picture fallback, export and
 375px layout. Serve the repository locally with a fresh temporary browser profile for this graphics
 smoke test. It refuses non-local hosts or an existing progress/sync configuration,
 and contains no learner data.
+
+## v5.5.1 visibility and load recovery
+
+The top of the room now always lists and displays the selected friends, including
+in 3D mode. Choose friends opens the roster. A deliberately empty roster stays
+empty and explains how to invite friends back; a device with no earned milestones
+shows that state instead of implying the feature is missing.
+
+The room loader recovers a missing companion graphics script, checks the room
+module's `CAT_FRIENDS_VERSION` contract, retries an outdated module once, and
+checks the renderer's companion count. If recovery fails it reports the error and
+keeps picture companions available. The version label alone is not a graphics
+health check. This release does not change milestone thresholds or reset progress.
