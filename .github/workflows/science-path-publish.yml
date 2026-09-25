@@ -1,0 +1,58 @@
+name: Science pathway release validation
+on:
+  push:
+    branches: [codex/science-path-v6-1-0]
+permissions:
+  contents: write
+jobs:
+  validate:
+    if: github.ref == 'refs/heads/codex/science-path-v6-1-0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Assemble exact reviewed sources
+        run: |
+          python3 scripts/assemble-science-path.py
+          git add -A
+          tree=$(git write-tree)
+          echo "Production tree: $tree"
+          test "$tree" = 'e49f9fc4468b9fcc634b45a2822d6a3978918839'
+      - run: npm ci --ignore-scripts
+      - name: Full regression and content validation
+        run: |
+          set -euo pipefail
+          npm run check:release
+          npm run check:course
+          npm test | tee "$RUNNER_TEMP/science-tests.log"
+      - name: Actual Chrome page and controls
+        run: |
+          set -euo pipefail
+          python3 -m http.server 8765 --bind 127.0.0.1 > "$RUNNER_TEMP/science-server.log" 2>&1 &
+          server=$!
+          trap 'kill "$server"' EXIT
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:8765/release.json && break || sleep 0.2; done
+          chrome=$(command -v google-chrome || command -v google-chrome-stable)
+          timeout 75s "$chrome" --headless --no-sandbox --enable-unsafe-swiftshader --use-angle=swiftshader --disable-dev-shm-usage --user-data-dir="$RUNNER_TEMP/science-browser" --window-size=1280,1800 --timeout=60000 --virtual-time-budget=22000 --screenshot="$RUNNER_TEMP/science-room.png" --dump-dom http://127.0.0.1:8765/tests/fixtures/science-path-browser.html > "$RUNNER_TEMP/science-browser.html" 2> "$RUNNER_TEMP/science-browser.log"
+          grep -q 'data-result="passed"' "$RUNNER_TEMP/science-browser.html"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: science-path-validation
+          path: |
+            ${{ runner.temp }}/science-room.png
+            ${{ runner.temp }}/science-browser.html
+            ${{ runner.temp }}/science-browser.log
+            ${{ runner.temp }}/science-tests.log
+          retention-days: 2
+      - name: Commit verified release to its working branch only
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git diff --check --cached
+          git commit -m 'Finalize v6.1.0 science pathway after regression and browser validation'
+          git push origin HEAD:refs/heads/codex/science-path-v6-1-0
