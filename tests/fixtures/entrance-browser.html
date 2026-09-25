@@ -1,0 +1,13 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Entrance pathway browser validation</title><style>body{margin:0;font:14px system-ui;background:#f7f5fc}#result{white-space:pre-wrap;padding:8px}iframe{border:0;width:100%;height:1600px}</style><pre id="result">Running…</pre><iframe title="Synthetic mathematics pathway validation" src="about:blank"></iframe><script src="entrance-controls.js"></script><script>
+(async()=>{const frame=document.querySelector('iframe'),sleep=ms=>new Promise(r=>setTimeout(r,ms));try{
+ if(!['localhost','127.0.0.1','[::1]'].includes(location.hostname))throw Error('Local test server only.');
+ if(localStorage.getItem('mochi-tutor-v1')||localStorage.getItem('cubs_sync'))throw Error('Use a fresh temporary browser profile; existing progress will not be changed.');
+ frame.src='../../index.html';for(let i=0;i<150&&!frame.contentWindow.MochiEntranceUI;i++)await sleep(50);
+ const w=frame.contentWindow,errors=[];w.addEventListener('error',e=>errors.push(e.message));
+ const report=await runEntranceControlChecks(w);
+ frame.style.width='375px';await sleep(100);if(w.document.documentElement.scrollWidth>375)throw Error('Narrow layout overflows');frame.style.width='100%';await sleep(100);
+ if(errors.length)throw Error(errors.join('; '));
+ document.body.dataset.result='passed';document.getElementById('result').textContent=JSON.stringify({...report,narrowLayout:true,pageErrors:errors});
+ w.document.getElementById('viewEntrance').scrollIntoView();
+ }catch(e){document.body.dataset.result='failed';document.getElementById('result').textContent=e.stack||e.message;}})();
+</script></html>

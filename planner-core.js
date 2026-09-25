@@ -69,6 +69,12 @@ function records(s){
  for(const a of s.science?.attempts||[])if(stamp(a.at))out.push({id:'science:'+(a.id||a.item+':'+a.at),subject:'science',skill:scienceSkills[a.skill]||a.skill,at:answered(a),form:a.item,correct:!!a.correct,first:!!a.firstCorrect,independent:!!(a.correct&&a.firstCorrect&&!a.helped&&!a.guess&&(a.concept?.correct&&a.concept.firstCorrect)&&!a.explanationFlag&&!(root.MochiScience?.explanationSignal(a))),conceptMiss:!a.concept||!a.concept.firstCorrect||!!a.explanationFlag||!!root.MochiScience?.explanationSignal(a),raw:a});
  for(const a of s.course?.attempts||[]){if(a.source==='practice-link')continue;const q=C.question(a.question),u=q&&C.unit(q.unit);if(!u||!stamp(a.at)||!a.responses?.length)continue;const first=a.responses[0]===q.answer,correct=a.responses.at(-1)===q.answer;
   out.push({id:'course:'+a.id,subject:u.subject,skill:u.skill,unit:u.id,at:answered(a),form:q.id,correct,first,independent:!!(correct&&first&&!a.helped&&!a.guess),raw:a});}
+ if(root.MochiEntrance&&s.entrance)for(const a of s.entrance.attempts||[]){
+  if(a.skipped||!stamp(a.at))continue;
+  const checked=root.MochiEntrance.record({attempts:[]},a);if(!checked)continue;
+  const p=s.entrance.papers?.[a.paperId],supported=(a.mode==='paper'||a.mode==='baseline')&&(!p?.submittedAt||p.assisted||p.interrupted||p.conflicted);
+  out.push({id:'entrance:'+a.id,subject:'maths',skill:'entrance-'+a.unit,at:checked.answeredAt,form:a.unit+':'+a.form,correct:checked.correct,first:checked.firstCorrect,independent:checked.independent&&!supported&&!checked.seenBefore,checked:!!s.entrance.reviews?.[a.id]?.verdict&&s.entrance.reviews[a.id].verdict==='valid',raw:a});
+ }
  // Repeated items within a day are not fresh independent evidence for promotion or growth.
  out.sort((a,b)=>a.at-b.at||a.id.localeCompare(b.id));const seen=new Map(),ids=new Set();
  return out.filter(a=>{if(ids.has(a.id))return false;ids.add(a.id);return true;}).map(a=>{const k=`${a.subject}:${a.skill}:${a.form}`,prev=seen.get(k);seen.set(k,a.at);return {...a,familiar:prev!==undefined,spaced:prev===undefined||a.at-prev>=DAY};});

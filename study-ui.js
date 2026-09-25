@@ -57,13 +57,16 @@ function studyInit(){
      const scienceRestored=typeof MochiScience!=='undefined'?MochiScience.validate(raw.science):null;
      const courseRestored=typeof MochiCourse!=='undefined'&&raw.course?MochiCourse.validate(raw.course):null;
      const friendsRestored=window.MochiCatFriends&&raw.catFriends?MochiCatFriends.validate(raw.catFriends):null;
+     const entranceRestored=window.MochiEntrance&&raw.entrance?MochiEntrance.validate(raw.entrance):null;
      const planRestored=window.MochiPlanner&&raw.planner?MochiPlanner.validate(raw.planner):null;
      if(!confirm('Replace learning history on this device with this backup? API settings and Mochi’s room are kept.'))return;
+     window.MochiEntranceUI?.pause();
      if(typeof coursePause==='function')coursePause();
      window.MochiPlanUI?.pause();if(planRestored)S.planner=planRestored;
      if(friendsRestored)S.catFriends=friendsRestored;
+     if(entranceRestored)S.entrance=entranceRestored;
      S.learning=restored;if(scienceRestored)S.science=scienceRestored;if(courseRestored)S.course=courseRestored;studyAttempt=null;studyInit();if(typeof studioInit==='function')studioInit();save(S);renderQuestion();studyParent();if(typeof scInit==='function'){SCI.q=null;SCI.state=null;scInit();if(SCI.view!=='maths')scShow(SCI.view);}if(typeof courseRefresh==='function')courseRefresh();$('backupStatus').textContent='Learning history restored.';
-     window.MochiPlanUI?.refresh();
+     window.MochiEntranceUI?.refresh();window.MochiPlanUI?.refresh();
    }catch(err){$('backupStatus').textContent='Could not restore: '+err.message;}finally{e.target.value='';}
  };
  if(studyClock)clearInterval(studyClock);
