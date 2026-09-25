@@ -20,12 +20,12 @@ test('balanced forces mean zero acceleration, opposing net force slows right-mov
  assert.equal(C.force({push:3,friction:3}).acceleration,0);assert.equal(C.force({push:3,friction:5}).acceleration,-1);
 });
 test('authored science bank has valid unique questions and reserves one check per skill',()=>{
- assert.equal(new Set(C.items.map(q=>q.id)).size,C.items.length);assert.equal(C.items.length,36);
- for(const skill of Object.keys(C.skills)){const qs=C.items.filter(q=>q.skill===skill);assert.equal(qs.length,['circuits','ecosystems'].includes(skill)?6:4);assert.equal(qs.filter(q=>q.assessment).length,1);}
+ assert.equal(new Set(C.items.map(q=>q.id)).size,C.items.length);assert.equal(C.items.length,41);
+ for(const skill of Object.keys(C.skills)){const qs=C.items.filter(q=>q.skill===skill);assert.equal(qs.length,skill==='circuits'?11:skill==='ecosystems'?6:4);assert.equal(qs.filter(q=>q.assessment).length,1);}
  for(const q of C.items){assert.ok(q.why&&q.prompt);assert.ok(Number.isInteger(q.answer)&&q.answer>=0&&q.answer<q.choices.length);assert.equal(new Set(q.choices).size,q.choices.length);}
 });
 test('practice never uses reserved questions; exposed assessment questions do not recycle',()=>{
- const d=C.fresh();for(let i=0;i<100;i++){const q=C.choose(d);assert.ok(!q.assessment);d.attempts.push({item:q.id,skill:q.skill,at:Date.now(),firstCorrect:true,correct:true,independent:true});}
+ const d=C.fresh();const now=Date.now();let count=0;for(let i=0;i<100;i++){const q=C.choose(d,'practice',null,now);if(!q)break;assert.ok(!q.assessment);d.attempts.push({item:q.id,skill:q.skill,at:now,firstCorrect:true,correct:true,independent:true});count++;}assert.equal(count,C.items.filter(q=>!q.assessment).length,'no immediate repeats after the fresh bank is exhausted');assert.equal(C.choose(d,'practice',null,now),null);assert.ok(C.choose(d,'practice',null,now+86400001));
  const ids=[];for(let i=0;i<8;i++){const q=C.choose(d,'assessment');assert.ok(q.assessment);ids.push(q.id);d.seenAssess.push(q.id);}assert.equal(new Set(ids).size,8);assert.equal(C.choose(d,'assessment'),null);
 });
 test('science backup recomputes independence and retains explanations, drafts and ink',()=>{

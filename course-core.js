@@ -2,6 +2,7 @@
 (function(root){
 'use strict';
 const D=root.MochiCourseData||(typeof require==='function'?require('./course-data.js'):null),DAY=86400000;
+const T=root.MochiTeaching||(typeof require==='function'?require('./teaching-core.js'):null);
 const unit=id=>D.units.find(u=>u.id===id),question=id=>D.questions.find(q=>q.id===id);
 const fresh=()=>({version:1,lastUnit:{maths:'m-number',science:'s-inquiry'},lessons:{},attempts:[]});
 const init=s=>s.course||(s.course=fresh());
@@ -21,6 +22,7 @@ function cleanAttempt(a){
   explanation:String(a.explanation||'').slice(0,6000),strokes:ink(a.strokes)};
 }
 function record(c,a){
+ if(a?.source==='practice-link')return T.storeLink(c,a,D);
  const x=cleanAttempt(a);if(!x)return null;
  const old=c.attempts.find(v=>v.id===x.id);
  if(old&&(old.question!==x.question||old.responses.some((v,i)=>x.responses[i]!==v)||x.responses.length<old.responses.length))return old;
@@ -38,24 +40,26 @@ function validate(raw){
   l.completedAt=l.visited.length===u.pages.length?stamp(v.completedAt):0;l.updatedAt=stamp(v.updatedAt);l.notes=String(v.notes||'').slice(0,6000);l.strokes=ink(v.strokes);
   const q=question(v.draft?.question);if(q?.unit===u.id&&typeof v.draft.id==='string')l.draft={id:v.draft.id.slice(0,120),question:q.id,at:stamp(v.draft.at),helped:!!v.draft.helped,guess:!!v.draft.guess,notes:String(v.draft.notes||'').slice(0,6000),strokes:ink(v.draft.strokes)};
  }
+ c.practiceContext=T.cleanContext(raw.practiceContext,D);
  for(const a of raw.attempts.slice().sort((a,b)=>(a?.at||0)-(b?.at||0)))record(c,a);
  for(const s of ['maths','science'])if(unit(raw.lastUnit?.[s])?.subject===s)c.lastUnit[s]=raw.lastUnit[s];
  return c;
 }
 function merge(a,b){
  a=validate(a);b=validate(b);const c=fresh();
+ c.practiceContext=[a.practiceContext,b.practiceContext].filter(Boolean).sort((x,y)=>y.started-x.started)[0]||null;
  for(const u of D.units){const x=a.lessons[u.id],y=b.lessons[u.id];if(!x&&!y)continue;
   const chosen=!x?y:!y?x:y.updatedAt>x.updatedAt?y:x;
   c.lessons[u.id]={...chosen,visited:[...new Set([...(x?.visited||[]),...(y?.visited||[])])].sort((a,b)=>a-b),completedAt:Math.max(x?.completedAt||0,y?.completedAt||0)};
   if(x?.draft&&y?.draft&&x.draft.id===y.draft.id)c.lessons[u.id].draft={...chosen.draft,helped:x.draft.helped||y.draft.helped,guess:x.draft.guess||y.draft.guess};
  }
- const map=new Map();for(const x of [...a.attempts,...b.attempts]){const p=map.get(x.id);if(!p)map.set(x.id,x);else {const selected=x.responses.length>p.responses.length?x:p;map.set(x.id,{...selected,helped:x.helped||p.helped,guess:x.guess||p.guess,repeated:x.repeated||p.repeated});}}
+ const map=new Map();for(const x of [...a.attempts,...b.attempts]){const p=map.get(x.id);if(!p)map.set(x.id,x);else {const selected=x.source==='practice-link'?(x.answeredAt>p.answeredAt?x:p):x.responses.length>p.responses.length?x:p;map.set(x.id,{...selected,helped:x.helped||p.helped,guess:x.guess||p.guess,repeated:x.repeated||p.repeated,...(x.source==='practice-link'?{firstCorrect:x.firstCorrect&&p.firstCorrect,reasoningFlag:x.reasoningFlag||p.reasoningFlag}:{})});}}
  for(const x of [...map.values()].sort((a,b)=>a.at-b.at))record(c,x);
  for(const s of ['maths','science'])c.lastUnit[s]=D.units.filter(u=>u.subject===s&&c.lessons[u.id]).sort((x,y)=>c.lessons[y.id].updatedAt-c.lessons[x.id].updatedAt)[0]?.id||c.lastUnit[s];
  return c;
 }
 function evidence(c,id,now=Date.now()){
- const all=c.attempts.filter(a=>a.unit===id),last=all.at(-1);let level=1,proof=new Set(),misses=0,lastLowered=0;
+ const all=c.attempts.filter(a=>a.unit===id&&a.source!=='practice-link'),last=all.at(-1);let level=1,proof=new Set(),misses=0,lastLowered=0;
  for(const a of all){
   if(a.level!==level)continue;
   if(!a.firstCorrect){proof.clear();misses++;if(misses>=2){level=Math.max(1,level-1);misses=0;lastLowered=a.at;}continue;}
@@ -92,7 +96,7 @@ function recommend(c,subject,now=Date.now()){
  const started=list.find(u=>c.lessons[u.id]&&!c.lessons[u.id].completedAt);
  const next=started||list.find(u=>!c.lessons[u.id]?.completedAt)||list[0];return {unit:next,reason:started?'Continue the lesson you started.':'Learn the next idea, then check your understanding.'};
 }
-function report(c,now=Date.now()){return {version:D.version,reviewedOn:D.reviewedOn,units:D.units.map(u=>({...evidence(c,u.id,now),title:u.title,subject:u.subject,pagesVisited:c.lessons[u.id]?.visited.length||0,pagesTotal:u.pages.length})),limits:['Lesson completion records exposure, not verified understanding.','Checks are original, uncalibrated and finite; question levels are teaching heuristics, not exam grades.','Familiar retrieval is separate from new independent answers. Free explanations and handwriting require human review.']};}
-root.MochiCourse={data:D,unit,question,fresh,init,lesson,visit,complete,record,validate,merge,evidence,choose,recommend,report,ink};
+function report(c,now=Date.now()){return {version:D.version,reviewedOn:D.reviewedOn,linkedPractice:T.linkedReport(c),units:D.units.map(u=>({...evidence(c,u.id,now),title:u.title,subject:u.subject,pagesVisited:c.lessons[u.id]?.visited.length||0,pagesTotal:u.pages.length})),limits:['Lesson completion records exposure, not verified understanding.','Checks are original, uncalibrated and finite; question levels are teaching heuristics, not exam grades.','Familiar retrieval is separate from new independent answers. Free explanations and handwriting require human review.']};}
+root.MochiCourse={recordLinked:(c,a,subject)=>T.link(c,a,subject,D),startPractice:(c,id,now=Date.now(),lessonKey='')=>{const u=unit(id);if(u)c.practiceContext={unit:id,subject:u.subject,skill:u.skill,started:now,lessonKey};},data:D,unit,question,fresh,init,lesson,visit,complete,record,validate,merge,evidence,choose,recommend,report,ink};
 if(typeof module!=='undefined')module.exports=root.MochiCourse;
 })(typeof globalThis!=='undefined'?globalThis:this);

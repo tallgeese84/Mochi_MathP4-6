@@ -1234,7 +1234,7 @@ function isCorrect(input,q){
 
 /* The cat ships inside the markup; this just reads her back out. */
 const BUILTIN_PHOTO = ($('catImg').getAttribute('src') || '');
-const APP_VERSION = '5.3.1';
+const APP_VERSION = '5.4.0';
 const BUILD_KIND  = 'site';
 const BUILD_DATE  = '2026-09-24';
 const BUILD = BUILD_KIND + ' v' + APP_VERSION + ' \u00b7 ' + BUILD_DATE;
@@ -1533,6 +1533,7 @@ function renderQuestion(customQuestion){
     for(let retry=0;retry<16&&recent.has(current.text);retry++)current=currentGen();
   }
   if(!customQuestion && selectedStudy?.stretch)current.stretch=true;
+  if(!customQuestion && selectedStudy?.needsTeaching)current.needsTeaching=true;
   settled = false; revealed = false; askCount = 0; tryCount = 0;
   history = [];   // the chat is scoped to the question on screen
   S.tick++; S.lastSeen[current.topic] = S.tick;
@@ -1607,6 +1608,7 @@ function showSteps(){
    ANSWER FLOW — verdict is instant, the cat catches up after
    ========================================================= */
 function submit(){
+  if(window.MochiTeachingUI?.active('maths'))return;
   if(settled||!current||current.custom)return;
   const raw=current.parts?current.parts.map((p,i)=>$('partAnswer'+i).value.trim()):$('answerInput').value.trim();
   if(Array.isArray(raw)?raw.some(v=>!v):!raw)return;
@@ -2525,5 +2527,5 @@ async function hydratePhoto(){
 }
 
 if('serviceWorker' in navigator){
-  document.addEventListener('mochi:ready', ()=> navigator.serviceWorker.register('sw.js?v=5.3.1',{updateViaCache:'none'}).catch(()=>{}),{once:true});
+  document.addEventListener('mochi:ready', ()=> navigator.serviceWorker.register('sw.js?v=5.4.0',{updateViaCache:'none'}).catch(()=>{}),{once:true});
 }

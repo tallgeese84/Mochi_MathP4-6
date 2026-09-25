@@ -61,11 +61,14 @@ function record(l,a){
 }
 function catalog(gens){return gens.map(g=>{const q=g(),skill=q.skill||mapping[g.name]; return {g,id:g.name,skill,topic:q.topic,difficulty:q.stars||2,repairOnly:!!q.repairOnly,stretch:!!q.stretch||!!skills[skill]?.stretch||g.name==='parallelAngle'};});}
 function choose(l,bank,now=Date.now()){
- const core=bank.filter(b=>!b.stretch&&!b.repairOnly), session=l.session;
+ const blocked=root.MochiTeaching?.blocked(l)||[],blockedIds=new Set(blocked.map(b=>b.generator));
+ const core=bank.filter(b=>!b.stretch&&!b.repairOnly&&!blockedIds.has(b.id)), session=l.session;
  const done=session&&!session.finished?session.done:0;
  const mode=session&&!session.finished?session.mode:l.mode;
  const repair=root.MochiRepair?.choose(l,bank,mode||'daily',now);
  if(repair&&(!session?.focusSkill||repair.skill===session.focusSkill))return repair;
+ const guard=blocked.find(b=>(!session?.focusSkill||session.focusSkill===b.skill)&&!Object.values(root.MochiRepair?.tracks||{}).some(t=>t.sources.includes(b.generator)));
+ if(guard&&mode!=='diagnostic'&&mode!=='stretch')return {...root.MochiRepair.conceptGuard(guard),kind:mode||'daily'};
  const base=l.attempts.slice(-1)[0];
  const ev=id=>evidence(l,id,now);
  let pool=core,reason='Mixing skills to keep earlier learning active.',transfer=false;
@@ -73,7 +76,7 @@ function choose(l,bank,now=Date.now()){
    const since=session?.started||0;
    const seen=new Set(l.attempts.filter(a=>a.at>=since&&a.kind==='diagnostic').map(a=>a.skill));
    const next=Object.keys(skills).find(id=>!skills[id].stretch&&!seen.has(id));
-   if(next){pool=core.filter(b=>b.skill===next);reason='A first look at '+skills[next].label.toLowerCase()+'. It is fine to ask for help.';}
+   if(next){pool=bank.filter(b=>!b.stretch&&!b.repairOnly&&b.skill===next);reason='A first look at '+skills[next].label.toLowerCase()+'. It is fine to ask for help.';}
  } else if(mode==='stretch'){
    pool=bank.filter(b=>b.stretch); transfer=true; reason='Explore, test a claim, then explain why it works.';
  } else if(mode==='sprint'){
@@ -81,7 +84,7 @@ function choose(l,bank,now=Date.now()){
  } else {
    const due=core.filter(b=>ev(b.skill).overdue);
    if(base && !base.skipped && (!base.firstCorrect||base.hints||base.revealed)){
-     const prerequisites=base.probe?[]:skills[base.skill]?.prereq||[];
+     const prerequisites=base.probe||['gst','cubeEdge'].includes(base.generator)?[]:skills[base.skill]?.prereq||[];
      const p=prerequisites.find(id=>ev(id).independent<2);
      pool=core.filter(b=>b.skill===(p||base.skill));
      reason=base.probe&&!base.probe.correct?'The concept check suggests revisiting '+base.probe.checks+'.':p?'Let’s check a building block: '+skills[p].label.toLowerCase()+'.':'Try the idea in another form, with less help.';
@@ -100,10 +103,15 @@ function choose(l,bank,now=Date.now()){
    }
  }
  if(session?.focusSkill && mode!=='diagnostic'){
-   const focused=bank.filter(b=>b.skill===session.focusSkill&&!b.repairOnly&&(!b.stretch||mode==='stretch'));
+   const focused=bank.filter(b=>b.skill===session.focusSkill&&!b.repairOnly&&!blockedIds.has(b.id)&&(!b.stretch||mode==='stretch'));
+   if(!focused.length&&mode!=='diagnostic'){const gate=blocked.find(b=>b.skill===session.focusSkill);if(gate)return {...root.MochiRepair.conceptGuard(gate),kind:mode||'daily'};}
    if(focused.length){pool=focused;reason='A focused session on '+skills[session.focusSkill].label.toLowerCase()+'.';}
  }
- if(!pool.length) pool=core;
+ if(mode!=='diagnostic')pool=pool.filter(b=>!blockedIds.has(b.id));
+ if(!pool.length)pool=core;
+ if(!pool.length&&blocked.length)return {...root.MochiRepair.conceptGuard(blocked[0]),kind:mode||'daily'};
+ const freshForm=pool.filter(b=>{const band=root.MochiReasoning?.band(l,b.skill);return !band?.provisional||b.id!==band.excludeGenerator;});
+ if(freshForm.length)pool=freshForm;
  // Pick the nearest available tier within each selected skill; gaps do not reopen the whole bank.
  const distance=b=>Math.abs(b.difficulty-(root.MochiReasoning?.band(l,b.skill).target||1));
  pool=pool.filter(b=>distance(b)===Math.min(...pool.filter(x=>x.skill===b.skill).map(distance)));

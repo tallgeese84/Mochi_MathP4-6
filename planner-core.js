@@ -2,6 +2,7 @@
 (function(root){
 'use strict';
 const C=root.MochiCourse||(typeof require==='function'?require('./course-core.js'):null);
+const Teaching=root.MochiTeaching||(typeof require==='function'?require('./teaching-core.js'):null);
 const DAY=86400000,subjects=['maths','science'],days=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 const defaults=[[25,20],[20,25],[25,20],[20,25],[15,15],[30,30],[10,10]];
 const fresh=()=>({version:1,schedule:{updatedAt:0,week:defaults.map(([maths,science])=>({maths,science}))},sessions:[],days:{},milestones:{}});
@@ -65,8 +66,8 @@ const scienceSkills={circuits:'electricity',shadows:'light',ecosystems:'ecology'
 function records(s){
  const out=[];
  for(const a of s.learning?.attempts||[])if(!a.skipped&&a.kind!=='custom'&&stamp(a.at)&&a.tries>0)out.push({id:'math:'+a.id,subject:'maths',skill:a.skill,at:answered(a),form:a.generator,correct:!!a.correct,first:!!a.firstCorrect,independent:!!(a.correct&&a.firstCorrect&&!a.hints&&!a.model&&!a.revealed&&a.confidence!=='guess'),confident:a.confidence==='sure',checked:!!a.trace?.verify?.trim(),obstacle:a.obstacle||'',raw:a});
- for(const a of s.science?.attempts||[])if(stamp(a.at))out.push({id:'science:'+a.id,subject:'science',skill:scienceSkills[a.skill]||a.skill,at:answered(a),form:a.item,correct:!!a.correct,first:!!a.firstCorrect,independent:!!(a.correct&&a.firstCorrect&&!a.helped&&!a.guess&&(!a.concept||a.concept.correct&&a.concept.firstCorrect)),conceptMiss:!!a.concept&&!a.concept.firstCorrect,raw:a});
- for(const a of s.course?.attempts||[]){const q=C.question(a.question),u=q&&C.unit(q.unit);if(!u||!stamp(a.at)||!a.responses?.length)continue;const first=a.responses[0]===q.answer,correct=a.responses.at(-1)===q.answer;
+ for(const a of s.science?.attempts||[])if(stamp(a.at))out.push({id:'science:'+(a.id||a.item+':'+a.at),subject:'science',skill:scienceSkills[a.skill]||a.skill,at:answered(a),form:a.item,correct:!!a.correct,first:!!a.firstCorrect,independent:!!(a.correct&&a.firstCorrect&&!a.helped&&!a.guess&&(a.concept?.correct&&a.concept.firstCorrect)&&!a.explanationFlag&&!(root.MochiScience?.explanationSignal(a))),conceptMiss:!a.concept||!a.concept.firstCorrect||!!a.explanationFlag||!!root.MochiScience?.explanationSignal(a),raw:a});
+ for(const a of s.course?.attempts||[]){if(a.source==='practice-link')continue;const q=C.question(a.question),u=q&&C.unit(q.unit);if(!u||!stamp(a.at)||!a.responses?.length)continue;const first=a.responses[0]===q.answer,correct=a.responses.at(-1)===q.answer;
   out.push({id:'course:'+a.id,subject:u.subject,skill:u.skill,unit:u.id,at:answered(a),form:q.id,correct,first,independent:!!(correct&&first&&!a.helped&&!a.guess),raw:a});}
  // Repeated items within a day are not fresh independent evidence for promotion or growth.
  out.sort((a,b)=>a.at-b.at||a.id.localeCompare(b.id));const seen=new Map(),ids=new Set();
@@ -85,6 +86,11 @@ function observations(s,subject,now=Date.now()){
 }
 function recommend(s,subject,now=Date.now()){
  const c=s.course||C.fresh(),all=records(s).filter(a=>a.subject===subject&&a.at<=now),list=C.data.units.filter(u=>u.subject===subject);
+ // A known question-level difficulty routes to its own explanation, not a generic prerequisite.
+ const special=subject==='maths'?Teaching.blocked(s.learning).find(a=>['gst','cubeEdge'].includes(a.generator)):null;
+ if(special)return {unit:special.generator==='gst'?'m-percent':'m-volume',kind:'repair',lessonKey:special.generator==='gst'?'gstDirection':'cubeEdge',reason:'Check this specific relationship before doing another numerical variant.',evidence:all.filter(a=>a.form===special.generator).slice(-2).map(a=>a.id)};
+ const circuit=subject==='science'?all.filter(a=>a.skill==='electricity').slice(-2):[];
+ if(circuit.length&&((circuit.length===2&&circuit.every(a=>!a.first||a.conceptMiss))||circuit.at(-1).raw.explanationFlag))return {unit:'s-electricity',kind:'repair',lessonKey:'circuits',reason:'Trace the complete conducting paths and compare series with parallel branches.',evidence:circuit.map(a=>a.id)};
  // Two recent first-answer misses in the same skill outweigh moving on to a new topic.
  const misses=[...new Set(all.slice(-12).map(a=>a.skill))].map(skill=>({skill,a:all.filter(a=>a.skill===skill).slice(-2)})).filter(x=>x.a.length===2&&x.a.every(a=>!a.first||a.conceptMiss)).sort((a,b)=>b.a.at(-1).at-a.a.at(-1).at);
  if(misses.length){const m=misses[0],last=m.a.at(-1),u=list.find(u=>u.id===last.unit)||list.find(u=>u.skill===m.skill);if(u){const prerequisite=u.prerequisites.map(C.unit).find(v=>v&&!c.lessons[v.id]?.completedAt);return {unit:(prerequisite||u).id,kind:'repair',reason:prerequisite?'Two recent checks suggest revisiting this building block before returning to '+u.title+'.':'Two recent first answers need a closer look. Revisit the explanation, then try a different check.',evidence:m.a.map(a=>a.id)};}}

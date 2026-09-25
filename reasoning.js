@@ -33,6 +33,7 @@ function cleanProbe(p){
  return {skill:p.skill,choice:p.choice,correct:p.choice===probes[p.skill].answer,checks:probes[p.skill].checks,at:Number.isFinite(p.at)?p.at:0};
 }
 function cleanExtras(a){return {
+ conceptGate:root.MochiTeaching?.cleanGate(a.conceptGate)||null,teachingKey:typeof a.teachingKey==='string'?a.teachingKey.slice(0,80):'',lessonCompletedAt:Number(a.lessonCompletedAt)||0,
  route:Object.hasOwn(routes,a.route)?a.route:'unsure',
  trace:cleanTrace(a.trace),
  reasoningHistory:(Array.isArray(a.reasoningHistory)?a.reasoningHistory:[]).slice(-12).map(e=>({stage:Object.hasOwn(stages,e.stage)?e.stage:'connect',text:String(e.text||'').slice(0,1200)})),
@@ -49,15 +50,31 @@ function profile(l,skill){
   recentProbe:recent.slice().reverse().map(a=>cleanProbe(a.probe)).find(Boolean)||null};
 }
 function band(l,skill){
- const all=l.attempts.filter(a=>a.skill===skill&&!a.skipped&&a.kind!=='custom');
- let target=1,forms=new Set(),misses=0;
+ const all=l.attempts.filter(a=>a.skill===skill&&!a.skipped&&a.kind!=='custom'&&!a.conceptGate);
+ let target=1,forms=new Set(),variants=new Map(),misses=0,probe=null;
  for(const a of all){
   if(!Number.isInteger(a.difficulty)||a.difficulty<1||a.difficulty>5)continue;
-  if(!a.firstCorrect&&a.difficulty>=target){forms.clear();if(++misses>=2){target=Math.max(1,target-1);misses=0;}continue;}
-  if(a.independent&&a.difficulty>=target){forms.add(a.generator);misses=0;if(forms.size>=2){target=Math.min(5,target+1);forms.clear();}}
+  if(!a.firstCorrect&&a.difficulty>=target){
+   forms.clear();variants.clear();
+   if(++misses>=2){if(probe)probe=null;else target=Math.max(1,target-1);misses=0;}
+   continue;
+  }
+  if(!a.independent||a.difficulty<target)continue;
+  if(probe){
+   if(a.generator!==probe.from&&a.difficulty>=probe.target){target=probe.target;probe=null;forms.clear();variants.clear();misses=0;}
+   continue;
+  }
+  forms.add(a.generator);misses=0;
+  if(forms.size>=2){target=Math.min(5,target+1);forms.clear();variants.clear();continue;}
+  // Missing text and repeated identical questions cannot trigger the one-form invitation.
+  if(a.question?.trim()){
+   const key=a.generator;if(!variants.has(key))variants.set(key,new Map());variants.get(key).set(a.question.trim(),a.difficulty);
+   const levels=[...variants.get(key).values()];
+   if(levels.length>=4&&target<5)probe={from:key,target:Math.min(5,Math.max(target,Math.min(...levels))+1)};
+  }
  }
- const rebuild=all.length>=2&&all.slice(-2).every(a=>!a.firstCorrect);
- return {min:target,max:target,target,label:rebuild?'Rebuild':target>=3?'Stretch':'Explore',reason:rebuild?'Revisit the explanation, then try a smaller conceptual step.':target>=3?'Independent answers in different question forms support a gradual increase.':'Build independent evidence in different forms before increasing difficulty.'};
+ const rebuild=all.length>=2&&all.slice(-2).every(a=>!a.firstCorrect),requested=probe?.target||target;
+ return {min:requested,max:requested,target:requested,confirmed:target,provisional:!!probe,excludeGenerator:probe?.from||'',label:rebuild?'Rebuild':probe?'Try a new form':target>=3?'Stretch':'Explore',reason:probe?'Several different unassisted questions support trying a harder, different form. This is a trial, not confirmed mastery.':rebuild?'Revisit the explanation, then try a smaller conceptual step.':target>=3?'Independent answers in different question forms support a gradual increase.':'Build independent evidence in different forms before increasing difficulty.'};
 }
 function nextMove(l,skill,obstacle=''){
  const p=profile(l,skill),b=band(l,skill);

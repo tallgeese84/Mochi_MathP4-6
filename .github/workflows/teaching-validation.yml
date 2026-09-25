@@ -1,11 +1,12 @@
-name: Teaching update validation
+name: Finalize teaching release
 on:
   push:
     branches: [codex/teaching-first-v5-4-0]
 permissions:
-  contents: read
+  contents: write
 jobs:
-  validate:
+  finalize:
+    if: github.ref == 'refs/heads/codex/teaching-first-v5-4-0'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -13,15 +14,62 @@ jobs:
         with:
           node-version: '24.15.0'
           cache: npm
-      - run: npm ci
-      - run: npm test
-      - run: npm run check:course && npm run check:release
-      - name: Package reproducible test workspace
-        if: always()
-        run: tar --exclude=.git --exclude=workspace.tar.gz -czf "$RUNNER_TEMP/workspace.tar.gz" .
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: teaching-test-workspace
-          path: ${{ runner.temp }}/workspace.tar.gz
-          retention-days: 1
+      - name: Assemble the reviewed release metadata
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs=require('node:fs'),crypto=require('node:crypto'),assert=require('node:assert/strict');
+          const sha=s=>crypto.createHash('sha1').update(Buffer.concat([Buffer.from('blob '+Buffer.byteLength(s)+'\0'),Buffer.from(s)])).digest('hex');
+          let html=fs.readFileSync('index.html','utf8');
+          assert.equal(sha(html),'0221986633ea6b2dfee4789362a0857b34e5cbd5','Unexpected starting page');
+          html=html.replace(/(<link rel="stylesheet" href="course.css\?v=[^"]+">)/,'$1\n<link rel="stylesheet" href="teaching.css?v=5.4.0">')
+            .replace(/(<script defer src="course-data.js\?v=[^"]+"><\/script>)/,'$1\n<script defer src="teaching-core.js?v=5.4.0"></script>')
+            .replace(/(<script defer src="course-ui.js\?v=[^"]+"><\/script>)/,'$1\n<script defer src="teaching-ui.js?v=5.4.0"></script>');
+          fs.writeFileSync('index.html',html);
+          let readme=fs.readFileSync('README.md','utf8');
+          assert.equal(sha(readme),'2eb2f5d3ae7efb2308e1ffd72f777ec247315b02','Unexpected starting README');
+          readme=readme.replace('**v5.2.0 — 23 September 2026.** Mochi’s room now opens the approved 3D kitten with','**v5.4.0 — 24 September 2026.** Targeted mini-lessons now interrupt repeated GST and cube-edge errors. Four distinct unassisted variants can invite a harder question in another form, without immediately certifying mastery. Science keeps answer choice separate from the reasoning check, limits immediate repeats and flags selected circuit explanations for discussion. Completing a textbook opens a conceptual exit check. Linked practice records preserve lesson context without double-counting questions. See [the implementation notes](docs/TEACHING_FIRST.md).\n\nMochi’s room now opens the approved 3D kitten with')
+            .replace('notes are saved. **Finish & start practice** opens the original adaptive Maths\nquestions or related Science questions and experiments directly. **Practice\nquestions** is a main action for an explored textbook, while **Quick lesson check**','notes are saved. **Finish & check understanding** opens a conceptual exit check. The original adaptive Maths\nquestions and related Science questions remain accessible through **Practice\nquestions**, a main action for an explored textbook, while **Quick lesson check**');
+          assert.equal(sha(readme),'712384e7e35cffd15e13326f63ae4f632fb52ec0','README differs from reviewed bundle');
+          fs.writeFileSync('README.md',readme);
+          const changelog=fs.readFileSync('CHANGELOG.md','utf8');
+          assert.equal(sha(changelog),'8f288f366211bea9284e10c756710deec7ba26c1','Unexpected starting changelog');
+          const prefix=`# v5.4.0 — Teach before another numerical variant
+
+          - Add short GST-direction, cube-layer and complete-circuit-path mini-lessons.
+            Two first-answer misses on GST or cube-edge questions select the matching
+            conceptual check before another numerical variant. Other repeated generator
+            failures receive a conceptual gate. Focused sessions cannot bypass the gate.
+          - Add eight GST/cube repair generators with practice, different-context transfer
+            and a recall stage that waits a full day. Preserve the original fraction tracks.
+          - Add four ratio forms. Four distinct independent variants may invite a higher
+            different-form trial; same-form repetition cannot confirm that trial.
+          - Add five circuit situations with separate reasoning probes. Require reasoning
+            evidence for independent practice, flag selected circuit contradictions for
+            discussion and defer familiar questions for at least a day.
+          - Route specific GST, cube-edge and circuit signals to their own teaching units,
+            rather than generic percentage-whole, area or materials prerequisites.
+          - Finish textbook reading with an exit check. Link subject attempts to classroom
+            outcomes without double-counting questions or treating reading as mastery.
+          - Preserve original answers, notes, handwriting, configuration and earned
+            companion milestones; test restore/merge and real answer-button interactions.
+
+          `;
+          assert.equal(sha(prefix+changelog),'7ea8df7c3914c356eae88c67104357c04fc05b1a','Changelog differs from reviewed bundle');
+          fs.writeFileSync('CHANGELOG.md',prefix+changelog);
+          NODE
+          node scripts/release.cjs
+          rm .github/workflows/teaching-validation.yml
+          git add -A
+          actual_tree=$(git write-tree)
+          echo "Final release tree: $actual_tree"
+          test "$actual_tree" = "0c5268b2b9c33e03dfeed134fe36d485e8375d62"
+      - run: npm ci --ignore-scripts
+      - run: npm run check:release && npm run check:course && npm test
+      - name: Commit verified release to its working branch only
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Finalize v5.4.0 metadata after exact-bundle verification and tests'
+          git push origin HEAD:refs/heads/codex/teaching-first-v5-4-0
