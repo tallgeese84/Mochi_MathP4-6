@@ -1,3 +1,14 @@
+# v6.2.0 — One next step for Euna
+
+- Replace the default landing dashboard with one Today’s Plan and a single Start/Continue action.
+- Resume saved lessons, answers, working and already-open assessments before selecting new tasks.
+- Pace maths/science using the existing local-day weekly time plan and foreground clock; keep time completion distinct from mastery.
+- No automatic starts of reserved papers. Confirm before leaving an active paper; preserve original deadlines and support tracking.
+- Move lesson libraries, papers, experiments, cats and grown-up evidence behind More. Keep the lesson controls visible and hide unrelated navigation during the guided route.
+- Keep home/timers idle on loading, pausing, backgrounding and restoring. Reaching a time goal never submits or discards the current answer.
+- Preserve all subject records, assessment rules, storage keys, coins, wardrobes and cat milestones. Add no new learner data or paid dependency.
+- Add read-only routing tests and browser coverage of the actual controls, handoffs, paper safety and narrow-screen layout.
+
 # v6.1.0 — Science reasoning alongside mathematics
 
 - Add 24 original science lessons, 72 worked-example forms and 96 seeded question

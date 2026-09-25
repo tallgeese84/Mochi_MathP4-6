@@ -68,7 +68,7 @@ function studyInit(){
      if(entranceRestored)S.entrance=entranceRestored;
      if(sciencePathRestored)S.sciencePath=sciencePathRestored;
      S.learning=restored;if(scienceRestored)S.science=scienceRestored;if(courseRestored)S.course=courseRestored;studyAttempt=null;studyInit();if(typeof studioInit==='function')studioInit();save(S);renderQuestion();studyParent();if(typeof scInit==='function'){SCI.q=null;SCI.state=null;scInit();if(SCI.view!=='maths')scShow(SCI.view);}if(typeof courseRefresh==='function')courseRefresh();$('backupStatus').textContent='Learning history restored.';
-     window.MochiEntranceUI?.refresh();window.MochiSciencePathUI?.refresh();window.MochiPlanUI?.refresh();
+     window.MochiEntranceUI?.refresh();window.MochiSciencePathUI?.refresh();window.MochiPlanUI?.refresh();window.MochiTodayUI?.refresh();
    }catch(err){$('backupStatus').textContent='Could not restore: '+err.message;}finally{e.target.value='';}
  };
  if(studyClock)clearInterval(studyClock);

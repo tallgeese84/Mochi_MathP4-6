@@ -4,7 +4,7 @@ async function runSciencePathChecks(w){
  const E=w.MochiSciencePath,errors=[];w.addEventListener('error',e=>errors.push(e.message));w.confirm=()=>true;
  const unchanged=()=>w.eval('JSON.stringify({math: S.entrance, oldMath: S.learning.attempts, oldScience: S.science.attempts, coins: S.coins, worn:S.worn})');
  const original=unchanged();
- check(w.MochiEntranceUI.visible(),'Maths remains the default home');click('subjectScience');check(w.MochiSciencePathUI.visible(),'Science pathway is visible');
+ w.MochiEntranceUI.open('home');check(w.MochiEntranceUI.visible(),'Maths overview remains accessible');click('subjectScience');check(w.MochiSciencePathUI.visible(),'Science pathway is visible');
  check(d.getElementById('spTitle').textContent==='Ask questions. Follow the evidence.','Science title');
  click('spLessons');check(d.querySelectorAll('#viewSciencePath [data-lesson]').length===24,'24 science lessons');
  query('#viewSciencePath [data-lesson="measurement"]').click();
@@ -38,7 +38,7 @@ async function runSciencePathChecks(w){
  w.eval("MochiSciencePath.finishPractice(S.sciencePath)");w.MochiSciencePathUI.practice('earth','transfer');q=E.question(w.eval('S.sciencePath.draft'));
  // Transfer form earth is a single choice; reserve form has three statements, exercised in the paper below.
  respond(q);click('spCheckAnswer');check(w.eval('S.sciencePath.attempts.at(-1).correct'),'Enrichment reasoning selection works');
- click('spHome');click('spPapers');query('[data-start-paper="mixed-a"]').click();
+ click('spHome');w.MochiSciencePathUI.open('papers');query('[data-start-paper="mixed-a"]').click();
  const qs=E.paperQuestions('mixed-a'),idx=qs.findIndex(q=>!!q.statements);check(idx>=0,'Paper includes statements');query('[data-paper-index="'+idx+'"]').click();q=qs[idx];
  check(!d.getElementById('spHint')&&!d.getElementById('spReveal')&&!d.getElementById('spFeedback'),'No immediate paper support');
  respond(q,true);click('spPaperNext');query('[data-paper-index="'+idx+'"]').click();respond(q);query('#spWorking').value='My saved paper explanation cites the given condition.';query('#spWorking').dispatchEvent(new w.Event('input'));

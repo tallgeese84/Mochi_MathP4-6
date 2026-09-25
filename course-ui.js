@@ -23,6 +23,7 @@ function support(){const l=state();if(l.draft&&!currentAttempt()?.correct){l.dra
 function abort(){epoch++;pointer=null;controller?.abort();controller=null;}
 function leave(){if(!el('viewCourse')||el('viewCourse').hidden)return;const skip=document.querySelector('.skip-link');if(skip){skip.href='#qText';skip.textContent='Skip to the problem';}capture();saveCourse();abort();el('viewCourse').hidden=true;el('courseReturn').hidden=false;el('courseReturn').textContent='Back to textbook · '+C.unit(active).title;document.body.classList.remove('course-active');}
 function open(subject='maths',id,restored=false){
+ root.MochiTodayUI?.leave();
  root.MochiEntranceUI?.leave();root.MochiSciencePathUI?.leave();
  if(!el('viewCourse'))return;if(!restored)capture();if(typeof scDraft==='function')scDraft();abort();focusClose(false);
  active=id&&C.unit(id)?.subject===subject?id:data().lastUnit[subject]||C.recommend(data(),subject).unit.id;

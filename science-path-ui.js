@@ -18,6 +18,7 @@ function leave(){
 }
 function open(kind='home',id){
  if(!host||paused)return;
+ root.MochiTodayUI?.leave();
  capture();if(view.kind==='paper'&&kind!=='paper'&&kind!=='results')E.interruptPaper(data(),view.paper);
  root.MochiEntranceUI?.leave();if(typeof courseLeave==='function')courseLeave();if(typeof scDraft==='function')scDraft();if(typeof scAbort==='function')scAbort();if(typeof focusClose==='function')focusClose(false);
  $('viewMaths').style.display='none';$('viewScience').hidden=true;$('viewMap').hidden=true;$('viewRoom').style.display='none';$('viewCourse').hidden=true;$('focusDock').hidden=true;$('courseReturn').hidden=true;
@@ -31,8 +32,9 @@ function open(kind='home',id){
  const skip=document.querySelector('.skip-link');if(skip){skip.href='#spTitle';skip.textContent='Skip to the learning activity';}
  $('spTitle')?.focus({preventScroll:true});
 }
-function nextRecommended(){const r=E.recommend(S);if(r.kind==='paper'){open('paper',r.paper);return;}if(r.kind==='resume'){open('practice',data().draft.unit);return;}if(r.kind==='mixed'){open('papers');return;}if(r.kind==='learn'){open('lesson',r.unit);return;}beginPractice(r.unit,r.kind==='recall'?'recall':undefined);}
+function nextRecommended(){if(root.MochiTodayUI?.atBoundary('science'))return;const r=E.recommend(S);if(r.kind==='paper'){open('paper',r.paper);return;}if(r.kind==='resume'){open('practice',data().draft.unit);return;}if(r.kind==='mixed'){if(root.MochiTodayUI)beginPractice(root.MochiToday.task(S,'science').unit);else open('papers');return;}if(r.kind==='learn'){open('lesson',r.unit);return;}beginPractice(r.unit,r.kind==='recall'?'recall':undefined);}
 function beginPractice(id,phase){
+ if(root.MochiTodayUI?.atBoundary('science'))return;
  const d=data();if(d.draft&&d.draft.unit!==id){const old=d.attempts.find(a=>a.id===d.draft.id);if(!old?.correct&&!confirm('A question and its working are saved. Start a different question instead? The recorded answers will remain, but this unsent draft will be replaced.')){open('practice',d.draft.unit);return;}E.finishPractice(d);}
  if(d.draft&&d.attempts.find(a=>a.id===d.draft.id)?.correct)E.finishPractice(d);
  E.startPractice(d,id,{phase});open('practice',id);
@@ -83,7 +85,7 @@ function resultsView(){
  return header('Review the reasoning, not just the score.')+`<section class="sp-result-summary"><h2>${esc(p.title)}</h2><p class="sp-result-number">${score.correct}<small> / ${score.total}</small></p><p>${Math.round(score.percent)}% complete conclusion-and-reason pairs · ${esc(score.status)}</p><p>Conclusions: ${score.results.filter(a=>a.components?.claim).length}/${score.total}; structured reasons: ${score.results.filter(a=>a.components?.reason).length}/${score.total}. Written explanations are not automatically scored.</p><p>${score.unseen?'First exposure':'Previously exposed'} · ${score.independent?'No recorded help':'Support or interruption recorded'} · ${score.timed?'Within the practice limit':score.kind==='baseline'?'Untimed starting check':'Not a qualifying timed result'}</p></section><div class="sp-evidence-strip">${Object.entries(score.byStrand).filter(([,v])=>v.total).map(([k,v])=>`<span><strong>${v.correct}/${v.total}</strong>${esc(E.D.strands[k])}</span>`).join('')}</div><section class="sp-review-list">${score.results.map((a,i)=>`<details><summary>Question ${i+1} · ${a.correct?'Correct answer':a.blank?'Not answered':'Revisit'} · ${esc(E.unit(a.unit).title)}</summary><p>${esc(a.question)}</p>${F.diagram(a.figure,'sp-review-'+i)}<p><strong>Your answer:</strong> ${esc(a.answerDisplay||'Blank')}</p><p><strong>Your working:</strong> ${esc(a.working||'No typed working recorded.')}</p>${a.strokes.length?drawing(a.strokes):''}<p><strong>Answer:</strong> ${esc(a.reference)}</p><ol>${a.steps.map(s=>`<li>${esc(s)}</li>`).join('')}</ol><button data-lesson="${a.unit}">Learn this method</button><p class="sp-note">Review your explanation with an adult. A correct structured response is not automatic validation of your own explanation.</p></details>`).join('')}</section><button id="spContinue" class="sp-primary">Choose my next learning step</button>`;
 }
 function wireNavigation(){
- $('spHome').onclick=()=>open('home');$('spLessons').onclick=()=>open('lessons');$('spPapers').onclick=()=>open('papers');$('spFoundations').onclick=()=>{leave();root.courseOpen('science');};$('spLabs').onclick=()=>{leave();scShow('science');};
+ $('spHome').onclick=()=>root.MochiTodayUI?root.MochiTodayUI.open():open('home');$('spLessons').onclick=()=>open('lessons');$('spPapers').onclick=()=>open('papers');$('spFoundations').onclick=()=>{leave();root.courseOpen('science');};$('spLabs').onclick=()=>{leave();scShow('science');};
  for(const b of host.querySelectorAll('[data-lesson]'))b.onclick=()=>open('lesson',b.dataset.lesson);
  for(const b of host.querySelectorAll('[data-foundation]'))b.onclick=()=>{leave();root.courseOpen('science',b.dataset.foundation);};
  for(const b of host.querySelectorAll('[data-start-paper]'))b.onclick=()=>{
@@ -120,7 +122,7 @@ function wire(){
   if($('spNextPractice'))$('spNextPractice').onclick=()=>{capture();E.finishPractice(data());save(S);nextRecommended();};
   if($('spMorePractice'))$('spMorePractice').onclick=()=>{capture();const id=view.unit;E.finishPractice(data());beginPractice(id);};
   if($('spFreshGuided'))$('spFreshGuided').onclick=()=>{capture();const id=view.unit;E.finishPractice(data());beginPractice(id,'guided');};
-  $('spRevisitLesson').onclick=()=>{capture();E.help(data());open('lesson',view.unit);};$('spSaveHome').onclick=()=>open('home');$('spPrintPractice').onclick=printPractice;
+  $('spRevisitLesson').onclick=()=>{capture();E.help(data());open('lesson',view.unit);};$('spSaveHome').onclick=()=>root.MochiTodayUI?root.MochiTodayUI.open():open('home');$('spPrintPractice').onclick=printPractice;
  }
  if(view.kind==='paper'){
   wireEditor();const p=data().papers[view.paper],qs=E.paperQuestions(p.id);
@@ -129,7 +131,7 @@ function wire(){
   $('spPaperPrev').onclick=()=>go(Math.max(0,p.index-1));$('spPaperNext').onclick=()=>go(Math.min(qs.length-1,p.index+1));
   $('spPaperFlag').onclick=()=>{capture();p.flags=p.flags.includes(p.index)?p.flags.filter(x=>x!==p.index):[...p.flags,p.index];render();save(S);};
   $('spSubmitPaper').onclick=()=>{capture();const blanks=qs.filter((_,i)=>!p.answers[i]?.answer.trim()).length;if(!confirm(`Submit this paper${blanks?' with '+blanks+' unanswered question(s)':''}? You cannot edit it after submission.`))return;E.submitPaper(data(),p.id);save(S);open('results',p.id);};
-  $('spPausePaper').onclick=()=>{capture();if(!confirm('Pause and continue as supported practice? The paper will no longer count as an independent timed check.'))return;E.interruptPaper(data(),p.id);open('home');};
+  $('spPausePaper').onclick=()=>{capture();if(!confirm('Pause and continue as supported practice? The paper will no longer count as an independent timed check.'))return;E.interruptPaper(data(),p.id);if(root.MochiTodayUI)root.MochiTodayUI.open();else open('home');};
   tickPaper();
  }
  requestAnimationFrame(drawInk);

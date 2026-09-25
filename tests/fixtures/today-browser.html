@@ -1,0 +1,14 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Today plan browser validation</title>
+<style>body{margin:0;background:#f8f5fc;font:14px system-ui}iframe{border:0;width:100%;height:1050px}#result{padding:10px;white-space:pre-wrap}</style>
+<pre id="result">Running isolated synthetic-state checks…</pre><iframe title="Today plan test app" src="about:blank"></iframe>
+<script src="today-browser.js"></script><script>
+(async()=>{const f=document.querySelector('iframe'),delay=ms=>new Promise(r=>setTimeout(r,ms));try{
+ if(!['localhost','127.0.0.1','[::1]'].includes(location.hostname))throw Error('Local test server only.');
+ if(localStorage.getItem('mochi-tutor-v1')||localStorage.getItem('cubs_sync'))throw Error('Use an empty temporary profile; existing progress will not be changed.');
+ localStorage.setItem('mochi-room-view-v1','picture');f.src='../../index.html';for(let n=0;n<150&&!f.contentWindow.MochiTodayUI;n++)await delay(50);
+ if(!f.contentWindow.MochiTodayUI)throw Error('Home did not start.');
+ const result=await runTodayChecks(f.contentWindow);f.style.width='375px';await delay(100);
+ if(f.contentDocument.documentElement.scrollWidth>375)throw Error('Narrow layout overflow');result.narrowLayout=true;
+ f.style.width='100%';await delay(60);document.body.dataset.result='passed';document.getElementById('result').textContent=JSON.stringify(result);
+ }catch(e){document.body.dataset.result='failed';document.getElementById('result').textContent=e.stack||String(e);}})();
+</script></html>
