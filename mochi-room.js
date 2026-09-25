@@ -13,7 +13,7 @@ function init(){
  function saveMode(){try{localStorage.setItem(modeKey,preferPicture?'picture':'3d');}catch(_){} }
  function fail(error){
   failure=error?.message||'The browser reset the 3D view.';failed=true;
-  const previous=api;api=null;try{previous?.dispose();}catch(_){}
+  const previous=api;api=null;try{previous?.setVisible(false);previous?.dispose();}catch(_){}
   paint();
  }
  function sync(){
