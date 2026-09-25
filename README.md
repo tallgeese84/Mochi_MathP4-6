@@ -5,6 +5,8 @@ Euna for Primary 6 mathematics and her **September 2027 SPERS-Sec1 planning targ
 with a separate enrichment strand for mathematical thinking. The exact 2027 test
 and application dates must be checked when published.
 
+**v6.0.0 — 25 September 2026.** Maths now opens a June 2027 entrance-reasoning pathway: 24 short teaching units, three original worked-example forms per unit, adaptive guided/application/transfer practice, seven-day retrieval and monochrome examination-style diagrams. Two untimed starting checks and three reserved 24-question mixed papers keep assessment separate from teaching. The 85% goal is an internal training target, not a school cutoff or an admission prediction. See [scope, evidence and validation](docs/ENTRANCE_PATH.md). The foundation classroom, Science, existing notes, cats and rewards remain available.
+
 **v5.5.2 — 25 September 2026.** The 2D room, tutor portraits and background now use a flat, rounded Mochi that matches his friends. Custom photos remain optional; the parent settings include **Use illustrated Mochi**. The 3D models and learning rewards are unchanged.
 
 **Cat Friends:** Mochi now has four cat friends: Miso (British Shorthair), Suki (Siamese), Kumo (Maine Coon) and Yuki (Ragdoll). Open **Mochi’s room → Cat Friends** to invite up to three companions. Earned milestone thresholds are 2, 8, 18 and 32; coins and learning scores are unchanged. The new models share the existing renderer, with picture-mode companions as a fallback. Roster preferences are included in backup and family sync.

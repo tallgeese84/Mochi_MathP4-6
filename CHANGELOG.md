@@ -1,3 +1,14 @@
+# v6.0.0 — Entrance-reasoning learning pathway
+
+- Set the mathematics preparation goal to June 2027, separate from the preserved September SPERS goal.
+- Add 24 teaching units, 72 worked-example forms and 96 seeded question templates across algebra/rates, geometry, counting/number theory and logic.
+- Add original monochrome SVG diagrams with hatching, labelled vertices and grayscale cube views; keep support-only construction lines out of unassisted questions.
+- Separate guided learning, independent application, changed-structure transfer and delayed retrieval after a full week.
+- Add two short untimed starting checks and three reserved balanced papers with no in-paper feedback, editable saved answers, fixed deadlines and frozen submissions.
+- Add explicit parent review of written/ink reasoning and separately recorded external-paper results. Internal targets are not official cutoffs or calibrated admissions predictions.
+- Include new evidence in existing learning milestones without changing coins or removing earned cats. Preserve old work and add conservative path backup/merge handling.
+- Retain the original foundation and Science classrooms, photo/3D improvements and offline features.
+
 # v5.5.2 — A consistent 2D cat family
 
 - Render Mochi with the same flat, rounded, big-eyed portrait renderer as his friends.

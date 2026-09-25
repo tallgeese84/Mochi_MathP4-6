@@ -98,3 +98,61 @@ function startPaper(d,id,now=Date.now()){
 }
 function savePaperAnswer(d,id,index,fields,now=Date.now()){
  const p=d.papers[id],qs=paperQuestions(id);if(!p||p.submittedAt||index<0||index>=qs.length||!Number.isInteger(index))return false;
+ if(p.deadline&&now>p.deadline)return false;
+ p.answers[index]={answer:text(fields.answer,180),working:text(fields.working),strokes:ink(fields.strokes),updatedAt:now};p.updatedAt=now;p.index=index;return true;
+}
+function interruptPaper(d,id,now=Date.now()){const p=d.papers[id];if(!p||p.submittedAt)return;p.interrupted=true;p.assisted=true;p.updatedAt=now;}
+function submitPaper(d,id,now=Date.now()){
+ const p=d.papers[id],def=paperDefinitions.find(p=>p.id===id);if(!p||!def)return null;if(p.submittedAt)return scorePaper(d,id);
+ p.submittedAt=p.updatedAt=now;
+ for(const [index,q]of paperQuestions(id).entries()){const v=p.answers[index]||{};record(d,{...q,id:`paper:${id}:${index}`,mode:def.kind,paperId:id,phase:def.kind,at:p.startedAt,updatedAt:now,helped:p.assisted||p.interrupted,conflicted:p.conflicted,seenBefore:p.seenBefore,guess:false,responses:[{answer:v.answer||'',working:v.working||'',strokes:v.strokes||[],at:now}]});}
+ return scorePaper(d,id);
+}
+function scorePaper(d,id){
+ const p=d.papers[id],def=paperDefinitions.find(x=>x.id===id);if(!p?.submittedAt||!def)return null;const qs=paperQuestions(id),byStrand=Object.fromEntries(Object.keys(D.strands).map(k=>[k,{correct:0,total:0}]));
+ let correct=0;const results=qs.map((q,i)=>{const v=p.answers[i]||{},ok=B.mark(q,v.answer||'');byStrand[q.strand].total++;byStrand[q.strand].correct+=Number(ok);correct+=Number(ok);return {index:i,unit:q.unit,question:q.text,correct:ok,blank:!v.answer?.trim(),answer:v.answer||'',working:v.working||'',strokes:v.strokes||[],reference:q.answerLabel,steps:q.steps};});
+ const percent=100*correct/qs.length,timed=def.kind==='paper'&&!!p.deadline&&p.submittedAt<=p.deadline+1500,independent=!p.assisted&&!p.interrupted&&!p.conflicted,qualifying=def.kind==='paper'&&percent>=D.target&&timed&&independent&&!p.seenBefore;
+ return {id,kind:def.kind,correct,total:qs.length,percent,byStrand,timed,independent,unseen:!p.seenBefore,qualifying,results,seconds:Math.round((p.submittedAt-p.startedAt)/1000),status:def.kind==='baseline'?'Starting-point evidence, not a readiness score.':qualifying?'Internal paper target achieved. External calibration is still needed.':!independent?'Supported or interrupted practice paper.':!timed?'Untimed or overtime practice paper.':'Use the results to choose the next lessons.'};
+}
+function review(d,id,verdict,note='',now=Date.now()){if(['__proto__','constructor','prototype'].includes(id)||!d.attempts.some(a=>a.id===id)||!['valid','needs-discussion','unreviewed'].includes(verdict))return false;d.reviews[id]={verdict,note:text(note,1500),at:now};return true;}
+function addExternal(d,entry,now=Date.now()){if(!text(entry.name,150)||!Number.isFinite(entry.score)||!Number.isFinite(entry.total)||entry.total<=0||entry.score<0||entry.score>entry.total)throw Error('Enter a named paper and a valid score/total.');d.external.push({id:uid(),name:text(entry.name,150),score:entry.score,total:entry.total,unseen:!!entry.unseen,independent:!!entry.independent,timed:!!entry.timed,at:now});d.external=d.external.slice(-30);}
+function report(d,now=Date.now()){
+ const units=D.units.map(u=>evidence(d,u.id,now)),papers=paperDefinitions.map(p=>scorePaper(d,p.id)).filter(Boolean),qualifying=papers.filter(p=>p.qualifying),reviewed=d.attempts.filter(a=>d.reviews[a.id]?.verdict==='valid'&&a.independent),reviewedStrands=new Set(reviewed.map(a=>unit(a.unit).strand));
+ const external=d.external.filter(x=>x.independent&&x.unseen&&x.timed&&100*x.score/x.total>=D.target),breadth=qualifying.length===3&&Object.keys(D.strands).every(k=>{const total=qualifying.reduce((n,p)=>n+p.byStrand[k].total,0),correct=qualifying.reduce((n,p)=>n+p.byStrand[k].correct,0);return total&&correct/total>=.75;});
+ return {goalMonth:d.goalMonth,target:D.target,units,papers,qualifyingPapers:qualifying.length,reviewedStrands:reviewedStrands.size,externalChecks:external.length,breadth,internalTarget:qualifying.length===3&&breadth&&reviewedStrands.size===4,externalReported:external.length>0,limits:['The commercial booklet is a working benchmark, not an official entrance paper.','These original items and time limits are not psychometrically calibrated.','85% on three reserved mixed papers is an internal training goal, not an admissions cutoff.','Independent correctness does not automatically validate written reasoning.','Parent-entered external results and explanation reviews are self-reported.','No school admission probability is calculated.']};
+}
+function validate(raw){
+ const d=fresh();if(!raw)return d;if(raw.version!==1)throw Error('Unsupported entrance-path backup version.');
+ for(const u of D.units){const x=raw.lessons?.[u.id];if(!x)continue;const l=lesson(d,u.id);l.page=Math.min(2,Math.max(0,Math.trunc(x.page)||0));l.visited=[...new Set((Array.isArray(x.visited)?x.visited:[]).filter(n=>Number.isInteger(n)&&n>=0&&n<=2))];l.lastViewedAt=stamp(x.lastViewedAt);l.updatedAt=stamp(x.updatedAt);l.notes=text(x.notes);l.conceptChoice=Number.isInteger(x.conceptChoice)&&x.conceptChoice>=0&&x.conceptChoice<3?x.conceptChoice:-1;l.conceptResponses=(Array.isArray(x.conceptResponses)?x.conceptResponses:[]).slice(-12).filter(v=>Number.isInteger(v.choice)&&v.choice>=0&&v.choice<3&&stamp(v.at));l.completedAt=l.visited.length===3?stamp(x.completedAt):0;}
+ for(const [k,v] of Object.entries(raw.seen||{}).slice(-12000))if(/^[a-z0-9]{1,12}$/.test(k)&&stamp(v))d.seen[k]=v;
+ for(const rawAttempt of (Array.isArray(raw.attempts)?raw.attempts:[]).slice(-5000).sort((a,b)=>(a?.at||0)-(b?.at||0))){const a=record(d,rawAttempt);if(a)d.seen[a.fingerprint]=Math.min(d.seen[a.fingerprint]||a.at,a.at);}
+ d.draft=cleanDraft(raw.draft);
+ for(const def of paperDefinitions){const x=raw.papers?.[def.id];if(!x||!stamp(x.startedAt))continue;const p={id:def.id,startedAt:x.startedAt,updatedAt:stamp(x.updatedAt)||x.startedAt,deadline:def.minutes?x.startedAt+def.minutes*60000:0,submittedAt:stamp(x.submittedAt),assisted:!!x.assisted,interrupted:!!x.interrupted,conflicted:!!x.conflicted,seenBefore:!!x.seenBefore,index:Math.max(0,Math.min(def.units.length-1,Math.trunc(x.index)||0)),answers:{},flags:[...new Set((Array.isArray(x.flags)?x.flags:[]).filter(i=>Number.isInteger(i)&&i>=0&&i<def.units.length))]};
+  for(let i=0;i<def.units.length;i++){const a=x.answers?.[i];if(a)p.answers[i]={answer:text(a.answer,180),working:text(a.working),strokes:ink(a.strokes),updatedAt:stamp(a.updatedAt)||x.startedAt};}if(p.submittedAt&&p.submittedAt<p.startedAt)p.conflicted=true;for(const a of Object.values(p.answers))if(a.updatedAt<p.startedAt||p.submittedAt&&a.updatedAt>p.submittedAt||p.deadline&&a.updatedAt>p.deadline)p.conflicted=true;
+  d.papers[def.id]=p;for(const q of paperQuestions(def.id))d.seen[q.fingerprint]=Math.min(d.seen[q.fingerprint]||p.startedAt,p.startedAt);
+ }
+ for(const a of d.attempts){if(a.mode==='paper'||a.mode==='baseline'){const p=d.papers[a.paperId];if(!p?.submittedAt||p.assisted||p.interrupted||p.conflicted){a.helped=true;a.independent=false;}}}
+ for(const [id,v]of Object.entries(raw.reviews||{}).slice(-5000))if(v)review(d,id,v.verdict,v.note,stamp(v.at));
+ for(const x of (Array.isArray(raw.external)?raw.external:[]).slice(-30)){if(!text(x?.id,120)||!text(x?.name,150)||!stamp(x?.at)||!Number.isFinite(x.total)||x.total<=0||!Number.isFinite(x.score)||x.score<0||x.score>x.total)continue;d.external.push({id:text(x.id,120),name:text(x.name,150),score:x.score,total:x.total,unseen:!!x.unseen,independent:!!x.independent,timed:!!x.timed,at:x.at});}
+ return d;
+}
+function merge(a,b){
+ a=validate(a);b=validate(b);const d=fresh(),newest=(x,y,key='updatedAt')=>!x?y:!y?x:(y[key]||0)>(x[key]||0)?y:(y[key]||0)<(x[key]||0)?x:JSON.stringify(y)>JSON.stringify(x)?y:x;
+ for(const u of D.units){const x=a.lessons[u.id],y=b.lessons[u.id],win=newest(x,y);if(!win)continue;d.lessons[u.id]={...copy(win),visited:[...new Set([...(x?.visited||[]),...(y?.visited||[])])].sort(),completedAt:Math.max(x?.completedAt||0,y?.completedAt||0),lastViewedAt:Math.max(x?.lastViewedAt||0,y?.lastViewedAt||0),conceptResponses:[...(x?.conceptResponses||[]),...(y?.conceptResponses||[])].filter((v,i,all)=>all.findIndex(w=>w.at===v.at&&w.choice===v.choice)===i).sort((x,y)=>x.at-y.at).slice(-12)};}
+ for(const [k,v]of [...Object.entries(a.seen),...Object.entries(b.seen)])d.seen[k]=Math.min(d.seen[k]||v,v);
+ const combined=new Map();for(const x of [...a.attempts,...b.attempts])combined.set(x.id,combined.has(x.id)?combineAttempts(combined.get(x.id),x):x);for(const x of [...combined.values()].sort((x,y)=>x.at-y.at||x.id.localeCompare(y.id)))record(d,x);
+ d.draft=copy(newest(a.draft,b.draft)||null);if(d.draft&&d.attempts.find(x=>x.id===d.draft.id)?.correct)d.draft=null;
+ if(a.draft&&b.draft&&a.draft.id===b.draft.id&&d.draft){d.draft.helped=a.draft.helped||b.draft.helped;d.draft.revealed=a.draft.revealed||b.draft.revealed;d.draft.guess=a.draft.guess||b.draft.guess;}
+ for(const def of paperDefinitions){const x=a.papers[def.id],y=b.papers[def.id];if(!x&&!y)continue;let win;if(x?.submittedAt&&y?.submittedAt)win=x.submittedAt<y.submittedAt?x:y.submittedAt<x.submittedAt?y:newest(x,y);else win=x?.submittedAt?x:y?.submittedAt?y:newest(x,y);const p=copy(win);
+  if(x&&y){p.assisted=x.assisted||y.assisted;p.interrupted=x.interrupted||y.interrupted;p.conflicted=x.conflicted||y.conflicted||x.startedAt!==y.startedAt;p.seenBefore=x.seenBefore||y.seenBefore;p.flags=[...new Set([...x.flags,...y.flags])].sort((x,y)=>x-y);
+   if(!p.submittedAt)for(let i=0;i<def.units.length;i++){const ax=x.answers[i],ay=y.answers[i];if(ax&&ay&&ax.updatedAt===ay.updatedAt&&ax.answer!==ay.answer)p.conflicted=true;const answer=newest(ax,ay);if(answer)p.answers[i]=copy(answer);}
+  }d.papers[def.id]=p;
+ }
+ for(const id of new Set([...Object.keys(a.reviews),...Object.keys(b.reviews)]))d.reviews[id]=copy(newest(a.reviews[id],b.reviews[id],'at'));
+ const ext=new Map();for(const x of [...a.external,...b.external])ext.set(x.id,newest(ext.get(x.id),x,'at'));d.external=[...ext.values()].sort((x,y)=>x.at-y.at||x.id.localeCompare(y.id)).slice(-30);
+ return validate(d);
+}
+function exportData(d){return validate(d);}
+root.MochiEntrance={D,B,DAY,uid,unit,question,fresh,init,lesson,visit,concept,complete,record,evidence,recommend,startPractice,touchDraft,help,respond,finishPractice,paperDefinitions,paperQuestions,startPaper,savePaperAnswer,interruptPaper,submitPaper,scorePaper,review,addExternal,report,validate,merge,exportData,ink};
+if(typeof module!=='undefined')module.exports=root.MochiEntrance;
+})(typeof globalThis!=='undefined'?globalThis:this);

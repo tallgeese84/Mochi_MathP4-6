@@ -6,6 +6,7 @@ const scText=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>'
 function scDraft(){if(!SCI.state)return;scData().drafts[SCI.skill]={prediction:$('scPrediction').value.slice(0,1000),explanation:$('scExplanation').value.slice(0,2500),strokes:SCI.strokes};save(S);}
 function scAbort(){SCI.epoch++;SCI.controller?.abort();SCI.controller=null;}
 function scShow(view){
+ window.MochiEntranceUI?.leave();
  if(typeof courseLeave==='function')courseLeave();
  const experiment=view==='investigate';if(experiment)view='science';
  scDraft();scAbort();focusClose(false);SCI.view=view;
