@@ -1,0 +1,211 @@
+[
+ {
+  "path": "CHANGELOG.md",
+  "before": "b17cc39a521712d427ec3e585ae33cb340baea159072f3a1f85dc429b75571c5",
+  "after": "0df1729853e1b167dedf6de4b005e8097d4ea25fa7454f46ae5c79613e5037ab",
+  "edits": [
+   [
+    0,
+    0,
+    "# v6.0.0 — Entrance-reasoning learning pathway\n\n- Set the mathematics preparation goal to June 2027, separate from the preserved September SPERS goal.\n- Add 24 teaching units, 72 worked-example forms and 96 seeded question templates across algebra/rates, geometry, counting/number theory and logic.\n- Add original monochrome SVG diagrams with hatching, labelled vertices and grayscale cube views; keep support-only construction lines out of unassisted questions.\n- Separate guided learning, independent application, changed-structure transfer and delayed retrieval after a full week.\n- Add two short untimed starting checks and three reserved balanced papers with no in-paper feedback, editable saved answers, fixed deadlines and frozen submissions.\n- Add explicit parent review of written/ink reasoning and separately recorded external-paper results. Internal targets are not official cutoffs or calibrated admissions predictions.\n- Include new evidence in existing learning milestones without changing coins or removing earned cats. Preserve old work and add conservative path backup/merge handling.\n- Retain the original foundation and Science classrooms, photo/3D improvements and offline features.\n\n"
+   ]
+  ]
+ },
+ {
+  "path": "README.md",
+  "before": "ca1feaae12632b3a72679ddc50b602008086f4c7f7a966c3e944c78585294b97",
+  "after": "e9cb50e6a712578733fa1b2470dd358e39ed15625b3dca7ae7e48228e1e27d95",
+  "edits": [
+   [
+    6,
+    6,
+    "\n**v6.0.0 — 25 September 2026.** Maths now opens a June 2027 entrance-reasoning pathway: 24 short teaching units, three original worked-example forms per unit, adaptive guided/application/transfer practice, seven-day retrieval and monochrome examination-style diagrams. Two untimed starting checks and three reserved 24-question mixed papers keep assessment separate from teaching. The 85% goal is an internal training target, not a school cutoff or an admission prediction. See [scope, evidence and validation](docs/ENTRANCE_PATH.md). The foundation classroom, Science, existing notes, cats and rewards remain available.\n"
+   ]
+  ]
+ },
+ {
+  "path": "app.js",
+  "before": "0b688c507b96cc06be92e919e5bac10cc4f02bc663133971bc474e8886334a4f",
+  "after": "ca776428549e55caca70272b4f64d9b7297cf82d81abbac546e31a25f05593bb",
+  "edits": [
+   [
+    1237,
+    1238,
+    "const APP_VERSION = '6.0.0';\n"
+   ],
+   [
+    1242,
+    1243,
+    "const MOCHI_AVATAR = 'mochi-flat-avatar.svg?v=6.0.0';\n"
+   ],
+   [
+    2495,
+    2495,
+    "  window.MochiEntranceUI?.pause();\n  if(window.MochiEntrance)S.entrance=MochiEntrance.fresh();\n"
+   ],
+   [
+    2518,
+    2518,
+    "  if(window.MochiEntrance)S.entrance=MochiEntrance.validate(S.entrance);\n"
+   ],
+   [
+    2548,
+    2549,
+    "  document.addEventListener('mochi:ready', ()=> navigator.serviceWorker.register('sw.js?v=6.0.0',{updateViaCache:'none'}).catch(()=>{}),{once:true});\n"
+   ]
+  ]
+ },
+ {
+  "path": "cloud-sync.js",
+  "before": "e8a9a3172a0daee4b076ea9e088449cbe3f5c303bafde39b619ab7711cbc2972",
+  "after": "960b92f97bab7c0cc00c216a08151e17adad8344d9088fa2d24d5bd2478f5372",
+  "edits": [
+   [
+    18,
+    20,
+    "function mergeState(local={},remote={},remoteNewer){const out=cp(remoteNewer?remote:local)||{},other=remoteNewer?local:remote;for(const [k,v] of Object.entries(other))if(out[k]===undefined)out[k]=cp(v);out.learning=mergeLearning(local.learning,remote.learning,remoteNewer);if(local.science||remote.science)out.science=mergeScience(local.science,remote.science,remoteNewer);if(window.MochiCourse&&(local.course||remote.course))out.course=MochiCourse.merge(local.course,remote.course);if(window.MochiPlanner&&(local.planner||remote.planner))out.planner=MochiPlanner.merge(local.planner,remote.planner);if(window.MochiCatFriends)out.catFriends=MochiCatFriends.merge(local.catFriends,remote.catFriends);if(window.MochiEntrance&&(local.entrance||remote.entrance))out.entrance=MochiEntrance.merge(local.entrance,remote.entrance);out.mastery=mastery(local.mastery,remote.mastery);for(const k of ['done','right','best','fed'])out[k]=Math.max(+local[k]||0,+remote[k]||0);if(Array.isArray(local.owned)||Array.isArray(remote.owned))out.owned=[...new Set([...(local.owned||[]),...(remote.owned||[])])];for(const k of ['keys','provider','models','readModels']){if(local[k]!==undefined)out[k]=cp(local[k]);else delete out[k];}return out;}\nfunction normalise(s){if(window.MochiEntrance&&s.entrance)s.entrance=MochiEntrance.validate(s.entrance);if(window.MochiCatFriends)MochiCatFriends.sync(s);if(window.MochiPlanner&&s.planner)s.planner=MochiPlanner.validate(s.planner);if(window.MochiCourse&&s.course)s.course=MochiCourse.validate(s.course);if(typeof MochiLearning!=='undefined')try{MochiLearning.init(s);}catch(e){}if(s.science){s.science.version=1;s.science.attempts=Array.isArray(s.science.attempts)?s.science.attempts.slice(-1000):[];s.science.notes=Array.isArray(s.science.notes)?s.science.notes.slice(-100):[];s.science.seenAssess=Array.isArray(s.science.seenAssess)?s.science.seenAssess:[];}return s;}\n"
+   ]
+  ]
+ },
+ {
+  "path": "course-ui.js",
+  "before": "39e34a6abc823b01099e6ceb7c36a73e58c22cf336798d594c312840f73a0754",
+  "after": "1a0108661c48c0aa5af58228c534121d4bba568ae3bd6e4222a5051bcdbafa06",
+  "edits": [
+   [
+    25,
+    25,
+    " root.MochiEntranceUI?.leave();\n"
+   ],
+   [
+    135,
+    136,
+    " const bindSubjects=()=>{for(const s of ['Maths','Science'])el('subject'+s).onclick=()=>s==='Maths'&&root.MochiEntranceUI?root.MochiEntranceUI.open():open(s.toLowerCase());el('studioHome').onclick=e=>{e.preventDefault();if(root.MochiEntranceUI)root.MochiEntranceUI.open();else open(C.unit(active).subject,active);};};bindSubjects();\n"
+   ]
+  ]
+ },
+ {
+  "path": "learning-review.js",
+  "before": "f4935b4ec7f7a8c10de72f6e23ed359a4e9bddce927d0f0247e23c07a30ed7ca",
+  "after": "9c99a727012cec009bcf3e741138ab7854c411080a1dfadc84d9da27858d5eb7",
+  "edits": [
+   [
+    15,
+    15,
+    " if(root.MochiEntranceUI)root.MochiEntranceUI.capture(false);\n"
+   ],
+   [
+    23,
+    23,
+    " if(root.MochiEntrance&&state.entrance){data.entrance=root.MochiEntrance.exportData(state.entrance);data.entranceReview=root.MochiEntrance.report(data.entrance);}\n"
+   ]
+  ]
+ },
+ {
+  "path": "planner-core.js",
+  "before": "56ee7d19279c421b9e77093c3a2e92cbb195fd98eb54a0b2d0e54e52a95fbc3c",
+  "after": "71b6a379b263bbe7a10b57b360c77e7dbf161f023efee3683dad12847fd7053f",
+  "edits": [
+   [
+    71,
+    71,
+    " if(root.MochiEntrance&&s.entrance)for(const a of s.entrance.attempts||[]){\n  if(a.skipped||!stamp(a.at))continue;\n  const checked=root.MochiEntrance.record({attempts:[]},a);if(!checked)continue;\n  const p=s.entrance.papers?.[a.paperId],supported=(a.mode==='paper'||a.mode==='baseline')&&(!p?.submittedAt||p.assisted||p.interrupted||p.conflicted);\n  out.push({id:'entrance:'+a.id,subject:'maths',skill:'entrance-'+a.unit,at:checked.answeredAt,form:a.unit+':'+a.form,correct:checked.correct,first:checked.firstCorrect,independent:checked.independent&&!supported&&!checked.seenBefore,checked:!!s.entrance.reviews?.[a.id]?.verdict&&s.entrance.reviews[a.id].verdict==='valid',raw:a});\n }\n"
+   ]
+  ]
+ },
+ {
+  "path": "planner-ui.js",
+  "before": "1ac2283f030976e85f23ff160474a1b763e68649b9855319b8d96914632cc590",
+  "after": "fad7f22e006f6afb59fb51f13514ad699b33e4e1894070cb459b3f828ce54464",
+  "edits": [
+   [
+    9,
+    9,
+    " if(root.MochiEntranceUI?.visible())return 'maths';\n"
+   ],
+   [
+    26,
+    27,
+    " if(visibleSubject()!==subject){if(subject==='maths'&&root.MochiEntranceUI)root.MochiEntranceUI.open();else root.courseOpen(subject,d.unit);}\n"
+   ],
+   [
+    35,
+    35,
+    " if(subject==='maths'&&root.MochiEntranceUI?.visible()){\n  const r=root.MochiEntrance.recommend(S),id=root.MochiEntranceUI.currentUnit()||r.unit||'relationships';\n  if(action==='learn')root.MochiEntranceUI.next();else root.MochiEntranceUI.practice(id,action==='check'?'guided':undefined);paint();return;\n }\n"
+   ],
+   [
+    53,
+    53,
+    "  if(s==='maths'&&root.MochiEntranceUI?.visible()){const next=root.MochiEntrance.recommend(S),id=root.MochiEntranceUI.currentUnit()||next.unit;$('focus-'+s).textContent=id?root.MochiEntrance.unit(id).title:'Entrance reasoning';$('reason-'+s).textContent=next.reason;}\n"
+   ]
+  ]
+ },
+ {
+  "path": "science-ui.js",
+  "before": "ebc913c2d0e484038524d959090ca4ddc90097753599d2a860760966361c717d",
+  "after": "7ee4151b4237bab6cbf6ca287783bb5eae52fbe1ce699a7c7f328c24ac97c2de",
+  "edits": [
+   [
+    8,
+    8,
+    " window.MochiEntranceUI?.leave();\n"
+   ]
+  ]
+ },
+ {
+  "path": "studio.js",
+  "before": "336a46b702971f0915c2ede6a4bbf34e9893b8f2d0a350ceacb8fafd81599518",
+  "after": "c87229cc56730c0901508677a4ec588a319b60aa4e25f4d7735bee808d1139c9",
+  "edits": [
+   [
+    34,
+    34,
+    " window.MochiEntranceUI?.leave();\n"
+   ]
+  ]
+ },
+ {
+  "path": "study-ui.js",
+  "before": "6e36c2dfa8ea0767ba10a957a65213455d6ee08ee886016a50b8f24735a0b3ce",
+  "after": "2dd52f82005fa99bc38c7bc604a84e73657093d66b6ada3a1b361e918af70af2",
+  "edits": [
+   [
+    59,
+    59,
+    "     const entranceRestored=window.MochiEntrance&&raw.entrance?MochiEntrance.validate(raw.entrance):null;\n"
+   ],
+   [
+    61,
+    61,
+    "     window.MochiEntranceUI?.pause();\n"
+   ],
+   [
+    64,
+    64,
+    "     if(entranceRestored)S.entrance=entranceRestored;\n"
+   ],
+   [
+    65,
+    66,
+    "     window.MochiEntranceUI?.refresh();window.MochiPlanUI?.refresh();\n"
+   ]
+  ]
+ },
+ {
+  "path": "tests/fixtures/startup.cjs",
+  "before": "325dfa1ac0c71d7922c21424d88395186ba4a3e0c4573843c0c7b4f9db95105b",
+  "after": "a6dd583966d69655e8486dbd65fea885443b1fd8f8c4a98d77e5980ec52049f5",
+  "edits": [
+   [
+    50,
+    51,
+    " assert.equal(w.document.getElementById('viewEntrance').hidden,false,'entrance pathway is the new maths home');\n w.document.getElementById('epFoundations').click();\n assert.equal(w.document.getElementById('viewCourse').hidden,false,'foundation classroom remains available before original practice');\n"
+   ],
+   [
+    97,
+    97,
+    " w.document.getElementById('epFoundations').click();\n"
+   ]
+  ]
+ }
+]
