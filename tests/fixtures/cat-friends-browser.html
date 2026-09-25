@@ -1,0 +1,35 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Cat Friends browser regression</title>
+<style>body{margin:0;background:#faf8fc;font:14px system-ui}iframe{border:0;width:100%;height:1500px}#result{padding:8px;white-space:pre-wrap}</style>
+<pre id="result">Running…</pre><iframe title="Isolated synthetic Mochi room test" src="about:blank"></iframe>
+<script>
+(async()=>{
+ const frame=document.querySelector('iframe'),sleep=ms=>new Promise(r=>setTimeout(r,ms)),check=(v,m)=>{if(!v)throw Error(m);};
+ try{
+  check(['localhost','127.0.0.1','[::1]'].includes(location.hostname),'Graphics fixture is limited to a local test server.');
+  check(!localStorage.getItem('mochi-tutor-v1')&&!localStorage.getItem('cubs_sync'),'Use a fresh temporary browser profile; this test will not change existing progress.');
+  frame.src='../../index.html';
+  for(let n=0;n<100&&!frame.contentWindow.MochiReady;n++)await sleep(50);
+  const w=frame.contentWindow,d=w.document;check(w.MochiReady,'App did not start');const errors=[];w.addEventListener('error',e=>errors.push(e.message));
+  w.eval(`S.planner=MochiPlanner.fresh();for(let i=0;i<40;i++)S.planner.milestones['maths:test'+i+':idea']={subject:'maths',skill:'test'+i,kind:'idea',earnedAt:Date.now(),evidence:['synthetic'+i]};save(S);studioShow('room');`);
+  for(let n=0;n<150&&d.getElementById('mochi3d').dataset.mochiReady!=='true';n++)await sleep(50);
+  const room=d.getElementById('mochi3d');check(room.dataset.mochiReady==='true',d.getElementById('room3dStatus').textContent||'3D did not start');
+  check(room.dataset.catFriends==='3','Three companions must appear');check(room.querySelectorAll('canvas').length===1,'Use one renderer');
+  d.getElementById('catFriends').open=true;
+  const click=selector=>d.querySelector(selector).click();
+  const before=w.eval('JSON.stringify({coins:S.coins,learning:S.learning,science:S.science,worn:S.worn})');
+  click('[data-friend="yuki"] button');check(d.getElementById('catFriendsStatus').textContent.includes('Three friends'),'Room cap feedback');
+  click('[data-friend="miso"] button');click('[data-friend="yuki"] button');check(w.eval('S.catFriends.selected.join(",")')==='suki,kumo,yuki','Swap friends');
+  check(w.MochiRoom.petFriend('yuki'),'Pet the selected Ragdoll');click('#roomPictureMode');await sleep(30);
+  check(!d.getElementById('catFriendsPictures').hidden,'Picture fallback visible');check(d.querySelectorAll('#catFriendsPictures button').length===3,'All selected picture friends');
+  click('#catFriendsPictures button');check(w.eval('JSON.stringify({coins:S.coins,learning:S.learning,science:S.science,worn:S.worn})')===before,'No learning or coin mutations');
+  check(w.MochiReviewDownload.make().catFriends.selected.join(',')==='suki,kumo,yuki','Backup keeps selection');
+  click('#room3dMode');await sleep(30);check(room.querySelectorAll('canvas').length===1,'Mode switching reuses renderer');
+  frame.style.width='375px';await sleep(80);check(d.documentElement.scrollWidth<=375,'No narrow-screen horizontal overflow');frame.style.width='100%';await sleep(80);
+  click('[data-friend="yuki"] button');click('[data-friend="miso"] button');
+  const pause=room.querySelector('[data-action="pause"]');if(pause.getAttribute('aria-pressed')!=='true')pause.click();
+  check(errors.length===0,'Browser errors: '+errors.join('; '));
+  const result={result:'passed',friends:3,oneRenderer:true,rosterSwap:true,pictureFallback:true,backup:true,narrowLayout:true,pageErrors:errors};
+  document.body.dataset.result='passed';document.getElementById('result').textContent=JSON.stringify(result);d.getElementById('viewRoom').scrollIntoView();
+ }catch(error){document.body.dataset.result='failed';document.getElementById('result').textContent=error.stack||error.message;}
+})();
+</script></html>

@@ -1,0 +1,56 @@
+name: Cat Friends release validation
+on:
+  push:
+    branches: [codex/cat-friends-v5-5-0]
+permissions:
+  contents: write
+jobs:
+  validate:
+    if: github.ref == 'refs/heads/codex/cat-friends-v5-5-0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Assemble exact reviewed release
+        run: |
+          python3 scripts/assemble-cat-friends.py
+          git add -A
+          tree=$(git write-tree)
+          echo "Release tree: $tree"
+          test "$tree" = 'c29b0eac41a662255f130c843cb28e4a621c52d9'
+      - run: npm ci --ignore-scripts
+      - name: Regression and release checks
+        run: |
+          npm run check:release
+          npm run check:course
+          npm test | tee "$RUNNER_TEMP/cat-friends-tests.log"
+      - name: Actual Chrome graphics and controls
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 > "$RUNNER_TEMP/cat-friends-server.log" 2>&1 &
+          server=$!
+          trap 'kill "$server"' EXIT
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:8765/release.json && break || sleep 0.2; done
+          chrome=$(command -v google-chrome || command -v google-chrome-stable)
+          timeout 75s "$chrome" --headless --no-sandbox --enable-unsafe-swiftshader --use-angle=swiftshader --disable-dev-shm-usage --user-data-dir="$RUNNER_TEMP/cat-friends-chrome" --window-size=1280,1600 --timeout=60000 --virtual-time-budget=18000 --screenshot="$RUNNER_TEMP/cat-friends-room.png" --dump-dom http://127.0.0.1:8765/tests/fixtures/cat-friends-browser.html > "$RUNNER_TEMP/cat-friends-browser.html" 2> "$RUNNER_TEMP/cat-friends-browser.log"
+          grep -q 'data-result="passed"' "$RUNNER_TEMP/cat-friends-browser.html"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cat-friends-validation
+          path: |
+            ${{ runner.temp }}/cat-friends-room.png
+            ${{ runner.temp }}/cat-friends-browser.html
+            ${{ runner.temp }}/cat-friends-browser.log
+            ${{ runner.temp }}/cat-friends-tests.log
+          retention-days: 1
+      - name: Commit verified build to working branch only
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git diff --check --cached
+          git commit -m 'Finalize v5.5.0 Cat Friends after regression and graphics validation'
+          git push origin HEAD:refs/heads/codex/cat-friends-v5-5-0
