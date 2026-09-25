@@ -1,0 +1,58 @@
+name: Mochi flat portrait validation
+on:
+  push:
+    branches: [codex/mochi-flat-portrait-v5-5-2]
+permissions:
+  contents: write
+jobs:
+  validate:
+    if: github.ref == 'refs/heads/codex/mochi-flat-portrait-v5-5-2'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.15.0'
+          cache: npm
+      - name: Assemble exact reviewed portrait update
+        run: python3 scripts/assemble-style.py
+      - run: npm ci --ignore-scripts
+      - name: Release, artwork, course and complete regression checks
+        run: |
+          set -euo pipefail
+          npm run check:release
+          npm run check:course
+          npm test | tee "$RUNNER_TEMP/mochi-portrait-tests.log"
+      - name: Chrome picture-room and saved-photo checks
+        run: |
+          set -euo pipefail
+          python3 -m http.server 8765 --bind 127.0.0.1 > "$RUNNER_TEMP/mochi-portrait-server.log" 2>&1 &
+          server=$!
+          trap 'kill "$server"' EXIT
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:8765/release.json && break || sleep 0.2; done
+          chrome=$(command -v google-chrome || command -v google-chrome-stable)
+          timeout 75s "$chrome" --headless --no-sandbox --disable-dev-shm-usage --user-data-dir="$RUNNER_TEMP/mochi-portrait-chrome" --window-size=1280,1800 --timeout=60000 --virtual-time-budget=14000 --screenshot="$RUNNER_TEMP/mochi-portrait-room.png" --dump-dom http://127.0.0.1:8765/tests/fixtures/cat-portraits.html > "$RUNNER_TEMP/mochi-portrait-browser.html" 2> "$RUNNER_TEMP/mochi-portrait-browser.log"
+          grep -q 'data-result="passed"' "$RUNNER_TEMP/mochi-portrait-browser.html"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mochi-flat-portrait-validation
+          path: |
+            ${{ runner.temp }}/mochi-portrait-room.png
+            ${{ runner.temp }}/mochi-portrait-browser.html
+            ${{ runner.temp }}/mochi-portrait-browser.log
+            ${{ runner.temp }}/mochi-portrait-tests.log
+          retention-days: 1
+      - name: Commit verified output to the working branch only
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --check --cached
+          git commit -m 'Finalize v5.5.2 shared flat Mochi portraits after validation'
+          git push origin HEAD:refs/heads/codex/mochi-flat-portrait-v5-5-2
