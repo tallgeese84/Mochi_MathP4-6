@@ -1,3 +1,23 @@
+# v5.4.0 — Teach before another numerical variant
+
+- Add short GST-direction, cube-layer and complete-circuit-path mini-lessons.
+  Two first-answer misses on GST or cube-edge questions select the matching
+  conceptual check before another numerical variant. Other repeated generator
+  failures receive a conceptual gate. Focused sessions cannot bypass the gate.
+- Add eight GST/cube repair generators with practice, different-context transfer
+  and a recall stage that waits a full day. Preserve the original fraction tracks.
+- Add four ratio forms. Four distinct independent variants may invite a higher
+  different-form trial; same-form repetition cannot confirm that trial.
+- Add five circuit situations with separate reasoning probes. Require reasoning
+  evidence for independent practice, flag selected circuit contradictions for
+  discussion and defer familiar questions for at least a day.
+- Route specific GST, cube-edge and circuit signals to their own teaching units,
+  rather than generic percentage-whole, area or materials prerequisites.
+- Finish textbook reading with an exit check. Link subject attempts to classroom
+  outcomes without double-counting questions or treating reading as mastery.
+- Preserve original answers, notes, handwriting, configuration and earned
+  companion milestones; test restore/merge and real answer-button interactions.
+
 # v5.2.0 — Mochi’s 3D room
 
 - Integrate the approved bright-eyed kitten with a continuous body and leg mesh,

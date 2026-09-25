@@ -50,7 +50,7 @@ function render(){
   el('courseGoals').innerHTML=u.goals.map(g=>'<li>'+esc(g)+'</li>').join('');el('courseGoalsDetails').hidden=l.page!==0;
   el('coursePrerequisites').innerHTML=u.prerequisites.length?'Builds on: '+u.prerequisites.map(id=>`<button class="course-link" data-unit="${id}">${esc(C.unit(id).title)}${data().lessons[id]?.completedAt?'':' (not yet explored)'}</button>`).join(' · '):'Start here. No earlier course lesson is required.';
   for(const b of el('coursePrerequisites').querySelectorAll('[data-unit]'))b.onclick=()=>{support();open(u.subject,b.dataset.unit);};
-  el('coursePrev').disabled=l.page===0;el('courseNext').disabled=false;el('courseNext').textContent=l.page===u.pages.length-1?'Finish & start practice':'Next section';
+  el('coursePrev').disabled=l.page===0;el('courseNext').disabled=false;el('courseNext').textContent=l.page===u.pages.length-1?'Finish & check understanding':'Next section';
   el('courseCheckStart').disabled=!l.completedAt;el('courseCheckStart').textContent=l.draft&&!currentAttempt()?.correct?'Resume lesson check':'Quick lesson check';
   el('courseCompletion').hidden=false;el('courseCompletion').textContent=l.completedAt?(hasTopicBank(u)?'Textbook explored. Continue with the original topic questions, or try a short lesson check.':'Textbook explored. Practise this topic with its lesson questions. The wider Science bank is available above.'):'Explore the teaching sections, then practise this topic. For review of earlier work, use All '+(u.subject==='maths'?'Maths':'Science')+' practice above.';
   MochiCourseVisuals.mount(el('courseVisual'),u.visual,support);
@@ -71,6 +71,7 @@ function practice(all=false){
  if(!all&&!state().completedAt){el('courseCompletion').textContent='Explore the teaching sections first, then start topic practice.';return;}
  if(!all&&!hasTopicBank(u)){startCheck();return;}
  capture();support();
+ if(!all)C.startPractice(data(),active);else data().practiceContext=null;
  if(u.subject==='maths'){
   const l=learning(),focus=all?null:u.skill,session=l.session;
   const resume=current&&!current.custom&&session&&!session.finished&&(session.focusSkill||null)===focus&&(!focus||currentSkill()===focus);
@@ -115,7 +116,7 @@ async function ask(){
 }
 function paintReport(){
  const host=el('parentCourse');if(!host)return;const report=C.report(data()),done=report.units.filter(u=>u.taught).length;
- host.innerHTML='<p>'+done+' / '+report.units.length+' teaching units explored. This measures exposure, not mastery.</p><div class="course-table"><table><thead><tr><th>Topic</th><th>New independent</th><th>Familiar independent</th><th>Next step</th></tr></thead><tbody>'+report.units.filter(u=>u.taught||u.attempts||u.pagesVisited).map(u=>'<tr><td>'+esc(u.title)+'</td><td>'+u.newIndependent+'</td><td>'+u.familiarIndependent+'</td><td>'+esc(u.overdue?'Review due':u.status)+'</td></tr>').join('')+'</tbody></table></div><p>Notes and handwriting are included in the learning mirror. A parent or teacher should review explanations and practical work; choices are not a calibrated exam score.</p>';
+ host.innerHTML='<p>'+done+' / '+report.units.length+' teaching units explored. This measures exposure, not mastery.</p><p>'+report.linkedPractice.recorded+' linked topic attempts: '+report.linkedPractice.exit+' concept exits, '+report.linkedPractice.transfer+' transfer checks, '+report.linkedPractice.delayed+' delayed recalls. These are copies of subject attempts, not extra questions.</p><div class="course-table"><table><thead><tr><th>Topic</th><th>New independent</th><th>Familiar independent</th><th>Next step</th></tr></thead><tbody>'+report.units.filter(u=>u.taught||u.attempts||u.pagesVisited).map(u=>'<tr><td>'+esc(u.title)+'</td><td>'+u.newIndependent+'</td><td>'+u.familiarIndependent+'</td><td>'+esc(u.overdue?'Review due':u.status)+'</td></tr>').join('')+'</tbody></table></div><p>Notes and handwriting are included in the learning mirror. A parent or teacher should review explanations and practical work; choices are not a calibrated exam score.</p>';
 }
 function init(){
  C.init(S);const host=document.createElement('main');host.id='viewCourse';host.className='course-view';host.innerHTML=`
@@ -136,7 +137,7 @@ function init(){
  el('courseTopic').onchange=e=>open(C.unit(e.target.value).subject,e.target.value);
  el('courseRecommend').onclick=()=>{const subject=C.unit(active).subject,r=root.MochiPlanner?root.MochiPlanner.recommend(S,subject):null;if(r){open(subject,r.unit);el('courseActionStatus').textContent=r.reason;}else{const next=C.recommend(data(),subject);open(subject,next.unit.id);el('courseActionStatus').textContent=next.reason;}};
  el('coursePrev').onclick=()=>{capture();C.visit(data(),active,state().page-1);abort();render();saveCourse();el('courseSectionTitle').scrollIntoView({block:'start'});};
- el('courseNext').onclick=()=>{capture();const l=state(),u=C.unit(active);if(l.page===u.pages.length-1){C.complete(data(),active);saveCourse();practice();return;}C.visit(data(),active,l.page+1);abort();render();saveCourse();el('courseSectionTitle').scrollIntoView({block:'start'});};
+ el('courseNext').onclick=()=>{capture();const l=state(),u=C.unit(active);if(l.page===u.pages.length-1){C.complete(data(),active);saveCourse();startCheck();return;}C.visit(data(),active,l.page+1);abort();render();saveCourse();el('courseSectionTitle').scrollIntoView({block:'start'});};
  el('courseStartPractice').onclick=()=>practice();el('courseBrowsePractice').onclick=()=>practice(true);
  el('courseCheckStart').onclick=startCheck;el('courseSubmit').onclick=check;el('courseNextCheck').onclick=()=>{capture();state().draft=null;saveCourse();const next=C.choose(data(),active);if(next.kind==='question')startCheck();else{mode='teach';render();el('courseActionStatus').textContent=next.reason;}};
  el('courseBackLesson').onclick=()=>{capture();support();mode='teach';abort();render();};

@@ -4,6 +4,18 @@ const close=(a,b,msg)=>assert.ok(Math.abs(a-b)<1e-8,`${msg}: ${a} != ${b}`);
 const nums=s=>(s.match(/\d+(?:\.\d+)?/g)||[]).map(Number);
 // Independent calculations from the visible statement (not generator internals).
 const solve={
+ repairGstCheck(){return 'Greater';},
+ repairGstPractice(q){const [cost,rate]=nums(q.text);return cost*(100+rate)/100;},
+ repairGstTransfer(q){const [cost,rate,paid]=nums(q.text);return paid-cost*(100+rate)/100;},
+ repairGstReview(q){const [cost,rate]=nums(q.text);return cost*(100+rate)/100;},
+ repairCubeCheck(q){const [n]=nums(q.text);return `${n} × ${n} × ${n}`;},
+ repairCubePractice(q){return Math.round(Math.cbrt(nums(q.text)[0]));},
+ repairCubeTransfer(q){return 2*Math.round(Math.cbrt(nums(q.text)[0]));},
+ repairCubeReview(q){return Math.round(Math.cbrt(nums(q.text)[0]));},
+ ratioReverseTotal(q){const [a,b,blue]=nums(q.text);return blue/b*(a+b);},
+ ratioFromDifference(q){const [a,b,difference]=nums(q.text);return difference/(b-a)*a;},
+ ratioAddBlue(q){const [a,b,red,A,B]=nums(q.text);return red/a*(B-b);},
+ ratioShareTransfer(q){const [total,a,b,A,B]=nums(q.text);return total/(a+b)*(a-A);},
  repairWholeCheck(q){return nums(q.text).at(-1)/2*3;},
  repairWholePractice(q){return nums(q.text).at(-1)/(3/4*1/2);},
  repairWholeTransfer(q){const n=nums(q.text);return (n.at(-1)+n.at(-2))/(1-n[0]/n[1]);},

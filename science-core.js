@@ -101,15 +101,42 @@ const probes={
   ['f-motion','For a cart already moving right, equal opposing forces mean…',['no change in its speed or direction in this model','it must stop instantly','its mass changes'],0,'Balanced forces do not change motion in this model. This is extension work.']
  ]
 };
-function probeFor(q){const list=items.filter(x=>x.skill===q.skill&&!x.assessment);const raw=probes[q.skill][Math.max(0,list.findIndex(x=>x.id===q.id))%2];return {id:raw[0],prompt:raw[1],choices:raw[2],answer:raw[3],why:raw[4]};}
+
+add('circuits','c-return-wire','A bulb is connected to only one terminal of a cell. The other bulb contact is not connected. What would make a complete circuit?',['Add a return wire from the other bulb contact to the other cell terminal','Shake the cell','Put another bulb beside it'],0,'A complete conducting path must connect the two terminals through both contacts of the bulb.',{level:1,concept:{id:'c-return',prompt:'A simple cell and bulb circuit lights when…',choices:['current escapes into the air','a conducting path goes through the bulb from one terminal to the other','only one terminal touches a wire'],answer:1,why:'Both bulb contacts and both cell terminals must be part of the complete conducting path.'}});
+add('circuits','c-open-after','A battery, switch and two bulbs form one series loop. The switch after the second bulb is opened. Which bulbs stay lit?',['Only the first bulb','Both bulbs','Neither bulb'],2,'The position of the break does not change the result: the only complete path is broken.',{level:2,concept:{id:'c-gap-position',prompt:'Moving an open switch from before a bulb to after it in the same series loop…',choices:['still breaks the complete path','makes current reach the bulb before escaping','provides a second path'],answer:0,why:'An open switch anywhere on the single series path interrupts the complete circuit.'}});
+add('circuits','c-branch-switch','Two lamps have separate parallel branches across an ideal battery. A switch in lamp A’s branch is opened, while lamp B’s branch remains complete. What happens?',['Both go out','A goes out and B stays lit','A stays lit and B goes out'],1,'Only A’s branch is interrupted. B still has a complete path through the battery.',{level:2,state:{parallel:true,closed:true},concept:{id:'c-own-path',prompt:'To decide whether B remains lit, which path must you trace?',choices:['Only A’s branch','A path out into the room','B’s complete branch through the battery'],answer:2,why:'A complete conducting path through B remains even when A’s separate branch is open.'}});
+add('circuits','c-branch-brightness','An ideal battery keeps the same voltage across two separate parallel lamp branches. One branch is disconnected. The lamp and wires in the other branch do not change. What happens to its brightness?',['It necessarily gets brighter','It stays the same in this model','It goes out'],1,'The remaining branch has the same battery voltage and the same components. Its current and brightness do not have to increase.',{level:3,state:{parallel:true,closed:true},concept:{id:'c-unchanged-branch',prompt:'Why does the remaining lamp not have to get brighter?',choices:['The removed branch sends all its current into it','The current is used up by the gap','The remaining branch has unchanged conditions in this ideal-battery model'],answer:2,why:'A separate branch is not a fixed share of a total supply of current. Trace its complete path and use the stated ideal-battery assumption.'}});
+add('circuits','c-main-switch','Two bulbs are in parallel, but one common switch lies between the battery and both branches. The common switch is opened. What happens?',['Both bulbs go out','One bulb stays lit','Both keep the same brightness'],0,'The open common switch interrupts every complete path through the battery.',{level:3,state:{parallel:true,closed:false},concept:{id:'c-common-path',prompt:'A break in a wire shared by every branch…',choices:['affects only the nearest bulb','interrupts all complete paths through that wire','makes a new branch'],answer:1,why:'Each branch still needs a complete path through the battery; a break in their common connection interrupts them all.'}});
+
+function probeFor(q){if(q?.concept)return {...q.concept};const list=items.filter(x=>x.skill===q.skill&&!x.assessment);const raw=probes[q.skill][Math.max(0,list.findIndex(x=>x.id===q.id))%2];return {id:raw[0],prompt:raw[1],choices:raw[2],answer:raw[3],why:raw[4]};}
 function cleanConcept(q,value){if(!value)return null;const p=probeFor(q);if(value.id!==p.id||!Number.isInteger(value.choice)||value.choice<0||value.choice>=p.choices.length)return null;return {id:p.id,choice:value.choice,correct:value.choice===p.answer,firstCorrect:value.firstCorrect===true};}
+
+function explanationSignal(a){
+ if(a?.skill!=='circuits')return '';
+ const text=String(a.explanation||'').toLowerCase().replace(/[’]/g,"'");
+ // Conservative: negated statements are not flagged, and no signal means "not checked", not "correct".
+ if(/\b(?:not|never|cannot|can't|doesn't|isn't|won't|does not|do not)\b/.test(text))return '';
+ if(/\b(?:current|electricity|energy|power)\b.{0,55}\b(?:escap\w*|leak\w*|flow out)\b/.test(text)||/\b(?:switch|gap)\b.{0,30}\b(?:lets? out|releases?)\b.{0,15}\b(?:energy|current|power)\b/.test(text))return 'open-path';
+ if(/\bcurrent\b.{0,55}\bflood\w*\b/.test(text))return 'parallel-branch';
+ return '';
+}
+function supportedReasoning(a){return !!(a.correct&&a.firstCorrect&&!a.helped&&!a.guess&&a.concept?.correct&&a.concept.firstCorrect&&!explanationSignal(a));}
+function teachingNeeded(data,skill){
+ const recent=data.attempts.filter(a=>a.skill===skill).slice(-2);
+ return skill==='circuits'&&(!!explanationSignal(recent.at(-1))||recent.length===2&&recent.every(a=>!a.firstCorrect||a.concept&&!a.concept.firstCorrect));
+}
+
 function record(data,a){
  const previous=data.attempts.findIndex(x=>a.id&&x.id===a.id);
  const others=data.attempts.filter((_,i)=>i!==previous);
  a.repeated=others.some(x=>x.item===a.item);
- a.independent=!!(a.correct&&a.firstCorrect&&!a.helped&&!a.guess&&!a.repeated);
+ const old=previous>=0?data.attempts[previous]:null;
+ if(old){a.helped=!!(a.helped||old.helped);a.guess=!!(a.guess||old.guess);a.firstCorrect=!!(a.firstCorrect&&old.firstCorrect);}
  const q=items.find(q=>q.id===a.item);a.concept=cleanConcept(q,a.concept);
- a.conceptIndependent=!!(a.concept?.correct&&a.concept.firstCorrect&&!a.helped&&!a.guess&&!others.some(x=>x.concept?.id===a.concept.id));
+ if(old?.concept&&a.concept)a.concept.firstCorrect=!!(a.concept.firstCorrect&&old.concept.firstCorrect);
+ a.explanationFlag=explanationSignal(a);
+ a.independent=!!((a.assessment?(a.correct&&a.firstCorrect&&!a.helped&&!a.guess):supportedReasoning(a))&&!a.repeated);
+ a.conceptIndependent=!!(supportedReasoning(a)&&!a.repeated&&!others.some(x=>x.concept?.id===a.concept.id));
  if(previous<0)data.attempts.push(a);else data.attempts[previous]=a;
  data.attempts=data.attempts.slice(-1000);return a;
 }
@@ -119,7 +146,7 @@ function validate(raw){const out=fresh();if(!raw||raw.version!==1)return out;
  out.attempts=[];
  for(const a of (Array.isArray(raw.attempts)?raw.attempts:[]).slice(-1000)){
   const q=items.find(q=>q.id===a.item);if(!q||!Number.isFinite(a.at))continue;
-  record(out,{id:String(a.id||'').slice(0,120),item:q.id,skill:q.skill,at:a.at,choice:Number.isInteger(a.choice)?a.choice:-1,correct:a.correct===true&&a.choice===q.answer,firstCorrect:a.firstCorrect===true,helped:a.helped===true,guess:a.guess===true,assessment:a.assessment===true,concept:cleanConcept(q,a.concept),explanation:String(a.explanation||'').slice(0,2500),prediction:String(a.prediction||'').slice(0,1000),strokes:cleanInk(a.strokes),responses:(Array.isArray(a.responses)?a.responses:[]).slice(-20).map(r=>({choice:Number.isInteger(r.choice)?r.choice:-1,conceptChoice:Number.isInteger(r.conceptChoice)?r.conceptChoice:-1,explanation:String(r.explanation||'').slice(0,2500),at:Number(r.at)||a.at}))});
+  record(out,{teachingKey:a.teachingKey==='circuits'?'circuits':'',lessonCompletedAt:Number(a.lessonCompletedAt)||0,id:String(a.id||'').slice(0,120),item:q.id,skill:q.skill,at:a.at,choice:Number.isInteger(a.choice)?a.choice:-1,correct:a.correct===true&&a.choice===q.answer,firstCorrect:a.firstCorrect===true,helped:a.helped===true,guess:a.guess===true,assessment:a.assessment===true,concept:cleanConcept(q,a.concept),explanation:String(a.explanation||'').slice(0,2500),prediction:String(a.prediction||'').slice(0,1000),strokes:cleanInk(a.strokes),responses:(Array.isArray(a.responses)?a.responses:[]).slice(-20).map(r=>({choice:Number.isInteger(r.choice)?r.choice:-1,conceptChoice:Number.isInteger(r.conceptChoice)?r.conceptChoice:-1,explanation:String(r.explanation||'').slice(0,2500),at:Number(r.at)||a.at}))});
  }
  out.notes=(Array.isArray(raw.notes)?raw.notes:[]).slice(-100).filter(n=>Object.hasOwn(skills,n.skill)).map(n=>({skill:n.skill,at:Number(n.at)||0,text:String(n.text||'').slice(0,2500),prediction:String(n.prediction||'').slice(0,1000),strokes:cleanInk(n.strokes),trials:(Array.isArray(n.trials)?n.trials:[]).slice(-12).map(t=>({state:copy(t.state||{}),result:copy(t.result||{})}))}));
  out.seenAssess=(Array.isArray(raw.seenAssess)?raw.seenAssess:[]).filter(id=>items.some(q=>q.id===id&&q.assessment));
@@ -129,15 +156,15 @@ function validate(raw){const out=fresh();if(!raw||raw.version!==1)return out;
 }
 function evidence(data,skill){
  const a=data.attempts.filter(x=>x.skill===skill),recent=a.slice(-6),ind=recent.filter(x=>x.independent),concept=recent.filter(x=>x.conceptIndependent);
- return {count:a.length,independent:ind.length,conceptChecks:concept.length,pending:recent.filter(x=>!x.concept).length,misses:a.filter(x=>x.at>(a.filter(r=>r.concept?.correct&&r.concept.firstCorrect&&!r.helped&&!r.guess).at(-1)?.at||0)&&(!x.firstCorrect||x.concept&&!x.concept.firstCorrect)).length,days:new Set(ind.map(x=>new Date(x.at).toISOString().slice(0,10))).size,last:a.at(-1)?.at||0,label:!a.length?'Not checked':concept.length<2?'Building':'Practising'};
+ return {count:a.length,independent:ind.length,conceptChecks:concept.length,pending:recent.filter(x=>!x.concept).length,misses:a.filter(x=>x.at>(a.filter(r=>supportedReasoning(r)).at(-1)?.at||0)&&(!x.firstCorrect||x.concept&&!x.concept.firstCorrect)).length,days:new Set(ind.map(x=>new Date(x.at).toISOString().slice(0,10))).size,last:a.at(-1)?.at||0,label:!a.length?'Not checked':concept.length<2?'Building':'Practising'};
 }
-function choose(data,mode='practice',focus=null){
+function choose(data,mode='practice',focus=null,now=Date.now()){
  let pool=items.filter(q=>!!q.assessment===(mode==='assessment'));if(focus)pool=pool.filter(q=>q.skill===focus);
  if(mode==='assessment')return pool.find(q=>!data.seenAssess.includes(q.id))||null;
  const last=data.attempts.at(-1),tail=data.attempts.slice(-2);
- const needsCheck=a=>a&&(!a.firstCorrect||a.concept&&!a.concept.correct||a.helped||a.guess);
+ const needsCheck=a=>a&&(!a.firstCorrect||a.concept&&!a.concept.correct||a.helped||a.guess||explanationSignal(a));
  const consecutive=tail.length===2&&tail.every(a=>a.skill===last.skill);
- let target=focus||(!consecutive&&needsCheck(last)?last.skill:null);
+ let target=focus||(last&&teachingNeeded(data,last.skill)?last.skill:!consecutive&&needsCheck(last)?last.skill:null);
  // Older mistakes and missing concept evidence get a fresh check on the next visit.
  if(!target){
   const ids=[...new Set(pool.map(q=>q.skill))];
@@ -150,13 +177,14 @@ function choose(data,mode='practice',focus=null){
  let candidates=pool.filter(q=>q.skill===target),fresh=candidates.filter(q=>!data.attempts.some(a=>a.item===q.id));
  if(!fresh.length&&!focus){fresh=pool.filter(q=>!data.attempts.some(a=>a.item===q.id));}
  if(fresh.length)candidates=fresh;
- else candidates=candidates.slice().sort((a,b)=>{
+ else candidates=candidates.filter(q=>now-(data.attempts.filter(x=>x.item===q.id).at(-1)?.at||0)>=86400000).slice().sort((a,b)=>{
   const time=q=>data.attempts.filter(x=>x.item===q.id).at(-1)?.at||0;return time(a)-time(b);
  });
+ if(!candidates.length&&!focus)candidates=pool.filter(q=>now-(data.attempts.filter(x=>x.item===q.id).at(-1)?.at||0)>=86400000);
  const q=candidates[0];if(!q)return null;
  const repeated=data.attempts.some(a=>a.item===q.id);
- return {...q,reason:repeated?'Familiar practice — this repeat is not new independent evidence.':needsCheck(last)&&q.skill===last.skill?'A follow-up to check the idea from your last answer.':'A fresh question with a separate reasoning check.'};
+ return {...q,teachingKey:teachingNeeded(data,q.skill)?'circuits':'',needsTeaching:teachingNeeded(data,q.skill),reason:repeated?'Familiar practice — this repeat is not new independent evidence.':needsCheck(last)&&q.skill===last.skill?'A follow-up to check the idea from your last answer.':'A fresh question with a separate reasoning check.'};
 }
-root.MochiScience={tutorLanguage,skills,changes,defaults,items,copy,circuit,shadow,cooling,force,model,fresh,validate,evidence,choose,probeFor,record};
+root.MochiScience={explanationSignal,supportedReasoning,teachingNeeded,tutorLanguage,skills,changes,defaults,items,copy,circuit,shadow,cooling,force,model,fresh,validate,evidence,choose,probeFor,record};
 if(typeof module!=='undefined')module.exports=root.MochiScience;
 })(typeof globalThis!=='undefined'?globalThis:this);

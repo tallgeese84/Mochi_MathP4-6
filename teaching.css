@@ -1,0 +1,22 @@
+/* The intervention is one compact card; it never opens another window or requires 3D. */
+.teaching-locked{display:none!important}
+.teaching-support{grid-column:1/-1;border:1px solid #decde9;border-radius:18px;padding:clamp(16px,3vw,26px);margin:0 0 18px;background:#faf7fd;color:#392849;min-width:0}
+.teaching-support h2{margin:5px 0 8px;font-size:clamp(21px,3vw,28px);line-height:1.25}
+.teaching-support h3{margin:16px 0 8px;font-size:18px}
+.teaching-step{font-size:13px;color:#6f5b7a}
+.teaching-prose{font-size:17px;line-height:1.65;max-width:68ch}
+.teaching-actions,.teaching-compact{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:18px}
+.teaching-compact{margin-top:0;font-size:14px;justify-content:space-between}
+.teaching-support button{min-height:44px;white-space:normal}
+.teaching-bars{max-width:520px;margin:20px 0}
+.teaching-bars>div{display:flex;align-items:stretch;min-height:48px;margin-top:16px;max-width:100%}
+.teaching-bars span{display:flex;align-items:center;justify-content:center;border:1px solid #9875b0;font-size:14px;min-width:46px}
+.tax-whole{flex:100;background:#e4d6ef}.tax-extra{flex:9;background:#c6acd8}.discount-kept{flex:91;background:#e4d6ef}.discount-removed{flex:9;background:#eee9f0;text-decoration:line-through;border-style:dashed!important}
+.teaching-bars figcaption{font-size:14px;padding:8px 0}
+.teaching-layers{display:flex;flex-wrap:wrap;gap:16px;margin:16px 0}
+.teaching-layers figure{margin:0}.teaching-layers figcaption{font-size:13px;margin-bottom:7px}
+.teaching-layer{display:grid;grid-template-columns:repeat(var(--edge),25px);gap:3px}
+.teaching-layer span{width:25px;height:25px;background:#d9c5e9;border:1px solid #8a66a3;border-bottom-width:4px;border-radius:3px}
+.teaching-count{line-height:1.5;max-width:60ch}.teaching-build button{margin:4px 6px 4px 0}
+.teaching-path,.teaching-branches{font-size:16px;line-height:1.7;border-left:3px solid #8e6aad;padding:12px 16px;background:#f1e9f7;overflow-wrap:anywhere}
+@media(max-width:600px){.teaching-actions{align-items:stretch}.teaching-actions button{flex:1 1 100%}.teaching-prose{font-size:16px}.teaching-layer{grid-template-columns:repeat(var(--edge),22px)}.teaching-layer span{width:22px;height:22px}}

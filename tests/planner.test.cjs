@@ -3,7 +3,7 @@ const P=require('../planner-core.js'),C=require('../course-core.js');
 const DAY=86400000,now=new Date(2026,8,21,12).getTime(); // Monday, local time
 const state=()=>({learning:{version:1,attempts:[],notes:[]},science:{version:1,attempts:[]},course:C.fresh(),planner:P.fresh()});
 const math=(id,patch={})=>({id,at:now,skill:'number',generator:'rounding',kind:'daily',tries:1,correct:true,firstCorrect:true,confidence:'sure',...patch});
-const science=(id,patch={})=>({id,at:now,item:'circuit-1',skill:'circuits',correct:true,firstCorrect:true,...patch});
+const science=(id,patch={})=>({id,at:now,item:'circuit-1',skill:'circuits',correct:true,firstCorrect:true,concept:{correct:true,firstCorrect:true},...patch});
 function taught(s,id){const l=C.lesson(s.course,id);l.visited=C.unit(id).pages.map((_,i)=>i);l.completedAt=now;l.updatedAt=now;}
 function answer(s,id,qid,correct=true,at=now){const q=C.question(qid);return C.record(s.course,{id,at,question:qid,responses:[correct?q.answer:(q.answer+1)%q.choices.length]});}
 

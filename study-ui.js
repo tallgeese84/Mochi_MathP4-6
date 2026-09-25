@@ -73,7 +73,7 @@ function studyInit(){
 }
 function studyNewQuestion(){
  const meta=selectedStudy||{};
- studyAttempt={id:Date.now().toString(36)+'-'+questionEpoch,at:Date.now(),skill:currentSkill(),generator:currentGen?.name||'custom',kind:current.custom?'custom':meta.kind||'daily',question:current.text,difficulty:current.stars||2,tries:0,hints:0,revealed:false,model:false,firstCorrect:false,correct:false,confidence:'unsure',plan:'',reflection:'',repair:MochiRepair.clean(current.repair),transfer:!!(current.transfer||meta.transfer)};
+ studyAttempt={id:Date.now().toString(36)+'-'+questionEpoch,at:Date.now(),skill:currentSkill(),generator:currentGen?.name||'custom',kind:current.custom?'custom':meta.kind||'daily',question:current.text,difficulty:current.stars||2,tries:0,hints:0,revealed:false,model:false,firstCorrect:false,correct:false,confidence:'unsure',plan:'',reflection:'',repair:MochiRepair.clean(current.repair),conceptGate:(typeof MochiTeaching!=='undefined'?MochiTeaching.cleanGate(current.conceptGate):null),teachingKey:current.teachingKey||'',lessonCompletedAt:0,transfer:!!(current.transfer||meta.transfer)};
  $('studyPlan').value='';$('studyConfidence').value='unsure';$('studyObstacle').value='';
  $('reflectionText').value='';$('resourceNote').value='';$('studyReflection').hidden=!current.custom;
  $('saveReflection').textContent='Save my insight';$('saveResource').textContent='Save and discuss my finding';
@@ -106,6 +106,7 @@ function studyNewQuestion(){
  $('studyResource').textContent='Explore: '+skill.label.toLowerCase();
  $('studyQuestionNote').textContent=current.repair?(selectedStudy?.reason||'Check the idea and show your working.'):current.custom?'Your own problem · AI explanation, not independently marked. Include diagram details if needed.':current.stretch?'Reasoning investigation · original enrichment, not an official NUS High test question or required SPERS topic.':'No calculator · '+(selectedStudy?.reason||'Practise '+skill.label.toLowerCase()+'.')+(current.parts?' Show how the parts connect.':' Explain what makes your method work.');
  if(typeof studioNewQuestion==='function')studioNewQuestion();
+ window.MochiTeachingUI?.math(current,studyAttempt);
  studyPaint();
 }
 function studyCommit(skipped){
@@ -119,6 +120,7 @@ function studyCommit(skipped){
  else{
    const temp={attempts:[],session:null};MochiLearning.record(temp,a);l.attempts[i]=temp.attempts[0];
  }
+ if(window.MochiCourse&&S.course)MochiCourse.recordLinked(S.course,l.attempts.find(x=>x.id===a.id),'maths');
  save(S);studyPaint();
 }
 function studyPaint(){
