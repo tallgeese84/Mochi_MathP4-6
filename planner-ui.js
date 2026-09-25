@@ -105,7 +105,7 @@ function init(){
  document.addEventListener('mochi:activity',()=>{if(clock.subject&&clock.subject!==visibleSubject())pause('Paused when you changed activity.');clearTimeout(renderTimer);renderTimer=setTimeout(paint,80);});
  window.addEventListener('pagehide',()=>pause());window.addEventListener('blur',()=>pause('Paused while this window is inactive.'));
  const reset=$('resetBtn').onclick;$('resetBtn').onclick=()=>{const before=S.learning;reset();if(before!==S.learning){clock.stop();S.planner=P.fresh();save(S);schedulePaint();paint();}};
- root.MochiPlanUI={pause,flush:()=>tick(true),refresh:()=>{clock.stop();schedulePaint();paint();}};
+ root.MochiPlanUI={pause,start:subject=>{if(clock.subject!==subject)start(subject);},running:()=>clock.subject,flush:()=>tick(true),refresh:()=>{clock.stop();schedulePaint();paint();}};
  setInterval(()=>tick(),1000);paint();
 }
 if(root.MochiReady)init();else document.addEventListener('mochi:ready',init,{once:true});

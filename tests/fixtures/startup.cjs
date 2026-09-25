@@ -19,6 +19,7 @@ const dom=new JSDOM(fs.readFileSync(path.join(root,'index.html'),'utf8'),{
  beforeParse(w){
   w.HTMLCanvasElement.prototype.getContext=()=>null;
   w.HTMLElement.prototype.scrollIntoView=()=>{};
+  w.scrollTo=()=>{};
   w.matchMedia=()=>({matches:false,addEventListener(){},removeEventListener(){}});
   w.storage={get:()=>new Promise(()=>{}),set:()=>new Promise(()=>{})};
   w.localStorage.setItem('mochi-tutor-v1',saved);
@@ -48,7 +49,9 @@ const w=dom.window,delay=ms=>new Promise(r=>setTimeout(r,ms));
  assert.equal(scripts.length,new Set(scripts).size,'no duplicate dynamic script loader');
  const ids=[...w.document.querySelectorAll('[id]')].map(n=>n.id);
  assert.equal(ids.length,new Set(ids).size,'no ambiguous duplicate controls');
- assert.equal(w.document.getElementById('viewEntrance').hidden,false,'entrance pathway is the new maths home');
+ assert.equal(w.MochiTodayUI.visible(),true,'one Today plan is the default home');
+ assert.equal(w.document.getElementById('viewEntrance').hidden,true,'the maths dashboard does not compete with Today');
+ w.MochiEntranceUI.open('home');
  w.document.getElementById('epFoundations').click();
  assert.equal(w.document.getElementById('viewCourse').hidden,false,'foundation classroom remains available before original practice');
  assert.equal(w.document.getElementById('courseCheckStart').disabled,true,'new lesson cannot begin checks yet');

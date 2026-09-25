@@ -1,7 +1,7 @@
 /* Real-page control checks, with synthetic state only. Invoked by the local-only fixture. */
 window.runEntranceControlChecks=async function(w){
  const d=w.document,delay=ms=>new Promise(r=>setTimeout(r,ms)),assert=(v,m)=>{if(!v)throw Error(m);},click=id=>{const n=d.getElementById(id);assert(n,'Missing '+id);assert(!n.disabled,'Disabled '+id);n.click();},input=(id,value)=>{const n=d.getElementById(id);n.value=value;n.dispatchEvent(new w.Event('input',{bubbles:true}));},evalIn=s=>w.eval(s),E=w.MochiEntrance;
- assert(w.MochiReady&&w.MochiEntranceUI,'App boot');assert(!d.getElementById('viewEntrance').hidden,'New maths home');
+ assert(w.MochiReady&&w.MochiEntranceUI,'App boot');w.MochiEntranceUI.open('home');assert(!d.getElementById('viewEntrance').hidden,'New maths home');
  const old=evalIn('JSON.stringify({learning:S.learning,science:S.science,coins:S.coins,worn:S.worn,catFriends:S.catFriends})');
  w.confirm=()=>true;
  click('epLessons');d.querySelector('[data-lesson="percent"]').click();

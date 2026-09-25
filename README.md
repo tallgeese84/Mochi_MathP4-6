@@ -7,6 +7,8 @@ foundations and September 2027 SPERS-Sec1 planning goal remain available. Intern
 practice targets are not official school cutoffs or validated test equivalents.
 Exact 2027 test and application dates must be checked when published.
 
+**v6.2.0 — 25 September 2026.** The app now opens **Today’s Plan**, with one Start/Continue button that resumes saved work or selects the next maths/science activity. Existing weekly minutes pace the two study blocks; completion measures time, not mastery. **More** contains lessons, papers, experiment activities, the cat room and grown-up controls. There are no new streaks, penalties or automatic paper starts. See [Today’s Plan](docs/TODAY_PLAN.md).
+
 **v6.1.0 — 25 September 2026.** Science now has a matching structured reasoning pathway. Open **Science → My path** for 24 lessons, conclusion-and-reason practice, original figures and separate assessments. Core and enrichment scope is explicit; SPSO samples are supplementary, not an official DSA paper. Maths and prior records remain intact. See [Science pathway](docs/SCIENCE_PATH.md).
 
 **v6.0.0 — 25 September 2026.** Maths now opens a June 2027 entrance-reasoning pathway: 24 short teaching units, three original worked-example forms per unit, adaptive guided/application/transfer practice, seven-day retrieval and monochrome examination-style diagrams. Two untimed starting checks and three reserved 24-question mixed papers keep assessment separate from teaching. The 85% goal is an internal training target, not a school cutoff or an admission prediction. See [scope, evidence and validation](docs/ENTRANCE_PATH.md). The foundation classroom, Science, existing notes, cats and rewards remain available.
