@@ -1235,7 +1235,7 @@ function isCorrect(input,q){
 
 /* The cat ships inside the markup; this just reads her back out. */
 const BUILTIN_PHOTO = ($('catImg').getAttribute('src') || '');
-const APP_VERSION = '5.5.0';
+const APP_VERSION = '5.5.1';
 const BUILD_KIND  = 'site';
 const BUILD_DATE  = '2026-09-25';
 const BUILD = BUILD_KIND + ' v' + APP_VERSION + ' \u00b7 ' + BUILD_DATE;
@@ -2529,5 +2529,5 @@ async function hydratePhoto(){
 }
 
 if('serviceWorker' in navigator){
-  document.addEventListener('mochi:ready', ()=> navigator.serviceWorker.register('sw.js?v=5.5.0',{updateViaCache:'none'}).catch(()=>{}),{once:true});
+  document.addEventListener('mochi:ready', ()=> navigator.serviceWorker.register('sw.js?v=5.5.1',{updateViaCache:'none'}).catch(()=>{}),{once:true});
 }

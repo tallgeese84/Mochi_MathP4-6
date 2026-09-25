@@ -1,3 +1,11 @@
+# v5.5.1 — Keep Cat Friends visible and recover missing graphics
+
+- Put selected cat portraits, names and a Choose friends control at the top of the room in both viewing modes. Explain an empty or resting roster explicitly.
+- Retry the companion graphics dependency if its original request failed. Check the room module's companion capability before mounting, retry a stale module once with a fresh URL, and verify the rendered count matches the selected roster.
+- Fall back to the visible portraits with an explanatory status instead of silently presenting a Mochi-only 3D scene.
+- Preserve existing milestones, deliberate roster choices, learning data and rewards. No unlock thresholds are changed.
+- Add upgraded-state, missing-dependency and legacy-module regression tests; use synthetic progress in public tests.
+
 # v5.5.0 — Cat friends for Mochi
 
 - Add four distinct breed-inspired companions with coat, face, ear and tail differences.

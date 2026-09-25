@@ -1,3 +1,5 @@
+// Checked by the room loader: legacy cached modules must not hide selected friends.
+export const CAT_FRIENDS_VERSION=1;
 
 export async function mountMochiRoom(root,options={}){
 const stage=root.querySelector('.mp-stage'),loading=root.querySelector('.mp-loading'),mood=root.querySelector('.mp-mood');
@@ -343,7 +345,8 @@ poseTail(0,0,0);const tailFuzz=addFuzz(tail,150,.030,{flow:[0,1,0]});
 const heartShape=new T.Shape();heartShape.moveTo(0,-.10);heartShape.bezierCurveTo(-.20,.02,-.13,.18,0,.085);heartShape.bezierCurveTo(.13,.18,.20,.02,0,-.10);
 const heartGeo=new T.ExtrudeGeometry(heartShape,{depth:.025,bevelEnabled:true,bevelSize:.009,bevelThickness:.006,bevelSegments:3,curveSegments:12});
 const hearts=[];for(let i=0;i<3;i++){const mesh=new T.Mesh(heartGeo,new T.MeshStandardMaterial({color:['#b393ce','#d0accf','#b29bcf'][i],roughness:.55,transparent:true,opacity:0}));mesh.visible=false;scene.add(mesh);hearts.push(mesh);}
-friends=window.MochiCatFriendsScene?.mount(T,scene,{lite,onPet:info=>setMood(info.name+' leans into your hand. Prrr…')});
+if(typeof window.MochiCatFriendsScene?.mount!=='function')throw Error('Cat Friends graphics are not loaded.');
+friends=window.MochiCatFriendsScene.mount(T,scene,{lite,onPet:info=>setMood(info.name+' leans into your hand. Prrr…')});
 friends?.set(options.friends||[]);
 function setFriends(ids=[]){const next=JSON.stringify(ids);if(next===friendsSignature)return;friendsSignature=next;friends?.set(ids);draw(0);}
 const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -495,7 +498,7 @@ wake();
 return {
  pet:()=>setAction('pet',false),
  feed(name){setAction('pet',false);setMood(name?'Yum! '+name+'.':'That was delicious.');},
- setWear,setGrowth,setFriends,petFriend(id){const ok=friends?.pet(id)||false;if(ok){draw(0);wake();}return ok;},dispose,
+ setWear,setGrowth,setFriends,getFriendCount:()=>friends.count,petFriend(id){const ok=friends?.pet(id)||false;if(ok){draw(0);wake();}return ok;},dispose,
  setVisible(visible){suspended=!visible;root.dataset.mochiActive=String(visible);if(suspended)halt();else{resize();wake();}}
 };
 }catch(error){clearTimeout(delay);cleanup();throw error;}

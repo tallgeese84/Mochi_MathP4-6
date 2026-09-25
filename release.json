@@ -1,5 +1,5 @@
 {
-  "version": "5.5.0",
+  "version": "5.5.1",
   "releasedOn": "2026-09-25",
-  "summary": "Mochi has four breed-specific cat friends. Earn companion unlocks from learning milestones, choose up to three visitors, and enjoy shared 3D or picture mode. Existing learning, coins and rewards are preserved."
+  "summary": "Cat friends are now visible by name at the top of the room in both 3D and picture mode. Missing companion graphics are recovered, and outdated room modules cannot silently show Mochi alone. Saved learning, coins and earned friends are preserved."
 }
