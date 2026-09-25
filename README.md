@@ -1,9 +1,13 @@
 # Mochi · Euna’s maths and science studio
 
-An offline-capable family maths app with optional conversational AI. It prepares
-Euna for Primary 6 mathematics and her **September 2027 SPERS-Sec1 planning target**,
-with a separate enrichment strand for mathematical thinking. The exact 2027 test
-and application dates must be checked when published.
+An offline-capable family maths and science studio with optional conversational AI.
+Both subjects now build towards **June 2027 entrance-style preparation**, with
+separate evidence of application, transfer and retention. The original primary
+foundations and September 2027 SPERS-Sec1 planning goal remain available. Internal
+practice targets are not official school cutoffs or validated test equivalents.
+Exact 2027 test and application dates must be checked when published.
+
+**v6.1.0 — 25 September 2026.** Science now has a matching structured reasoning pathway. Open **Science → My path** for 24 lessons, conclusion-and-reason practice, original figures and separate assessments. Core and enrichment scope is explicit; SPSO samples are supplementary, not an official DSA paper. Maths and prior records remain intact. See [Science pathway](docs/SCIENCE_PATH.md).
 
 **v6.0.0 — 25 September 2026.** Maths now opens a June 2027 entrance-reasoning pathway: 24 short teaching units, three original worked-example forms per unit, adaptive guided/application/transfer practice, seven-day retrieval and monochrome examination-style diagrams. Two untimed starting checks and three reserved 24-question mixed papers keep assessment separate from teaching. The 85% goal is an internal training target, not a school cutoff or an admission prediction. See [scope, evidence and validation](docs/ENTRANCE_PATH.md). The foundation classroom, Science, existing notes, cats and rewards remain available.
 

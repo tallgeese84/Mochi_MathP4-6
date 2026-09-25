@@ -1,0 +1,13 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Science pathway browser validation</title>
+<style>body{margin:0;background:#faf8fc;font:14px system-ui}iframe{border:0;width:100%;height:1550px}#result{padding:10px;white-space:pre-wrap}</style>
+<pre id="result">Running isolated synthetic-state checks…</pre><iframe title="Science pathway test app" src="about:blank"></iframe>
+<script src="science-path-browser.js"></script><script>
+(async()=>{const frame=document.querySelector('iframe'),delay=ms=>new Promise(r=>setTimeout(r,ms));try{
+ if(!['localhost','127.0.0.1','[::1]'].includes(location.hostname))throw Error('Local test server only.');
+ if(localStorage.getItem('mochi-tutor-v1')||localStorage.getItem('cubs_sync'))throw Error('Use an empty temporary browser profile; existing progress will not be changed.');
+ frame.src='../../index.html';for(let i=0;i<150&&!frame.contentWindow.MochiReady;i++)await delay(50);if(!frame.contentWindow.MochiReady)throw Error('App did not start');
+ const result=await runSciencePathChecks(frame.contentWindow);frame.style.width='375px';await delay(100);
+ if(frame.contentDocument.documentElement.scrollWidth>375)throw Error('Horizontal overflow on narrow screen');result.narrowLayout=true;frame.style.width='100%';await delay(80);
+ document.body.dataset.result='passed';document.getElementById('result').textContent=JSON.stringify(result);frame.contentDocument.getElementById('viewSciencePath').scrollIntoView();
+ }catch(e){document.body.dataset.result='failed';document.getElementById('result').textContent=e.stack||String(e);}})();
+</script></html>

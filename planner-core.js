@@ -75,6 +75,12 @@ function records(s){
   const p=s.entrance.papers?.[a.paperId],supported=(a.mode==='paper'||a.mode==='baseline')&&(!p?.submittedAt||p.assisted||p.interrupted||p.conflicted);
   out.push({id:'entrance:'+a.id,subject:'maths',skill:'entrance-'+a.unit,at:checked.answeredAt,form:a.unit+':'+a.form,correct:checked.correct,first:checked.firstCorrect,independent:checked.independent&&!supported&&!checked.seenBefore,checked:!!s.entrance.reviews?.[a.id]?.verdict&&s.entrance.reviews[a.id].verdict==='valid',raw:a});
  }
+ if(root.MochiSciencePath&&s.sciencePath)for(const a of s.sciencePath.attempts||[]){
+  if(a.skipped||!stamp(a.at))continue;
+  const checked=root.MochiSciencePath.record({attempts:[]},a);if(!checked)continue;
+  const p=s.sciencePath.papers?.[a.paperId],supported=(a.mode==='paper'||a.mode==='baseline')&&(!p?.submittedAt||p.assisted||p.interrupted||p.conflicted);
+  out.push({id:'science-path:'+a.id,subject:'science',skill:'science-path-'+a.unit,at:checked.answeredAt,form:a.unit+':'+a.form,correct:checked.correct,first:checked.firstCorrect,independent:checked.independent&&!supported&&!checked.seenBefore,conceptMiss:!checked.components?.reason,checked:!!s.sciencePath.reviews?.[a.id]?.verdict&&s.sciencePath.reviews[a.id].verdict==='valid',raw:a});
+ }
  // Repeated items within a day are not fresh independent evidence for promotion or growth.
  out.sort((a,b)=>a.at-b.at||a.id.localeCompare(b.id));const seen=new Map(),ids=new Set();
  return out.filter(a=>{if(ids.has(a.id))return false;ids.add(a.id);return true;}).map(a=>{const k=`${a.subject}:${a.skill}:${a.form}`,prev=seen.get(k);seen.set(k,a.at);return {...a,familiar:prev!==undefined,spaced:prev===undefined||a.at-prev>=DAY};});

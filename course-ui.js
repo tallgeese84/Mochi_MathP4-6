@@ -23,7 +23,7 @@ function support(){const l=state();if(l.draft&&!currentAttempt()?.correct){l.dra
 function abort(){epoch++;pointer=null;controller?.abort();controller=null;}
 function leave(){if(!el('viewCourse')||el('viewCourse').hidden)return;const skip=document.querySelector('.skip-link');if(skip){skip.href='#qText';skip.textContent='Skip to the problem';}capture();saveCourse();abort();el('viewCourse').hidden=true;el('courseReturn').hidden=false;el('courseReturn').textContent='Back to textbook · '+C.unit(active).title;document.body.classList.remove('course-active');}
 function open(subject='maths',id,restored=false){
- root.MochiEntranceUI?.leave();
+ root.MochiEntranceUI?.leave();root.MochiSciencePathUI?.leave();
  if(!el('viewCourse'))return;if(!restored)capture();if(typeof scDraft==='function')scDraft();abort();focusClose(false);
  active=id&&C.unit(id)?.subject===subject?id:data().lastUnit[subject]||C.recommend(data(),subject).unit.id;
  // Reopening related teaching is support for a question already on screen.
@@ -134,7 +134,7 @@ function init(){
  <details class="course-more"><summary>Sources and course scope</summary><p><a id="courseSource" target="_blank" rel="noopener"></a></p><p id="coursePages"></p><p>The course builds Singapore primary foundations and includes original reasoning enrichment. It is not an official NUS High test blueprint. NUS High calls the route DSA-Sec.</p></details>`;
  el('viewMaths').before(host);const back=document.createElement('button');back.id='courseReturn';back.className='course-secondary course-return';back.textContent='Back to textbook';back.hidden=true;host.before(back);back.onclick=()=>{open(C.unit(active).subject,active);if(mode==='practice')el('courseBackLesson').click();el('courseTitle').focus();};
  const report=document.createElement('details');report.className='study-details';report.innerHTML='<summary>Classroom learning and next steps</summary><div id="parentCourse"></div>';el('parentEvidence').after(report);
- const bindSubjects=()=>{for(const s of ['Maths','Science'])el('subject'+s).onclick=()=>s==='Maths'&&root.MochiEntranceUI?root.MochiEntranceUI.open():open(s.toLowerCase());el('studioHome').onclick=e=>{e.preventDefault();if(root.MochiEntranceUI)root.MochiEntranceUI.open();else open(C.unit(active).subject,active);};};bindSubjects();
+ const bindSubjects=()=>{for(const s of ['Maths','Science'])el('subject'+s).onclick=()=>s==='Maths'&&root.MochiEntranceUI?root.MochiEntranceUI.open():s==='Science'&&root.MochiSciencePathUI?root.MochiSciencePathUI.open():open(s.toLowerCase());el('studioHome').onclick=e=>{e.preventDefault();if(root.MochiEntranceUI)root.MochiEntranceUI.open();else open(C.unit(active).subject,active);};};bindSubjects();
  el('courseTopic').onchange=e=>open(C.unit(e.target.value).subject,e.target.value);
  el('courseRecommend').onclick=()=>{const subject=C.unit(active).subject,r=root.MochiPlanner?root.MochiPlanner.recommend(S,subject):null;if(r){open(subject,r.unit);el('courseActionStatus').textContent=r.reason;}else{const next=C.recommend(data(),subject);open(subject,next.unit.id);el('courseActionStatus').textContent=next.reason;}};
  el('coursePrev').onclick=()=>{capture();C.visit(data(),active,state().page-1);abort();render();saveCourse();el('courseSectionTitle').scrollIntoView({block:'start'});};

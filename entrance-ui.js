@@ -19,7 +19,7 @@ function leave(){
 function open(kind='home',id){
  if(!host||paused)return;
  capture();if(view.kind==='paper'&&kind!=='paper'&&kind!=='results')E.interruptPaper(data(),view.paper);
- if(typeof courseLeave==='function')courseLeave();if(typeof scDraft==='function')scDraft();if(typeof scAbort==='function')scAbort();if(typeof focusClose==='function')focusClose(false);
+ root.MochiSciencePathUI?.leave();if(typeof courseLeave==='function')courseLeave();if(typeof scDraft==='function')scDraft();if(typeof scAbort==='function')scAbort();if(typeof focusClose==='function')focusClose(false);
  $('viewMaths').style.display='none';$('viewScience').hidden=true;$('viewMap').hidden=true;$('viewRoom').style.display='none';$('viewCourse').hidden=true;$('focusDock').hidden=true;$('courseReturn').hidden=true;
  if(typeof SCI!=='undefined')SCI.view='maths';document.body.classList.remove('science-active','course-active');document.body.classList.add('entrance-active');host.hidden=false;
  $('subjectMaths').setAttribute('aria-pressed','true');$('subjectScience').setAttribute('aria-pressed','false');
