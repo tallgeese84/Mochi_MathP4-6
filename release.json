@@ -1,5 +1,5 @@
 {
-  "version": "5.5.1",
+  "version": "5.5.2",
   "releasedOn": "2026-09-25",
-  "summary": "Cat friends are now visible by name at the top of the room in both 3D and picture mode. Missing companion graphics are recovered, and outdated room modules cannot silently show Mochi alone. Saved learning, coins and earned friends are preserved."
+  "summary": "2D Mochi now matches his cat friends: rounded shapes, big green eyes and a simple brown-tabby coat. The room, tutor portraits and background use the same artwork. 3D cats, learning progress, coins, unlocks and saved custom photos are unchanged."
 }

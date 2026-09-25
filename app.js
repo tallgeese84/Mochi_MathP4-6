@@ -1235,11 +1235,15 @@ function isCorrect(input,q){
 
 /* The cat ships inside the markup; this just reads her back out. */
 const BUILTIN_PHOTO = ($('catImg').getAttribute('src') || '');
-const APP_VERSION = '5.5.1';
+const APP_VERSION = '5.5.2';
 const BUILD_KIND  = 'site';
 const BUILD_DATE  = '2026-09-25';
 const BUILD = BUILD_KIND + ' v' + APP_VERSION + ' \u00b7 ' + BUILD_DATE;
 const PHOTO_KEY = 'cat-photo-v1';
+const MOCHI_AVATAR = 'mochi-flat-avatar.svg?v=5.5.2';
+function photoSource(url){
+  return url==='__builtin__'||/^(?:\.\/)?mochi-(?:builtin\.webp|flat\.svg)(?:\?[^#]*)?$/.test(url)?BUILTIN_PHOTO:url;
+}
 
 /* =========================================================
    THE CAT — mood shown by the frame, not a drawn face
@@ -1251,13 +1255,22 @@ function setCat(mood){
 }
 function showPhoto(url){
   if(!url) return;
+  url=photoSource(url);
+  const flat=url===BUILTIN_PHOTO;
+  if($('stage'))$('stage').dataset.portrait=flat?'flat':'custom';
+  document.querySelectorAll('[data-mochi-avatar]').forEach(img=>{img.src=flat?MOCHI_AVATAR:url;});
   if($('roomImg')) $('roomImg').src = url;
   $('catImg').src = url;
   $('catImg').style.display = '';
   $('catPh').style.display = 'none';
   const p = $('catPrev'); p.src = url; p.style.display = '';
+  paintAcc();
 }
 function clearPhoto(){
+  if($('roomImg'))$('roomImg').src=BUILTIN_PHOTO;
+  if($('stage'))$('stage').dataset.portrait='flat';
+  document.querySelectorAll('[data-mochi-avatar]').forEach(img=>{img.src=MOCHI_AVATAR;});
+  paintAcc();
   $('catImg').removeAttribute('src');
   $('catImg').style.display = 'none';
   $('catPh').style.display = '';
@@ -1268,11 +1281,11 @@ async function savePhoto(url){
   if(!lsSet(PHOTO_KEY, url)) MEM[PHOTO_KEY] = url;
 }
 async function loadPhoto(){
-  const local=lsGet(PHOTO_KEY)||MEM[PHOTO_KEY];if(local)return local;
+  const local=lsGet(PHOTO_KEY)||MEM[PHOTO_KEY];if(local)return photoSource(local);
   try{
-    if(window.storage){ const r = await storageRead(PHOTO_KEY); if(r && r.value) return r.value; }
+    if(window.storage){ const r = await storageRead(PHOTO_KEY); if(r && r.value) return photoSource(r.value); }
   }catch(e){}
-  return lsGet(PHOTO_KEY) || MEM[PHOTO_KEY] || BUILTIN_PHOTO || '';
+  return photoSource(lsGet(PHOTO_KEY) || MEM[PHOTO_KEY] || BUILTIN_PHOTO || '');
 }
 /* Downscale before storing — a phone photo is several MB and would be slow every load. */
 function handleFile(file){
@@ -1440,7 +1453,7 @@ function toggleWear(w){
 function paintAcc(){
   const worn = S.worn || {};
   $('accLayer').innerHTML = ['neck','head','eyes']
-    .map(sl => worn[sl] ? (ACC_SVG[worn[sl]] || '') : '').join('');
+    .map(sl => worn[sl] ? '<g'+(sl==='neck'&&$('stage').dataset.portrait==='flat'?' transform="translate(0 -14)"':'')+'>'+(ACC_SVG[worn[sl]] || '')+'</g>' : '').join('');
 }
 function paintShop(){
   const tg = $('treatGrid'); tg.innerHTML = '';
@@ -2465,6 +2478,10 @@ $('tutorSave').onclick = ()=>{
   save(S); syncTutorFields(); updateNet();
   $('keyNote').textContent = 'Saved. ' + PROVIDERS[p].label + ' is now the tutor, using ' + modelName(p) + '. The badge by Ask ' + (S.cat||'Mochi') + ' will confirm it once it answers.';
 };
+$('photoDefault').onclick = ()=>{
+  showPhoto(BUILTIN_PHOTO);savePhoto('__builtin__');
+  $('photoNote').textContent='Illustrated Mochi selected. Learning progress, coins and cat friends are unchanged.';
+};
 $('photoInput').addEventListener('change', e=> handleFile(e.target.files && e.target.files[0]));
 $('photoClear').onclick = async ()=>{
   clearPhoto();
@@ -2529,5 +2546,5 @@ async function hydratePhoto(){
 }
 
 if('serviceWorker' in navigator){
-  document.addEventListener('mochi:ready', ()=> navigator.serviceWorker.register('sw.js?v=5.5.1',{updateViaCache:'none'}).catch(()=>{}),{once:true});
+  document.addEventListener('mochi:ready', ()=> navigator.serviceWorker.register('sw.js?v=5.5.2',{updateViaCache:'none'}).catch(()=>{}),{once:true});
 }

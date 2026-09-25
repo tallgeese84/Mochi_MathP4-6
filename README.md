@@ -5,7 +5,9 @@ Euna for Primary 6 mathematics and her **September 2027 SPERS-Sec1 planning targ
 with a separate enrichment strand for mathematical thinking. The exact 2027 test
 and application dates must be checked when published.
 
-**v5.5.0 — 25 September 2026.** Mochi now has four cat friends: Miso (British Shorthair), Suki (Siamese), Kumo (Maine Coon) and Yuki (Ragdoll). Open **Mochi’s room → Cat Friends** to invite up to three companions. Earned milestone thresholds are 2, 8, 18 and 32; coins and learning scores are unchanged. The new models share the existing renderer, with picture-mode companions as a fallback. Roster preferences are included in backup and family sync.
+**v5.5.2 — 25 September 2026.** The 2D room, tutor portraits and background now use a flat, rounded Mochi that matches his friends. Custom photos remain optional; the parent settings include **Use illustrated Mochi**. The 3D models and learning rewards are unchanged.
+
+**Cat Friends:** Mochi now has four cat friends: Miso (British Shorthair), Suki (Siamese), Kumo (Maine Coon) and Yuki (Ragdoll). Open **Mochi’s room → Cat Friends** to invite up to three companions. Earned milestone thresholds are 2, 8, 18 and 32; coins and learning scores are unchanged. The new models share the existing renderer, with picture-mode companions as a fallback. Roster preferences are included in backup and family sync.
 
 **v5.4.0 teaching improvements:** Targeted mini-lessons now interrupt repeated GST and cube-edge errors. Four distinct unassisted variants can invite a harder question in another form, without immediately certifying mastery. Science keeps answer choice separate from the reasoning check, limits immediate repeats and flags selected circuit explanations for discussion. Completing a textbook opens a conceptual exit check. Linked practice records preserve lesson context without double-counting questions. See [the implementation notes](docs/TEACHING_FIRST.md).
 

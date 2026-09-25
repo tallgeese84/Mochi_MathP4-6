@@ -1,0 +1,37 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Mochi flat portraits regression</title>
+<style>body{margin:0;background:#faf8fc;font:14px system-ui}iframe{border:0;width:100%;height:1500px}#result{padding:8px;white-space:pre-wrap}</style>
+<pre id="result">Running…</pre><iframe title="Isolated synthetic Mochi portrait test" src="about:blank"></iframe>
+<script>
+(async()=>{
+ const frame=document.querySelector('iframe'),sleep=ms=>new Promise(r=>setTimeout(r,ms));
+ const check=(v,m)=>{if(!v)throw Error(m);};
+ try{
+  check(['localhost','127.0.0.1','[::1]'].includes(location.hostname),'Use a local server for this synthetic test.');
+  check(!localStorage.getItem('mochi-tutor-v1')&&!localStorage.getItem('cubs_sync'),'Use a fresh temporary browser profile. Existing progress is not changed by this test.');
+  localStorage.setItem('mochi-room-view-v1','picture');frame.src='../../index.html';
+  for(let i=0;i<150&&!frame.contentWindow.MochiReady;i++)await sleep(50);
+  const w=frame.contentWindow,d=w.document,errors=[];check(w.MochiReady,'App did not start');w.addEventListener('error',e=>errors.push(e.message));
+  w.eval(`S.planner=MochiPlanner.fresh();for(let i=0;i<40;i++)S.planner.milestones['maths:portrait'+i+':idea']={subject:'maths',skill:'portrait'+i,kind:'idea',earnedAt:Date.now(),evidence:['synthetic-'+i]};save(S);studioShow('room');`);
+  d.getElementById('catFriends').open=true;await sleep(100);
+  const room=d.getElementById('roomImg'),flat=room.src;
+  check(flat.includes('mochi-flat.svg?v='),'New versioned default in the room');
+  check(room.complete&&room.naturalWidth>0,'Room SVG actually loaded');
+  check(d.querySelectorAll('[data-mochi-avatar]').length===3,'Tutor controls and daily-plan avatar');
+  for(const img of d.querySelectorAll('[data-mochi-avatar]'))check(img.src.includes('mochi-flat-avatar.svg?v=')&&img.complete&&img.naturalWidth>0,'Tutor avatar loaded');
+  check(d.querySelectorAll('#catFriendsCards .cf-portrait svg').length===4,'All original friend portraits');
+  check(d.getElementById('mochi3d').querySelectorAll('canvas').length===0,'Picture mode does not load a 3D renderer');
+  const snapshot=()=>w.eval('JSON.stringify({learning:S.learning,science:S.science,course:S.course,planner:S.planner,coins:S.coins,worn:S.worn,catFriends:S.catFriends})'),before=snapshot();
+  const custom='data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"><circle cx="10" cy="10" r="5"/></svg>');
+  w.showPhoto(custom);await w.savePhoto(custom);await w.hydratePhoto();check(room.src===custom,'A custom photo survives hydration');
+  for(const img of d.querySelectorAll('[data-mochi-avatar]'))check(img.src===custom,'Custom choice is consistent across tutor controls');
+  d.getElementById('photoDefault').click();await sleep(30);
+  check(room.src===flat,'Explicit illustrated-Mochi control restores current default');
+  check(localStorage.getItem('cat-photo-v1')==='__builtin__','Default selector survives later releases');
+  check(snapshot()===before,'Artwork changes do not mutate learning, unlocks, coins or wardrobe');
+  frame.style.width='375px';await sleep(80);check(d.documentElement.scrollWidth<=375,'375px layout without horizontal overflow');frame.style.width='100%';
+  check(errors.length===0,'Page errors: '+errors.join('; '));
+  document.body.dataset.result='passed';document.getElementById('result').textContent=JSON.stringify({result:'passed',roomSVG:true,tutorSVG:true,unchangedFriends:4,customPhotoPreserved:true,progressUnchanged:true,narrowLayout:true,no3DRenderer:true,pageErrors:errors});
+  await sleep(80);d.getElementById('viewRoom').scrollIntoView();
+ }catch(e){document.body.dataset.result='failed';document.getElementById('result').textContent=e.stack||e.message;}
+})();
+</script></html>

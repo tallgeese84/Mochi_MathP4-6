@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "test": "node --test tests/*.test.cjs",
-    "check:release": "node scripts/release.cjs --check",
+    "check:release": "node scripts/release.cjs --check && node scripts/build-cat-portraits.cjs --check",
     "check:course": "node scripts/build-course.cjs --check"
   },
   "engines": {

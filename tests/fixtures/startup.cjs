@@ -210,7 +210,7 @@ const w=dom.window,delay=ms=>new Promise(r=>setTimeout(r,ms));
  const planBackup=w.MochiReviewDownload.make();assert.ok(planBackup.planner);assert.ok(planBackup.learningPlanReview.thinking.maths);
  const coins=w.eval('S.coins');click('plannerPet');assert.equal(w.document.getElementById('viewRoom').style.display,'');
  assert.equal(w.eval('S.coins'),coins,'growth does not spend existing coins');assert.ok(w.document.getElementById('mochiGrowth').textContent.includes('Rest days'));
- assert.ok(w.document.getElementById('roomImg').src.endsWith('mochi-builtin.webp'),'original cat illustration remains');
+ assert.ok(w.document.getElementById('roomImg').src.includes('mochi-flat.svg?v='+version),'Mochi uses the shared flat illustration');
  await delay(1300); // Let all bounded setup timers finish.
  let releaseMutations=0;
  const observer=new w.MutationObserver(records=>releaseMutations+=records.length);

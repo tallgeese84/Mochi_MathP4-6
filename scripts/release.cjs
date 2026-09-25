@@ -29,11 +29,11 @@ for (const file of ['index.html', 'app.js', 'sw.js', 'manifest.webmanifest']) {
   }
   if (file === 'sw.js') {
     const html = generated.find(f => path.basename(f.filename) === 'index.html').text;
-    const core = ['./index.html', './manifest.webmanifest', './mochi-builtin.webp', './mochi-watermark.webp', './euna-avatar.webp',
+    const core = ['./index.html', './manifest.webmanifest', './euna-avatar.webp',
       './mochi-room-scene.js?v=' + release.version, './vendor/three-r180/three.module.js', './vendor/three-r180/three.core.js',
       ...fs.readdirSync(runtime).filter(f => /^science-.*\.webp$/.test(f)).map(f => './' + f),
       ...fs.readdirSync(path.join(runtime,'course/assets')).filter(f => /\.webp$/.test(f)).map(f => './course/assets/' + f),
-      ...Array.from(html.matchAll(/(?:src|href)="([^"]+\.(?:js|css|png)(?:\?[^"]*)?)"/g), m => './' + m[1]).filter(x => !x.includes('://'))];
+      ...Array.from(html.matchAll(/(?:src|href)="([^"]+\.(?:js|css|png|svg)(?:\?[^"]*)?)"/g), m => './' + m[1]).filter(x => !x.includes('://'))];
     for (const asset of core) if (!fs.existsSync(path.join(runtime, asset.split('?')[0]))) throw Error('Missing offline asset: ' + asset);
     text = text.replace(/const VERSION = '[^']+';/, `const VERSION = '${release.version}';`)
       .replace(/const CORE = .*?;[^\n]*/, 'const CORE = ' + JSON.stringify([...new Set(core)]) + '; // Generated from index.html.');
