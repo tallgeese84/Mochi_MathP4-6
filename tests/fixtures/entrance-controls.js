@@ -18,6 +18,12 @@ window.runEntranceControlChecks=async function(w){
  click('epHint');input('epAnswer',evalIn('MochiEntrance.question(S.entrance.draft).answerLabel'));click('epCheckAnswer');assert(!evalIn('S.entrance.attempts.at(-1).independent'),'Revision cannot become independent');
  input('epWorking','Later explanation: divide by the fraction retained.');click('epSaveHome');const backup=w.MochiReviewDownload.make();assert(backup.entrance.attempts.length===2,'Review backup includes path');assert(backup.entrance.attempts.at(-1).reflection.includes('Later explanation'),'Later notes retained separately');assert(!JSON.stringify(backup).includes('SECRET'),'No test secret');
  assert(evalIn('JSON.stringify({learning:S.learning,science:S.science,coins:S.coins,worn:S.worn,catFriends:S.catFriends})')===old,'Legacy subjects and rewards preserved');
+ // The learner can always leave an exhausted retry sequence for guided teaching.
+ w.MochiEntranceUI.practice('percent');
+ for(let i=0;i<12;i++){input('epAnswer','999999');click('epCheckAnswer');}
+ const stuckId=evalIn('S.entrance.draft.id');assert(d.getElementById('epFreshGuided'),'Guided recovery offered');click('epFreshGuided');
+ assert(evalIn('S.entrance.draft.id')!==stuckId,'Fresh question replaces only the draft');assert(evalIn('S.entrance.draft.phase')==='guided','Recovery is supported practice');
+ assert(evalIn('S.entrance.attempts.at(-1).responses.length')===12,'Original response history retained');assert(!evalIn('S.entrance.attempts.at(-1).independent'),'Recovery does not erase failures');
  // Fresh, synthetic paper state for timing, revision and feedback withholding.
  evalIn('S.entrance=MochiEntrance.fresh();save(S);');w.MochiEntranceUI.open('papers');
  d.querySelector('[data-start-paper="mixed-a"]').click();assert(d.querySelectorAll('[data-paper-index]').length===24,'Balanced paper length');assert(!d.querySelector('#epHint'),'No hint button');assert(!d.querySelector('.ep-worked'),'No worked answer');
