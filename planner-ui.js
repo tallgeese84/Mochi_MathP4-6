@@ -8,6 +8,7 @@ let message='Start a subject when you are ready. Take a break between subjects.'
 function visibleSubject(){
  if($('ov').classList.contains('show')||!$('sessionPanel').hidden)return null;
  if(root.MochiEntranceUI?.visible())return 'maths';
+ if(root.MochiSciencePathUI?.visible())return 'science';
  if(!$('viewCourse').hidden)return root.courseCurrent().subject;
  if(!$('viewScience').hidden)return 'science';
  if($('viewMaths').style.display!=='none')return 'maths';return null;
@@ -25,7 +26,7 @@ function start(subject){
  if(!P.minutes(data(),subject)){message='This is a rest day for '+label(subject)+'. You can still explore, or edit the weekly plan.';$('plannerStatus').textContent=message;return;}
  if(P.elapsed(data())[subject]>=P.minutes(data(),subject)*60000){message='Today’s '+label(subject)+' time goal is complete. You can finish your checks without restarting the clock.';$('plannerStatus').textContent=message;return;}
  const d=P.day(data(),subject);d.unit=d.unit||P.recommend(S,subject).unit;
- if(visibleSubject()!==subject){if(subject==='maths'&&root.MochiEntranceUI)root.MochiEntranceUI.open();else root.courseOpen(subject,d.unit);}
+ if(visibleSubject()!==subject){if(subject==='maths'&&root.MochiEntranceUI)root.MochiEntranceUI.open();else if(subject==='science'&&root.MochiSciencePathUI)root.MochiSciencePathUI.open();else root.courseOpen(subject,d.unit);}
  clock.start(subject,data(),uid(),Date.now(),performance.now());lastSave=Date.now();save(S);
  message=label(subject)+' time is running. Reading and working count; the clock is not a speed test.';$('plannerStatus').textContent=message;paintClocks();
 }
@@ -37,6 +38,10 @@ function route(subject,action){
  if(subject==='maths'&&root.MochiEntranceUI?.visible()){
   const r=root.MochiEntrance.recommend(S),id=root.MochiEntranceUI.currentUnit()||r.unit||'relationships';
   if(action==='learn')root.MochiEntranceUI.next();else root.MochiEntranceUI.practice(id,action==='check'?'guided':undefined);paint();return;
+ }
+ if(subject==='science'&&root.MochiSciencePathUI?.visible()){
+  const r=root.MochiSciencePath.recommend(S),id=root.MochiSciencePathUI.currentUnit()||r.unit||'evidence';
+  if(action==='learn')root.MochiSciencePathUI.next();else root.MochiSciencePathUI.practice(id,action==='check'?'guided':undefined);paint();return;
  }
  const d=P.day(data(),subject),r=P.recommend(S,subject),current=root.courseCurrent();
  d.unit=action==='learn'?r.unit:current.subject===subject?current.unit:d.unit||r.unit;d.updatedAt=Date.now();
@@ -57,6 +62,7 @@ function paint(){
   const current=root.courseCurrent(),focus=current.subject===s?current.unit:d?.unit||r.unit;
   $('focus-'+s).textContent=C.unit(focus).title;$('reason-'+s).textContent='Next study focus: '+u.title+'. '+r.reason;
   if(s==='maths'&&root.MochiEntranceUI?.visible()){const next=root.MochiEntrance.recommend(S),id=root.MochiEntranceUI.currentUnit()||next.unit;$('focus-'+s).textContent=id?root.MochiEntrance.unit(id).title:'Entrance reasoning';$('reason-'+s).textContent=next.reason;}
+  if(s==='science'&&root.MochiSciencePathUI?.visible()){const next=root.MochiSciencePath.recommend(S),id=root.MochiSciencePathUI.currentUnit()||next.unit;$('focus-'+s).textContent=id?root.MochiSciencePath.unit(id).title:'Science reasoning';$('reason-'+s).textContent=next.reason;}
   $('goal-'+s).textContent=g.minutes===0?'Rest day · no catch-up debt.':`${g.practice}/${g.target} practice answers · ${g.exit?'exit answer recorded':'1 exit check'} · ${g.reflected?'reflection saved':'reflect on your approach'}`;
   $('learned-'+s).checked=g.learned;
   if(document.activeElement!==$('reflection-'+s))$('reflection-'+s).value=d?.reflection||'';

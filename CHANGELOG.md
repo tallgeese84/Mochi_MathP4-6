@@ -1,3 +1,19 @@
+# v6.1.0 — Science reasoning alongside mathematics
+
+- Add 24 original science lessons, 72 worked-example forms and 96 seeded question
+  templates covering inquiry, physical/living systems, matter, Earth and technology.
+- Ground scope in MOE primary science and official selection aims; label SPSO as a
+  supplementary reference, not a DSA paper or validated equivalence.
+- Separately check conclusions/statements and supporting reasons. Save free
+  explanations and handwriting for adult review, not keyword-based certification.
+- Add adaptive guided/application/transfer/week-later retrieval and three reserved
+  24-question science papers, with original 60-minute practice limits and two short
+  untimed starting checks. Preserve exposure, support and original deadlines.
+- Retain maths and its paper states while sharing the tested pathway state machine.
+  Preserve original science labs, classroom, histories, settings and companions.
+- Add original monochrome figures, accessible tables/graphs, science print practice,
+  backup/merge integration and real-browser regression fixtures.
+
 # v6.0.0 — Entrance-reasoning learning pathway
 
 - Set the mathematics preparation goal to June 2027, separate from the preserved September SPERS goal.

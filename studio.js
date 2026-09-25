@@ -32,7 +32,7 @@ function studioStageGo(stage,focus=false){
  $('traceCount').textContent=count?count+' thinking step'+(count===1?'':'s')+' recorded':'Your route is yours';
 }
 function studioShow(which){
- window.MochiEntranceUI?.leave();
+ window.MochiEntranceUI?.leave();window.MochiSciencePathUI?.leave();
  if(typeof courseLeave==='function')courseLeave();
  if(typeof SCI!=='undefined'&&SCI.view!=='maths'){scDraft();scAbort();SCI.view='maths';document.body.classList.remove('science-active');$('viewScience').hidden=true;for(const [id,on] of [['subjectMaths',true],['subjectScience',false]])$(id).setAttribute('aria-pressed',String(on));}
  if(which==='tools'){studioOpenLab();return;}
