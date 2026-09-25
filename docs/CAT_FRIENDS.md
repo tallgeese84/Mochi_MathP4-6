@@ -44,3 +44,14 @@ module's `CAT_FRIENDS_VERSION` contract, retries an outdated module once, and
 checks the renderer's companion count. If recovery fails it reports the error and
 keeps picture companions available. The version label alone is not a graphics
 health check. This release does not change milestone thresholds or reset progress.
+
+## Shared 2D appearance — v5.5.2
+
+`cat-portraits.js` is the single flat portrait renderer. The four friends keep
+exactly their earlier geometry; Mochi adds brown-tabby marks, green eyes, a white
+muzzle and paws, and a blue collar. Run `node scripts/build-cat-portraits.cjs`
+after changing the portrait. Release validation checks its two generated SVGs.
+Default room/tutor/background images use these versioned SVGs and work offline.
+A previously chosen custom photo remains a deliberate override; the parent-only
+“Use illustrated Mochi” control returns to the current built-in artwork. No photo
+or learning storage key is deleted during the upgrade. 3D is unchanged.

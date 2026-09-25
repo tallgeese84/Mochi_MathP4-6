@@ -1,3 +1,14 @@
+# v5.5.2 — A consistent 2D cat family
+
+- Render Mochi with the same flat, rounded, big-eyed portrait renderer as his friends.
+  Keep his brown tabby markings, white muzzle/paws, green eyes and blue collar.
+- Use generated SVG assets for the picture room, tutor controls and background.
+  Precache versioned SVGs so an old unversioned illustration cannot linger offline.
+- Preserve saved custom photos and add an explicit “Use illustrated Mochi” control.
+  Reposition neck accessories for the full-body portrait without changing ownership.
+- Leave all 3D meshes, progress, coins and companion unlock thresholds unchanged.
+- Check generated artwork consistency, saved-photo behaviour and real picture-mode UI.
+
 # v5.5.1 — Keep Cat Friends visible and recover missing graphics
 
 - Put selected cat portraits, names and a Choose friends control at the top of the room in both viewing modes. Explain an empty or resting roster explicitly.

@@ -48,3 +48,9 @@ test('neck accessories fit the new full-body portrait and custom-photo placement
  assert.match(h.nodes.get('accLayer').innerHTML,/translate\(0 -14\)/);
  h.run("$('stage').dataset.portrait='custom';paintAcc();");assert.doesNotMatch(h.nodes.get('accLayer').innerHTML,/translate\(0 -14\)/);
 });
+
+test('daily plan uses the same current portrait instead of a leftover detailed image',()=>{
+ const ui=fs.readFileSync(path.join(root,'planner-ui.js'),'utf8');
+ assert.match(ui,/id="plannerPetImage" data-mochi-avatar src="\$\{MOCHI_AVATAR\}"/);
+ assert.doesNotMatch(ui,/mochi-builtin\.webp/);
+});

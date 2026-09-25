@@ -16,7 +16,7 @@
   const room=d.getElementById('roomImg'),flat=room.src;
   check(flat.includes('mochi-flat.svg?v='),'New versioned default in the room');
   check(room.complete&&room.naturalWidth>0,'Room SVG actually loaded');
-  check(d.querySelectorAll('[data-mochi-avatar]').length===2,'Both tutor controls');
+  check(d.querySelectorAll('[data-mochi-avatar]').length===3,'Tutor controls and daily-plan avatar');
   for(const img of d.querySelectorAll('[data-mochi-avatar]'))check(img.src.includes('mochi-flat-avatar.svg?v=')&&img.complete&&img.naturalWidth>0,'Tutor avatar loaded');
   check(d.querySelectorAll('#catFriendsCards .cf-portrait svg').length===4,'All original friend portraits');
   check(d.getElementById('mochi3d').querySelectorAll('canvas').length===0,'Picture mode does not load a 3D renderer');

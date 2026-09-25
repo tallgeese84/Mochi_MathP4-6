@@ -26,7 +26,7 @@ function svg(cat=mochi){
 }
 function documentSVG(avatar=false){
  return svg(mochi).replace('<svg viewBox="0 0 120 120" aria-hidden="true" focusable="false">',
-  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="'+(avatar?'12 4 96 96':'0 0 120 120')+'" role="img" aria-label="Mochi, a round brown tabby cat"><title>Mochi</title>')+'\n';
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="'+(avatar?'12 4 96 96':'0 0 120 120')+'" role="img" aria-label="Mochi, a round brown tabby cat"><title>Mochi</title>').replace(/[ \t]+$/gm,'')+'\n';
 }
 root.MochiCatPortraits=Object.freeze({mochi,svg,documentSVG});
 if(typeof module!=='undefined')module.exports=root.MochiCatPortraits;
