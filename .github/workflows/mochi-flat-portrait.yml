@@ -19,7 +19,9 @@ jobs:
           node-version: '24.15.0'
           cache: npm
       - name: Assemble exact reviewed portrait update
-        run: python3 scripts/assemble-style.py
+        run: |
+          python3 scripts/assemble-style.py
+          python3 scripts/polish-portrait.py
       - run: npm ci --ignore-scripts
       - name: Release, artwork, course and complete regression checks
         run: |
