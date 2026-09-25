@@ -9,6 +9,8 @@ p.write_text(s)
 p=Path('planner-ui.js');s=p.read_text()
 assert 'id="plannerPetImage" src="mochi-builtin.webp"' in s
 s=s.replace('id="plannerPetImage" src="mochi-builtin.webp"','id="plannerPetImage" data-mochi-avatar src="${MOCHI_AVATAR}"')
+assert "$('plannerPetImage').src=$('roomImg').src;" in s
+s=s.replace("$('plannerPetImage').src=$('roomImg').src;","$('plannerPetImage').src=$('stage').dataset.portrait==='flat'?MOCHI_AVATAR:$('roomImg').src;")
 p.write_text(s)
 p=Path('tests/fixtures/cat-portraits.html');s=p.read_text().replace("length===2,'Both tutor controls'","length===3,'Tutor controls and daily-plan avatar'");p.write_text(s)
 p=Path('tests/cat-portraits.test.cjs');s=p.read_text()+'''
