@@ -12,6 +12,7 @@ function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; 
 function lsSet(k,v){ try{ localStorage.setItem(k,v); return true; }catch(e){ return false; } }
 async function save(obj){
   if(window.MochiPlanner)window.MochiPlanner.grow(obj);
+  if(window.MochiCatFriends)window.MochiCatFriends.sync(obj);
   const str = JSON.stringify(obj);
   try { if(window.storage) Promise.resolve(window.storage.set(KEY, str)).catch(()=>{}); } catch(e){}
   if(!lsSet(KEY, str)) MEM[KEY] = str;
@@ -1234,9 +1235,9 @@ function isCorrect(input,q){
 
 /* The cat ships inside the markup; this just reads her back out. */
 const BUILTIN_PHOTO = ($('catImg').getAttribute('src') || '');
-const APP_VERSION = '5.4.0';
+const APP_VERSION = '5.5.0';
 const BUILD_KIND  = 'site';
-const BUILD_DATE  = '2026-09-24';
+const BUILD_DATE  = '2026-09-25';
 const BUILD = BUILD_KIND + ' v' + APP_VERSION + ' \u00b7 ' + BUILD_DATE;
 const PHOTO_KEY = 'cat-photo-v1';
 
@@ -2476,6 +2477,7 @@ $('parentDismiss').onclick=()=> $('ovClose').click();
 $('resetBtn').onclick = ()=>{
   if(!confirm('Reset all learning progress and coins on this device? Back up first if you want to keep them.'))return;
   S.learning=MochiLearning.fresh();
+  if(window.MochiCatFriends)S.catFriends=MochiCatFriends.fresh();
   if(window.MochiScience)S.science=MochiScience.fresh();
   if(window.MochiPlanner)S.planner=MochiPlanner.fresh();
   if(window.MochiCourse)S.course=MochiCourse.fresh();
@@ -2527,5 +2529,5 @@ async function hydratePhoto(){
 }
 
 if('serviceWorker' in navigator){
-  document.addEventListener('mochi:ready', ()=> navigator.serviceWorker.register('sw.js?v=5.4.0',{updateViaCache:'none'}).catch(()=>{}),{once:true});
+  document.addEventListener('mochi:ready', ()=> navigator.serviceWorker.register('sw.js?v=5.5.0',{updateViaCache:'none'}).catch(()=>{}),{once:true});
 }
