@@ -5,7 +5,9 @@ Euna for Primary 6 mathematics and her **September 2027 SPERS-Sec1 planning targ
 with a separate enrichment strand for mathematical thinking. The exact 2027 test
 and application dates must be checked when published.
 
-**v5.2.0 — 23 September 2026.** Mochi’s room now opens the approved 3D kitten with
+**v5.4.0 — 24 September 2026.** Targeted mini-lessons now interrupt repeated GST and cube-edge errors. Four distinct unassisted variants can invite a harder question in another form, without immediately certifying mastery. Science keeps answer choice separate from the reasoning check, limits immediate repeats and flags selected circuit explanations for discussion. Completing a textbook opens a conceptual exit check. Linked practice records preserve lesson context without double-counting questions. See [the implementation notes](docs/TEACHING_FIRST.md).
+
+Mochi’s room now opens the approved 3D kitten with
 large bright eyes and a continuous body and leg mesh. Visit Mochi from the daily
 plan or More → Mochi’s room. Walk, sit, stroke, turn the view or tap the rug to
 choose a destination. Treats and all six owned accessories use the existing shop
@@ -26,9 +28,9 @@ The app now opens a written **Maths and Science classroom**: 42 sequenced units,
 Original illustrations accompany worked explanations, notebook activities and
 labelled interactive models. Switch subjects in the header, choose a unit and
 explore its teaching sections before checking understanding. Keyboard and stylus
-notes are saved. **Finish & start practice** opens the original adaptive Maths
-questions or related Science questions and experiments directly. **Practice
-questions** is a main action for an explored textbook, while **Quick lesson check**
+notes are saved. **Finish & check understanding** opens a conceptual exit check. The original adaptive Maths
+questions and related Science questions remain accessible through **Practice
+questions**, a main action for an explored textbook, while **Quick lesson check**
 offers the short authored checks separately. Science units without a matching
 original bank use their own lesson questions; the primary forces unit keeps its
 core checks, with the original forces extension available in the wider bank.
