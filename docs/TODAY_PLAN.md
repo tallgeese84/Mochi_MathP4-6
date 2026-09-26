@@ -1,4 +1,4 @@
-# Today’s Plan — v6.2.0
+# Today’s Plan — v6.2.1
 
 The student landing page has one primary action, Start/Continue Maths or Science.
 It shows the next activity, a short two-subject time plan, and a small Mochi room
@@ -32,8 +32,10 @@ has no required block. Reviews fit within the existing budget.
 Start/Continue explicitly starts a foreground study clock for an ordinary lesson
 or practice question. Home, menus, pausing, backgrounding, inactivity, and reload
 leave it stopped. A timed paper uses its own original deadline and does not start
-the study clock. The original three-minute inactivity guard remains: long reading
-may require Resume time. Counts are foreground estimates, not proof of engagement.
+the study clock. Quiet reading, thinking and paper work count without requiring repeated taps. A
+10-minute no-interaction guard still pauses conservatively, and ordinary short browser
+timer stalls are tolerated. Longer browser/OS interruptions pause with an explicit
+reason. Counts are foreground estimates, not proof of engagement.
 
 When the time goal is reached, the current answer remains visible and editable.
 The learner may finish the thought and return to the plan. The next learning-step
