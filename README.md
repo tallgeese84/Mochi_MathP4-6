@@ -7,6 +7,8 @@ foundations and September 2027 SPERS-Sec1 planning goal remain available. Intern
 practice targets are not official school cutoffs or validated test equivalents.
 Exact 2027 test and application dates must be checked when published.
 
+**v6.3.0 — 26 September 2026.** The student home is now **Daily Quests**: one next action plus two compact Maths/Science progress chips. After all scheduled study blocks are complete, Euna may choose up to three optional Bonus Quests. Fresh first-try independent bonus answers earn one coin each; completing three adds a two-coin chest. Hints, AI help, retries, repeated questions and guided work earn no bonus coin. Bonus coins affect room rewards only, never mastery or admissions evidence. See [Today’s Plan](docs/TODAY_PLAN.md).
+
 **v6.2.0 — 25 September 2026.** The app now opens **Today’s Plan**, with one Start/Continue button that resumes saved work or selects the next maths/science activity. Existing weekly minutes pace the two study blocks; completion measures time, not mastery. **More** contains lessons, papers, experiment activities, the cat room and grown-up controls. There are no new streaks, penalties or automatic paper starts. See [Today’s Plan](docs/TODAY_PLAN.md).
 
 **v6.1.0 — 25 September 2026.** Science now has a matching structured reasoning pathway. Open **Science → My path** for 24 lessons, conclusion-and-reason practice, original figures and separate assessments. Core and enrichment scope is explicit; SPSO samples are supplementary, not an official DSA paper. Maths and prior records remain intact. See [Science pathway](docs/SCIENCE_PATH.md).
