@@ -96,7 +96,7 @@ function paint(){
   $('todayFocusSubject').textContent=names[v.subject];
   $('todayFocusTime').textContent=b.rest?'Optional study':b.done?'Time goal reached':Math.max(1,Math.ceil(b.remaining/60000))+' min left';
   $('todayTimer').hidden=b.rest||b.done;$('todayTimer').textContent=running?'Pause time':'Resume time';$('todayTimer').setAttribute('aria-pressed',String(running));
-  $('todayFocusNote').textContent=b.done?'Finish this thought, then return to your plan.':running?'Reading and thinking count.':'Time is paused. Your work is saved.';
+  $('todayFocusNote').textContent=b.done?'Finish this thought, then return to your plan.':running?'Reading, thinking and paper work count.':(root.MochiPlanUI?.status?.()||'Time is paused. Your work is saved.');
   $('todayFinish').hidden=!b.done;$('todayFinish').textContent='Back to today’s plan';
  }
 }
