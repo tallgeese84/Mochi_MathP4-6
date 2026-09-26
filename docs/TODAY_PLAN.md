@@ -1,4 +1,4 @@
-# Today’s Plan — v6.3.0
+# Today’s Plan — v6.4.0
 
 The student landing page has one primary action, Start/Continue Maths or Science.
 It shows one next activity, two compact Maths/Science quest chips, and a small Mochi
@@ -43,19 +43,38 @@ The learner may finish the thought and return to the plan. The next learning-ste
 button returns to Today at a safe boundary rather than opening endless drills.
 Unfinished work remains resumable, including on the next planned day.
 
-## Optional Bonus Quest
+## Mastery coaching
+
+Every active lesson or practice question now shows one **Quest goal** and a compact
+five-step method path: **Learn → Apply → Transfer → Remember → Mix**. These labels
+summarise the existing evidence rules; they do not introduce a new mastery score.
+Apply requires two fresh independent applications, Transfer requires a changed
+problem structure, Remember requires qualifying delayed retrieval, and Mix is only
+checked after actual independent mixed-paper evidence.
+
+After the first incorrect response, the app offers one short **Quick check** aimed
+at the underlying relationship rather than another numerical retry. Known current
+gaps such as systematic counting, factors/LCM, shared-height area, exposed cube
+faces, circuits and matter use targeted forks; other units reuse their authored
+concept check. Opening or answering the Quick check records help, so the original
+attempt cannot later be presented as independent. Feedback stays short; a deeper
+explanation is available on demand, and Ask Mochi remains available for a tailored
+scaffold.
+
+
 
 After every non-rest scheduled subject has reached its daily time goal, the home
 screen may offer one optional **Bonus Quest**. It chooses from methods already
-taught and does not start another required time block. A fresh question earns one
-coin only when the first submitted answer is correct, no hint/AI help/solution was
-used, and the item is not a familiar repeat. A retry, supported answer, guided
+taught and does not start another required time block. A fresh independent application earns one coin when the first submitted answer is
+correct, no hint/AI help/solution was used, and the item is not a familiar repeat.
+Independent changed-structure transfer or a genuine week-later recall earns two
+coins because those are stronger learning signals. A retry, supported answer, guided
 question or repeated item earns no bonus coin. This reward rule is deliberately
 stricter than ordinary learning credit.
 
-At most three bonus successes are rewarded per local day. Each earns one coin;
-completing all three adds a two-coin chest, for a maximum of five bonus coins per
-day. Coins buy room treats/accessories only. They do not change mastery, pathway
+At most three bonus successes are rewarded per local day. Completing all three
+adds a two-coin chest. Because stronger transfer/recall questions can earn two
+coins each, the daily maximum is eight bonus coins. Coins buy room treats/accessories only. They do not change mastery, pathway
 recommendations, admissions evidence, time goals, or companion growth. Failed
 bonus questions carry no penalty and the learner may stop at any time.
 

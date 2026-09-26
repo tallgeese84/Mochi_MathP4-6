@@ -1,3 +1,13 @@
+# v6.4.0 — Mastery loops, diagnostic forks and better incentives
+
+- Show one Quest goal plus Learn → Apply → Transfer → Remember → Mix progress on Maths and Science lessons/practice.
+- After the first wrong answer, offer a one-step diagnostic Quick check before more retries. Target current gaps in counting, factors/LCM, shared-height area, exposed cube faces, circuits, matter and related concepts; fall back to the authored concept check elsewhere.
+- Record Quick-check use as help so supported learning cannot be relabelled as independent evidence.
+- Shorten immediate feedback and put longer explanations behind Explain more; keep Ask Mochi available for personalised scaffolding.
+- Give stronger optional rewards for evidence quality: +1 coin for fresh independent application, +2 for changed-structure transfer or qualifying delayed recall, with the existing three-success +2 chest.
+- Offer a small Maths/Science choice only after planned daily quests are complete. Bonus questions remain optional and capped; coins never alter mastery, papers, time goals or admissions evidence.
+- Preserve existing learning history, timers, papers, cats, wardrobe, coins and family sync.
+
 # v6.3.0 — Compact Daily Quests and optional bonus rewards
 
 - Compress the student landing screen to one next action and two small Maths/Science quest chips.
