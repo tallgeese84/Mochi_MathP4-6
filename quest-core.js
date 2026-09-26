@@ -33,7 +33,7 @@ function qualifying(a){return !!(a&&a.correct&&a.firstCorrect&&a.independent&&!a
 function phaseFor(e){return e.overdue?'recall':e.apply>=2&&!e.transfer?'transfer':'apply';}
 function candidateUnits(state,subject,now=Date.now()){
  const E=engines[subject],d=state[keys[subject]]||E.fresh();
- return E.D.units.map(u=>E.evidence(d,u.id,now)).filter(e=>e.taught&&!e.needsTeaching).sort((a,b)=>Number(b.overdue)-Number(a.overdue)||(phaseFor(a)==='transfer'?0:1)-(phaseFor(b)==='transfer'?0:1)||a.apply-b.apply||a.last-b.last);
+ return E.D.units.map(u=>E.evidence(d,u.id,now)).filter(e=>e.taught&&!e.needsTeaching).sort((a,b)=>Number(b.overdue)-Number(a.overdue)||((phaseFor(a)==='transfer'?0:1)-(phaseFor(b)==='transfer'?0:1))||a.apply-b.apply||a.last-b.last);
 }
 function bonusTask(state,now=Date.now(),preferred=''){
  const s=status(state,now);if(!s.unlocked||s.complete)return null;
