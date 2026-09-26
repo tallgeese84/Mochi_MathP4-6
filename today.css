@@ -48,3 +48,11 @@
 #todayRewardToast[hidden]{display:none!important}
 .today-bonus-guided .ep-nav,.today-bonus-guided .sp-nav,.today-bonus-guided .ep-target,.today-bonus-guided .sp-target,.today-bonus-guided #epPrintPractice,.today-bonus-guided #spPrintPractice{display:none!important}
 @media(max-width:600px){#todayHome{margin-top:14px;padding:0 14px}.today-enabled .topbar{padding:9px 14px!important}.today-card{padding:16px 14px 12px!important}.today-greeting img{width:36px;height:36px}#todayTaskTitle{font-size:20px!important}.today-quest-strip{gap:6px}.today-quest-chip{padding:7px 8px}.today-bonus{margin-top:8px}}
+
+
+/* v6.4 bonus choice appears only after the planned quests are complete. */
+.today-bonus-choices{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.today-bonus-choices:empty{display:none}.today-bonus-choices button{min-height:43px;border:1px solid #d7c3e4;border-radius:11px;background:#fff;color:#76528d;font:600 12px/1.2 system-ui;cursor:pointer;padding:8px 10px}
+.today-bonus-choices button small{display:block;font-size:9px;font-weight:500;color:#9a87a4;margin-top:3px}
+.today-bonus-coins{font-size:10px!important;letter-spacing:0!important;white-space:nowrap}
+@media(max-width:440px){.today-bonus-choices{grid-template-columns:1fr}.today-bonus{grid-template-columns:1fr auto}}
