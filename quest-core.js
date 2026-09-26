@@ -71,7 +71,7 @@ function merge(a,b){
   const union=(x,y,max)=>{const m=new Map();for(const v of [...x,...y])if(!m.has(v.id))m.set(v.id,v);return [...m.values()].slice(-max);};
   const active=!A.active?B.active:!B.active?A.active:(A.active.startedAt>=B.active.startedAt?A.active:B.active);
   const success=union(A.success,B.success,MAX);
-  out.days[k]={attempts:union(A.attempts,B.attempts,20),success,chest:(A.chest||B.chest)&&success.length>=MAX,active};
+  out.days[k]={attempts:union(A.attempts,B.attempts,20),success,chest:success.length>=MAX,active};
  }
  return validate(out);
 }
