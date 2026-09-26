@@ -1,5 +1,5 @@
 {
-  "version": "6.2.0",
+  "version": "6.2.1",
   "releasedOn": "2026-09-25",
-  "summary": "One calm Today’s Plan with a single Start/Continue action. Resume saved work, follow maths and science within the existing weekly time plan, and keep libraries, papers and grown-up evidence behind More. Learning, rewards and saved work are preserved."
+  "summary": "Fix study timing so quiet reading, thinking and paper work count. The no-interaction guard is now 10 minutes, ordinary short browser stalls are tolerated, and any automatic pause explains why. Existing maths, science, progress and daily goals are preserved."
 }

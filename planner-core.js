@@ -3,7 +3,7 @@
 'use strict';
 const C=root.MochiCourse||(typeof require==='function'?require('./course-core.js'):null);
 const Teaching=root.MochiTeaching||(typeof require==='function'?require('./teaching-core.js'):null);
-const DAY=86400000,subjects=['maths','science'],days=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const DAY=86400000,IDLE_PAUSE_MS=10*60*1000,MAX_TICK_GAP_MS=30000,CLOCK_SKEW_MS=2000,subjects=['maths','science'],days=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 const defaults=[[25,20],[20,25],[25,20],[20,25],[15,15],[30,30],[10,10]];
 const fresh=()=>({version:1,schedule:{updatedAt:0,week:defaults.map(([maths,science])=>({maths,science}))},sessions:[],days:{},milestones:{}});
 const init=s=>s.planner||(s.planner=fresh());
@@ -53,7 +53,7 @@ function clock(){
   stop(){run=null;},
   tick(p,wall,mono,visible=true,activeSubject=run?.subject){
    if(!run)return {running:false};const delta=mono-lastMono,wallDelta=wall-lastWall;
-   let reason=!visible?'Paused while the app is hidden.':activeSubject!==run.subject?'Paused when you changed activity.':localDay(wall)!==run.day?'A new day has started. Start today’s clock when ready.':mono-touched>=180000?'Paused after three minutes without interaction. Resume when ready.':delta<0||delta>5000||wallDelta<0||Math.abs(wallDelta-delta)>250?'Paused after an interruption. Resume when ready.':'';
+   let reason=!visible?'Paused while the app is hidden.':activeSubject!==run.subject?'Paused when you changed activity.':localDay(wall)!==run.day?'A new day has started. Start today’s clock when ready.':mono-touched>=IDLE_PAUSE_MS?'Paused after 10 minutes without interaction. Quiet reading and paper work count; tap Resume when ready.':delta<0||delta>MAX_TICK_GAP_MS||wallDelta<0||Math.abs(wallDelta-delta)>CLOCK_SKEW_MS?'Paused because the browser was interrupted for too long. Resume when ready.':'';
    if(reason){run=null;return {running:false,reason};}
    // A cloud merge can replace the state object. Preserve this session's identity.
    let saved=p.sessions.find(x=>x.id===run.id);if(!saved){saved={...run};p.sessions.push(saved);}saved.end=run.end+delta;run=saved;lastMono=mono;lastWall=wall;

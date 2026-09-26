@@ -27,11 +27,17 @@ test('background, subject switch, suspended tab, clock jumps and midnight do not
   const p=P.fresh(),c=P.clock();c.start('maths',p,'a',now,0);c.tick(p,now+1000,1000);const r=c.tick(p,wall,mono,visible,subject);assert.equal(c.subject,null);assert.ok(r.reason);assert.equal(P.elapsed(p,P.localDay(now)).maths,1000);
  }
 });
-test('idle pauses after three minutes; ordinary interaction extends a reading session',()=>{
+test('quiet reading counts for ten minutes; interaction extends a long reasoning session',()=>{
  const p=P.fresh(),c=P.clock();c.start('maths',p,'a',now,0);
- for(let t=1000;t<=179000;t+=1000)c.tick(p,now+t,t);
- assert.equal(c.subject,'maths');c.tick(p,now+180000,180000);assert.equal(c.subject,null);assert.equal(P.elapsed(p,P.localDay(now)).maths,179000);
- c.start('maths',p,'b',now+200000,200000);for(let t=201000;t<=400000;t+=1000){if(t===350000)c.touch(t);c.tick(p,now+t,t);}assert.equal(c.subject,'maths');
+ for(let t=1000;t<=599000;t+=1000)c.tick(p,now+t,t);
+ assert.equal(c.subject,'maths');const idle=c.tick(p,now+600000,600000);assert.equal(c.subject,null);assert.match(idle.reason,/10 minutes/);assert.equal(P.elapsed(p,P.localDay(now)).maths,599000);
+ c.start('maths',p,'b',now+620000,620000);for(let t=621000;t<=1300000;t+=1000){if(t===1100000)c.touch(t);c.tick(p,now+t,t);}assert.equal(c.subject,'maths');
+});
+test('brief foreground timer stalls count, while long or skewed interruptions pause conservatively',()=>{
+ const p=P.fresh(),c=P.clock();c.start('maths',p,'a',now,0);c.tick(p,now+1000,1000);
+ const brief=c.tick(p,now+7000,7000,true,'maths');assert.equal(brief.running,true);assert.equal(P.elapsed(p,P.localDay(now)).maths,7000);
+ const long=c.tick(p,now+38000,38000,true,'maths');assert.equal(long.running,false);assert.match(long.reason,/browser was interrupted/);assert.equal(P.elapsed(p,P.localDay(now)).maths,7000);
+ const q=P.fresh(),d=P.clock();d.start('science',q,'b',now,0);d.tick(q,now+1000,1000);const skew=d.tick(q,now+9000,6000,true,'science');assert.equal(skew.running,false);assert.match(skew.reason,/browser was interrupted/);assert.equal(P.elapsed(q,P.localDay(now)).science,1000);
 });
 test('reaching the subject target stops timing without submitting or erasing an answer',()=>{
  const p=P.fresh(),c=P.clock();p.schedule.week[0].maths=1;c.start('maths',p,'a',now,0);
