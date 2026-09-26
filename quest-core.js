@@ -38,7 +38,8 @@ function candidateUnits(state,subject,now=Date.now()){
 function bonusTask(state,now=Date.now(),preferred=''){
  const s=status(state,now);if(!s.unlocked||s.complete)return null;
  if(s.active){const E=engines[s.active.subject],d=state[keys[s.active.subject]]||E.fresh(),unit=s.active.unit||d.draft?.unit||candidateUnits(state,s.active.subject,now)[0]?.id,phase=s.active.phase||'apply';if(unit&&E.unit(unit))return {subject:s.active.subject,unit,title:E.unit(unit).title,phase,coins:C.reward(phase),resume:!!d.draft};}
- const available=T.model(state,now).blocks.filter(b=>!b.rest).map(b=>b.subject),count=subject=>s.success.filter(x=>x.subject===subject).length;
+ const available=T.model(state,now).blocks.filter(b=>!b.rest).map(b=>b.subject);if(available.some(subject=>{const d=state[keys[subject]]||engines[subject].fresh(),v=d.draft;return v&&!d.attempts.find(a=>a.id===v.id)?.correct;}))return null;
+ const count=subject=>s.success.filter(x=>x.subject===subject).length;
  const ordered=[...available].sort((a,b)=>(a===preferred?-1:b===preferred?1:count(a)-count(b)||a.localeCompare(b)));
  for(const subject of ordered){const units=candidateUnits(state,subject,now);if(units.length){const phase=phaseFor(units[0]);return {subject,unit:units[0].id,title:units[0].title,phase,coins:C.reward(phase),resume:false};}}
  return null;
