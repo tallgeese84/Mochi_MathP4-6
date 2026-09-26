@@ -49,3 +49,21 @@ test('older or malformed reward state cannot unlock unlimited coins',()=>{
  const bad={version:1,days:{'2026-09-25':{success:Array.from({length:20},(_,i)=>({id:'x'+i,subject:i%2?'science':'maths'})),attempts:[],chest:true,active:{subject:'spelling',startedAt:now}}}};
  const clean=Q.validate(bad);assert.equal(clean.days['2026-09-25'].success.length,3);assert.equal(clean.days['2026-09-25'].active,null);assert.equal(Q.MAX,3);assert.equal(Q.CHEST,2);
 });
+
+
+test('bonus quest prefers transfer or delayed retrieval and pays two coins for stronger evidence',()=>{
+ const s=fresh();finishLesson(s.entrance,M,'relationships');finishLesson(s.sciencePath,S,'matter');finishDay(s);
+ // Build two independent applications so the next Maths bonus is a transfer question.
+ for(const seed of [11,22]){M.finishPractice(s.entrance);M.startPractice(s.entrance,'relationships',{phase:'apply',seed,now:now-1000+seed});const q=M.question(s.entrance.draft);M.touchDraft(s.entrance,{answer:q.answerLabel},now-900+seed);M.respond(s.entrance,now-800+seed);}
+ M.finishPractice(s.entrance);
+ const task=Q.bonusTask(s,now,'maths');assert.equal(task.subject,'maths');assert.equal(task.phase,'transfer');assert.equal(task.coins,2);
+ assert.ok(Q.start(s,'maths',now+10));attempt(s,'maths','transfer-bonus',now+20,{phase:'transfer'});const r=Q.settle(s,now+30);
+ assert.equal(r.success,true);assert.equal(r.coins,2);assert.equal(r.phase,'transfer');assert.equal(Q.status(s,now+40).earned,2);
+});
+
+test('bonus options offer a small post-plan choice without opening a question or changing mastery',()=>{
+ const s=fresh();finishLesson(s.entrance,M,'relationships');finishLesson(s.sciencePath,S,'matter');finishDay(s);
+ const before=JSON.stringify({entrance:s.entrance,sciencePath:s.sciencePath,coins:s.coins});
+ const options=Q.bonusOptions(s,now);assert.deepEqual(options.map(x=>x.subject).sort(),['maths','science']);
+ assert.equal(JSON.stringify({entrance:s.entrance,sciencePath:s.sciencePath,coins:s.coins}),before);
+});
