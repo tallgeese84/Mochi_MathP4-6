@@ -35,3 +35,11 @@ test('quest goals are short and specific for current gaps, with authored fallbac
  assert.match(C.goal('maths','counting',M),/no duplicates/i);assert.match(C.goal('science','circuits',S),/complete electrical path/i);
  assert.equal(C.goal('maths','motion',M),M.unit('motion').why);
 });
+
+
+test('mastery coach is versioned offline and Quick checks stay out of reserved papers',()=>{
+ const fs=require('node:fs'),v=require('../release.json').version,html=fs.readFileSync(require.resolve('../index.html'),'utf8'),sw=fs.readFileSync(require.resolve('../sw.js'),'utf8');
+ assert.equal(html.split('path-coach.js?v=').length-1,1);assert.ok(sw.includes('path-coach.js?v='+v));
+ assert.ok(html.indexOf('path-coach.js?')<html.indexOf('entrance-ui.js?'));assert.ok(html.indexOf('path-coach.js?')<html.indexOf('science-path-ui.js?'));
+ for(const file of ['entrance-ui.js','science-path-ui.js']){const src=fs.readFileSync(require.resolve('../'+file),'utf8');assert.match(src,/QUICK CHECK/);assert.match(src,/wireDiagnostic\(\)/);}
+});
