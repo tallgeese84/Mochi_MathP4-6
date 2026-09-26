@@ -1,5 +1,5 @@
 {
-  "version": "6.2.2",
-  "releasedOn": "2026-09-25",
-  "summary": "Restore a visible Ask Mochi AI teaching assistant inside the new Maths and Science practice questions. Euna can ask what a question means, how to start, or whether her idea makes sense. Help is recorded as support, paper-mode assessments stay help-free, and existing learning progress is preserved."
+  "version": "6.3.0",
+  "releasedOn": "2026-09-26",
+  "summary": "Make Euna’s home a compact Daily Quests screen with one next action, two small Maths/Science progress chips, and an optional capped Bonus Quest after planned study is complete. Fresh first-try independent bonus answers earn coins without changing mastery; three bonus successes unlock a +2 coin chest. Existing learning, papers, timers, cats and rewards are preserved."
 }
