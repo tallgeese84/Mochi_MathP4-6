@@ -1,3 +1,14 @@
+# v6.3.0 — Compact Daily Quests and optional bonus rewards
+
+- Compress the student landing screen to one next action and two small Maths/Science quest chips.
+- Keep lesson libraries, papers, experiments, cats and grown-up controls behind More.
+- Offer optional Bonus Quests only after all scheduled non-rest study blocks are complete.
+- Reward a fresh first-try independent bonus answer with one coin; cap rewards at three successes per local day and add a two-coin completion chest.
+- Hints, AI tutor help, retries, revealed solutions, guided work and familiar repeats earn no bonus coin. Failed bonus questions have no penalty.
+- Keep coins separate from mastery, pathway recommendations, paper evidence, time goals and cat growth.
+- Validate/merge the small reward ledger across family sync and include it in learning backups.
+- Preserve all existing learning records, papers, timers, cats, wardrobe and reward balances.
+
 # v6.2.0 — One next step for Euna
 
 - Replace the default landing dashboard with one Today’s Plan and a single Start/Continue action.
