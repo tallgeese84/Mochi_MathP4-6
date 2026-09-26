@@ -47,9 +47,9 @@ function status(state,now=Date.now()){
  return {day:dayKey(now),unlocked:m.finished,complete:base>=MAX,success,max:MAX,earned:base+(chest?CHEST:0),chest,active:d.active,attempted:d.attempts.length};
 }
 function start(state,subject,now=Date.now()){
- const s=status(state,now),d=day(state,now);if(!s.unlocked||s.complete||d.active||!validSubject(subject))return false;
+ const s=status(state,now);if(!s.unlocked||s.complete||s.active||!validSubject(subject))return false;
  const task=bonusTask(state,now);if(!task||task.subject!==subject)return false;
- d.active={subject,startedAt:now};return true;
+ const d=day(state,now);d.active={subject,startedAt:now};return true;
 }
 function settle(state,now=Date.now()){
  const d=day(state,now),active=d.active;if(!active)return {settled:false,coins:0};
