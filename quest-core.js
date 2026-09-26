@@ -20,7 +20,7 @@ function validate(raw){
  for(const [k,v] of days){
   const attempts=[],seenA=new Set();for(const x of Array.isArray(v.attempts)?v.attempts:[]){const id=String(x?.id||'').slice(0,140),subject=x?.subject;if(!id||!validSubject(subject)||seenA.has(id))continue;seenA.add(id);attempts.push({id,subject});if(attempts.length>=20)break;}
   const success=[],seenS=new Set();for(const x of Array.isArray(v.success)?v.success:[]){const id=String(x?.id||'').slice(0,140),subject=x?.subject,phase=['apply','transfer','recall'].includes(x?.phase)?x.phase:'apply',coins=Number.isInteger(x?.coins)&&x.coins>=1&&x.coins<=2?x.coins:C.reward(phase);if(!id||!validSubject(subject)||seenS.has(id))continue;seenS.add(id);success.push({id,subject,phase,coins});if(success.length>=MAX)break;}
-  const active=v.active&&validSubject(v.active.subject)&&stamp(v.active.startedAt)?{subject:v.active.subject,startedAt:v.active.startedAt,unit:String(v.active.unit||'').slice(0,80),phase:['apply','transfer','recall'].includes(v.active.phase)?v.active.phase:'apply'}:null;
+  const active=v.active&&validSubject(v.active.subject)&&stamp(v.active.startedAt)?{subject:v.active.subject,startedAt:v.active.startedAt,unit:engines[v.active.subject]?.unit?.(String(v.active.unit||''))?String(v.active.unit).slice(0,80):'',phase:['apply','transfer','recall'].includes(v.active.phase)?v.active.phase:'apply'}:null;
   out.days[k]={attempts,success,chest:v.chest===true&&success.length>=MAX,active};
  }
  return out;
