@@ -1235,9 +1235,9 @@ function isCorrect(input,q){
 
 /* The cat ships inside the markup; this just reads her back out. */
 const BUILTIN_PHOTO = ($('catImg').getAttribute('src') || '');
-const APP_VERSION = '6.2.2';
+const APP_VERSION = '6.3.0';
 const BUILD_KIND  = 'site';
-const BUILD_DATE  = '2026-09-25';
+const BUILD_DATE  = '2026-09-26';
 const BUILD = BUILD_KIND + ' v' + APP_VERSION + ' \u00b7 ' + BUILD_DATE;
 const PHOTO_KEY = 'cat-photo-v1';
 const MOCHI_AVATAR = 'mochi-flat-avatar.svg?v=6.2.2';
