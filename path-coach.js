@@ -48,12 +48,12 @@ function goal(subject,id,E){
  const u=E?.unit?.(id);return u?.why||u?.title||'Understand the relationship, then use it in a new situation.';
 }
 function progress(E,d,id,now=Date.now()){
- const e=E.evidence(d,id,now),steps=[
+ const e=E.evidence(d,id,now),mixed=(d.attempts||[]).some(a=>a.unit===id&&a.mode==='paper'&&a.independent),steps=[
   {id:'learn',label:'Learn',done:e.taught},
   {id:'apply',label:'Apply',done:e.apply>=2},
   {id:'connect',label:'Transfer',done:e.transfer>=1},
   {id:'remember',label:'Remember',done:e.delayed>=1},
-  {id:'mix',label:'Mix',done:e.stage==='Mixed-paper practice'}
+  {id:'mix',label:'Mix',done:mixed}
  ];
  let current=steps.findIndex(x=>!x.done);if(current<0)current=steps.length-1;
  return {evidence:e,steps,current};
