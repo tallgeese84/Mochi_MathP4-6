@@ -35,10 +35,11 @@ function candidateUnits(state,subject,now=Date.now()){
 }
 function bonusTask(state,now=Date.now()){
  const s=status(state,now);if(!s.unlocked||s.complete)return null;
+ if(s.active){const E=engines[s.active.subject],d=state[keys[s.active.subject]]||E.fresh(),unit=d.draft?.unit||candidateUnits(state,s.active.subject,now)[0]?.id;if(unit&&E.unit(unit))return {subject:s.active.subject,unit,title:E.unit(unit).title,resume:!!d.draft};}
  const available=T.model(state,now).blocks.filter(b=>!b.rest).map(b=>b.subject);
  const count=subject=>s.success.filter(x=>x.subject===subject).length;
  const ordered=[...available].sort((a,b)=>count(a)-count(b)||a.localeCompare(b));
- for(const subject of ordered){const units=candidateUnits(state,subject,now);if(units.length)return {subject,unit:units[0].id,title:units[0].title};}
+ for(const subject of ordered){const units=candidateUnits(state,subject,now);if(units.length)return {subject,unit:units[0].id,title:units[0].title,resume:false};}
  return null;
 }
 function status(state,now=Date.now()){
