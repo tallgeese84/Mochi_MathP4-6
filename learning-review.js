@@ -24,7 +24,7 @@ function build(state,version){
  if(root.MochiCourse&&state.course){data.course=root.MochiCourse.validate(state.course);data.courseReview=root.MochiCourse.report(data.course);const ids=new Set(data.course.attempts.map(a=>a.question));data.courseQuestions=root.MochiCourse.data.questions.filter(q=>ids.has(q.id));}
  if(root.MochiCatFriends)data.catFriends=root.MochiCatFriends.validate(root.MochiCatFriends.sync(state));
  if(root.MochiEntrance&&state.entrance){data.entrance=root.MochiEntrance.exportData(state.entrance);data.entranceReview=root.MochiEntrance.report(data.entrance);}
- if(root.MochiSciencePath&&state.sciencePath){data.sciencePath=root.MochiSciencePath.exportData(state.sciencePath);data.sciencePathReview=root.MochiSciencePath.report(data.sciencePath);}
+ if(root.MochiSciencePath&&state.sciencePath){data.sciencePath=root.MochiSciencePath.exportData(state.sciencePath);data.sciencePathReview=root.MochiSciencePath.report(data.sciencePath);}\n if(root.MochiQuestRewards&&state.questRewards)data.questRewards=root.MochiQuestRewards.validate(state.questRewards);
  data.source={appVersion:version||'unknown',student:'Euna',timeZone:Intl.DateTimeFormat().resolvedOptions().timeZone||'unknown'};
  if(root.MochiPlanner){data.planner=root.MochiPlanner.validate(root.MochiPlanner.init(state));data.learningPlanReview=root.MochiPlanner.report(state);}
  data.review={schema:1,maths:{...counts(data.learning.attempts),followUps:root.MochiRepair?.pending(data.learning).map(p=>({key:p.key,label:p.label,stage:p.stage,due:p.due,ready:p.ready}))||[]},science:counts(data.science?.attempts||[],true),
