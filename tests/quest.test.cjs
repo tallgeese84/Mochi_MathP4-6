@@ -67,3 +67,11 @@ test('bonus options offer a small post-plan choice without opening a question or
  const options=Q.bonusOptions(s,now);assert.deepEqual(options.map(x=>x.subject).sort(),['maths','science']);
  assert.equal(JSON.stringify({entrance:s.entrance,sciencePath:s.sciencePath,coins:s.coins}),before);
 });
+
+
+test('bonus choices stay hidden while an ordinary saved question still needs finishing',()=>{
+ const s=fresh();finishLesson(s.entrance,M,'relationships');finishLesson(s.sciencePath,S,'matter');finishDay(s);
+ M.startPractice(s.entrance,'relationships',{phase:'apply',seed:77,now:now-50});
+ M.touchDraft(s.entrance,{answer:'not-finished'},now-40);
+ assert.equal(Q.bonusTask(s,now),null);assert.deepEqual(Q.bonusOptions(s,now),[]);
+});
