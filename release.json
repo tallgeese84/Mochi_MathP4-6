@@ -1,5 +1,5 @@
 {
-  "version": "6.2.1",
+  "version": "6.2.2",
   "releasedOn": "2026-09-25",
-  "summary": "Fix study timing so quiet reading, thinking and paper work count. The no-interaction guard is now 10 minutes, ordinary short browser stalls are tolerated, and any automatic pause explains why. Existing maths, science, progress and daily goals are preserved."
+  "summary": "Restore a visible Ask Mochi AI teaching assistant inside the new Maths and Science practice questions. Euna can ask what a question means, how to start, or whether her idea makes sense. Help is recorded as support, paper-mode assessments stay help-free, and existing learning progress is preserved."
 }

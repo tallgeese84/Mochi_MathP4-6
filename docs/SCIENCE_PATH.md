@@ -128,3 +128,7 @@ validation.
 empty temporary profile using synthetic data. It checks learning navigation, dual
 answers, incomplete selections, saved working, access to older labs/classrooms,
 maths preservation, statement controls, paper feedback/submission and narrow layout.
+
+## Ask Mochi · AI TA
+
+During science practice questions, Euna can open **Ask Mochi · AI TA** and choose **I don’t understand the question**, **I don’t know how to start**, **Check my idea/reasoning**, or type her own question. The TA receives the active question and her current typed working. Before the solution is open, it is instructed to scaffold one next step rather than reveal the final answer. Asking records the attempt as supported, so it cannot be counted as independent evidence. Reserved paper mode deliberately has no tutor access before submission. Without a configured live provider, the panel falls back to the built-in lesson guidance.
