@@ -1,5 +1,5 @@
 {
-  "version": "6.3.0",
+  "version": "6.4.0",
   "releasedOn": "2026-09-26",
-  "summary": "Make Euna’s home a compact Daily Quests screen with one next action, two small Maths/Science progress chips, and an optional capped Bonus Quest after planned study is complete. Fresh first-try independent bonus answers earn coins without changing mastery; three bonus successes unlock a +2 coin chest. Existing learning, papers, timers, cats and rewards are preserved."
+  "summary": "Turn each daily lesson into a clearer mastery loop: one visible quest goal, Learn → Apply → Transfer → Remember → Mix progress, and a one-step diagnostic quick check after the first miss. Feedback stays short with deeper explanation on demand. Optional bonus quests now reward fresh application with 1 coin and independent transfer or week-later recall with 2 coins, while keeping rewards separate from mastery."
 }
