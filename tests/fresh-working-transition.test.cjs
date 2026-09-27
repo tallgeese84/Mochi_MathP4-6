@@ -12,7 +12,7 @@ function taught(d,E,id){
 }
 function answerAndFinish(d,E,id,working){
  taught(d,E,id);E.startPractice(d,id,{phase:'apply',seed:11,now:200});
- const q=E.question(d.draft);E.touchDraft(d,{answer:q.answerLabel||q.answer,working,strokes:[[[.1,.2],[.3,.4]]]},201);
+ const q=E.question(d.draft),answer=E===S?q.answer:(q.answerLabel||String(q.answer));E.touchDraft(d,{answer,working,strokes:[[[.1,.2],[.3,.4]]]},201);
  const a=E.respond(d,202).attempt;assert.equal(a.correct,true);E.finishPractice(d);
  E.startPractice(d,id,{phase:'apply',seed:12,now:203});return d.draft;
 }
