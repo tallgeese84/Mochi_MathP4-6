@@ -1,3 +1,11 @@
+# v6.4.1 — Keep working attached to the right question
+
+- Fix a transition bug in the new Maths and Science pathways where the old screen could write its answer, typed working or handwriting into a newly-created draft before the new question rendered.
+- Save the old question first, then create the new blank draft during navigation.
+- Preserve answer, working and ink when resuming the same unfinished question.
+- Leave historical records unchanged rather than guessing which older notes were intentional.
+- Add regression tests for blank new drafts, transition ordering and same-question resume.
+
 # v6.4.0 — Mastery loops, diagnostic forks and better incentives
 
 - Show one Quest goal plus Learn → Apply → Transfer → Remember → Mix progress on Maths and Science lessons/practice.

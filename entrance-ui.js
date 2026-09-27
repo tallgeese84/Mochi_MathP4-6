@@ -17,7 +17,7 @@ function tutorAbort(clear=true){tutorEpoch++;tutorController?.abort();tutorContr
 function leave(){
  if(!visible()||paused)return;capture();tutorAbort();if(view.kind==='paper')E.interruptPaper(data(),view.paper);host.hidden=true;document.body.classList.remove('entrance-active','entrance-paper');save(S);
 }
-function open(kind='home',id){
+function open(kind='home',id,practicePhase){
  if(!host||paused)return;
  root.MochiTodayUI?.leave();
  capture();tutorAbort();if(view.kind==='paper'&&kind!=='paper'&&kind!=='results')E.interruptPaper(data(),view.paper);
@@ -27,7 +27,7 @@ function open(kind='home',id){
  $('subjectMaths').setAttribute('aria-pressed','true');$('subjectScience').setAttribute('aria-pressed','false');
  view={kind,unit:['lesson','practice'].includes(kind)?id:null,paper:['paper','results'].includes(kind)?id:null};message='';pointer=null;
  if(kind==='lesson'){if(data().draft&&!data().attempts.find(a=>a.id===data().draft.id)?.correct)E.help(data());E.visit(data(),id,E.lesson(data(),id).page);exampleForm=0;}
- if(kind==='practice'&&!data().draft)E.startPractice(data(),id);
+ if(kind==='practice'&&!data().draft)E.startPractice(data(),id,{phase:practicePhase});
  if(kind==='paper'&&!data().papers[id])E.startPaper(data(),id);
  document.body.classList.toggle('entrance-paper',kind==='paper');render();save(S);document.dispatchEvent(new Event('mochi:activity'));
  const skip=document.querySelector('.skip-link');if(skip){skip.href='#epTitle';skip.textContent='Skip to the learning activity';}
@@ -36,9 +36,13 @@ function open(kind='home',id){
 function nextRecommended(){if(root.MochiTodayUI?.atBoundary('maths'))return;const r=E.recommend(S);if(r.kind==='paper'){open('paper',r.paper);return;}if(r.kind==='resume'){open('practice',data().draft.unit);return;}if(r.kind==='mixed'){if(root.MochiTodayUI)beginPractice(root.MochiToday.task(S,'maths').unit);else open('papers');return;}if(r.kind==='learn'){open('lesson',r.unit);return;}beginPractice(r.unit,r.kind==='recall'?'recall':undefined);}
 function beginPractice(id,phase){
  if(root.MochiTodayUI?.atBoundary('maths'))return;
+ // Save the old screen before changing draft identity. Otherwise open() could copy
+ // the old answer/working/ink into the newly-created question.
+ capture(true);
  const d=data();if(d.draft&&d.draft.unit!==id){const old=d.attempts.find(a=>a.id===d.draft.id);if(!old?.correct&&!confirm('A question and its working are saved. Start a different question instead? The recorded answers will remain, but this unsent draft will be replaced.')){open('practice',d.draft.unit);return;}E.finishPractice(d);}
  if(d.draft&&d.attempts.find(a=>a.id===d.draft.id)?.correct)E.finishPractice(d);
- E.startPractice(d,id,{phase});open('practice',id);
+ // Let open() create the new blank draft only after its normal pre-navigation capture.
+ open('practice',id,phase);
 }
 function header(title,kicker='YOUR MATHEMATICS PATH'){return `<div class="ep-heading"><div><p class="ep-kicker">${esc(kicker)}</p><h1 id="epTitle" tabindex="-1">${esc(title)}</h1></div><span class="ep-target">June 2027<br><small>Preparation goal</small></span></div>`;}
 function render(){

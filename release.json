@@ -1,5 +1,5 @@
 {
-  "version": "6.4.0",
+  "version": "6.4.1",
   "releasedOn": "2026-09-26",
-  "summary": "Turn each daily lesson into a clearer mastery loop: one visible quest goal, Learn → Apply → Transfer → Remember → Mix progress, and a one-step diagnostic quick check after the first miss. Feedback stays short with deeper explanation on demand. Optional bonus quests now reward fresh application with 1 coin and independent transfer or week-later recall with 2 coins, while keeping rewards separate from mastery."
+  "summary": "Fix a pathway transition bug that could copy the previous question’s answer, typed working or handwriting into a genuinely new Maths/Science question. New questions now start clean, while resuming the same unfinished question still preserves all work. Existing historical records are left unchanged rather than guessed at or rewritten."
 }
