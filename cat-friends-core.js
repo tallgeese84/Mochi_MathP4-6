@@ -85,7 +85,7 @@ function merge(a,b){
  const ra=rank(a),rb=rank(b);let winner=a;
  for(let i=0;i<ra.length;i++){if(ra[i]!==rb[i]){winner=rb[i]>ra[i]?b:a;break;}}
  const bonuses=new Map();for(const x of [...a.doubleBonuses,...b.doubleBonuses]){const old=bonuses.get(x.key);if(!old||x.earnedAt<old.earnedAt)bonuses.set(x.key,x);}
- return validate({...winner,unlocked:catalog.filter(c=>a.unlocked.includes(c.id)||b.unlocked.includes(c.id)).map(c=>c.id),doubleBonuses:[...bonuses.values()]});
+ const doubleBonuses=[...bonuses.values()].sort((x,y)=>x.earnedAt-y.earnedAt||x.key.localeCompare(y.key));return validate({...winner,unlocked:catalog.filter(c=>a.unlocked.includes(c.id)||b.unlocked.includes(c.id)).map(c=>c.id),doubleBonuses});
 }
 function report(state,now=Date.now()){
  const c=sync(state,now),milestones=milestoneCount(state),timePoints=bonusPoints(c),points=milestones+timePoints,next=catalog.find(cat=>!c.unlocked.includes(cat.id))||null;
