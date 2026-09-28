@@ -27,7 +27,7 @@ function start(subject){
  const target=P.minutes(data(),subject),spent=P.elapsed(data())[subject];if(spent>=target*2*60000){message=label(subject)+' double-study bonus is complete. The clock stops at 2×; take a break or switch activity.';$('plannerStatus').textContent=message;return;}
  const d=P.day(data(),subject);d.unit=d.unit||P.recommend(S,subject).unit;
  if(visibleSubject()!==subject){if(subject==='maths'&&root.MochiEntranceUI)root.MochiEntranceUI.open();else if(subject==='science'&&root.MochiSciencePathUI)root.MochiSciencePathUI.open();else root.courseOpen(subject,d.unit);}
- clock.start(subject,data(),uid(),Date.now(),performance.now());lastSave=Date.now();save(S);
+ clock.start(subject,data(),uid(),Date.now(),performance.now(),spent>=target*60000?2:1);lastSave=Date.now();save(S);
  message=(spent>=target*60000?label(subject)+' bonus time is running toward the 2× Cat Point bonus. ':label(subject)+' time is running. ')+'Reading and working count; the clock is not a speed test.';$('plannerStatus').textContent=message;paintClocks();
 }
 function paintClocks(){
