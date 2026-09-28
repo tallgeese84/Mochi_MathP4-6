@@ -1,4 +1,4 @@
-# Science reasoning pathway — v6.1.0
+# Science reasoning pathway — v6.5.0
 
 ## The benchmark and its limits
 
@@ -33,6 +33,20 @@ near-equilibrium melting, or a supplied buoyancy model. The course does not teac
 unconditional claims that photosynthesis always rises with temperature, that all
 floating objects are half-submerged, or that a positive result proves every cause.
 
+## Discovery-first lessons
+
+Science lessons now introduce the **reasoning that produced the concept** before asking Euna to use the finished rule. Each of the 24 units follows the same compact sequence:
+
+1. **Mystery** — encounter a phenomenon and make an ungraded prediction before the explanation is shown.
+2. **How the idea changed** — read a short historical or representative investigation: what people thought, what was observed, and what competing explanation was challenged.
+3. **Recreate the evidence** — choose the observation or comparison that actually discriminates between the explanations.
+4. **Build the model** — reveal the modern scientific model and use it in a worked changed-context example.
+5. **Explain and check** — put the model into words, complete the authored concept check, then move to guided and independent practice.
+
+The history is explicitly **not a scientist-name memory list**. Some lessons use named historical cases (for example Snow on cholera evidence, Lind on treatment comparisons, Volta/Galvani on electricity, Ibn al-Haytham on optics, Lavoisier on quantitative chemistry, Harvey on circulation, Perrault on hydrology, and the Wright brothers on wind-tunnel testing). Other units use a representative sequence of observations where attributing the idea to one person would be misleading. The student interface reminds Euna that scientific discovery is cumulative and that the question is always: *what evidence would have made the explanation change?*
+
+Prediction and discovery choices are low-stakes lesson state. They do not count as independent mastery, paper evidence, or admissions-readiness evidence. Existing completed lessons remain completed after this update; revisiting them opens the new discovery story without deleting prior progress. Historical source notes are collapsed for grown-ups and are separate from the official syllabus/selection references below.
+
 ## The 24-unit route
 
 | Strand | Units |
@@ -42,8 +56,7 @@ floating objects are half-submerged, or that a positive result proves every caus
 | Living systems | Classification; photosynthesis and limiting effects; respiration and net exchange; transport; digestion and controls; ecology/life-stage needs. |
 | Matter, Earth and technology | System boundaries/particles; changes and separation; density/buoyancy models; water/environmental evidence; Sun/Earth/Moon models; unfamiliar passages/design trade-offs. |
 
-Each unit has three teaching sections, three original worked examples and a
-conceptual exit check. There are 96 seeded templates: 72 learning forms plus 24
+Each unit has three compact teaching sections: **Mystery**, **Evidence**, and **Build the model**, followed by the same guided/application/transfer/retrieval pathway. The Evidence section can reveal three original worked examples after the discriminating-evidence check; the final section includes the conceptual exit check. There are 96 seeded templates: 72 learning forms plus 24
 reserved assessment forms. Numerical variants are not 96 different methods and
 some conceptual forms are intentionally finite. Repeated exposure does not become
 fresh evidence merely because choices are shuffled. The interface labels core

@@ -1,5 +1,5 @@
 {
-  "version": "6.4.1",
-  "releasedOn": "2026-09-26",
-  "summary": "Fix a pathway transition bug that could copy the previous question’s answer, typed working or handwriting into a genuinely new Maths/Science question. New questions now start clean, while resuming the same unfinished question still preserves all work. Existing historical records are left unchanged rather than guessed at or rewritten."
+  "version": "6.5.0",
+  "releasedOn": "2026-09-27",
+  "summary": "Rebuild Science lessons around discovery: each topic now starts with a mystery and ungraded prediction, follows how observations and experiments changed scientific explanations, asks Euna to identify the discriminating evidence, then builds the modern model before guided and entrance-style practice. Historical stories are for understanding how science works, not memorising names; existing progress and mastery evidence are preserved."
 }

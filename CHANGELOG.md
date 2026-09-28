@@ -1,3 +1,14 @@
+# v6.5.0 — Science as discovery, not answer memorisation
+
+- Rebuild all 24 Science lessons around **Mystery → Prediction → Historical evidence → Discriminating test → Modern model → Concept check → Practice**.
+- Add a concise discovery story to every Science unit. Use named historical cases only where they illuminate the evidence; explicitly avoid presenting science as a list of lone-genius discoveries.
+- Keep predictions ungraded. Require Euna to identify which observation or comparison would actually distinguish competing explanations before the modern model and worked example are revealed.
+- Move the formal unit explanation to the final model-building section so definitions follow evidence rather than precede it.
+- Add grown-up source notes for selected historical cases, including electricity, optics, quantitative chemistry, circulation, digestion, hydrology and engineering design.
+- Preserve all existing lesson completion, attempts, papers, timers, rewards and mastery evidence. Discovery choices are low-stakes lesson state only.
+- Keep reserved papers discovery/history-free so assessment remains independent of the teaching scaffolds.
+- Add regression coverage for 24/24 story completeness, legacy lesson preservation, low-stakes state validation and discovery-free papers.
+
 # v6.4.1 — Keep working attached to the right question
 
 - Fix a transition bug in the new Maths and Science pathways where the old screen could write its answer, typed working or handwriting into a newly-created draft before the new question rendered.
