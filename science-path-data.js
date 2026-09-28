@@ -132,6 +132,6 @@ const sources=[
 ];
 const scope='Science preparation for June 2027, grounded in primary science and official selection aims. SPSO is a supplementary challenge reference, not the DSA test. Original questions and practice limits are not calibrated entrance-test equivalents.';
 const stages=[{title:'Build a sound explanation',until:'2026-11',detail:'Repair core concepts; separate observations, predictions and explanations.'},{title:'Investigate and transfer',until:'2027-02',detail:'Use fair comparisons, data, models and unfamiliar contexts across the sciences.'},{title:'Choose evidence independently',until:'2027-04',detail:'Mix topics and discriminate plausible explanations without a chapter label.'},{title:'Check readiness honestly',until:'2027-06',detail:'Use reserved sets plus external unseen work and adult-reviewed explanations.'}];
-root.MochiSciencePathData={units,strands,scope,sources,stages,goalMonth:'2027-06',target:85,version:'1.0',reviewedOn:'2026-09-25'};
+root.MochiSciencePathData={units,strands,scope,sources,stages,goalMonth:'2027-06',target:85,version:'1.1',reviewedOn:'2026-09-27'};
 if(typeof module!=='undefined')module.exports=root.MochiSciencePathData;
 })(typeof globalThis!=='undefined'?globalThis:this);
