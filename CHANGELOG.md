@@ -1,3 +1,15 @@
+# v6.6.0 — 100-cat collection and bounded double-time Cat Points
+
+- Expand Mochi’s collection from four friends to **99 collectible friends + Mochi = 100 cats total**.
+- Preserve the original Miso, Suki, Kumo and Yuki unlock thresholds and all previously earned friends.
+- Keep the room calm: Mochi remains permanent and at most three friends may visit at once.
+- Render the collection 12 cats at a time so 100-cat browsing remains light on tablets; 3D models are still created lazily only for visitors.
+- Introduce **Cat Points**: each validated learning milestone contributes one point; reaching 2× a subject’s planned foreground study time earns +2 Cat Points once for that subject/day.
+- Preserve the normal 1× daily-study stop. Only explicit optional bonus study can restart timing toward 2×, and timing stops again at 2× with no further time reward.
+- Show 2× progress and Cat Points on the post-plan bonus surface and celebrate the +2 award when reached.
+- Store and merge the bounded double-time award ledger across family devices. Old version-1 cat rosters migrate without losing unlocks or deliberate visitor choices.
+- Cat Points never alter mastery, paper scores, adaptive difficulty or admission evidence.
+
 # v6.5.0 — Science as discovery, not answer memorisation
 
 - Rebuild all 24 Science lessons around **Mystery → Prediction → Historical evidence → Discriminating test → Modern model → Concept check → Practice**.

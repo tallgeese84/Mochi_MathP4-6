@@ -27,8 +27,9 @@ function portrait(cat){
 /* GENERATED PORTRAIT END */
 function init(){
  const view=document.getElementById('viewRoom');if(!view||document.getElementById('catFriends'))return;
+ const PAGE=12;let page=0,last='';
  const box=document.createElement('details');box.id='catFriends';box.className='cat-friends';
- box.innerHTML='<summary><span>Cat Friends</span><span id="catFriendsCount"></span></summary><p class="cf-intro">Mochi always stays. Invite up to three friends to share the room. Friends unlock through earned learning milestones, not coins or streaks.</p><div id="catFriendsCards" class="cf-cards"></div><p id="catFriendsStatus" class="cf-status" role="status" aria-live="polite"></p><p class="cf-note">Earned friends stay unlocked through mistakes and rest days. Pausing the room pauses every cat.</p>';
+ box.innerHTML='<summary><span>Cat collection</span><span id="catFriendsCount"></span></summary><p class="cf-intro">Mochi always stays. Collect up to 99 friends (100 cats total) and invite up to three at a time. Cat Points come mainly from earned learning milestones; reaching exactly 2× a subject’s planned study time adds a small bounded bonus.</p><div class="cf-points"><strong id="catPointTotal"></strong><span id="catPointBreakdown"></span><small id="catNextUnlock"></small></div><div class="cf-page-nav"><button type="button" id="catPrevPage">← Previous</button><span id="catPageLabel"></span><button type="button" id="catNextPage">Next →</button></div><div id="catFriendsCards" class="cf-cards"></div><p id="catFriendsStatus" class="cf-status" role="status" aria-live="polite"></p><p class="cf-note">The time bonus is awarded once per subject per day at 2× and stops there; going beyond 2× earns nothing extra. Earned cats never disappear after mistakes or rest days.</p>';
  const room=view.querySelector('.card.room')||view;
  const welcome=document.createElement('div');welcome.className='cf-room-welcome';
  welcome.innerHTML='<div><strong>Mochi + friends</strong><p id="catFriendsRoomSummary" role="status"></p></div><button type="button" class="cf-toggle" id="catFriendsManage" aria-controls="catFriends" aria-expanded="false">Choose friends</button>';
@@ -36,48 +37,36 @@ function init(){
  document.getElementById('catFriendsManage').onclick=()=>{box.open=!box.open;if(box.open)box.scrollIntoView({block:'nearest'});};
  box.addEventListener('toggle',()=>document.getElementById('catFriendsManage').setAttribute('aria-expanded',String(box.open)));
  const roomLink=document.getElementById('tabRoom');if(roomLink)roomLink.textContent='Mochi + cat friends ↗';
- const pictures=document.createElement('div');pictures.id='catFriendsPictures';pictures.className='cf-picture-room';pictures.setAttribute('aria-label','Mochi’s companion cats');
- welcome.after(pictures);
- const cards=document.getElementById('catFriendsCards'),status=document.getElementById('catFriendsStatus');let last='';
- function stroke(cat){
-  if(!root.MochiRoom?.petFriend(cat.id))status.textContent=cat.name+' settles beside Mochi. Prrr…';
-  else status.textContent=cat.name+' is enjoying a gentle stroke.';
- }
- for(const cat of F.catalog){
-  const card=document.createElement('article');card.className='cf-card';card.dataset.friend=cat.id;
-  // All markup values are constants from the catalog, never imported learner text.
-  card.innerHTML=`<div class="cf-portrait">${portrait(cat)}</div><div class="cf-name"><h3>${cat.name}</h3><p>${cat.breed}</p></div><p class="cf-description">${cat.description}</p><p class="cf-unlock"></p><button type="button" class="cf-toggle" aria-pressed="false"></button>`;
-  const toggle=card.querySelector('.cf-toggle');toggle.onclick=()=>{
-   const result=F.select(S,cat.id,!F.sync(S).selected.includes(cat.id));
-   status.textContent=result.ok?(result.selected.includes(cat.id)?cat.name+' joined the room.':cat.name+' is resting. You can invite this friend back at any time.'):result.reason;
-   if(result.ok){save(S);document.dispatchEvent(new Event('mochi:cat-friends-changed'));}
-   paint();
-  };cards.appendChild(card);
- }
- function paint(){
-  const r=F.report(S),signature=JSON.stringify([r.unlocked,r.selected,r.milestones]);
-  // Keep the named visitors visible even if the 3D renderer is unavailable or out of view.
-  pictures.hidden=!r.selected.length;
-  if(signature===last)return;last=signature;
-  document.getElementById('catFriendsRoomSummary').textContent=r.selected.length
-   ?r.selected.map(id=>F.catalog.find(c=>c.id===id).name).join(', ')+' are visiting Mochi.'
-   :r.unlocked.length?'Your friends are resting. Choose friends to invite them back.'
-   :'No friends unlocked on this device yet ('+r.milestones+' earned milestones). Saved progress from another device needs to finish syncing.';
-  document.getElementById('catFriendsCount').textContent=`${r.unlocked.length}/4 unlocked · ${r.selected.length}/3 visiting`;
-  for(const cat of r.cats){
-   const card=cards.querySelector(`[data-friend="${cat.id}"]`),button=card.querySelector('.cf-toggle');
-   card.dataset.unlocked=String(cat.unlocked);card.dataset.selected=String(cat.selected);
-   card.querySelector('.cf-unlock').textContent=cat.unlocked?(cat.selected?'With Mochi':'Ready to visit'):`${cat.remaining} more earned milestones to unlock (${cat.milestones} total)`;
-   button.disabled=!cat.unlocked;button.setAttribute('aria-pressed',String(cat.selected));
-   button.textContent=!cat.unlocked?'Not unlocked':cat.selected?'Let '+cat.name+' rest':'Invite '+cat.name;
+ const pictures=document.createElement('div');pictures.id='catFriendsPictures';pictures.className='cf-picture-room';pictures.setAttribute('aria-label','Mochi’s companion cats');welcome.after(pictures);
+ const cards=document.getElementById('catFriendsCards'),status=document.getElementById('catFriendsStatus');
+ function stroke(cat){if(!root.MochiRoom?.petFriend(cat.id))status.textContent=cat.name+' settles beside Mochi. Prrr…';else status.textContent=cat.name+' is enjoying a gentle stroke.';}
+ function renderCards(r){
+  const maxPage=Math.max(0,Math.ceil(F.catalog.length/PAGE)-1);page=Math.max(0,Math.min(page,maxPage));cards.replaceChildren();
+  for(const cat of r.cats.slice(page*PAGE,page*PAGE+PAGE)){
+   const card=document.createElement('article');card.className='cf-card';card.dataset.friend=cat.id;card.dataset.unlocked=String(cat.unlocked);card.dataset.selected=String(cat.selected);
+   card.innerHTML=`<div class="cf-portrait">${portrait(cat)}</div><div class="cf-name"><h3>${cat.name}</h3><p>${cat.breed}</p></div><p class="cf-description">${cat.description}</p><p class="cf-unlock">${cat.unlocked?(cat.selected?'With Mochi':'Ready to visit'):`${cat.remaining} more Cat Points · unlock at ${cat.points}`}</p><button type="button" class="cf-toggle" aria-pressed="${cat.selected}" ${cat.unlocked?'':'disabled'}>${!cat.unlocked?'Not unlocked':cat.selected?'Let '+cat.name+' rest':'Invite '+cat.name}</button>`;
+   card.querySelector('.cf-toggle').onclick=()=>{const result=F.select(S,cat.id,!F.sync(S).selected.includes(cat.id));status.textContent=result.ok?(result.selected.includes(cat.id)?cat.name+' joined the room.':cat.name+' is resting. You can invite this friend back at any time.'):result.reason;if(result.ok){save(S);document.dispatchEvent(new Event('mochi:cat-friends-changed'));}paint(true);};
+   cards.appendChild(card);
   }
-  pictures.replaceChildren();
-  for(const id of r.selected){const cat=F.catalog.find(c=>c.id===id),b=document.createElement('button');b.type='button';b.className='cf-picture-cat';b.innerHTML=portrait(cat)+'<span>'+cat.name+'</span>';b.setAttribute('aria-label','Stroke '+cat.name+', '+cat.breed);b.onclick=()=>stroke(cat);pictures.appendChild(b);}
+  document.getElementById('catPageLabel').textContent=`Cats ${page*PAGE+2}–${Math.min(F.catalog.length+1,(page+1)*PAGE+1)} of ${F.TOTAL}`;
+  document.getElementById('catPrevPage').disabled=page===0;document.getElementById('catNextPage').disabled=page>=maxPage;
  }
- document.addEventListener('mochi:state-saved',paint);document.addEventListener('mochi:cloud-merged',paint);document.addEventListener('mochi:cat-friends-changed',paint);
- document.addEventListener('mochi:activity',paint);
- const before=JSON.stringify(S.catFriends);paint();if(before!==JSON.stringify(S.catFriends))save(S);
- root.MochiCatFriendsUI={refresh:paint};
+ function paint(force=false){
+  const r=F.report(S),signature=JSON.stringify([r.unlocked,r.selected,r.points,r.timeBonusAwards,page]);pictures.hidden=!r.selected.length;
+  if(signature===last&&!force)return;last=signature;
+  document.getElementById('catFriendsRoomSummary').textContent=r.selected.length?r.selected.map(id=>F.catalog.find(c=>c.id===id).name).join(', ')+' are visiting Mochi.':r.unlocked.length?'Your friends are resting. Choose friends to invite them back.':'Mochi is waiting for the first friend to unlock.';
+  document.getElementById('catFriendsCount').textContent=`${r.unlockedTotal}/${r.totalCats} cats · ${r.selected.length}/${r.maxFriends} visiting`;
+  document.getElementById('catPointTotal').textContent=`${r.points} Cat Points`;
+  document.getElementById('catPointBreakdown').textContent=`${r.milestones} learning · ${r.timeBonusPoints} double-time bonus`;
+  document.getElementById('catNextUnlock').textContent=r.nextCat?`Next: ${r.nextCat.name} in ${r.nextCat.remaining} Cat Points`:'All 100 cats collected!';
+  renderCards(r);
+  pictures.replaceChildren();for(const id of r.selected){const cat=F.catalog.find(c=>c.id===id),b=document.createElement('button');b.type='button';b.className='cf-picture-cat';b.innerHTML=portrait(cat)+'<span>'+cat.name+'</span>';b.setAttribute('aria-label','Stroke '+cat.name+', '+cat.breed);b.onclick=()=>stroke(cat);pictures.appendChild(b);}
+ }
+ document.getElementById('catPrevPage').onclick=()=>{page--;last='';paint(true);};
+ document.getElementById('catNextPage').onclick=()=>{page++;last='';paint(true);};
+ document.addEventListener('mochi:state-saved',()=>paint());document.addEventListener('mochi:cloud-merged',()=>paint(true));document.addEventListener('mochi:cat-friends-changed',()=>paint(true));document.addEventListener('mochi:activity',()=>paint());
+ const before=JSON.stringify(S.catFriends);paint(true);if(before!==JSON.stringify(S.catFriends))save(S);
+ root.MochiCatFriendsUI={refresh:()=>paint(true)};
 }
 root.MochiCatFriendsPortrait=portrait;
 if(root.MochiReady)init();else document.addEventListener('mochi:ready',init,{once:true});

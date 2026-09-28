@@ -47,17 +47,17 @@ function elapsed(p,date=localDay()){
  for(const x of p.sessions.filter(x=>x.day===date).sort((a,b)=>a.start-b.start||a.id.localeCompare(b.id))){out[x.subject]+=Math.max(0,x.end-Math.max(x.start,covered));covered=Math.max(covered,x.end);}return out;
 }
 function clock(){
- let run=null,lastMono=0,lastWall=0,touched=0;
+ let run=null,lastMono=0,lastWall=0,touched=0,limitMultiplier=1;
  return {get subject(){return run?.subject||null;},touch(mono){touched=mono;},
-  start(subject,p,id,wall,mono){if(!subjects.includes(subject))throw Error('Unknown subject');run={id,subject,day:localDay(wall),start:wall,end:wall};p.sessions.push(run);p.sessions=p.sessions.slice(-3000);lastMono=touched=mono;lastWall=wall;},
-  stop(){run=null;},
+  start(subject,p,id,wall,mono,multiplier=1){if(!subjects.includes(subject))throw Error('Unknown subject');limitMultiplier=multiplier===2?2:1;run={id,subject,day:localDay(wall),start:wall,end:wall};p.sessions.push(run);p.sessions=p.sessions.slice(-3000);lastMono=touched=mono;lastWall=wall;},
+  stop(){run=null;limitMultiplier=1;},
   tick(p,wall,mono,visible=true,activeSubject=run?.subject){
    if(!run)return {running:false};const delta=mono-lastMono,wallDelta=wall-lastWall;
    let reason=!visible?'Paused while the app is hidden.':activeSubject!==run.subject?'Paused when you changed activity.':localDay(wall)!==run.day?'A new day has started. Start today’s clock when ready.':mono-touched>=IDLE_PAUSE_MS?'Paused after 10 minutes without interaction. Quiet reading and paper work count; tap Resume when ready.':delta<0||delta>MAX_TICK_GAP_MS||wallDelta<0||Math.abs(wallDelta-delta)>CLOCK_SKEW_MS?'Paused because the browser was interrupted for too long. Resume when ready.':'';
    if(reason){run=null;return {running:false,reason};}
    // A cloud merge can replace the state object. Preserve this session's identity.
    let saved=p.sessions.find(x=>x.id===run.id);if(!saved){saved={...run};p.sessions.push(saved);}saved.end=run.end+delta;run=saved;lastMono=mono;lastWall=wall;
-   if(elapsed(p,run.day)[run.subject]>=minutes(p,run.subject,wall)*60000){run=null;return {running:false,reason:'Time goal reached. Finish your thought, take a break and try your exit check when ready.'};}
+   const target=minutes(p,run.subject,wall),cap=target*limitMultiplier*60000;if(target&&elapsed(p,run.day)[run.subject]>=cap){const bonus=limitMultiplier===2;run=null;limitMultiplier=1;return {running:false,reason:bonus?'Double-study bonus reached. The clock stops at 2× today’s target; there is no extra time reward beyond this.':'Time goal reached. Finish your thought, take a break and try your exit check when ready.'};}
    return {running:true};
   }
  };

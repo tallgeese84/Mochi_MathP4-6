@@ -2,7 +2,7 @@
    This is a navigation layer, not another learning or reward engine. */
 (function(root){
 'use strict';
-const T=root.MochiToday,Q=root.MochiQuestRewards,$=id=>document.getElementById(id),names=T.names;
+const T=root.MochiToday,Q=root.MochiQuestRewards,F=root.MochiCatFriends,P=root.MochiPlanner,$=id=>document.getElementById(id),names=T.names;
 let home,bar,menu,guided=false,transition=false,lastHome='',queued=null,lastFocus=null,rewarding=false,rewardNote='';
 const engines=()=>({maths:root.MochiEntrance,science:root.MochiSciencePath});
 const U=subject=>subject==='maths'?root.MochiEntranceUI:root.MochiSciencePathUI;
@@ -59,7 +59,7 @@ function launchBonus(subject=''){
  const ui=U(task.subject),d=S[stateKey(task.subject)];
  if(!status.active){if(!Q.start(S,task.subject))return;save(S);}
  if(d?.draft&&d.draft.unit===task.unit&&!d.attempts.find(a=>a.id===d.draft.id)?.correct)ui.open('practice',task.unit);else ui.practice(task.unit,task.phase||'apply');
- paint();root.scrollTo?.({top:0,behavior:'instant'});
+ root.MochiPlanUI?.startBonus?.(task.subject);paint();root.scrollTo?.({top:0,behavior:'instant'});
 }
 function rewardToast(text){
  let toast=$('todayRewardToast');if(!toast){toast=document.createElement('div');toast.id='todayRewardToast';toast.setAttribute('role','status');toast.setAttribute('aria-live','polite');document.body.append(toast);}
@@ -94,11 +94,11 @@ function go(subject,kind){
 }
 function paint(){
  if(!home)return;
- const m=T.model(S),v=current(),bonus=Q?.status(S),bonusOptions=Q?.bonusOptions?.(S)||[],bonusTask=bonusOptions[0]||Q?.bonusTask(S);
+ const m=T.model(S),v=current(),bonus=Q?.status(S),bonusOptions=Q?.bonusOptions?.(S)||[],bonusTask=bonusOptions[0]||Q?.bonusTask(S),cat=F?.report?.(S),study=P?P.elapsed(P.init(S)):null;
  // Existing modules can navigate by their own controls. Never leave two main views visible.
  if(v||!$('viewScience').hidden||!$('viewCourse').hidden||$('viewMaths').style.display!=='none'||$('viewRoom').style.display!=='none'||!$('viewMap').hidden)leave();
  if(!home.hidden){
-  const signature=JSON.stringify([m,bonus,bonusOptions,rewardNote]);if(signature!==lastHome){lastHome=signature;
+  const signature=JSON.stringify([m,bonus,bonusOptions,rewardNote,cat?.points,cat?.timeBonusAwards,study]);if(signature!==lastHome){lastHome=signature;
    const t=m.next,first=m.order[0],isPaper=t?.kind==='paper';
    $('todayDate').textContent=new Date().toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric'});
    $('todayTitle').textContent=m.restDay&&!t?'Rest day':m.finished&&!t?'Daily quests complete':'Today’s quests';
@@ -112,10 +112,11 @@ function paint(){
    $('todayQuestStrip').innerHTML=m.blocks.map(b=>`<div class="today-quest-chip" data-status="${b.done?'done':b.rest?'rest':t?.subject===b.subject?'now':'next'}"><span class="today-quest-icon" aria-hidden="true">${b.done?'✓':b.rest?'–':b.subject==='maths'?'M':'S'}</span><span><strong>${esc(b.name)}</strong><small>${b.rest?'Rest':b.done?'Done':Math.max(1,Math.ceil(b.remaining/60000))+' min left'}</small></span></div>`).join('');
    $('todayProgress').textContent=m.restDay?'Rest day':`${m.completed}/${m.planned} complete`;
    $('todayProgressBar').max=m.planned||1;$('todayProgressBar').value=m.completed;
-   const bonusBox=$('todayBonus');bonusBox.hidden=!m.finished||m.restDay||(!bonusOptions.length&&!(bonus?.complete));
+   const bonusBox=$('todayBonus');bonusBox.hidden=!m.finished||m.restDay;
    if(!bonusBox.hidden){
     $('todayBonusCoins').textContent=`${bonus?.earned||0} bonus coin${bonus?.earned===1?'':'s'} today`;
     $('todayBonusText').textContent=bonus?.complete?'Three strong extra answers finished today’s chest.':`${bonus?.success.length||0}/3 complete · transfer or week-later recall earns 2 coins; fresh application earns 1`;
+    if($('todayCatBonus')&&P&&cat){const p=P.init(S),bits=P.subjects.filter(x=>P.minutes(p,x)>0).map(x=>{const target=P.minutes(p,x),spent=Math.floor((study?.[x]||0)/60000);return `${x==='maths'?'M':'S'} ${Math.min(spent,target*2)}/${target*2}m`;});$('todayCatBonus').textContent=`Cat Points ${cat.points} · 2× time ${bits.join(' · ')} · +${F.DOUBLE_POINTS} each, capped at 2×`;}
     const choices=$('todayBonusChoices');choices.innerHTML=bonus?.complete?'':bonusOptions.map(x=>`<button type="button" data-bonus-subject="${x.subject}">${bonus?.active?'Continue':names[x.subject]} · +${x.coins} coin${x.coins===1?'':'s'}<small>${x.phase==='recall'?'Remember later':x.phase==='transfer'?'Transfer challenge':'Fresh application'}</small></button>`).join('');
     for(const b of choices.querySelectorAll('[data-bonus-subject]'))b.onclick=()=>launchBonus(b.dataset.bonusSubject);
    }
@@ -136,7 +137,7 @@ function paint(){
 function init(){
  if(!T||!root.MochiPlanUI||!U('maths')||!U('science')||$('todayHome'))return;
  home=document.createElement('main');home.id='todayHome';home.hidden=true;
- home.innerHTML=`<div class="today-greeting"><img src="euna-avatar.webp" width="44" height="44" alt=""><p id="todayDate"></p></div><h1 id="todayTitle" tabindex="-1"></h1><p id="todayIntro" class="today-intro"></p><section class="today-card" aria-label="Today’s study plan"><div class="today-card-top"><span id="todayNowLabel" class="today-eyebrow"></span><span id="todayTaskSubject" class="today-subject"></span></div><h2 id="todayTaskTitle"></h2><p id="todayTaskDetail"></p><button id="todayStart" class="today-primary" type="button">Start next quest</button><div id="todayQuestStrip" class="today-quest-strip" aria-label="Daily quest progress"></div><div class="today-progress"><span id="todayProgress"></span><progress id="todayProgressBar" max="2" value="0" aria-label="Daily study time goals reached"></progress></div></section><section id="todayBonus" class="today-bonus" hidden><div><strong>Bonus quest</strong><small id="todayBonusText"></small></div><span id="todayBonusCoins" class="today-bonus-coins"></span><div id="todayBonusChoices" class="today-bonus-choices"></div></section><p id="todayNote" class="today-note"></p><button id="todayMochi" class="today-mochi" type="button"><img id="todayMochiImage" src="mochi-flat-avatar.svg" width="38" height="38" alt=""><span>Mochi<small>Room & rewards</small></span><span aria-hidden="true">↗</span></button>`;
+ home.innerHTML=`<div class="today-greeting"><img src="euna-avatar.webp" width="44" height="44" alt=""><p id="todayDate"></p></div><h1 id="todayTitle" tabindex="-1"></h1><p id="todayIntro" class="today-intro"></p><section class="today-card" aria-label="Today’s study plan"><div class="today-card-top"><span id="todayNowLabel" class="today-eyebrow"></span><span id="todayTaskSubject" class="today-subject"></span></div><h2 id="todayTaskTitle"></h2><p id="todayTaskDetail"></p><button id="todayStart" class="today-primary" type="button">Start next quest</button><div id="todayQuestStrip" class="today-quest-strip" aria-label="Daily quest progress"></div><div class="today-progress"><span id="todayProgress"></span><progress id="todayProgressBar" max="2" value="0" aria-label="Daily study time goals reached"></progress></div></section><section id="todayBonus" class="today-bonus" hidden><div><strong>Bonus quest</strong><small id="todayBonusText"></small></div><span id="todayBonusCoins" class="today-bonus-coins"></span><p id="todayCatBonus" class="today-cat-bonus"></p><div id="todayBonusChoices" class="today-bonus-choices"></div></section><p id="todayNote" class="today-note"></p><button id="todayMochi" class="today-mochi" type="button"><img id="todayMochiImage" src="mochi-flat-avatar.svg" width="38" height="38" alt=""><span>Mochi<small>Room & rewards</small></span><span aria-hidden="true">↗</span></button>`;
  $('viewEntrance').before(home);
  bar=document.createElement('section');bar.id='todayFocusBar';bar.hidden=true;bar.setAttribute('aria-label','Current study time');bar.innerHTML='<button id="todayBack" type="button">← Today</button><div><strong id="todayFocusSubject"></strong><span id="todayFocusTime"></span><small id="todayFocusNote"></small></div><button id="todayTimer" type="button" aria-pressed="false">Pause time</button><button id="todayFinish" type="button" hidden>Back to today’s plan</button>';
  home.before(bar);
@@ -157,6 +158,7 @@ function init(){
  document.body.classList.add('today-enabled');
  document.addEventListener('mochi:activity',paint);
  document.addEventListener('mochi:state-saved',()=>{collectBonus();clearTimeout(queued);queued=setTimeout(paint,100);});
+ document.addEventListener('mochi:cat-time-bonus',e=>{const s=e.detail?.subject,p=e.detail?.points||F?.DOUBLE_POINTS||2;rewardToast(`+${p} Cat Points · ${names[s]||'Study'} reached 2×!`);lastHome='';paint();});
  document.addEventListener('mochi:cloud-merged',()=>{bind();lastHome='';paint();});
  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')paint();});
  const reset=$('resetBtn').onclick;$('resetBtn').onclick=()=>{const before=S.learning;reset();if(before!==S.learning){if(Q)S.questRewards=Q.fresh();open();}};

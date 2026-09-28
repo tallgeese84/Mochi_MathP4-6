@@ -5,7 +5,7 @@ const digest=s=>crypto.createHash('sha256').update(s.replace(/>\s+</g,'><').trim
 // Previous approved friend portraits. Only the new Mochi portrait should change.
 const approved={"miso":"6d55ed86fcdfe295c223fa3a1540f93f961a6dd45133c97a07f04f8113890713","suki":"fe3386f4388f2b03fb94dd46622db898b65a5efc3966dbb0b11fc2f8b8e60fc1","kumo":"f1fc1986e381b119aecfadc2f80e29a23b9fcd7136c65b931611597835f845f5","yuki":"600f63c5b0359d9ea51cc3b87dde868c34dc301085ea640e5d2dd24ff2501ccc"};
 test('the four existing friends keep their exact approved shapes and palette',()=>{
- for(const cat of F.catalog)assert.equal(digest(P.svg(cat)),approved[cat.id]);
+ for(const cat of F.catalog.slice(0,4))assert.equal(digest(P.svg(cat)),approved[cat.id]);
 });
 test('Mochi shares the friends eye and body geometry but keeps his tabby identity',()=>{
  const svg=P.svg(P.mochi),friend=P.svg(F.catalog[0]);
