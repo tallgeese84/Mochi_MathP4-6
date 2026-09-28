@@ -137,3 +137,16 @@ test('an overnight attempt belongs to its first answer day, not the day the prob
  const restored=require('../learning.js').restore(require('../learning.js').backup(s.learning));assert.equal(restored.attempts[0].answeredAt,submitted);
  assert.equal(C.validate(s.course).attempts[0].answeredAt,submitted);
 });
+
+
+test('normal study still stops at 1×, while explicit bonus mode stops exactly at 2×',()=>{
+ const p=P.fresh();p.schedule.week[0].maths=1;
+ const normal=P.clock();normal.start('maths',p,'normal',now,0);
+ for(let t=1000;t<=60000;t+=1000)normal.tick(p,now+t,t);
+ assert.equal(normal.subject,null);assert.equal(P.elapsed(p,P.localDay(now)).maths,60000);
+ const bonus=P.clock();bonus.start('maths',p,'bonus',now+61000,61000,2);
+ for(let t=62000;t<=121000;t+=1000)bonus.tick(p,now+t,t);
+ assert.equal(bonus.subject,null);assert.equal(P.elapsed(p,P.localDay(now)).maths,120000);
+ const again=P.clock();again.start('maths',p,'extra',now+122000,122000,2);
+ const r=again.tick(p,now+123000,123000);assert.equal(r.running,false);assert.match(r.reason,/Double-study bonus reached/);assert.equal(P.elapsed(p,P.localDay(now)).maths,121000,'the caller should refuse starts beyond 2×; core never grants an unbounded reward');
+});
