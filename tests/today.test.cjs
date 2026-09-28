@@ -17,3 +17,10 @@ test('when two devices left different papers open the earliest real deadline win
 test('structured practice never defaults to a reserved mixed paper after lessons are explored',()=>{const s=fresh();for(const u of M.D.units){finish(s.entrance,M,u.id,now-2000);for(let i=0;i<2;i++)answer(s.entrance,M,u.id,'apply',now-1900+i*500);answer(s.entrance,M,u.id,'transfer',now-500);}M.finishPractice(s.entrance);const before=JSON.stringify(s);const t=T.task(s,'maths',now);assert.equal(t.kind,'practice');assert.equal(Object.keys(s.entrance.papers).length,0);assert.equal(JSON.stringify(s),before);});
 test('due retrieval can lead today but it remains a request, not an automatic success',()=>{const s=fresh();finish(s.entrance,M,'relationships',now-8*DAY-1000);for(let i=0;i<2;i++)answer(s.entrance,M,'relationships','apply',now-8*DAY-900+i*100);answer(s.entrance,M,'relationships','transfer',now-8*DAY-300);M.finishPractice(s.entrance);const t=T.task(s,'maths',now);assert.equal(t.kind,'recall');assert.equal(M.evidence(s.entrance,'relationships',now).delayed,0);});
 test('unknown study subjects are rejected rather than routed to an unrelated lesson',()=>assert.throws(()=>T.task(fresh(),'spelling',now),/Unknown/));
+
+
+test('optional bonus quests start bounded bonus study timing and expose Cat Point progress only after the base plan',()=>{
+ const fs=require('node:fs'),src=fs.readFileSync(require.resolve('../today-ui.js'),'utf8');
+ assert.match(src,/startBonus\?\.\(task\.subject\)/);
+ assert.match(src,/Cat Points/);assert.match(src,/2× time/);assert.match(src,/capped at 2×/);
+});
