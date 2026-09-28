@@ -99,6 +99,6 @@ test('science figures cover each configured type with original safe markup and n
 });
 test('every new runtime dependency is included exactly once and versioned for offline use',()=>{
  const html=fs.readFileSync(require.resolve('../index.html'),'utf8'),sw=fs.readFileSync(require.resolve('../sw.js'),'utf8'),v=require('../release.json').version;
- for(const f of ['path-core.js','science-path-data.js','science-path-bank.js','science-path-core.js','science-path-figures.js','science-path-ui.js','science-path.css']){assert.equal(html.split('"'+f+'?v=').length-1,1,f);assert.ok(sw.includes(f+'?v='+v),f);}
+ for(const f of ['path-core.js','science-path-data.js','science-discovery-data.js','science-path-bank.js','science-path-core.js','science-path-figures.js','science-path-ui.js','science-path.css']){assert.equal(html.split('"'+f+'?v=').length-1,1,f);assert.ok(sw.includes(f+'?v='+v),f);}
  assert.ok(html.indexOf('path-core.js?')<html.indexOf('entrance-core.js?'));
 });
