@@ -2,7 +2,7 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const P=require('../planner-core.js'),F=require('../cat-friends-core.js');
 const now=new Date(2026,8,25,12).getTime();
 function state(n=0){const s={learning:{attempts:[]},science:{attempts:[]},coins:42,owned:['bow'],worn:{neck:'bow'},planner:P.fresh()};for(let i=0;i<n;i++)s.planner.milestones[`maths:skill${i}:idea`]={subject:'maths',skill:'skill'+i,kind:'idea',earnedAt:now,evidence:['synthetic-'+i]};return s;}
-function addTime(s,subject,minutes,id='time'){s.planner.sessions.push({id:id+'-'+subject,subject,day:P.localDay(now),start:now-minutes*60000,end:now});}
+function addTime(s,subject,minutes,id='time'){const offset=subject==='science'?4*3600000:0,end=now-offset;s.planner.sessions.push({id:id+'-'+subject,subject,day:P.localDay(now),start:end-minutes*60000,end});}
 
 test('collection contains Mochi plus 99 unique collectible friends',()=>{
  assert.equal(F.TOTAL,100);assert.equal(F.catalog.length,99);assert.equal(new Set(F.catalog.map(c=>c.id)).size,99);assert.equal(new Set(F.catalog.map(c=>c.name)).size,99);
