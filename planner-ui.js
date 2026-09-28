@@ -16,7 +16,7 @@ function visibleSubject(){
 function tick(persist=false){
  const was=clock.subject,r=clock.tick(data(),Date.now(),performance.now(),document.visibilityState==='visible',visibleSubject());
  if(r.reason){message=r.reason;$('plannerStatus').textContent=message;}
- if(was&&(persist||!r.running||Date.now()-lastSave>15000)){lastSave=Date.now();save(S);}paintClocks();
+ if(was&&(persist||!r.running||Date.now()-lastSave>15000)){lastSave=Date.now();save(S);}if(was&&r.reason?.startsWith('Double-study bonus reached'))document.dispatchEvent(new CustomEvent('mochi:cat-time-bonus',{detail:{subject:was,points:root.MochiCatFriends?.DOUBLE_POINTS||2}}));paintClocks();
 }
 function pause(note='Clock paused. Your work is saved.'){
  if(clock.subject)tick(true);clock.stop();message=note;$('plannerStatus').textContent=message;paintClocks();
