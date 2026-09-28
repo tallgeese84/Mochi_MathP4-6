@@ -57,7 +57,7 @@ function clock(){
    if(reason){run=null;return {running:false,reason};}
    // A cloud merge can replace the state object. Preserve this session's identity.
    let saved=p.sessions.find(x=>x.id===run.id);if(!saved){saved={...run};p.sessions.push(saved);}saved.end=run.end+delta;run=saved;lastMono=mono;lastWall=wall;
-   if(elapsed(p,run.day)[run.subject]>=minutes(p,run.subject,wall)*60000){run=null;return {running:false,reason:'Time goal reached. Finish your thought, take a break and try your exit check when ready.'};}
+   const target=minutes(p,run.subject,wall);if(target&&elapsed(p,run.day)[run.subject]>=target*2*60000){run=null;return {running:false,reason:'Double-study bonus reached. The clock stops at 2× today’s target; there is no extra time reward beyond this.'};}
    return {running:true};
   }
  };
