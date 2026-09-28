@@ -269,9 +269,9 @@ const w=dom.window,delay=ms=>new Promise(r=>setTimeout(r,ms));
  assert.deepEqual(errors,[]);
  // Companion roster is additive and uses the existing earned milestone ledger.
  w.eval(`S.planner=MochiPlanner.fresh();for(let i=0;i<40;i++)S.planner.milestones['maths:friendSkill'+i+':idea']={subject:'maths',skill:'friendSkill'+i,kind:'idea',earnedAt:Date.now(),evidence:['synthetic-friend-'+i]};save(S);studioShow('room');`);
- assert.equal(w.eval('S.catFriends.unlocked.length'),4);
+ assert.equal(w.eval('S.catFriends.unlocked.length'),5,'40 Cat Points unlock the four original friends plus the first collection cat');
  assert.equal(w.eval('S.catFriends.selected.length'),3);
- assert.equal(w.document.querySelectorAll('#catFriendsCards article').length,4);
+ assert.equal(w.document.querySelectorAll('#catFriendsCards article').length,12,'collection renders one lightweight page, not all 99 friends');
  const beforeFriends=w.eval('JSON.stringify({learning:S.learning,science:S.science,coins:S.coins,worn:S.worn})');
  w.document.querySelector('[data-friend="yuki"] button').click();
  assert.match(w.document.getElementById('catFriendsStatus').textContent,/Three friends/);
