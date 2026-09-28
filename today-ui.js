@@ -158,6 +158,7 @@ function init(){
  document.body.classList.add('today-enabled');
  document.addEventListener('mochi:activity',paint);
  document.addEventListener('mochi:state-saved',()=>{collectBonus();clearTimeout(queued);queued=setTimeout(paint,100);});
+ document.addEventListener('mochi:cat-time-bonus',e=>{const s=e.detail?.subject,p=e.detail?.points||F?.DOUBLE_POINTS||2;rewardToast(`+${p} Cat Points · ${names[s]||'Study'} reached 2×!`);lastHome='';paint();});
  document.addEventListener('mochi:cloud-merged',()=>{bind();lastHome='';paint();});
  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')paint();});
  const reset=$('resetBtn').onclick;$('resetBtn').onclick=()=>{const before=S.learning;reset();if(before!==S.learning){if(Q)S.questRewards=Q.fresh();open();}};
