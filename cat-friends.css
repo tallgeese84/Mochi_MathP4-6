@@ -24,3 +24,12 @@
 .cf-room-welcome strong{font-size:17px;color:#493453}.cf-room-welcome p{font-size:13px;line-height:1.5;margin:5px 0;color:#786584}
 .cf-room-welcome .cf-toggle{flex:0 0 auto;width:auto;min-width:112px}.cf-room-welcome+ .cf-picture-room{margin:0 auto 14px}
 @media(max-width:480px){.cf-room-welcome{align-items:flex-start}.cf-room-welcome .cf-toggle{min-width:98px;padding:9px;font-size:12px}.cf-room-welcome strong{font-size:16px}}
+
+
+/* v6.6: scalable 100-cat collection without rendering 99 portraits at once. */
+.cf-points{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;margin:0 16px 12px;padding:11px 13px;border:1px solid #e8deed;border-radius:14px;background:#faf7fc;align-items:baseline}
+.cf-points strong{font-size:16px;color:#5a3f6c}.cf-points span{font-size:11px;color:#856f8f;text-align:right}.cf-points small{grid-column:1/-1;font-size:11px;color:#745c80}
+.cf-page-nav{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;padding:0 16px 10px}.cf-page-nav span{text-align:center;font-size:11px;color:#806d88}
+.cf-page-nav button{min-height:34px;border:1px solid #dfd3e6;border-radius:10px;background:#fff;color:#6f527f;padding:6px 9px;font:600 11px/1.2 system-ui}.cf-page-nav button:disabled{opacity:.4}
+@media(max-width:480px){.cf-points{margin-left:10px;margin-right:10px}.cf-page-nav{padding-left:10px;padding-right:10px}.cf-page-nav button{font-size:10px;padding:5px 7px}}
+
