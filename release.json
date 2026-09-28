@@ -1,5 +1,5 @@
 {
-  "version": "6.5.0",
+  "version": "6.6.0",
   "releasedOn": "2026-09-27",
-  "summary": "Rebuild Science lessons around discovery: each topic now starts with a mystery and ungraded prediction, follows how observations and experiments changed scientific explanations, asks Euna to identify the discriminating evidence, then builds the modern model before guided and entrance-style practice. Historical stories are for understanding how science works, not memorising names; existing progress and mastery evidence are preserved."
+  "summary": "Expand Mochi’s rewards into a 100-cat collection: Mochi plus 99 collectible friends, with only three visitors rendered at once. Existing milestone unlocks are preserved. Cat Points combine validated learning milestones with a bounded +2 bonus when a scheduled subject reaches exactly 2× its planned foreground study time; normal study still stops at 1×, optional bonus timing stops at 2×, and no extra time reward exists beyond that."
 }
