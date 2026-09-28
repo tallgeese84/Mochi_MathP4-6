@@ -56,3 +56,7 @@
 .today-bonus-choices button small{display:block;font-size:9px;font-weight:500;color:#9a87a4;margin-top:3px}
 .today-bonus-coins{font-size:10px!important;letter-spacing:0!important;white-space:nowrap}
 @media(max-width:440px){.today-bonus-choices{grid-template-columns:1fr}.today-bonus{grid-template-columns:1fr auto}}
+
+
+.today-cat-bonus{grid-column:1/-1;margin:0;padding:8px 10px;border-radius:10px;background:#f5eff9;color:#735787;font-size:10px;line-height:1.4}
+
