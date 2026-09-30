@@ -1,0 +1,62 @@
+name: Geometry bridge release validation
+on:
+  push:
+    branches: [codex/geometry-bridge-v6-7-0]
+permissions:
+  contents: write
+jobs:
+  validate:
+    if: github.ref == 'refs/heads/codex/geometry-bridge-v6-7-0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Assemble exact reviewed production tree
+        run: |
+          set -euo pipefail
+          python3 scripts/assemble-geometry.py
+          git add -A
+          tree=$(git write-tree)
+          echo "Reviewed production tree: $tree"
+          test "$tree" = '07c973ea156582796253f5e583c34ea106dc011a'
+      - run: npm ci --ignore-scripts
+      - name: Full regression and curriculum checks
+        run: |
+          set -euo pipefail
+          npm run check:release
+          npm run check:course
+          npm test | tee "$RUNNER_TEMP/geometry-tests.log"
+      - name: Actual Chrome geometry and app controls
+        run: |
+          set -euo pipefail
+          python3 -m http.server 8765 --bind 127.0.0.1 > "$RUNNER_TEMP/geometry-server.log" 2>&1 &
+          server=$!
+          trap 'kill "$server"' EXIT
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:8765/release.json && break || sleep 0.2; done
+          chrome=$(command -v google-chrome || command -v google-chrome-stable)
+          timeout 75s "$chrome" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --user-data-dir="$RUNNER_TEMP/geometry-chrome" --window-size=1280,1800 --timeout=60000 --virtual-time-budget=22000 --screenshot="$RUNNER_TEMP/geometry-app.png" --dump-dom http://127.0.0.1:8765/tests/fixtures/geometry-browser.html > "$RUNNER_TEMP/geometry-browser.html" 2> "$RUNNER_TEMP/geometry-browser.log"
+          grep -q 'data-result="passed"' "$RUNNER_TEMP/geometry-browser.html"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: geometry-bridge-validation
+          path: |
+            ${{ runner.temp }}/geometry-app.png
+            ${{ runner.temp }}/geometry-browser.html
+            ${{ runner.temp }}/geometry-browser.log
+            ${{ runner.temp }}/geometry-tests.log
+          retention-days: 2
+      - name: Commit verified source to working branch only
+        run: |
+          set -euo pipefail
+          git add -A
+          test "$(git write-tree)" = '07c973ea156582796253f5e583c34ea106dc011a'
+          git diff --check --cached
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Finalize v6.7.0 geometry bridge after regression and real-browser checks'
+          git push origin HEAD:refs/heads/codex/geometry-bridge-v6-7-0
