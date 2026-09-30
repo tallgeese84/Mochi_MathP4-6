@@ -1,3 +1,10 @@
+# v6.7.1 — Separate help reporting from checking answers
+
+- Move the guess/outside-help checkbox above the reasoning pad in Maths and Science.
+- Use a distinct row, a 22 px checkbox and a label with a minimum 44 px touch height.
+- Keep the writing area and a divider between help reporting and answer submission.
+- Preserve existing saved flags, automatic in-app help recording, assessment restrictions, rewards and timers.
+
 # v6.7.0 — Geometry bridges and interactive solids
 
 - Add four targeted foundation units without changing the 24-method reserved-paper blueprint.

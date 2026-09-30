@@ -1,5 +1,5 @@
 {
-  "version": "6.7.0",
+  "version": "6.7.1",
   "releasedOn": "2026-09-29",
-  "summary": "Geometry bridge lessons now build length, area, volume, layers, hidden faces and angle identification with interactive 2D/3D models. Daily recommendations target missing relationships while preserving strengths, repeated identical submissions no longer add errors, and learning steps earn bounded Cat Points. Existing work, science, timers, assessments and cats are preserved."
+  "summary": "Move the guess/outside-help checkbox above the working pad in Maths and Science, away from Check my answer. Give it a separate touch-friendly row and clearer instructions without changing help recording, saved work, rewards or timers."
 }

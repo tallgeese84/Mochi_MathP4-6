@@ -37,3 +37,11 @@
 .sp-model-reveal{margin-top:14px;padding-top:12px;border-top:1px solid #eee6f2}.sp-model-reveal>p{font-size:14px;line-height:1.55;color:#4e4057}
 .sp-lesson-tabs button:disabled{opacity:.42;cursor:not-allowed}
 @media(max-width:520px){.sp-discovery{padding:14px;border-radius:15px}.sp-discovery h2{font-size:18px}.sp-discovery-choices button{font-size:12px}.sp-history{padding:12px}}
+
+/* Keep the help declaration above the working pad, away from answer submission. */
+.sp-attempt-note{margin:20px 0 24px;padding:8px 12px 12px;border:1px solid #e5ddea;border-radius:12px;background:#faf8fc;box-sizing:border-box}
+.sp-attempt-note .sp-check{align-items:center;gap:12px;min-height:44px;margin:0;line-height:1.5;cursor:pointer}
+.sp-attempt-note .sp-check input[type=checkbox]{flex:0 0 22px;width:22px;height:22px;margin:0;accent-color:#785295}
+.sp-attempt-note .sp-check span{min-width:0}
+.sp-attempt-note p{margin:0 0 0 34px;font-size:12px;line-height:1.5;color:#74657e}
+.sp-answer-area+.sp-actions{padding-top:20px;margin-top:24px;border-top:1px solid #e8e3ec}
