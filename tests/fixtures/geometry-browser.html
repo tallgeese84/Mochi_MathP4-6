@@ -1,0 +1,39 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Geometry bridge browser validation</title><style>body{margin:0;background:#faf7fd;font:14px system-ui}#result{padding:10px;white-space:pre-wrap}iframe{border:0;width:100%;height:1700px}</style>
+<pre id="result">Running synthetic geometry checks…</pre><iframe src="about:blank" title="Isolated geometry test app"></iframe><script>
+(async()=>{
+ const sleep=ms=>new Promise(r=>setTimeout(r,ms)),ok=(v,m)=>{if(!v)throw Error(m);},f=document.querySelector('iframe');
+ try{
+  ok(['localhost','127.0.0.1','[::1]'].includes(location.hostname),'Local test host only.');
+  ok(!localStorage.getItem('mochi-tutor-v1')&&!localStorage.getItem('cubs_sync'),'A fresh test profile is required.');
+  localStorage.setItem('mochi-room-view-v1','picture');f.src='../../index.html';
+  for(let i=0;i<150&&!f.contentWindow.MochiTodayUI;i++)await sleep(50);
+  const w=f.contentWindow,d=f.contentDocument,errors=[];ok(w.MochiTodayUI,'App starts');w.addEventListener('error',e=>errors.push(e.message));
+  const click=s=>{const e=d.querySelector(s);ok(e,'Missing '+s);e.click();},range=(key,v)=>{const el=d.querySelector(`[data-geo-slider="${key}"]`);ok(el,'Missing range '+key);el.value=v;el.dispatchEvent(new w.Event('input',{bubbles:true}));};
+  ok(!d.querySelector('#geometryLab'),'Home stays uncluttered');
+  w.MochiEntranceUI.open('lesson','geo-layers');ok(d.querySelector('#geometryCanvas svg polygon'),'Layer model renders without WebGL');
+  range('n',4);range('layers',2);ok(d.querySelector('#geometryInsight').textContent.includes('32 cm³'),'4 by 4 by 2 = 32');
+  const before=d.querySelector('#geometryCanvas').innerHTML;click('[data-geo-view="top"]');ok(d.querySelector('#geometryCanvas').innerHTML!==before,'Top view changes projection');
+  d.querySelector('#geometryCanvas').dispatchEvent(new w.KeyboardEvent('keydown',{key:'ArrowRight',bubbles:true}));
+  click('[data-geo-mode="joins"]');range('count',4);range('edge',2);range('gap',1);
+  ok(d.querySelector('#geometryInsight').textContent.includes('72 cm²'),'Four edge-2 cubes expose 72 cm²');ok(d.querySelector('#geometryCanvas [data-internal="true"]'),'Joining faces visible when separated');
+  click('[data-geo-mode="net"]');range('fold',100);ok(d.querySelector('#geometryInsight').textContent.includes('A–F'),'Folded opposite pairs');ok(d.querySelectorAll('#geometryCanvas polygon').length===6,'Six faces');
+  w.MochiEntranceUI.open('lesson','geo-angles');range('rotation',90);click('[data-geo-identify="interior"]');ok(d.querySelector('#geometryTargetFeedback').textContent.includes('inside angle'),'Targeted wrong-angle feedback');click('[data-geo-identify="exterior"]');ok(d.querySelector('#geometryTargetFeedback').textContent.includes('120°'),'Correct target feedback');
+  // Use an isolated blank practice record, not a real learner state.
+  w.eval("S.entrance=MochiEntrance.fresh();MochiEntrance.startPractice(S.entrance,'geo-layers',{phase:'apply',seed:345123});");
+  w.MochiEntranceUI.open('practice','geo-layers');ok(!d.querySelector('#geometryCanvas'),'Practice starts with visual support closed');
+  d.getElementById('epAnswer').value='999';d.getElementById('epWorking').value='I am checking the edge, not dividing by three.';d.getElementById('epWorking').dispatchEvent(new w.Event('input'));
+  d.querySelector('#geometryLab').open=true;await sleep(40);ok(w.eval('S.entrance.draft.helped'),'Opening the lab records help');ok(d.getElementById('epAnswer').value==='999','Help retains answer');
+  click('#epCheckAnswer');for(let i=0;i<7;i++)click('#epCheckAnswer');ok(w.eval('S.entrance.attempts.at(-1).responses.length')===1,'No duplicate mistakes');
+  ok(d.getElementById('epFeedback').textContent.includes('No extra mistake'),'Duplicate feedback visible');
+  d.getElementById('epAnswer').value=w.eval('MochiEntrance.question(S.entrance.draft).answerLabel');click('#epCheckAnswer');ok(w.eval('S.entrance.attempts.at(-1).correct'),'Can correct answer');ok(!w.eval('S.entrance.attempts.at(-1).independent'),'Support never becomes independent');
+  const backup=w.MochiReviewDownload.make();ok(backup.entrance.attempts.at(-1).helped,'Backup keeps support');
+  w.eval('MochiEntrance.finishPractice(S.entrance)');w.MochiEntranceUI.open('paper','mixed-a');ok(!d.querySelector('#geometryLab'),'No visual support in reserved papers');const deadline=w.eval('S.entrance.papers["mixed-a"].deadline');ok(deadline>0,'Paper deadline exists');
+  w.confirm=()=>true;w.MochiTodayUI.open();ok(w.eval('S.entrance.papers["mixed-a"].deadline')===deadline,'Paper deadline preserved');
+  w.MochiSciencePathUI.open('lesson','measurement');ok(!d.querySelector('#viewSciencePath #geometryLab'),'Science untouched');
+  w.MochiEntranceUI.open('lesson','geo-layers');f.style.width='375px';await sleep(80);ok(d.documentElement.scrollWidth<=375,'No mobile horizontal overflow');
+  f.style.width='100%';await sleep(60);ok(!errors.length,errors.join(';'));
+  d.getElementById('geometryLab').scrollIntoView({block:'start'});
+  document.body.dataset.result='passed';document.getElementById('result').textContent=JSON.stringify({result:'passed',layers:true,rotation:true,joins:true,folding:true,angleIdentification:true,supportedEvidence:true,duplicateProtection:true,papersUnchanged:true,backup:true,mobile:true,pageErrors:errors});
+ }catch(e){document.body.dataset.result='failed';document.getElementById('result').textContent=e.stack||String(e);}
+})();
+</script></html>

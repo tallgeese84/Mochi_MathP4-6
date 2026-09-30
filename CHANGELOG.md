@@ -1,3 +1,12 @@
+# v6.7.0 — Geometry bridges and interactive solids
+
+- Add four targeted foundation units without changing the 24-method reserved-paper blueprint.
+- Embed interactive 2D/3D layers, surfaces, hidden joins, hinged nets and angle identification.
+- Route weaker geometry relationships through fresh independent prerequisite checks while retaining algebra strengths.
+- Suppress duplicate unchanged submissions; preserve substantive revisions and historical evidence.
+- Add bounded learning/recovery Cat Points, independent of mastery and existing time bonuses.
+- Preserve existing data and assessment objects. See docs/GEOMETRY_BRIDGE.md.
+
 # v6.6.0 — 100-cat collection and bounded double-time Cat Points
 
 - Expand Mochi’s collection from four friends to **99 collectible friends + Mochi = 100 cats total**.

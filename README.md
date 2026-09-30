@@ -337,3 +337,7 @@ changed question or answer so old learning records are not reinterpreted.
 
 Run `npm run check:course`, `npm run check:release` and `npm test` before publishing.
 Release metadata and offline assets are generated from `release.json` and the page.
+
+## Geometry bridges (v6.7.0)
+
+Four targeted bridge lessons now connect length, area, cube layers, exposed faces and angle identification. Embedded interactive 2D/3D models work offline and are hidden in reserved papers. See [the teaching and validation notes](docs/GEOMETRY_BRIDGE.md).

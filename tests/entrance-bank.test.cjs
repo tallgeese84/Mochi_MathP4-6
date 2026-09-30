@@ -6,6 +6,11 @@ const coordinate=(N)=>{let x=0,y=0,dir=0,s=0;for(let length=1;s<N;length++){for(
 const brutePacks=(budget,costs,counts)=>{let max=0;for(let a=0;a*costs[0]<=budget;a++)for(let b=0;a*costs[0]+b*costs[1]<=budget;b++)for(let c=0;c<=(costs[2]?Math.floor((budget-a*costs[0]-b*costs[1])/costs[2]):0);c++)max=Math.max(max,a*counts[0]+b*counts[1]+c*(counts[2]||0));return max;};
 function independentlySolve(q){const p=q.params,f=q.form;
  switch(q.unit){
+ case 'geo-measure':return /space|volume|fill|inside/.test(p.quantity)?'cm³':/area|surface|face|cover/.test(p.quantity)?'cm²':'cm';
+ case 'geo-layers':return f===0?Array.from({length:p.c},()=>p.a*p.b).reduce((a,b)=>a+b,0):f===1?range(1,12).find(x=>x*x*x===p.a**3):f===2?p.a*p.b*p.c/(p.a*p.b):p.a*p.b*p.c/(p.b*p.c);
+ case 'geo-surface':return f===0?p.a*p.a:f===1?sum([p.a*p.b,p.a*p.b,p.a*p.c,p.a*p.c,p.b*p.c,p.b*p.c]):2*(p.count*p.a*p.a+p.count*p.a*p.a+p.a*p.a);
+ case 'geo-angles':return f===0?(p.exterior?'outside':'inside'):f===1?180-p.interior:180-(p.p+p.q);
+
  case 'relationships':return [()=>p.x,()=>range(0,p.total).find(x=>x+(x+p.difference)===p.total),()=>range(1,200).find(d=>(d+p.excess)/3===d-p.short),()=>sum([p.a,p.b])/2][f]();
  case 'percent':return [()=>p.price+p.price*p.rate/100,()=>p.paid*100/(100-p.rate),()=>p.paid/((1-p.p/100)*(1-p.s/100)),()=>range(0,1000).find(n=>Math.abs(.9*n+1.2*(n+p.difference)-p.total)<1e-8)][f]();
  case 'remainders':return [()=>p.whole-p.whole/3-(p.whole-p.whole/3)/4,()=>range(0,300).find(n=>3*n/4-p.fixed===p.left),()=>4*(p.left+p.fixed),()=>range(0,p.total).find(a=>((p.total-a)+a/3)*3/4===p.finalB)][f]();
@@ -48,5 +53,5 @@ test('diagram vertices agree with the central-square relationship and keep given
  const q=B.make('decomposition',1,18);assert.doesNotMatch(F.diagram(q.figure,q.id),/stroke-dasharray/);assert.match(F.diagram(q.figure,q.id,true),/stroke-dasharray/);
 });
 test('all curriculum dependencies exist and match valid original foundation units',()=>{
- const C=require('../course-core.js');assert.equal(D.units.length,24);for(const u of D.units){assert.ok(C.unit(u.foundation),u.id);assert.ok(u.ideas.length>=3);assert.ok(u.prerequisites.every(id=>D.units.some(v=>v.id===id)));assert.ok(u.check[1][u.check[2]]);}
+ const C=require('../course-core.js');assert.equal(D.units.length,28);assert.equal(D.units.filter(u=>u.bridge).length,4);for(const u of D.units){assert.ok(C.unit(u.foundation),u.id);assert.ok(u.ideas.length>=3);assert.ok(u.prerequisites.every(id=>D.units.some(v=>v.id===id)));assert.ok(u.check[1][u.check[2]]);}
 });
