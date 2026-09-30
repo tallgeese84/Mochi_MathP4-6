@@ -26,7 +26,7 @@
      ok(br.top-lr.bottom>=150,name+' label must not be adjacent to Check');
      ok(d.documentElement.scrollWidth<=width,name+' no horizontal overflow at '+width);
      ok(!c.checked&&!data.draft.guess,name+' no accidental default flag');
-     b.scrollIntoView({block:'center'});await sleep(15);
+     b.scrollIntoView({block:'center',behavior:'instant'});await sleep(15);
      const r=b.getBoundingClientRect(),target=d.elementFromPoint(r.left+Math.min(10,r.width/2),r.top+5);
      ok(target===b||b.contains(target),name+' Check hit area is unobstructed');
      target.click();ok(!data.draft.guess&&!d.getElementById(p+'Guess').checked,name+' clicking Check does not mark outside help');
@@ -46,7 +46,7 @@
    fresh();const independent=E.question(data.draft);d.getElementById(p+'Answer').value=p==='ep'?independent.answerLabel:independent.answer;click(p+'CheckAnswer');ok(data.attempts.at(-1).independent,name+' unassisted correct answers remain independent');
    w.MochiTodayUI.open();UI.open('paper','baseline-a');ok(!d.getElementById(p+'Guess'),name+' no declaration in assessment');w.MochiTodayUI.open();
   }
-  ok(!errors.length,errors.join(';'));w.MochiTodayUI.open();w.eval('S.entrance=MochiEntrance.fresh();MochiEntrance.startPractice(S.entrance,"percent",{phase:"apply",seed:814213});');w.MochiEntranceUI.open('practice','percent');click('epKeyboard');f.style.width='100%';await sleep(40);d.querySelector('.ep-attempt-note').scrollIntoView({block:'start'});
+  ok(!errors.length,errors.join(';'));w.MochiTodayUI.open();w.eval('S.entrance=MochiEntrance.fresh();MochiEntrance.startPractice(S.entrance,"percent",{phase:"apply",seed:814213});');w.MochiEntranceUI.open('practice','percent');click('epKeyboard');f.style.width='100%';await sleep(40);d.querySelector('.ep-attempt-note').scrollIntoView({block:'start',behavior:'instant'});
   document.body.dataset.result='passed';document.getElementById('result').textContent=JSON.stringify({result:'passed',measurements,supportPreserved:true,unassistedCredit:true,savedWorking:true,papersUnchanged:true,pageErrors:errors});
  }catch(e){document.body.dataset.result='failed';document.getElementById('result').textContent=e.stack||String(e);}
 })();
