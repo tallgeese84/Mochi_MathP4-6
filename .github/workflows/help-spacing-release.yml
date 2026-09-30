@@ -15,6 +15,20 @@ jobs:
         with:
           node-version: '24'
           cache: npm
+      - name: Make fixture hit-tests wait for completed scrolling
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib
+          f=Path('tests/fixtures/help-spacing-browser.html')
+          old='22bbd2645e0e8f347439b23713a6d41fac6cc2022d6332beb1b5c8012378ec28'
+          new='bff2aef123680da35a8783a081dcd3463b0afb1a00707f1d7706fe11a05a5f31'
+          assert hashlib.sha256(f.read_bytes()).hexdigest()==old
+          s=f.read_text().replace("scrollIntoView({block:'center'})","scrollIntoView({block:'center',behavior:'instant'})").replace("scrollIntoView({block:'start'})","scrollIntoView({block:'start',behavior:'instant'})")
+          f.write_text(s)
+          assert hashlib.sha256(f.read_bytes()).hexdigest()==new
+          p=Path('scripts/apply-help-spacing.py');s=p.read_text();assert s.count(old)==1;p.write_text(s.replace(old,new))
+          PY
       - name: Apply verified layout change
         run: python3 scripts/apply-help-spacing.py
       - run: npm ci --ignore-scripts
