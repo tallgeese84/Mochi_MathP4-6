@@ -1,0 +1,53 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Help checkbox separation checks</title>
+<style>body{margin:0;background:#faf7fd;font:14px system-ui}#result{padding:10px;white-space:pre-wrap}iframe{border:0;width:100%;height:1300px}</style>
+<pre id="result">Checking Maths and Science with synthetic progress…</pre><iframe src="about:blank" title="Isolated test app"></iframe><script>
+(async()=>{
+ const sleep=ms=>new Promise(r=>setTimeout(r,ms)),ok=(v,m)=>{if(!v)throw Error(m);},f=document.querySelector('iframe'),measurements=[];
+ try{
+  ok(['localhost','127.0.0.1','[::1]'].includes(location.hostname),'Local test host only');
+  ok(!localStorage.getItem('mochi-tutor-v1')&&!localStorage.getItem('cubs_sync'),'Fresh profile only');
+  localStorage.setItem('mochi-room-view-v1','picture');f.src='../../index.html';
+  for(let i=0;i<200&&!f.contentWindow.MochiSciencePathUI;i++)await sleep(50);
+  const w=f.contentWindow,d=f.contentDocument,errors=[];ok(w.MochiSciencePathUI&&w.MochiEntranceUI,'Both pathways load');
+  w.addEventListener('error',e=>errors.push(e.message));w.confirm=()=>true;
+  const click=id=>{const el=d.getElementById(id);ok(el,'Missing '+id);el.click();};
+  let seed=72001;
+  for(const [name,p,E,UI,unit] of [['Maths','ep',w.MochiEntrance,w.MochiEntranceUI,'percent'],['Science','sp',w.MochiSciencePath,w.MochiSciencePathUI,'measurement']]){
+   const data=E.init(w.eval('S'));
+   const fresh=()=>{w.MochiTodayUI.open();Object.assign(data,E.fresh());E.startPractice(data,unit,{phase:'apply',seed:seed++});UI.open('practice',unit);};
+   for(const width of [375,768,1280]){
+    fresh();f.style.width=width+'px';await sleep(70);
+    for(const input of ['Keyboard','Stylus']){
+     click(p+input);await sleep(30);
+     const label=d.querySelector('label[for="'+p+'Guess"]'),c=d.getElementById(p+'Guess'),b=d.getElementById(p+'CheckAnswer'),t=d.getElementById(p+'Working');
+     const lr=label.getBoundingClientRect(),cr=c.getBoundingClientRect(),br=b.getBoundingClientRect(),tr=t.getBoundingClientRect();
+     ok(lr.height>=44&&cr.width>=22&&cr.height>=22,name+' tap target size');
+     ok(lr.bottom<tr.top&&tr.bottom<br.top,name+' working separates help from submission');
+     ok(br.top-lr.bottom>=150,name+' label must not be adjacent to Check');
+     ok(d.documentElement.scrollWidth<=width,name+' no horizontal overflow at '+width);
+     ok(!c.checked&&!data.draft.guess,name+' no accidental default flag');
+     b.scrollIntoView({block:'center'});await sleep(15);
+     const r=b.getBoundingClientRect(),target=d.elementFromPoint(r.left+Math.min(10,r.width/2),r.top+5);
+     ok(target===b||b.contains(target),name+' Check hit area is unobstructed');
+     target.click();ok(!data.draft.guess&&!d.getElementById(p+'Guess').checked,name+' clicking Check does not mark outside help');
+     measurements.push({subject:name,width,input,separation:Math.round(br.top-lr.bottom)});
+    }
+   }
+   // The actual checkbox label still works, saves the declaration and prevents independent credit.
+   fresh();const q=E.question(data.draft);d.querySelector('label[for="'+p+'Guess"]').click();ok(data.draft.guess,name+' label saves help');
+   d.getElementById(p+'Working').value='My reasoning is saved.';d.getElementById(p+'Working').dispatchEvent(new w.Event('input'));
+   d.getElementById(p+'Answer').value=p==='ep'?q.answerLabel:q.answer;click(p+'CheckAnswer');
+   ok(data.attempts.at(-1).correct&&!data.attempts.at(-1).independent,name+' outside help preserved');
+   w.MochiTodayUI.open();UI.open('practice',unit);ok(d.getElementById(p+'Guess').checked&&d.getElementById(p+'Guess').disabled,name+' saved flag restored');
+   ok(d.getElementById(p+'Working').value==='My reasoning is saved.',name+' working retained');
+   // Hint use remains independent of the self-report control.
+   fresh();click(p+'Hint');ok(data.draft.helped&&!d.getElementById(p+'Guess').checked,name+' automatic help stays separate');
+   const answer=E.question(data.draft);d.getElementById(p+'Answer').value=p==='ep'?answer.answerLabel:answer.answer;click(p+'CheckAnswer');ok(!data.attempts.at(-1).independent,name+' actual help cannot earn independent credit');
+   fresh();const independent=E.question(data.draft);d.getElementById(p+'Answer').value=p==='ep'?independent.answerLabel:independent.answer;click(p+'CheckAnswer');ok(data.attempts.at(-1).independent,name+' unassisted correct answers remain independent');
+   w.MochiTodayUI.open();UI.open('paper','baseline-a');ok(!d.getElementById(p+'Guess'),name+' no declaration in assessment');w.MochiTodayUI.open();
+  }
+  ok(!errors.length,errors.join(';'));w.MochiTodayUI.open();w.eval('S.entrance=MochiEntrance.fresh();MochiEntrance.startPractice(S.entrance,"percent",{phase:"apply",seed:814213});');w.MochiEntranceUI.open('practice','percent');click('epKeyboard');f.style.width='100%';await sleep(40);d.querySelector('.ep-attempt-note').scrollIntoView({block:'start'});
+  document.body.dataset.result='passed';document.getElementById('result').textContent=JSON.stringify({result:'passed',measurements,supportPreserved:true,unassistedCredit:true,savedWorking:true,papersUnchanged:true,pageErrors:errors});
+ }catch(e){document.body.dataset.result='failed';document.getElementById('result').textContent=e.stack||String(e);}
+})();
+</script></html>

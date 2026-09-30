@@ -1,0 +1,61 @@
+name: Help checkbox layout validation
+on:
+  push:
+    branches: [codex/help-checkbox-v6-7-1]
+permissions:
+  contents: write
+jobs:
+  validate:
+    if: github.ref == 'refs/heads/codex/help-checkbox-v6-7-1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Apply verified layout change
+        run: python3 scripts/apply-help-spacing.py
+      - run: npm ci --ignore-scripts
+      - name: Regression and release checks
+        run: |
+          set -euo pipefail
+          npm run check:release
+          npm run check:course
+          npm test | tee "$RUNNER_TEMP/help-spacing-tests.log"
+      - name: Chrome full-app mobile, tablet and desktop controls
+        run: |
+          set -euo pipefail
+          python3 -m http.server 8765 --bind 127.0.0.1 > "$RUNNER_TEMP/help-server.log" 2>&1 &
+          server=$!
+          trap 'kill "$server"' EXIT
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:8765/release.json && break || sleep 0.2; done
+          chrome=$(command -v google-chrome || command -v google-chrome-stable)
+          timeout 75s "$chrome" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --user-data-dir="$RUNNER_TEMP/help-browser" --window-size=1280,1400 --timeout=60000 --virtual-time-budget=18000 --screenshot="$RUNNER_TEMP/help-spacing.png" --dump-dom http://127.0.0.1:8765/tests/fixtures/help-spacing-browser.html > "$RUNNER_TEMP/help-spacing.html" 2> "$RUNNER_TEMP/help-spacing-browser.log"
+          grep -q 'data-result="passed"' "$RUNNER_TEMP/help-spacing.html"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: help-checkbox-validation
+          path: |
+            ${{ runner.temp }}/help-spacing.png
+            ${{ runner.temp }}/help-spacing.html
+            ${{ runner.temp }}/help-spacing-browser.log
+            ${{ runner.temp }}/help-spacing-tests.log
+          retention-days: 2
+      - name: Commit tested change to working branch only
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib, json, os
+          for name,checksum in json.loads(Path(os.environ['RUNNER_TEMP'],'help-spacing-expected.json').read_text()).items():
+              assert hashlib.sha256(Path(name).read_bytes()).hexdigest()==checksum, name+' changed during tests'
+          PY
+          git add -A
+          git diff --check --cached
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Finalize v6.7.1: separate help reporting after regression and browser tests'
+          git push origin HEAD:refs/heads/codex/help-checkbox-v6-7-1
