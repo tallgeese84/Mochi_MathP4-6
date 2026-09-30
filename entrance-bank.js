@@ -15,7 +15,8 @@ function make(unit,form,seed){
  const u=D.units.find(x=>x.id===unit);if(!u||!Number.isInteger(form)||form<0||form>3||!Number.isSafeInteger(seed)||seed<0||seed>4294967295)throw Error('Invalid question identity');
  const r=random((seed^parseInt(hash(unit),36)^Math.imul(form+1,2654435761))>>>0),pick=a=>a[r(0,a.length-1)];let q;
  const out=(text,answer,steps,params={},extra={})=>q={unit,strand:u.strand,form,seed,id:`ep1:${unit}:${form}:${seed}`,text,answer,steps,params,level:form===0?1:form===1?2:3,...extra};
- if(unit==='relationships'){
+ if(u.bridge){const G=root.MochiGeometryBridge||(typeof require==='function'?require('./geometry-bridge.js'):null),v=G.make(unit,form,seed,r);if(v)out(v.text,v.answer,v.steps,v.params,v);}
+ else if(unit==='relationships'){
   if(form===0){const x=r(3,14),a=r(3,8),b=r(4,20);out(`A number is multiplied by ${a}, then ${b} is added. The result is ${a*x+b}. What is the number?`,x,[`Let the number be x: ${a}x + ${b} = ${a*x+b}.`,`Subtract ${b}, then divide by ${a}: x = ${x}.`,`Check: ${a} × ${x} + ${b} = ${a*x+b}.`],{x,a,b});}
   if(form===1){const small=r(13,45),difference=r(7,21),total=2*small+difference;out(`Two trays contain ${total} counters altogether. The first tray contains ${difference} more than the second. How many counters are in the second tray?`,small,[`Remove the difference: ${total} − ${difference} = ${2*small}.`,`This is twice the smaller amount: ${2*small} ÷ 2 = ${small}.`,`The other tray has ${small+difference}; together they have ${total}.`],{total,difference});}
   if(form===2){const excess=2*r(2,9),short=2*r(2,7),depth=(excess+3*short)/2;out(`A cord is ${excess} cm longer than the depth of a container. Folded into three equal lengths, it is ${short} cm shorter than that depth. What is the depth of the container?`,depth,[`Let the depth be d. The cord is d + ${excess} cm.`,`Three folded lengths give 3(d − ${short}) = d + ${excess}.`,`Thus 2d = ${excess+3*short}, so d = ${depth} cm.`,`Check: cord ${depth+excess} cm; one third is ${depth-short} cm.`],{excess,short},{suffix:'cm'});}
@@ -142,7 +143,7 @@ function make(unit,form,seed){
 // Restricted arithmetic parser, never eval. A pair [a,b] represents a + bπ.
 function parse(input,suffix=''){
  let s=String(input).trim().toLowerCase().replace(/−|–/g,'-').replace(/×/g,'*').replace(/÷/g,'/').replace(/π/g,'pi').replace(/,/g,'').replace(/^\$\s*/,'');
- const units={cm:['cm','centimetres','centimeters'],m:['m','metres','meters'],'cm²':['cm²','cm2','square centimetres'],'m²':['m²','m2','square metres'],hours:['hours','hour','h'],minutes:['minutes','minute','min'],seconds:['seconds','second','s'],years:['years','year'],litres:['litres','liters','l'],'km/h':['km/h'],km:['km'],'°':['°','degrees','deg']};
+ const units={cm:['cm','centimetres','centimeters'],m:['m','metres','meters'],'cm²':['cm²','cm2','square centimetres'],'cm³':['cm³','cm3','cubic centimetres'],'m²':['m²','m2','square metres'],hours:['hours','hour','h'],minutes:['minutes','minute','min'],seconds:['seconds','second','s'],years:['years','year'],litres:['litres','liters','l'],'km/h':['km/h'],km:['km'],'°':['°','degrees','deg']};
  for(const u of units[suffix]||[]){if(s.endsWith(u)){s=s.slice(0,-u.length).trim();break;}}
  s=s.replace(/(-?\d+)\s+(\d+)\s*\/\s*(\d+)/g,(_,a,b,c)=>a[0]==='-'?`(-(${a.slice(1)}+${b}/${c}))`:`(${a}+${b}/${c})`).replace(/\s+/g,'').replace(/(\d|\))(?=pi|\()/g,'$1*').replace(/pi(?=\d|\()/g,'pi*');
  if(!s||s.length>180)return null;const tokens=s.match(/pi|(?:\d+(?:\.\d*)?|\.\d+)|[()+*/-]/g)||[];if(tokens.join('')!==s||tokens.length>100)return null;let i=0;

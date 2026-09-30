@@ -15,6 +15,8 @@ function task(state,subject,now=Date.now()){
  const draft=d.draft,answer=draft&&d.attempts.find(a=>a.id===draft.id);
  const recent=Object.entries(d.lessons).filter(([id,l])=>E.unit(id)&&l.visited.length&&!l.completedAt).sort((a,b)=>b[1].lastViewedAt-a[1].lastViewedAt)[0];
  if(draft&&!answer?.correct){
+  const bridge=subject==='maths'&&answer?.responses.length&&E.prerequisite?.(d,draft.unit,now);
+  if(bridge)return {subject,kind:'lesson',unit:bridge,title:E.unit(bridge).title,resume:true,touched:draft.updatedAt||draft.at,detail:'Build this idea visually first. Your earlier question and working stay saved.'};
   if(recent&&recent[0]===draft.unit&&recent[1].lastViewedAt>draft.updatedAt)return {subject,kind:'lesson',unit:recent[0],title:E.unit(recent[0]).title,resume:true,touched:recent[1].lastViewedAt,detail:'Continue your saved lesson, then try the idea.'};
   return {subject,kind:'question',unit:draft.unit,title:E.unit(draft.unit).title,resume:true,touched:draft.updatedAt||draft.at,detail:'Your answer and working are saved. Pick up where you stopped.'};
  }

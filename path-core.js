@@ -71,6 +71,8 @@ function respond(d,now=Date.now()){
  if(!v.answer.trim())return {ok:false,reason:'Enter an answer first.'};
  if(B.validAnswer&&!B.validAnswer(q,v.answer))return {ok:false,reason:'Select a conclusion (or every statement) and a reason before checking. This incomplete response has not been counted as an error.'};
  if(typeof q.answer!=='string'&&!B.parse(v.answer,q.suffix))return {ok:false,reason:'Check the answer format. Use a number, fraction, or an exact expression with π. This has not been counted as a mathematical error.'};
+ const previous=old?.responses.at(-1);
+ if(previous&&previous.answer.trim()===v.answer.trim()&&(previous.working||'')===v.working&&JSON.stringify(previous.strokes||[])===JSON.stringify(v.strokes))return {ok:false,duplicate:true,reason:'That answer and working are already recorded. Change your answer or explain a new step, or open help. No extra mistake was counted.'};
  if(old?.responses.length>=12)return {ok:false,reason:'Revisit the worked example, then try a fresh question.'};
  const responses=[...(old?.responses||[]),{at:now,answer:v.answer,working:v.working,strokes:copy(v.strokes)}];
  const a=record(d,{...v,mode:'practice',updatedAt:now,responses});return {ok:true,attempt:a,needsLesson:!a.correct&&a.responses.length>=2};
@@ -79,7 +81,7 @@ function finishPractice(d){d.draft=null;}
 const paperDefinitions=options.paperDefinitions||[
  {id:'baseline-a',kind:'baseline',title:'Starting-point check · A',minutes:0,units:['relationships','percent','area','volume','counting','factors']},
  {id:'baseline-b',kind:'baseline',title:'Starting-point check · B',minutes:0,units:['remainders','simultaneous','motion','spatial','cycles','cases']},
- ...['A','B','C'].map(letter=>({id:'mixed-'+letter.toLowerCase(),kind:'paper',title:'Mixed reasoning paper '+letter,minutes:75,units:D.units.map(u=>u.id)}))
+ ...['A','B','C'].map(letter=>({id:'mixed-'+letter.toLowerCase(),kind:'paper',title:'Mixed reasoning paper '+letter,minutes:75,units:D.units.filter(u=>!u.bridge).map(u=>u.id)}))
 ];
 const paperCache=new Map();
 function paperQuestions(id){

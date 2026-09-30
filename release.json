@@ -1,5 +1,5 @@
 {
-  "version": "6.6.0",
-  "releasedOn": "2026-09-27",
-  "summary": "Expand Mochi’s rewards into a 100-cat collection: Mochi plus 99 collectible friends, with only three visitors rendered at once. Existing milestone unlocks are preserved. Cat Points combine validated learning milestones with a bounded +2 bonus when a scheduled subject reaches exactly 2× its planned foreground study time; normal study still stops at 1×, optional bonus timing stops at 2×, and no extra time reward exists beyond that."
+  "version": "6.7.0",
+  "releasedOn": "2026-09-29",
+  "summary": "Geometry bridge lessons now build length, area, volume, layers, hidden faces and angle identification with interactive 2D/3D models. Daily recommendations target missing relationships while preserving strengths, repeated identical submissions no longer add errors, and learning steps earn bounded Cat Points. Existing work, science, timers, assessments and cats are preserved."
 }

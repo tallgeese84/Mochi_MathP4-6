@@ -37,7 +37,7 @@ const ids=new Set(catalog.map(c=>c.id));
 const list=x=>Array.isArray(x)?[...new Set(x.filter(id=>ids.has(id)))]:[];
 const timestamp=x=>Number.isSafeInteger(x)&&x>=0&&x<=8640000000000000?x:0;
 const bonusKey=x=>typeof x==='string'&&/^\d{4}-\d{2}-\d{2}:(maths|science)$/.test(x)?x:'';
-function fresh(){return {version:2,unlocked:[],selected:[],selectionEdited:false,selectionUpdatedAt:0,doubleBonuses:[]};}
+function fresh(){return {version:2,unlocked:[],selected:[],selectionEdited:false,selectionUpdatedAt:0,doubleBonuses:[],studyAwards:[]};}
 function validate(raw){
  const c=fresh();if(!raw||![1,2].includes(raw.version))return c;
  c.unlocked=catalog.map(c=>c.id).filter(id=>list(raw.unlocked).includes(id));
@@ -46,6 +46,11 @@ function validate(raw){
  const seen=new Set();for(const x of Array.isArray(raw.doubleBonuses)?raw.doubleBonuses:[]){
   const key=bonusKey(x?.key||x),earnedAt=timestamp(x?.earnedAt);if(!key||seen.has(key))continue;seen.add(key);c.doubleBonuses.push({key,earnedAt});
   if(c.doubleBonuses.length>=1200)break;
+ }
+ const known=new Set();for(const a of Array.isArray(raw.studyAwards)?raw.studyAwards:[]){
+  if(!/^(learn|repair):(geo-measure|geo-layers|geo-surface|geo-angles|volume|angles|area|spatial)$/.test(a?.key||'')||known.has(a.key)||!timestamp(a.earnedAt))continue;
+  if(a.key.startsWith('learn:')&&!a.key.startsWith('learn:geo-'))continue;
+  known.add(a.key);c.studyAwards.push({key:a.key,earnedAt:timestamp(a.earnedAt)});
  }
  return c;
 }
@@ -62,10 +67,27 @@ function awardDoubleTime(state,c,now=Date.now()){
  }
  c.doubleBonuses=c.doubleBonuses.sort((a,b)=>a.earnedAt-b.earnedAt||a.key.localeCompare(b.key)).slice(-1200);return c;
 }
+// One point per completed new bridge lesson, and one per independently confirmed
+// recovery in each geometry method. A reveal or repeated tap alone earns nothing.
+function awardStudy(state,c){
+ const E=root.MochiEntrance,d=state?.entrance;if(!E||!d)return c;
+ const known=new Set(c.studyAwards.map(a=>a.key)),award=(key,at)=>{if(!known.has(key)&&timestamp(at)){c.studyAwards.push({key,earnedAt:timestamp(at)});known.add(key);}};
+ for(const id of ['geo-measure','geo-layers','geo-surface','geo-angles']){
+  const l=d.lessons?.[id];if(l?.visited?.length===3&&l.completedAt)award('learn:'+id,l.completedAt);
+ }
+ for(const id of ['geo-measure','geo-layers','geo-surface','geo-angles','volume','angles','area','spatial']){
+  const attempts=(d.attempts||[]).filter(a=>a.unit===id&&a.mode==='practice'&&a.responses?.length);
+  const recovered=attempts.find(a=>a.responses.length>1&&!E.B.mark(E.question(a),a.responses[0].answer)&&E.B.mark(E.question(a),a.responses.at(-1).answer));
+  if(!recovered)continue;
+  const follow=attempts.find(a=>a.at>recovered.answeredAt&&a.fingerprint!==recovered.fingerprint&&a.independent&&!a.helped&&!a.revealed&&!a.guess&&!a.seenBefore&&!a.conflicted&&a.form>0&&E.B.mark(E.question(a),a.responses[0].answer)&&E.B.mark(E.question(a),a.responses.at(-1).answer));
+  if(follow)award('repair:'+id,follow.answeredAt);
+ }
+ return c;
+}
 function bonusPoints(c){return c.doubleBonuses.length*DOUBLE_POINTS;}
-function pointCount(state,c=validate(state?.catFriends)){return milestoneCount(state)+bonusPoints(c);}
+function pointCount(state,c=validate(state?.catFriends)){return milestoneCount(state)+bonusPoints(c)+(c.studyAwards?.length||0);}
 function sync(state,now=Date.now()){
- const c=awardDoubleTime(state,validate(state.catFriends),now),points=pointCount(state,c);
+ const c=awardStudy(state,awardDoubleTime(state,validate(state.catFriends),now)),points=pointCount(state,c);
  c.unlocked=catalog.filter(cat=>c.unlocked.includes(cat.id)||points>=cat.points).map(cat=>cat.id);
  if(!c.selectionEdited)c.selected=c.unlocked.slice(0,MAX);
  state.catFriends=c;return c;
@@ -85,11 +107,11 @@ function merge(a,b){
  const ra=rank(a),rb=rank(b);let winner=a;
  for(let i=0;i<ra.length;i++){if(ra[i]!==rb[i]){winner=rb[i]>ra[i]?b:a;break;}}
  const bonuses=new Map();for(const x of [...a.doubleBonuses,...b.doubleBonuses]){const old=bonuses.get(x.key);if(!old||x.earnedAt<old.earnedAt)bonuses.set(x.key,x);}
- const doubleBonuses=[...bonuses.values()].sort((x,y)=>x.earnedAt-y.earnedAt||x.key.localeCompare(y.key));return validate({...winner,unlocked:catalog.filter(c=>a.unlocked.includes(c.id)||b.unlocked.includes(c.id)).map(c=>c.id),doubleBonuses});
+ const doubleBonuses=[...bonuses.values()].sort((x,y)=>x.earnedAt-y.earnedAt||x.key.localeCompare(y.key));return validate({...winner,unlocked:catalog.filter(c=>a.unlocked.includes(c.id)||b.unlocked.includes(c.id)).map(c=>c.id),doubleBonuses,studyAwards:[...a.studyAwards,...b.studyAwards].sort((x,y)=>x.earnedAt-y.earnedAt||x.key.localeCompare(y.key))});
 }
 function report(state,now=Date.now()){
- const c=sync(state,now),milestones=milestoneCount(state),timePoints=bonusPoints(c),points=milestones+timePoints,next=catalog.find(cat=>!c.unlocked.includes(cat.id))||null;
- return {milestones,timeBonusAwards:c.doubleBonuses.length,timeBonusPoints:timePoints,points,maxFriends:MAX,totalCats:TOTAL,main:'mochi',unlockedTotal:1+c.unlocked.length,nextCat:next?{...next,remaining:Math.max(0,next.points-points)}:null,...c,
+ const c=sync(state,now),milestones=milestoneCount(state),timePoints=bonusPoints(c),points=pointCount(state,c),next=catalog.find(cat=>!c.unlocked.includes(cat.id))||null;
+ return {milestones,studyPoints:c.studyAwards.length,timeBonusAwards:c.doubleBonuses.length,timeBonusPoints:timePoints,points,maxFriends:MAX,totalCats:TOTAL,main:'mochi',unlockedTotal:1+c.unlocked.length,nextCat:next?{...next,remaining:Math.max(0,next.points-points)}:null,...c,
   cats:catalog.map(cat=>({...cat,unlocked:c.unlocked.includes(cat.id),selected:c.selected.includes(cat.id),remaining:Math.max(0,cat.points-points)}))};
 }
 root.MochiCatFriends={catalog,MAX,TOTAL,DOUBLE_POINTS,fresh,validate,merge,sync,select,report,milestoneCount,pointCount,bonusPoints,threshold};
