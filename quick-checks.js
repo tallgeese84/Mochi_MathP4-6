@@ -355,6 +355,42 @@ const science={
   q('A solar panel only works in light. How can a lamp run after sunset?',['Store energy during the day.','Use a bigger panel.','Point it at the Moon.'],0,'Storage keeps energy for later.'),
   q('One trial shows a crop does well. What is the best next step?',['Repeat controlled trials.','Plant it everywhere.','Stop testing.'],0,'One result needs repeating before it can be trusted.'),
   q('Energy passes through two retention steps. How do you find what remains?',['Multiply by both fractions.','Add the fractions.','Use only the first fraction.'],0,'Each step keeps a fraction of what was there before it.')
+ ],
+ 'sx-cells':[
+  q('Which feature is the most reliable sign that a cell comes from a plant rather than an animal?',['Having a nucleus.','Having a cell wall.','Being very small.'],1,'Plant and animal cells both have a nucleus, membrane and cytoplasm. Only the plant cell has a wall; some plant cells have no chloroplasts.'),
+  q('How do you work out the total magnification of a microscope?',['Add the eyepiece and objective numbers.','Multiply the eyepiece and objective numbers.','Use the objective number only.'],1,'Each lens magnifies the image again, so multiply: ×10 and ×40 give ×400. For image size, multiply the actual size by the magnification.'),
+  q('A plant cell has no chloroplasts. What does that tell you?',['It must be an animal cell.','It may come from a part of the plant that gets no light.','It cannot be alive.'],1,'Root and bulb cells have walls but no chloroplasts. One missing feature is not enough; use several features together.'),
+  q('You know the image size and the magnification. How do you find the real size?',['Image size × magnification.','Image size ÷ magnification.','Image size − magnification.'],1,'The image is the real size made bigger, so divide to undo the magnification.')
+ ],
+ 'sx-machines':[
+  q('What two things decide the turning effect (moment) of a force?',['The force and its distance from the pivot.','The force and the colour of the lever.','Only how hard you push.'],0,'Moment = force × perpendicular distance. The same push further from the pivot turns more.'),
+  q('When is a beam balanced?',['When both sides hold the same mass.','When clockwise and anticlockwise moments are equal.','When the heavier load is further out.'],1,'Compare mass × distance on each side. A heavier load nearer the pivot can balance a lighter one further away.'),
+  q('What does a single movable pulley do in the ideal model?',['Halves the effort but you pull twice as much rope.','Halves the effort and the rope pulled.','Only changes the direction of the pull.'],0,'Two rope sections share the load. Machines trade force for distance; a fixed pulley only changes direction.'),
+  q('Two loads hang on the same side of a pivot. How do you find their total turning effect?',['Use only the heavier load.','Add mass × distance for each load.','Multiply the two masses together.'],1,'Each load has its own moment. Moments on the same side add up; then compare with the other side.')
+ ],
+ 'sx-pressure':[
+  q('The same force acts on a smaller area. What happens to the pressure?',['It gets smaller.','It gets larger.','It stays the same.'],1,'Pressure = force ÷ area. Dividing by a smaller area gives a larger pressure.'),
+  q('A brick can stand on different faces. Which face gives the greatest pressure?',['The face with the largest area.','The face with the smallest area.','All faces give the same pressure.'],1,'The weight is the same on every face, so the smallest area gives the largest pressure.'),
+  q('How does the pressure in a liquid change as you go deeper?',['It increases.','It decreases.','It stays the same.'],0,'More liquid lies above a deeper point, so it presses harder. Air pressure differences explain straws and suction cups.'),
+  q('Why does a sealed bag swell when taken up a high mountain?',['The air outside presses less than the air inside.','The air inside becomes heavier.','The bag becomes thinner.'],0,'Air pressure falls with height. The trapped air keeps pushing out while less air pushes in.')
+ ],
+ 'sx-waves':[
+  q('What does sound need to travel from a bell to your ear?',['Light.','A medium such as air, water or a solid.','A vacuum.'],1,'Sound is a vibration passed on by particles. With no particles, as in a vacuum, the sound cannot travel.'),
+  q('For an echo, how far does the sound travel compared with the distance to the wall?',['The same distance.','Twice the distance.','Half the distance.'],1,'The sound goes there and back, so distance to the wall = speed × time ÷ 2. Thunder from lightning is one way only.'),
+  q('In a fair test of whether bob mass affects a pendulum, what must stay the same?',['The mass of the bob.','The length of the string.','The time measured.'],1,'Change only the mass; keep the length and starting angle the same, and measure the time for several swings.'),
+  q('A pendulum makes 20 swings in 30 s. How do you find one period?',['30 × 20','30 ÷ 20','20 ÷ 30'],1,'Period = total time ÷ number of swings: 1.5 s. Timing many swings gives a more accurate period.')
+ ],
+ 'sx-chem':[
+  q('What decides whether a change is chemical?',['Whether bubbles appear.','Whether a new substance is made.','Whether the shape changes.'],1,'Bubbles or colour are clues, but boiling water also bubbles. A chemical change makes a new substance.'),
+  q('What turns limewater milky?',['Oxygen.','Carbon dioxide.','Water vapour.'],1,'The limewater test identifies carbon dioxide, made when an acid reacts with a carbonate.'),
+  q('In an experiment on rusting, what does iron need in order to rust?',['Water only.','Air only.','Both water and air.'],2,'Nails with only water or only air stay shiny. Change one condition at a time to find out what is needed.'),
+  q('A flask loses mass when vinegar and baking soda react in it. Where did the mass go?',['It was destroyed.','A gas escaped into the air.','The liquid became lighter by itself.'],1,'In an open flask, the new gas leaves. In a sealed flask the total mass would stay the same.')
+ ],
+ 'sx-life':[
+  q('Which life cycle has a pupa stage?',['Egg → nymph → adult.','Egg → larva → pupa → adult.','Both of them.'],1,'Four-stage life cycles have a larva and a pupa. In three-stage cycles the nymph looks like a small adult.'),
+  q('How do you find the total time from egg to adult from a table?',['Use only the longest stage.','Add the times of the egg, larva and pupa stages.','Multiply the stages together.'],1,'Each stage follows the one before, so the times add up until the adult appears.'),
+  q('Why does it help a plant when its seeds are carried far away?',['The seeds become bigger.','The young plants compete less with the parent for light, water and space.','The parent plant grows faster.'],1,'Link each fruit feature (hairs, hooks, husk, juicy flesh) to how it travels, then state the benefit: less competition.'),
+  q('Where does a baby develop after fertilisation?',['In the womb (uterus).','In the stomach.','In the ovary.'],0,'A sperm joins an egg in fertilisation; the fertilised egg develops in the womb and inherits features from both parents.')
  ]
 };
 function check(subject,unit,form){

@@ -88,8 +88,9 @@ success. Hints, guessing, solution reveals and wrong first pairs remain sticky a
 revision and device merging. Fixed ordering does not expose a repeating answer key:
 conclusions, reasons and statement rows are shuffled without creating new novelty.
 
-Typed explanations and stylus diagrams are saved. They are **not automatically
-graded** by keywords or represented as expert-verified. Grown-up settings displays
+The free "My explanation" working box and stylus diagrams are saved and are **not
+automatically graded**. (From bank revision 2, some questions are themselves short
+written answers; those are first-checked by key ideas — see "Revision 2" below.) Grown-up settings displays
 reference reasoning and a review rubric (claim, evidence, scientific connection and
 limits). Adult judgements and parent-entered external scores are separate records.
 The lesson and paper diagrams use original monochrome SVG constructions and
@@ -145,3 +146,36 @@ maths preservation, statement controls, paper feedback/submission and narrow lay
 ## Ask Mochi · AI TA
 
 During science practice questions, Euna can open **Ask Mochi · AI TA** and choose **I don’t understand the question**, **I don’t know how to start**, **Check my idea/reasoning**, or type her own question. The TA receives the active question and her current typed working. Before the solution is open, it is instructed to scaffold one next step rather than reveal the final answer. Asking records the attempt as supported, so it cannot be counted as independent evidence. Reserved paper mode deliberately has no tutor access before submission. Without a configured live provider, the panel falls back to the built-in lesson guidance.
+
+## Revision 2 of the science bank (DSA upgrade)
+
+Past answers are re-marked by regenerating each question from (unit, form, seed), so
+`science-path-bank.js` now has `REV = 2` and `make(id, form, seed, rev = REV)`. Revision 1
+of the 24 original units (96 templates) is frozen and byte-identical; every change to an
+original template lives in `science-path-rev2.js`. Existing papers and starting checks
+are pinned to the original 24 units at revision 1 (`rev: 1` in their definitions).
+
+- **No answer-length cue.** Revision-2 distractors are believable misconceptions of
+  similar length. Across the bank the correct reason is strictly the longest option in
+  about 10% of choice questions and the correct conclusion in about 7% (the test limit is
+  40%); no option is shorter than 55% of the longest.
+- **New answer kinds.** *Numeric* answers accept a tolerance and an optional unit
+  (equivalent units such as km/m or N cm/N m are converted; a wrong unit is recorded as
+  a unit slip). *Written* answers are checked against key ideas (claim, evidence,
+  scientific reason): each idea is a set of word groups matched within one sentence,
+  forgiving one spelling slip in longer word stems; some items also reject a stated
+  misconception. The learner sees which key ideas were found and which are missing, and a
+  grown-up can record a "Reasoning is valid" review alongside the automatic check.
+  *Variable roles* ask for the changed, measured and kept-the-same variables.
+- **Fair tests.** The fair-test unit now includes variable-role items and two written
+  "plan a fair test" items (change one thing, keep others the same, measure, repeat).
+- **Six DSA bridge units** (`sx-cells`, `sx-machines`, `sx-pressure`, `sx-waves`,
+  `sx-chem`, `sx-life`) follow the original 24 in the path, each with lessons, a
+  discovery story, a concept check, quick checks and four forms mixing question kinds.
+- **Figures.** New accessible SVG figures: bar chart (with an optional non-zero baseline,
+  now used by the truncated-axis question), plant cell, lever, pulley, water can, fruit
+  and life cycle.
+- **Variety.** Many single-question templates gain several contexts at revision 2.
+
+Key-idea marking is a first check, not expert grading: it can miss an unusual but valid
+answer, so grown-up review remains part of the evidence.

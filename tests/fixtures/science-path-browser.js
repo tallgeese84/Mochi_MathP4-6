@@ -6,7 +6,7 @@ async function runSciencePathChecks(w){
  const original=unchanged();
  w.MochiEntranceUI.open('home');check(w.MochiEntranceUI.visible(),'Maths overview remains accessible');click('subjectScience');check(w.MochiSciencePathUI.visible(),'Science pathway is visible');
  check(d.getElementById('spTitle').textContent==='Ask questions. Follow the evidence.','Science title');
- click('spLessons');check(d.querySelectorAll('#viewSciencePath [data-lesson]').length===24,'24 science lessons');
+ click('spLessons');check(d.querySelectorAll('#viewSciencePath [data-lesson]').length===w.MochiSciencePathData.units.length,'every science lesson is listed');
  query('#viewSciencePath [data-lesson="measurement"]').click();
  click('spLessonNext');check(!!query('#viewSciencePath .sp-question-sheet'),'Worked example');
  query('#spExample').value='1';query('#spExample').dispatchEvent(new w.Event('change'));check(!!query('#viewSciencePath table'),'Worked data table');

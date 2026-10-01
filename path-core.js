@@ -4,7 +4,7 @@
 'use strict';
 function create(D,B,options={}){
 const stateKey=options.stateKey||'entrance',prefix=options.prefix||'entrance-';
-const DAY=86400000,unit=id=>D.units.find(u=>u.id===id),stamp=n=>Number.isFinite(n)&&n>0&&n<8640000000000000?n:0;
+const AMAX=B.answerLimit||180,DAY=86400000,unit=id=>D.units.find(u=>u.id===id),stamp=n=>Number.isFinite(n)&&n>0&&n<8640000000000000?n:0;
 const text=(s,n=6000)=>typeof s==='string'?s.slice(0,n):'',copy=x=>JSON.parse(JSON.stringify(x));
 const uid=()=>root.crypto?.randomUUID?.()||Date.now().toString(36)+'-'+Math.random().toString(36).slice(2);
 const ink=raw=>(Array.isArray(raw)?raw:[]).slice(-60).map(s=>(Array.isArray(s)?s:[]).slice(0,300).filter(p=>Array.isArray(p)&&p.length===2&&p.every(Number.isFinite)).map(p=>p.map(n=>Math.round(Math.max(0,Math.min(1,n))*10000)/10000))).filter(s=>s.length);
@@ -16,10 +16,10 @@ function lesson(d,id){if(!unit(id))throw Error('Unknown teaching unit');return d
 function visit(d,id,page=0,now=Date.now()){const l=lesson(d,id);l.page=Math.max(0,Math.min(2,Math.trunc(page)||0));l.visited=[...new Set([...l.visited,l.page])];l.lastViewedAt=l.updatedAt=now;return l;}
 function concept(d,id,choice,now=Date.now()){const l=lesson(d,id),c=unit(id).check;if(!Number.isInteger(choice)||choice<0||choice>=c[1].length)return false;l.conceptChoice=choice;l.conceptResponses.push({choice,at:now});l.conceptResponses=l.conceptResponses.slice(-12);l.updatedAt=now;return choice===c[2];}
 function complete(d,id,now=Date.now()){const l=lesson(d,id);if(l.visited.length<3||l.conceptChoice!==unit(id).check[2])return false;l.completedAt=l.completedAt||now;l.updatedAt=now;return true;}
-function cleanDraft(v){if(!identity(v)||v.form===3||!text(v.id,120)||!stamp(v.at))return null;return {id:text(v.id,120),unit:v.unit,form:v.form,seed:v.seed,at:v.at,updatedAt:stamp(v.updatedAt)||v.at,phase:['guided','apply','transfer','recall'].includes(v.phase)?v.phase:'apply',helped:!!v.helped,revealed:!!v.revealed,guess:!!v.guess,seenBefore:!!v.seenBefore,lessonViewedAt:stamp(v.lessonViewedAt),recallOf:text(v.recallOf,120),answer:text(v.answer,180),working:text(v.working),strokes:ink(v.strokes)};}
+function cleanDraft(v){if(!identity(v)||v.form===3||!text(v.id,120)||!stamp(v.at))return null;return {id:text(v.id,120),unit:v.unit,form:v.form,seed:v.seed,at:v.at,updatedAt:stamp(v.updatedAt)||v.at,phase:['guided','apply','transfer','recall'].includes(v.phase)?v.phase:'apply',helped:!!v.helped,revealed:!!v.revealed,guess:!!v.guess,seenBefore:!!v.seenBefore,lessonViewedAt:stamp(v.lessonViewedAt),recallOf:text(v.recallOf,120),answer:text(v.answer,AMAX),working:text(v.working),strokes:ink(v.strokes)};}
 function cleanAttempt(a){
  if(!identity(a)||!text(a.id,120)||!stamp(a.at))return null;const q=question(a),mode=['practice','baseline','paper'].includes(a.mode)?a.mode:'practice';
- const responses=(Array.isArray(a.responses)?a.responses:[]).slice(0,12).filter(x=>stamp(x.at)).map(x=>({at:stamp(x.at),answer:text(x.answer,180),working:text(x.working),strokes:ink(x.strokes)}));
+ const responses=(Array.isArray(a.responses)?a.responses:[]).slice(0,12).filter(x=>stamp(x.at)).map(x=>({at:stamp(x.at),answer:text(x.answer,AMAX),working:text(x.working),strokes:ink(x.strokes)}));
  if(!responses.length)return null;const final=responses.at(-1),skipped=!final.answer.trim(),firstCorrect=B.mark(q,responses[0].answer)&&!a.conflicted,correct=B.mark(q,final.answer);
  const helped=!!a.helped||a.phase==='guided'||mode==='practice'&&a.form===0;
  return {id:text(a.id,120),unit:a.unit,form:a.form,seed:a.seed,fingerprint:q.fingerprint,at:a.at,updatedAt:stamp(a.updatedAt)||final.at,answeredAt:final.at,mode,paperId:text(a.paperId,40),phase:['guided','apply','transfer','recall','paper','baseline'].includes(a.phase)?a.phase:'apply',responses,helped,revealed:!!a.revealed,guess:!!a.guess,seenBefore:!!a.seenBefore,conflicted:!!a.conflicted,lessonViewedAt:stamp(a.lessonViewedAt),recallOf:text(a.recallOf,120),skipped,firstCorrect,correct,reflection:text(a.reflection),reflectionInk:ink(a.reflectionInk),reflectionAt:stamp(a.reflectionAt),independent:!!(correct&&firstCorrect&&!helped&&!a.revealed&&!a.guess&&!skipped&&!a.conflicted),question:q.text,...(B.parts?{components:B.parts(q,final.answer),firstComponents:B.parts(q,responses[0].answer)}:{})};
@@ -64,12 +64,12 @@ function startPractice(d,id,{phase,seed,now=Date.now(),force=false}={}){
  const seenBefore=!!d.seen[q.fingerprint];d.seen[q.fingerprint]=d.seen[q.fingerprint]||now;
  d.draft={id:prefix+uid(),unit:id,form,seed:value,at:now,updatedAt:now,phase,helped:phase==='guided',revealed:false,guess:false,seenBefore,lessonViewedAt:l.lastViewedAt||0,recallOf:phase==='recall'?e.lastSuccess:'',answer:'',working:'',strokes:[]};return d.draft;
 }
-function touchDraft(d,fields,now=Date.now()){if(!d.draft)return;Object.assign(d.draft,{answer:text(fields.answer??d.draft.answer,180),working:text(fields.working??d.draft.working),strokes:ink(fields.strokes??d.draft.strokes),guess:d.draft.guess||!!fields.guess,updatedAt:now});}
+function touchDraft(d,fields,now=Date.now()){if(!d.draft)return;Object.assign(d.draft,{answer:text(fields.answer??d.draft.answer,AMAX),working:text(fields.working??d.draft.working),strokes:ink(fields.strokes??d.draft.strokes),guess:d.draft.guess||!!fields.guess,updatedAt:now});}
 function help(d,reveal=false,now=Date.now()){if(!d.draft||d.attempts.find(a=>a.id===d.draft.id)?.correct)return;d.draft.helped=true;d.draft.revealed=d.draft.revealed||reveal;d.draft.updatedAt=now;const a=d.attempts.find(a=>a.id===d.draft.id);if(a)record(d,{...a,helped:true,revealed:a.revealed||reveal,updatedAt:now});}
 function respond(d,now=Date.now()){
  const v=d.draft;if(!v)return {ok:false};const q=question(v),old=d.attempts.find(x=>x.id===v.id);if(old?.correct)return {ok:true,attempt:old,already:true};
  if(!v.answer.trim())return {ok:false,reason:'Enter an answer first.'};
- if(B.validAnswer&&!B.validAnswer(q,v.answer))return {ok:false,reason:'Select a conclusion (or every statement) and a reason before checking. This incomplete response has not been counted as an error.'};
+ if(B.validAnswer&&!B.validAnswer(q,v.answer))return {ok:false,reason:B.invalidReason?.(q,v.answer)||'Select a conclusion (or every statement) and a reason before checking. This incomplete response has not been counted as an error.'};
  if(typeof q.answer!=='string'&&!B.parse(v.answer,q.suffix))return {ok:false,reason:'Check the answer format. Use a number, fraction, or an exact expression with π. This has not been counted as a mathematical error.'};
  const previous=old?.responses.at(-1);
  if(previous&&previous.answer.trim()===v.answer.trim()&&(previous.working||'')===v.working&&JSON.stringify(previous.strokes||[])===JSON.stringify(v.strokes))return {ok:false,duplicate:true,reason:'That answer and working are already recorded. Change your answer or explain a new step, or open help. No extra mistake was counted.'};
@@ -88,7 +88,7 @@ function paperQuestions(id){
  if(paperCache.has(id))return paperCache.get(id).map(copy);const def=paperDefinitions.find(p=>p.id===id);if(!def)throw Error('Unknown paper');
  // A fixed independent blueprint; prior paper values are excluded from later forms.
  const earlier=new Set();for(const prev of paperDefinitions){if(prev.id===id)break;for(const q of paperQuestions(prev.id))earlier.add(q.fingerprint);}
- const list=def.units.map((unit,i)=>{const form=def.kind==='baseline'?1:3;let seed=parseInt(B.hash((options.fingerprintPrefix||'ep-paper-v1:')+id+':'+unit),36)>>>0,q=B.make(unit,form,seed);for(let k=0;k<200&&earlier.has(q.fingerprint);k++)q=B.make(unit,form,seed=(seed+1)>>>0);if(earlier.has(q.fingerprint))throw Error('Paper family has no unseen variant');earlier.add(q.fingerprint);return q;});
+ const list=def.units.map((unit,i)=>{const form=def.kind==='baseline'?1:3;let seed=parseInt(B.hash((options.fingerprintPrefix||'ep-paper-v1:')+id+':'+unit),36)>>>0,q=B.make(unit,form,seed,def.rev);for(let k=0;k<200&&earlier.has(q.fingerprint);k++)q=B.make(unit,form,seed=(seed+1)>>>0,def.rev);if(earlier.has(q.fingerprint))throw Error('Paper family has no unseen variant');earlier.add(q.fingerprint);return q;});
  // Mix the strands without exposing a chapter sequence or topic label.
  const order=randomOrder(list.length,parseInt(B.hash(id),36));const shuffled=order.map(i=>list[i]);paperCache.set(id,shuffled);return shuffled.map(copy);
 }
@@ -102,7 +102,7 @@ function startPaper(d,id,now=Date.now()){
 function savePaperAnswer(d,id,index,fields,now=Date.now()){
  const p=d.papers[id],qs=paperQuestions(id);if(!p||p.submittedAt||index<0||index>=qs.length||!Number.isInteger(index))return false;
  if(p.deadline&&now>p.deadline)return false;
- p.answers[index]={answer:text(fields.answer,180),working:text(fields.working),strokes:ink(fields.strokes),updatedAt:now};p.updatedAt=now;p.index=index;return true;
+ p.answers[index]={answer:text(fields.answer,AMAX),working:text(fields.working),strokes:ink(fields.strokes),updatedAt:now};p.updatedAt=now;p.index=index;return true;
 }
 function interruptPaper(d,id,now=Date.now()){const p=d.papers[id];if(!p||p.submittedAt)return;p.interrupted=true;p.assisted=true;p.updatedAt=now;}
 function submitPaper(d,id,now=Date.now()){
@@ -131,7 +131,7 @@ function validate(raw){
  for(const rawAttempt of (Array.isArray(raw.attempts)?raw.attempts:[]).slice(-5000).sort((a,b)=>(a?.at||0)-(b?.at||0))){const a=record(d,rawAttempt);if(a)d.seen[a.fingerprint]=Math.min(d.seen[a.fingerprint]||a.at,a.at);}
  d.draft=cleanDraft(raw.draft);
  for(const def of paperDefinitions){const x=raw.papers?.[def.id];if(!x||!stamp(x.startedAt))continue;const p={id:def.id,startedAt:x.startedAt,updatedAt:stamp(x.updatedAt)||x.startedAt,deadline:def.minutes?x.startedAt+def.minutes*60000:0,submittedAt:stamp(x.submittedAt),assisted:!!x.assisted,interrupted:!!x.interrupted,conflicted:!!x.conflicted,seenBefore:!!x.seenBefore,index:Math.max(0,Math.min(def.units.length-1,Math.trunc(x.index)||0)),answers:{},flags:[...new Set((Array.isArray(x.flags)?x.flags:[]).filter(i=>Number.isInteger(i)&&i>=0&&i<def.units.length))]};
-  for(let i=0;i<def.units.length;i++){const a=x.answers?.[i];if(a)p.answers[i]={answer:text(a.answer,180),working:text(a.working),strokes:ink(a.strokes),updatedAt:stamp(a.updatedAt)||x.startedAt};}if(p.submittedAt&&p.submittedAt<p.startedAt)p.conflicted=true;for(const a of Object.values(p.answers))if(a.updatedAt<p.startedAt||p.submittedAt&&a.updatedAt>p.submittedAt||p.deadline&&a.updatedAt>p.deadline)p.conflicted=true;
+  for(let i=0;i<def.units.length;i++){const a=x.answers?.[i];if(a)p.answers[i]={answer:text(a.answer,AMAX),working:text(a.working),strokes:ink(a.strokes),updatedAt:stamp(a.updatedAt)||x.startedAt};}if(p.submittedAt&&p.submittedAt<p.startedAt)p.conflicted=true;for(const a of Object.values(p.answers))if(a.updatedAt<p.startedAt||p.submittedAt&&a.updatedAt>p.submittedAt||p.deadline&&a.updatedAt>p.deadline)p.conflicted=true;
   d.papers[def.id]=p;for(const q of paperQuestions(def.id))d.seen[q.fingerprint]=Math.min(d.seen[q.fingerprint]||p.startedAt,p.startedAt);
  }
  for(const a of d.attempts){if(a.mode==='paper'||a.mode==='baseline'){const p=d.papers[a.paperId];if(!p?.submittedAt||p.assisted||p.interrupted||p.conflicted){a.helped=true;a.independent=false;}}}

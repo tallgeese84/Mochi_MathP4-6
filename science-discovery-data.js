@@ -198,6 +198,54 @@ add('technology',
  'For unfamiliar technology, identify input, mechanism, measurable output, constraints and trade-offs. Use evidence to revise the design rather than memorising a product description.',
  {name:'Wright brothers wind-tunnel research — Smithsonian National Air and Space Museum',url:'https://airandspace.si.edu/explore/stories/researching-wright-way'});
 
+add('sx-cells',
+ 'A thin slice of cork looks smooth to the eye. What might you see if you could make it look hundreds of times bigger?',
+ ['Tiny boxes or compartments packed together.','Nothing new, because a smooth thing is the same all the way down.','Miniature cork trees growing inside.'],
+ ['In the 1660s Robert Hooke looked at thin slices of cork through an early microscope and saw many tiny empty boxes, which he called “cells”. A few years later, Antonie van Leeuwenhoek used tiny, powerful lenses to see moving single-celled living things in pond water and other samples.','Over the next two centuries, many observers found cells in every plant and animal they examined. By the mid-1800s the cell theory was widely accepted: living things are made of cells, the cell is the basic unit of life, and new cells come from existing cells. Better microscopes, not a single dramatic moment, changed the model.'],
+ {prompt:'Which observation best supports the idea that cells are the basic units of ALL living things, not just cork?',choices:['Cells are found in every plant and animal tissue examined, including fresh, living tissue.','Cork cells look like rooms in a building.','A microscope makes small things look bigger.'],correct:0,explain:'A general claim needs evidence from many different living things. Dead cork alone could not show that living tissues are made of cells too.'},
+ 'All living things are made of one or more cells. Plant and animal cells share a membrane, cytoplasm and nucleus; plant cells also have a cell wall and often chloroplasts. Use several features, not one, to identify a cell.',
+ {name:'Cell theory — overview of its history',url:'https://en.wikipedia.org/wiki/Cell_theory'});
+
+add('sx-machines',
+ 'A small child and a large adult sit on a see-saw. Is there any way the small child could lift the adult?',
+ ['Yes, if the child sits much further from the pivot than the adult.','No, the heavier person always goes down.','Only if the child jumps hard on the seat.'],
+ ['Levers have been used since ancient times. In the 3rd century BCE, Archimedes described the law of the lever: weights balance when they are at distances from the pivot in inverse proportion to their sizes. The boast “Give me a place to stand and I will move the Earth” is attributed to him.','The idea was not just a rule of thumb: it predicted exactly where loads must be placed to balance, and those predictions could be tested with real beams and weights. Later scientists described the same idea as the turning effect, or moment, of a force.'],
+ {prompt:'Which test would most clearly check the law of the lever?',choices:['Predict where a 2 kg mass must hang to balance 1 kg placed 40 cm from the pivot, then test it.','Ask several people whether heavy things always win.','Push one end of a see-saw as hard as possible.'],correct:0,explain:'A precise prediction (20 cm) can be checked against a measurement. If the beam balances where predicted, the law is supported.'},
+ 'Moment = force × perpendicular distance from the pivot. A beam balances when clockwise and anticlockwise moments are equal. Pulleys and ramps let a smaller force do a job by moving through a larger distance.',
+ {name:'Lever and the law of the lever — overview',url:'https://en.wikipedia.org/wiki/Lever'});
+
+add('sx-pressure',
+ 'A tube of liquid metal (mercury) is turned upside down in a dish. The mercury falls a little and then stops, about 76 cm high. What holds it up?',
+ ['The air pressing down on the dish pushes the mercury up the tube.','The empty space at the top sucks it up.','The glass tube is sticky.'],
+ ['In 1643 Evangelista Torricelli filled a glass tube with mercury and turned it upside down in a dish. The column stayed about 76 cm high. He suggested that the weight of the air pressing on the dish held the column up — we live at the bottom of an “ocean of air”.','Blaise Pascal reasoned that if air pressure caused this, the column should be shorter on a mountain, where there is less air above. In 1648 his brother-in-law carried the apparatus up the Puy de Dôme in France, and the mercury column was indeed lower at the top.'],
+ {prompt:'Why was carrying the tube up a mountain such a good test?',choices:['The air-pressure idea predicted a shorter column higher up, while a “suction” idea predicted no change.','Mountains are colder, so mercury shrinks.','It made the experiment more exciting to watch.'],correct:0,explain:'A good test is one where the competing explanations predict different results. The column really did fall, supporting the air-pressure model.'},
+ 'Pressure = force ÷ area. Liquid pressure increases with depth; air pressure acts in all directions and decreases with height. “Suction” is really a difference in air pressure pushing.',
+ {name:'Blaise Pascal and the Puy de Dôme experiment — overview',url:'https://en.wikipedia.org/wiki/Blaise_Pascal'});
+
+add('sx-waves',
+ 'A bell rings inside a glass jar. Air is pumped out of the jar while the bell keeps ringing. What will you hear?',
+ ['The sound gets fainter, even though the bell keeps moving.','The sound stays exactly the same.','The sound gets louder because nothing is in the way.'],
+ ['In the 1660s Robert Boyle placed a ticking watch inside a glass vessel and pumped the air out with an air pump. The ticking became very hard to hear, and returned when air was let back in. Later versions of the experiment used an electric bell, which can be seen striking even as the sound fades.','The result supported the idea that sound is carried by the air, not by some invisible influence that crosses empty space. Light still reached the observer through the vacuum, showing that light and sound travel in different ways.'],
+ {prompt:'What observation shows that the bell is still vibrating even when it can hardly be heard?',choices:['The hammer can still be seen striking the bell.','The jar feels cold.','The pump becomes noisy.'],correct:0,explain:'If the bell still vibrates but less sound arrives, the missing link is the medium (air) that carries the vibration.'},
+ 'Sound is made by vibrations and needs a medium. Pitch depends on frequency; loudness on amplitude. Echo distance = speed × time ÷ 2. A pendulum’s period depends on its length, not (for small swings) on its mass.',
+ {name:'Robert Boyle — overview, including air-pump experiments',url:'https://en.wikipedia.org/wiki/Robert_Boyle'});
+
+add('sx-chem',
+ 'Chalk (or eggshell) is dropped into vinegar and fizzes. Is the gas just air that was hiding inside the chalk?',
+ ['It may be a new gas made in a reaction; we need a test that tells gases apart.','It must be air, because all bubbles are air.','There is no gas; the fizzing is only a sound.'],
+ ['In the 1750s Joseph Black heated and treated carbonate substances and found they gave off a gas that was not ordinary air. He called it “fixed air” (we now call it carbon dioxide). He showed that it turned limewater cloudy, that it was given off when acids acted on carbonates, and that he could account for the mass lost.','Because the gas behaved differently from ordinary air in clear tests, Black’s work helped show that air is not a single substance and that reactions can make new substances. Careful weighing turned a vague idea into measurable evidence.'],
+ {prompt:'Which result best shows that the fizzing gas is not just ordinary air?',choices:['It turns limewater milky, while ordinary air bubbled through limewater does not.','It makes bubbles.','It escapes from the beaker.'],correct:0,explain:'A test that gives different results for the two gases discriminates between the explanations; bubbling alone does not.'},
+ 'A chemical change makes new substances. Indicators show acids, alkalis and neutral liquids. Acids react with carbonates to give carbon dioxide, which turns limewater milky. Rusting needs both water and oxygen.',
+ {name:'Joseph Black and “fixed air” (carbon dioxide) — overview',url:'https://en.wikipedia.org/wiki/Joseph_Black'});
+
+add('sx-life',
+ 'Maggots appear on meat left out for a few days. Did the meat turn into maggots by itself?',
+ ['Perhaps flies laid eggs on the meat; covering it would test this.','Yes, rotting meat always changes into maggots.','The maggots came from the air itself.'],
+ ['For centuries many people believed that small creatures such as maggots arose by themselves from rotting matter. In 1668 Francesco Redi set up jars of meat: some open, some sealed, and some covered with fine gauze that let air in but kept flies out.','Maggots appeared on meat in the open jars. None developed on the meat in the sealed or gauze-covered jars, although flies were attracted to the gauze and laid eggs on it. The evidence supported the idea that maggots hatch from eggs laid by flies — they are a stage in the fly’s life cycle.'],
+ {prompt:'Why was the gauze-covered jar especially useful?',choices:['It let air in but kept flies out, so “no air” could not explain the missing maggots.','It made the meat rot faster.','It let the scientist count the flies more easily.'],correct:0,explain:'A sealed jar alone changes two things (air and flies). The gauze jar separates them, so the result points to flies, not air.'},
+ 'Living things come from living things. Insects have three- or four-stage life cycles; flowering plants reproduce through pollination, fertilisation and seed dispersal; humans reproduce when a sperm fertilises an egg. Habitats and human actions affect survival.',
+ {name:'Francesco Redi and his experiment on maggots — overview',url:'https://en.wikipedia.org/wiki/Francesco_Redi'});
+
 root.MochiScienceDiscovery={stories,get:id=>stories[id]||null};
 if(typeof module!=='undefined')module.exports=root.MochiScienceDiscovery;
 })(typeof globalThis!=='undefined'?globalThis:this);

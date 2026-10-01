@@ -1,5 +1,7 @@
-/* Original questions with separately marked conclusions and reasons.
-   Synthetic data are illustrative, not reported experiments. No free-text auto-grading. */
+/* Original questions with separately marked conclusions and reasons, plus (from revision 2)
+   numeric entry, variable roles and short written explanations marked by key ideas.
+   Synthetic data are illustrative, not reported experiments. Key-idea marking is a first check;
+   a grown-up can review any written answer. */
 (function(root){
 'use strict';
 const D=root.MochiSciencePathData||(typeof require==='function'?require('./science-path-data.js'):null);
@@ -9,6 +11,16 @@ const table=(heads,rows,caption='Synthetic classroom data')=>({type:'table',head
 const line=(x,y,xlabel,ylabel,extra={})=>({type:'line',x,y,xlabel,ylabel,...extra});
 function pair(text,claim,wrong,reason,wrongReasons,steps,figure=null){return {text,claim,wrong,reason,wrongReasons,steps,figure};}
 function statements(text,items,reason,wrongReasons,steps,figure=null){return {text,statements:items,reason,wrongReasons,steps,figure};}
+/* Revision 2 question kinds. Each is generated deterministically from (unit, form, seed, rev). */
+const bar=(labels,values,xlabel,ylabel,extra={})=>({type:'bar',labels,values,xlabel,ylabel,...extra});
+// numeric(text, value, {unit, units:[spelling | [spelling, factor]], tol, method, steps, figure})
+function numeric(text,value,o={}){return {kind:'numeric',text,value,unit:o.unit||'',units:o.units||(o.unit?[o.unit]:[]),tol:o.tol||0,method:o.method||'',steps:o.steps||[],figure:o.figure||null};}
+// idea(label, group, group, ...): every group must be matched (in one sentence) by any of its phrases.
+const idea=(label,...groups)=>({label,groups});
+// written(text, {key, ideas, model, contradictions, steps, figure}); the first idea is the claim.
+function written(text,o){return {kind:'written',text,key:o.key,ideas:o.ideas,model:o.model,contradictions:o.contradictions||[],steps:o.steps||[],figure:o.figure||null};}
+// roles(text, [[variable, 0 changed | 1 measured | 2 kept the same], ...], {reason, steps, figure})
+function roles(text,items,o){return {kind:'roles',text,items,reason:o.reason,steps:o.steps||[],figure:o.figure||null};}
 const S={};
 S.evidence=[
  r=>{const n=r.int(2,8);return pair(`A pupil records that a bean shoot grew ${n} cm in seven days. Which statement is an observation, rather than an explanation?`,`The shoot grew ${n} cm.`,['Extra fertiliser caused the growth.','The plant grew because it likes this pot.','Every bean grows this much.'],'It reports the measured change without assigning a cause.',['A sentence containing a number always proves a cause.','Any plausible explanation is directly observed.'],['Identify the measured quantity: shoot height.','The record states a change in height, not which factor produced it.']);},
@@ -155,9 +167,23 @@ S.technology=[
  r=>{const need=r.int(4,7)*10,a=r.int(8,16)*10,b=r.int(8,16)*10,usableA=a/2,usableB=b*3/4*4/5;const result=usableA>=need?(usableB>=need?'Both':'A only'):(usableB>=need?'B only':'Neither');return pair(`A night-time device needs at least ${need} energy units. The table gives collected energy and two successive retention fractions: energy kept in storage, then energy reaching the device. Which systems meet the requirement?`,result,['A only','B only','Both','Neither'].filter(x=>x!==result),'Multiply the collected energy by both retention fractions before comparing useful output with the requirement.',['Apply both fractions to the original energy separately and add the retained amounts.','Compare the original collected energy with the demand without accounting for losses.'],[`A delivers ${a} × 1/2 × 1 = ${usableA} units.`,`B delivers ${b} × 3/4 × 4/5 = ${usableB} units.`,`Compare each delivered amount with ${need}; equality is sufficient for at least.`],table(['System','Collected energy / units','Storage fraction','Delivery fraction'],[['A',a,'1/2','1'],['B',b,'3/4','4/5']]));}
 ];
 function shuffle(a,r){const x=a.slice();for(let i=x.length-1;i>0;i--){const j=r.int(0,i);[x[i],x[j]]=[x[j],x[i]];}return x;}
-function make(id,form,seed){
+/* History stability: attempts and papers are re-marked by regenerating (unit, form, seed). Revision 1
+   output of every original template is frozen (tests/history-stability.test.cjs). Changes to an
+   original template live in the revision-2 table; new sx- units are revision-independent. */
+const REV=2;
+const helpers={pair,statements,table,line,bar,numeric,written,roles,idea};
+const load=(name,file)=>root[name]||(typeof require==='function'?require(file):null);
+const S2=load('MochiSciencePathRev2','./science-path-rev2.js')?.(helpers)||{};
+const SX=load('MochiSciencePathSX','./science-path-sx.js')?.(helpers)||{};
+for(const [id,forms] of Object.entries(SX))S[id]=forms;
+const ROLE_NAMES=['Changed','Measured','Kept the same'];
+const fmt=n=>String(Math.round(n*1e6)/1e6);
+const skillsFor=form=>form===0?['concept']:form===1?['application','evidence']:form===2?['transfer','explanation']:['mixed','evidence'];
+function make(id,form,seed,rev=REV){
  const u=D.units.find(x=>x.id===id);if(!u||!S[id]||!Number.isInteger(form)||form<0||form>3||!Number.isSafeInteger(seed)||seed<0||seed>4294967295)throw Error('Unknown science-path question');
- const spec=S[id][form](rng(seed));
+ if(!Number.isInteger(rev)||rev<1)rev=1;if(rev>REV)rev=REV;
+ const spec=(rev>=2&&S2[id]?.[form]||S[id][form])(rng(seed));
+ if(spec.kind)return makeKind(u,id,form,seed,spec);
  const canonical={text:spec.text,claim:spec.claim,wrong:spec.wrong,statements:spec.statements,reason:spec.reason,wrongReasons:spec.wrongReasons,figure:spec.figure};
  // Option order does not manufacture an unseen question. Semantic givens are fingerprinted.
  const fingerprint=hash(JSON.stringify(canonical)),r=rng(parseInt(hash('options:'+seed+':'+id+':'+form),36));
@@ -165,9 +191,79 @@ function make(id,form,seed){
  const claimKey=items?'s'+items.map(x=>+x[1]).join(''):'c'+options.indexOf(spec.claim),answer=claimKey+':r'+reasons.indexOf(spec.reason);
  return {id:'sp-'+id+'-'+form+'-'+seed,unit:id,strand:u.strand,form,seed,text:spec.text,figure:spec.figure,fingerprint,options,statements:items?.map(x=>x[0])||null,reasons,answer,answerLabel:items?items.map((x,i)=>`${i+1}: ${x[1]?'true':'false'}`).join('; '):spec.claim,reasonLabel:spec.reason,steps:spec.steps,scope:u.scope,rubric:['State a conclusion supported by the actual givens.','Cite a relevant observation, comparison or value.','Explain the scientific connection and any important limit.'],skills:form===0?['concept']:form===1?['application','evidence']:form===2?['transfer','explanation']:['mixed','evidence']};
 }
-function parts(q,answer){const s=String(answer||''),m=s.match(/^(c\d+|s[01]{3}):r(\d+)$/);if(!m)return {valid:false,claim:false,reason:false};const ck=m[1],ri=+m[2],valid=ri<q.reasons.length&&(q.statements?/^s[01]{3}$/.test(ck):/^c\d+$/.test(ck)&&+ck.slice(1)<q.options.length),expected=q.answer.split(':');return {valid,claim:valid&&ck===expected[0],reason:valid&&'r'+ri===expected[1]};}
+function makeKind(u,id,form,seed,spec){
+ const base={id:'sp-'+id+'-'+form+'-'+seed,unit:id,strand:u.strand,form,seed,kind:spec.kind,text:spec.text,figure:spec.figure},skills=skillsFor(form);
+ if(spec.kind==='numeric'){
+  const canonical={kind:'numeric',text:spec.text,value:spec.value,unit:spec.unit,figure:spec.figure};
+  return {...base,fingerprint:hash(JSON.stringify(canonical)),options:null,statements:null,reasons:null,answer:fmt(spec.value),value:spec.value,tolerance:spec.tol,unitLabel:spec.unit,units:spec.units,answerLabel:fmt(spec.value)+(spec.unit?' '+spec.unit:''),reasonLabel:spec.method,steps:spec.steps,scope:u.scope,rubric:['Write the relationship you are using.','Substitute the given values with their units.','Give the answer with a unit and check that it is sensible.'],skills:[...skills,'calculation']};
+ }
+ if(spec.kind==='written'){
+  const canonical={kind:'written',text:spec.text,key:spec.key,figure:spec.figure};
+  return {...base,fingerprint:hash(JSON.stringify(canonical)),writtenKey:spec.key,options:null,statements:null,reasons:null,ideas:spec.ideas.map(x=>({label:x.label,groups:x.groups})),contradictions:spec.contradictions.map(x=>({label:x.label,groups:x.groups})),answer:spec.model,answerLabel:spec.model,reasonLabel:'Key ideas: '+spec.ideas.map(x=>x.label).join('; ')+'.',steps:spec.steps,scope:u.scope,rubric:['Claim: answer the question directly.','Evidence: use the observation, data or feature given.','Scientific reason: link the evidence to the claim with the science idea.'],skills:[...skills,'written']};
+ }
+ if(spec.kind==='roles'){
+  const canonical={kind:'roles',text:spec.text,items:spec.items,figure:spec.figure},r=rng(parseInt(hash('options:'+seed+':'+id+':'+form),36)),items=shuffle(spec.items,r);
+  const group=k=>items.filter(x=>x[1]===k).map(x=>x[0]).join(', ');
+  return {...base,fingerprint:hash(JSON.stringify(canonical)),options:null,statements:null,reasons:null,variables:items.map(x=>x[0]),roleNames:ROLE_NAMES.slice(),answer:'v'+items.map(x=>x[1]).join(''),answerLabel:`Changed: ${group(0)}. Measured: ${group(1)}. Kept the same: ${group(2)}.`,reasonLabel:spec.reason,steps:spec.steps,scope:u.scope,rubric:['Name the one variable that is deliberately changed.','Name what is measured to see the effect.','List the conditions kept the same and say why each matters.'],skills:[...skills,'variables']};
+ }
+ throw Error('Unknown science question kind');
+}
+/* ---------- Numeric entry: tolerance and an optional unit ---------- */
+const UNIT_WORDS=[[/\bpercent(age)?\b/g,'%'],[/\bkilometres?\b|\bkilometers?\b/g,'km'],[/\bcentimetres?\b|\bcentimeters?\b/g,'cm'],[/\bmillimetres?\b|\bmillimeters?\b/g,'mm'],[/\bmetres?\b|\bmeters?\b/g,'m'],[/\bkilograms?\b/g,'kg'],[/\bgrams?\b/g,'g'],[/\bmillilitres?\b|\bmilliliters?\b/g,'ml'],[/\blitres?\b|\bliters?\b/g,'l'],[/\bnewtons?\b/g,'n'],[/\bseconds?\b|\bsecs?\b/g,'s'],[/\bminutes?\b|\bmins?\b/g,'min'],[/\bdays?\b/g,'day'],[/\bweeks?\b/g,'week'],[/\bjoules?\b/g,'j'],[/\bkilopascals?\b/g,'kpa'],[/\btimes\b/g,'x'],[/\bper\b/g,'/']];
+function unitKey(u){let s=String(u||'').toLowerCase().replace(/³/g,'3').replace(/²/g,'2').replace(/\^/g,'').replace(/°/g,'');for(const [re,to] of UNIT_WORDS)s=s.replace(re,to);return s.replace(/[\s.,;:!·*×-]/g,'');}
+const NUMBER=/^(?:about|approx\.?|approximately|≈|~)?\s*(-?(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?|-?\.\d+)(?:\s*\/\s*(\d+(?:\.\d+)?)(?![\d.]*\s*[a-z]))?\s*/i;
+function parse(input){
+ const s=String(input??'').trim().replace(/−/g,'-'),m=s.match(NUMBER);if(!m)return null;
+ let v=+m[1].replace(/,/g,'');if(m[2]){const d=+m[2];if(!d)return null;v/=d;}return Number.isFinite(v)?v:null;
+}
+function numericParts(q,answer){
+ const s=String(answer??'').trim().replace(/−/g,'-'),m=s.match(NUMBER),value=parse(s);if(!s||!m||value===null)return {valid:false,claim:false,reason:false,kind:'numeric'};
+ const key=unitKey(s.slice(m[0].length).replace(/[.!]+$/,''));
+ let factor=1,unit=!key;if(key)for(const u of q.units||[]){const [name,f]=Array.isArray(u)?u:[u,1];if(unitKey(name)===key){unit=true;factor=f;break;}}
+ const tol=Math.max(q.tolerance||0,1e-9*Math.max(1,Math.abs(q.value))),ok=Math.abs(value*factor-q.value)<=tol;
+ return {valid:true,claim:ok,reason:ok&&unit,unit,value,kind:'numeric'};
+}
+/* ---------- Key-idea marking for short written answers ----------
+   Forgiving of spelling (one slip in a word stem of five or more letters) and of extra words.
+   An idea counts when every one of its groups is matched inside the same sentence. */
+function lev(a,b){if(a===b)return 0;const m=a.length,n=b.length;if(!m||!n)return m||n;let prev=Array.from({length:n+1},(_,j)=>j);for(let i=1;i<=m;i++){const cur=[i];for(let j=1;j<=n;j++)cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));prev=cur;}return prev[n];}
+function tokenMatch(t,stem){
+ if(stem.endsWith('$'))return t===stem.slice(0,-1);
+ if(t.startsWith(stem))return true;if(stem.length<5||t.length<stem.length-1)return false;
+ for(const k of [stem.length-1,stem.length,stem.length+1])if(lev(t.slice(0,k),stem)<=1)return true;return false;
+}
+function normaliseText(s){return String(s||'').toLowerCase().replace(/[‘’`]/g,"'").replace(/\bcan't\b|\bcannot\b/g,'can not').replace(/\bwon't\b/g,'will not').replace(/(\w+)n't\b/g,'$1 not');}
+function sentences(s){return normaliseText(s).split(/[.!?;\n]+/).map(x=>x.replace(/[^a-z0-9%]+/g,' ').trim().split(' ').filter(Boolean)).filter(x=>x.length);}
+function phraseIn(tokens,phrase){
+ const p=phrase.toLowerCase().split(/\s+/).filter(Boolean);
+ for(let i=0;i<tokens.length;i++){if(!tokenMatch(tokens[i],p[0]))continue;let at=i,ok=true;for(let j=1;j<p.length&&ok;j++){let found=-1;for(let k=at+1;k<=Math.min(tokens.length-1,at+3);k++)if(tokenMatch(tokens[k],p[j])){found=k;break;}if(found<0)ok=false;else at=found;}if(ok)return true;}
+ return false;
+}
+const ideaIn=(list,x)=>list.some(tokens=>x.groups.every(g=>g.some(ph=>phraseIn(tokens,ph))));
+function writtenParts(q,answer){
+ const list=sentences(answer),words=list.reduce((n,x)=>n+x.length,0);
+ if(words<2)return {valid:false,claim:false,reason:false,kind:'written',ideas:q.ideas.map(()=>false),contradictions:[]};
+ const found=q.ideas.map(x=>ideaIn(list,x)),conflicts=(q.contradictions||[]).filter(x=>ideaIn(list,x)).map(x=>x.label),clean=!conflicts.length&&words>=4;
+ return {valid:true,claim:found[0]&&clean,reason:found.every(Boolean)&&clean,kind:'written',ideas:found,contradictions:conflicts};
+}
+function rolesParts(q,answer){
+ const n=q.variables.length,m=String(answer||'').match(new RegExp('^v([0-2]{'+n+'})$'));if(!m)return {valid:false,claim:false,reason:false,kind:'roles'};
+ const want=q.answer.slice(1),got=m[1],rows=[...got].map((c,i)=>c===want[i]),right=k=>rows.every((ok,i)=>ok||want[i]!==String(k)&&got[i]!==String(k));
+ return {valid:true,claim:right(0)&&right(1),reason:rows.every(Boolean),kind:'roles',rows};
+}
+function parts(q,answer){
+ if(q.kind==='numeric')return numericParts(q,answer);if(q.kind==='written')return writtenParts(q,answer);if(q.kind==='roles')return rolesParts(q,answer);
+ const s=String(answer||''),m=s.match(/^(c\d+|s[01]{3}):r(\d+)$/);if(!m)return {valid:false,claim:false,reason:false};const ck=m[1],ri=+m[2],valid=ri<q.reasons.length&&(q.statements?/^s[01]{3}$/.test(ck):/^c\d+$/.test(ck)&&+ck.slice(1)<q.options.length),expected=q.answer.split(':');return {valid,claim:valid&&ck===expected[0],reason:valid&&'r'+ri===expected[1]};
+}
 function mark(q,a){const p=parts(q,a);return p.valid&&p.claim&&p.reason;}
-function describe(q,a){const m=String(a||'').match(/^(c\d+|s[01-]{3}):r(-?\d+)$/);if(!m)return 'Not completed';const claim=q.statements?m[1].slice(1).split('').map((v,i)=>`${i+1}: ${v==='1'?'true':v==='0'?'false':'not selected'}`).join('; '):q.options[+m[1].slice(1)]||'No conclusion selected';return claim+' — '+(q.reasons[+m[2]]||'No reason selected');}
-root.MochiSciencePathBank={make,mark,parts,describe,hash,validAnswer:(q,a)=>parts(q,a).valid,parse:()=>null,templates:S};
+function ideaReport(q,a){const p=writtenParts(q,a);return {found:q.ideas.filter((_,i)=>p.ideas[i]).map(x=>x.label),missing:q.ideas.filter((_,i)=>!p.ideas[i]).map(x=>x.label),contradictions:p.contradictions||[],valid:p.valid};}
+function describe(q,a){
+ if(q.kind==='numeric'){const s=String(a||'').trim();return s||'Not completed';}
+ if(q.kind==='written'){const s=String(a||'').trim();if(!s)return 'Not completed';const p=ideaReport(q,s);return `${s} — Key ideas found: ${p.found.join('; ')||'none'}. Missing: ${p.missing.join('; ')||'none'}.${p.contradictions.length?' Conflicts with the evidence: '+p.contradictions.join('; ')+'.':''}`;}
+ if(q.kind==='roles'){const m=String(a||'').match(/^v([0-2-]+)$/);if(!m)return 'Not completed';return q.variables.map((v,i)=>`${v}: ${ROLE_NAMES[+m[1][i]]||'not selected'}`).join('; ');}
+ const m=String(a||'').match(/^(c\d+|s[01-]{3}):r(-?\d+)$/);if(!m)return 'Not completed';const claim=q.statements?m[1].slice(1).split('').map((v,i)=>`${i+1}: ${v==='1'?'true':v==='0'?'false':'not selected'}`).join('; '):q.options[+m[1].slice(1)]||'No conclusion selected';return claim+' — '+(q.reasons[+m[2]]||'No reason selected');
+}
+function invalidReason(q){return q.kind==='numeric'?'Type a number (the unit is optional), for example 12.5 or 12.5 g. This has not been counted as a science error.':q.kind==='written'?'Write at least a short sentence before checking. This has not been counted as a science error.':q.kind==='roles'?'Choose a role for every variable before checking. This has not been counted as a science error.':'Select a conclusion (or every statement) and a reason before checking. This incomplete response has not been counted as an error.';}
+root.MochiSciencePathBank={REV,make,mark,parts,describe,ideaReport,hash,validAnswer:(q,a)=>parts(q,a).valid,parse,invalidReason,answerLimit:600,unitKey,templates:S,revisions:S2,roleNames:ROLE_NAMES};
 if(typeof module!=='undefined')module.exports=root.MochiSciencePathBank;
 })(typeof globalThis!=='undefined'?globalThis:this);
