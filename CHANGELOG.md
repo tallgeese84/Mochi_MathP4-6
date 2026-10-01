@@ -1,3 +1,13 @@
+# v6.9.0 — DSA challenge units and a clearer 3D Mochi
+
+- Add six challenge units (`dsa-extension.js`) after the core pathway: totals in stages, same-time motion, hidden radii and circle patterns, grid angles and overlapping squares, factors/squares/letter sums, and sequence rules.
+- Nine question types that the pathway lacked: symmetric meeting points, “leftovers make k times the others”, rectangle in a quadrant, hexagon in a circle with unequal sides, angles from grid diagonals, letter-sum puzzles (each verified to have exactly one solution), next-term by differences, Fibonacci-type sequences forwards and backwards, and doubling differences.
+- Nine harder versions of types that were only practised at an easier level: two-group ticket takings with percentage changes, escalator step counting, multi-stage group transfers, grass that keeps growing, a grid region bounded by a quarter circle and two semicircles, three overlapping squares (area and outline), nested circle ratios, three-prime factor counts with conditions, and difference-of-squares searches.
+- Every type has an original lesson section, three worked-example forms, a concept check, a matched Quick check and, where useful, an exam-style monochrome diagram. Construction hints appear only in worked examples.
+- `tests/dsa-extension.test.cjs` re-derives every answer a different way (brute-force search, forward simulation, exact geometry, grid sampling, divisor enumeration) across 250 versions of each type.
+- Reserved papers and starting checks are unchanged; their exact question sets are now frozen by fingerprint in the tests.
+- 3D Mochi: a soft studio environment for reflections on fur, eyes and collar; neutral tone mapping so the ginger coat and stripes keep their true colour; drawing at the tablet’s full pixel density (up to 2×) with an automatic step-down on slower devices; a 2048 px shadow map and a visible contact shadow on the rug. The lighter Android path is unchanged.
+
 # v6.8.0 — Matched Quick checks, Mochi at Euna’s side, tablet-sized home
 
 - Add a Quick check for every question type in all 28 Maths units and 24 Science units (`quick-checks.js`). A miss now opens a check about the relationship in the question on screen. Correct choices are spread across positions instead of always first.
