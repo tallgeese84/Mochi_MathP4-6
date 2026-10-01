@@ -1,5 +1,5 @@
 {
-  "version": "6.7.1",
-  "releasedOn": "2026-09-29",
-  "summary": "Move the guess/outside-help checkbox above the working pad in Maths and Science, away from Check my answer. Give it a separate touch-friendly row and clearer instructions without changing help recording, saved work, rewards or timers."
+  "version": "6.8.0",
+  "releasedOn": "2026-09-30",
+  "summary": "Quick checks matched to every question type, clearer lesson gates and explanation boxes, bar models in worked examples, a tablet-sized home with Mochi and the next cat friend, and Mochi reacting beside each question. Sync, backup, mirror and export formats are unchanged."
 }

@@ -4,12 +4,12 @@
 'use strict';
 const goals={
  maths:{
-  relationships:'Turn totals and differences into equal parts.',
+  relationships:'Give the unknown a meaning, then turn the words into a balanced relationship.',
   percent:'Name the percentage whole before calculating.',
   counting:'Count each structure once — no duplicates.',
   factors:'Use factors and LCM only when the relationship calls for them.',
-  area:'Use shared heights to compare areas before calculating.',
-  volume:'Track which cube faces are hidden and which remain exposed.'
+  area:'Pair each base with its perpendicular height; shared heights let you compare areas.',
+  volume:'Decide whether you are filling the inside or covering the faces, then track hidden faces.'
  },
  science:{
   circuits:'Trace one complete electrical path from the cell and back.',
@@ -38,7 +38,9 @@ const forks={
   forces:{prompt:'A 4 N force acts right and a 2 N force acts left. What is the net force?',choices:['2 N right','6 N right','2 N left'],correct:0,explain:'Opposite forces subtract. The larger force sets the net direction.'}
  }
 };
-function diagnostic(subject,id,E){
+function diagnostic(subject,id,E,form){
+ const Q=root.MochiQuickChecks||(typeof require==='function'?(()=>{try{return require('./quick-checks.js')}catch(e){return null}})():null);
+ const matched=Q?.check(subject,id,form);if(matched)return matched;
  const custom=forks[subject]?.[id];if(custom)return custom;
  const u=E?.unit?.(id),c=u?.check;if(!c)return null;
  return {prompt:c[0],choices:[...c[1]],correct:c[2],explain:c[3]};

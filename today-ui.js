@@ -92,6 +92,19 @@ function go(subject,kind){
  else U(subject).open(kind);
  paint();
 }
+function paintCompanion(m,cat){
+ const t=m.next,says=$('todayMochiSays');
+ if(says)says.textContent=m.restDay&&!t?'Rest day. I’m napping too.':m.finished&&!t?'You did it! Come and play?':m.completed>0?'Nice work. One more quest?':t?.resume?'Let’s pick up where we left off.':'Ready when you are.';
+ if($('todayCoins'))$('todayCoins').textContent=String(Math.max(0,Math.floor(Number(S?.coins)||0)));
+ if($('todayCatPoints'))$('todayCatPoints').textContent=String(cat?.points||0);
+ const box=$('todayNextCat');if(!box)return;
+ const next=cat?.nextCat,portrait=root.MochiCatFriendsUI?.portrait||root.MochiCatPortraits?.svg,key=next?next.id+':'+next.remaining:cat?'all':'';
+ if(box.dataset.key===key)return;box.dataset.key=key;
+ if(!next){box.innerHTML=cat?'<p class="today-next-done">Every cat friend has joined Mochi!</p>':'';return;}
+ const have=Math.max(0,next.points-next.remaining),pct=next.points?Math.round(100*Math.min(1,have/next.points)):0;
+ let art='';try{art=portrait?portrait(next):'';}catch(e){art='';}
+ box.innerHTML=`<div class="today-next-art" aria-hidden="true">${art}</div><div class="today-next-info"><small>Next friend</small><strong>${esc(next.name)}</strong><span>${next.remaining===0?'Ready to join!':`${next.remaining} more Cat Point${next.remaining===1?'':'s'}`}</span><progress max="100" value="${pct}" aria-label="Progress to ${esc(next.name)}"></progress></div>`;
+}
 function paint(){
  if(!home)return;
  const m=T.model(S),v=current(),bonus=Q?.status(S),bonusOptions=Q?.bonusOptions?.(S)||[],bonusTask=bonusOptions[0]||Q?.bonusTask(S),cat=F?.report?.(S),study=P?P.elapsed(P.init(S)):null;
@@ -122,7 +135,7 @@ function paint(){
    }
    $('todayNote').textContent=isPaper?'Paper time is separate from the daily clock.':rewardNote||(m.finished?'Bonus questions are optional. Coins never change mastery.':'Reading and thinking count. No speed bonus.');
   }
-  const image=$('todayMochiImage'),src=$('plannerPetImage')?.getAttribute('src')||root.MOCHI_AVATAR||'mochi-flat-avatar.svg';if(image.getAttribute('src')!==src)image.src=src;
+  const image=$('todayMochiImage'),pet=$('plannerPetImage')?.getAttribute('src')||root.MOCHI_AVATAR||'',src=!pet||/mochi-flat(-avatar)?\.svg/.test(pet)?(typeof MOCHI_AVATAR==='string'?MOCHI_AVATAR:'mochi-flat-avatar.svg').replace('mochi-flat-avatar.svg','mochi-flat.svg'):pet;if(image.getAttribute('src')!==src)image.src=src;paintCompanion(m,cat);
  }
  bar.hidden=!v||!['lesson','practice'].includes(v.kind)||!guided;
  if(!bar.hidden){
@@ -137,7 +150,7 @@ function paint(){
 function init(){
  if(!T||!root.MochiPlanUI||!U('maths')||!U('science')||$('todayHome'))return;
  home=document.createElement('main');home.id='todayHome';home.hidden=true;
- home.innerHTML=`<div class="today-greeting"><img src="euna-avatar.webp" width="44" height="44" alt=""><p id="todayDate"></p></div><h1 id="todayTitle" tabindex="-1"></h1><p id="todayIntro" class="today-intro"></p><section class="today-card" aria-label="Today’s study plan"><div class="today-card-top"><span id="todayNowLabel" class="today-eyebrow"></span><span id="todayTaskSubject" class="today-subject"></span></div><h2 id="todayTaskTitle"></h2><p id="todayTaskDetail"></p><button id="todayStart" class="today-primary" type="button">Start next quest</button><div id="todayQuestStrip" class="today-quest-strip" aria-label="Daily quest progress"></div><div class="today-progress"><span id="todayProgress"></span><progress id="todayProgressBar" max="2" value="0" aria-label="Daily study time goals reached"></progress></div></section><section id="todayBonus" class="today-bonus" hidden><div><strong>Bonus quest</strong><small id="todayBonusText"></small></div><span id="todayBonusCoins" class="today-bonus-coins"></span><p id="todayCatBonus" class="today-cat-bonus"></p><div id="todayBonusChoices" class="today-bonus-choices"></div></section><p id="todayNote" class="today-note"></p><button id="todayMochi" class="today-mochi" type="button"><img id="todayMochiImage" src="mochi-flat-avatar.svg" width="38" height="38" alt=""><span>Mochi<small>Room & rewards</small></span><span aria-hidden="true">↗</span></button>`;
+ home.innerHTML=`<div class="today-layout"><div class="today-main"><div class="today-greeting"><img src="euna-avatar.webp" width="44" height="44" alt=""><p id="todayDate"></p></div><h1 id="todayTitle" tabindex="-1"></h1><p id="todayIntro" class="today-intro"></p><section class="today-card" aria-label="Today’s study plan"><div class="today-card-top"><span id="todayNowLabel" class="today-eyebrow"></span><span id="todayTaskSubject" class="today-subject"></span></div><h2 id="todayTaskTitle"></h2><p id="todayTaskDetail"></p><button id="todayStart" class="today-primary" type="button">Start next quest</button><div id="todayQuestStrip" class="today-quest-strip" aria-label="Daily quest progress"></div><div class="today-progress"><span id="todayProgress"></span><progress id="todayProgressBar" max="2" value="0" aria-label="Daily study time goals reached"></progress></div></section><section id="todayBonus" class="today-bonus" hidden><div><strong>Bonus quest</strong><small id="todayBonusText"></small></div><span id="todayBonusCoins" class="today-bonus-coins"></span><p id="todayCatBonus" class="today-cat-bonus"></p><div id="todayBonusChoices" class="today-bonus-choices"></div></section><p id="todayNote" class="today-note"></p></div><aside class="today-companion" aria-label="Mochi and rewards"><button id="todayMochi" class="today-mochi" type="button"><span class="today-mochi-says" id="todayMochiSays"></span><img id="todayMochiImage" src="mochi-flat-avatar.svg" width="150" height="150" alt=""><span class="today-mochi-visit">Visit Mochi’s room <span aria-hidden="true">→</span></span></button><div class="today-stats"><span class="today-stat"><span class="today-stat-icon" aria-hidden="true">🪙</span><strong id="todayCoins">0</strong><small>coins</small></span><span class="today-stat"><span class="today-stat-icon" aria-hidden="true">🐾</span><strong id="todayCatPoints">0</strong><small>Cat Points</small></span></div><div id="todayNextCat" class="today-next-cat"></div></aside></div>`;
  $('viewEntrance').before(home);
  bar=document.createElement('section');bar.id='todayFocusBar';bar.hidden=true;bar.setAttribute('aria-label','Current study time');bar.innerHTML='<button id="todayBack" type="button">← Today</button><div><strong id="todayFocusSubject"></strong><span id="todayFocusTime"></span><small id="todayFocusNote"></small></div><button id="todayTimer" type="button" aria-pressed="false">Pause time</button><button id="todayFinish" type="button" hidden>Back to today’s plan</button>';
  home.before(bar);

@@ -7,6 +7,8 @@ foundations and September 2027 SPERS-Sec1 planning goal remain available. Intern
 practice targets are not official school cutoffs or validated test equivalents.
 Exact 2027 test and application dates must be checked when published.
 
+**v6.8.0 — 30 September 2026.** Every Maths and Science question type now has its own **Quick check**, so the rescue question after a miss always matches the idea in the question on screen (previously each unit had one check, which often belonged to a different question type). Lessons say exactly what is needed before **Finish** unlocks and include a box to explain the concept check in her own words, saved in the existing lesson notes. Sum-and-difference and ratio worked examples and revealed solutions show **bar models**; independent questions and papers never do. The home screen is sized for a tablet, with Mochi, coins, Cat Points and the next cat friend always visible, and Mochi now sits beside each practice question and reacts to answers. Child-facing wording is simpler; grown-up detail stays in the parent views. **Sync, backups, the Drive mirror and the progress-review export are unchanged** and are now guarded by a test. See [the v6.8.0 notes](docs/UX_QUALITY_PASS.md).
+
 **v6.6.0 — 27 September 2026.** Mochi’s room now has a long-term **100-cat collection**: Mochi + 99 collectible friends, while only three friends visit the room at once. Existing milestone unlocks are preserved. Cat Points combine earned learning milestones with a bounded study-time bonus: reaching **2× a subject’s planned foreground study time** earns **+2 Cat Points once for that subject that day**, with no reward beyond 2×. The collection is paginated to stay light on tablets. See [Cat collection](docs/CAT_COLLECTION.md).
 
 **v6.5.0 — 27 September 2026.** Science is now taught **discovery first**. Every science unit begins with a mystery and ungraded prediction, follows a short history of how observations or experiments challenged an explanation, asks Euna to identify the evidence that distinguishes competing ideas, and only then formalises the modern model and moves into practice. Historical names are context, not facts to memorise. Existing completed lessons and mastery evidence are preserved. See [Science pathway](docs/SCIENCE_PATH.md).
@@ -78,7 +80,7 @@ provider settings, cat customisation and coins are preserved. Parent settings
 show the classroom evidence alongside the earlier question-studio records.
 
 The website and installed home-screen app share the same code and release.
-After publication, refresh online and confirm **v5.2.0** in the header. Do not
+After publication, refresh online and confirm the version in the header matches `release.json`. Do not
 clear app storage or reinstall to update: retain the existing learning history.
 
 ## Weekly learning and Mochi’s growth
@@ -110,7 +112,7 @@ compare their displayed numbers.
 For each release, update `release.json`, run `node scripts/release.cjs`, and commit
 the generated changes together. Run `node scripts/release.cjs --check` before
 publishing to reject inconsistent labels, runtime metadata and offline asset
-versions. Release numbering uses `major.minor.patch`; the current release is v5.2.0.
+versions. Release numbering uses `major.minor.patch`; `release.json` holds the current release.
 
 Run `npm ci --ignore-scripts`, `npm run check:release`, and `npm test` using Node
 24.15 or later before merging. GitHub's **App checks / test** job runs the same
