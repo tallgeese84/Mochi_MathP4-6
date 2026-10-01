@@ -81,7 +81,7 @@ function finishPractice(d){d.draft=null;}
 const paperDefinitions=options.paperDefinitions||[
  {id:'baseline-a',kind:'baseline',title:'Starting-point check · A',minutes:0,units:['relationships','percent','area','volume','counting','factors']},
  {id:'baseline-b',kind:'baseline',title:'Starting-point check · B',minutes:0,units:['remainders','simultaneous','motion','spatial','cycles','cases']},
- ...['A','B','C'].map(letter=>({id:'mixed-'+letter.toLowerCase(),kind:'paper',title:'Mixed reasoning paper '+letter,minutes:75,units:D.units.filter(u=>!u.bridge).map(u=>u.id)}))
+ ...['A','B','C'].map(letter=>({id:'mixed-'+letter.toLowerCase(),kind:'paper',title:'Mixed reasoning paper '+letter,minutes:75,units:D.units.filter(u=>!u.bridge&&!u.extension).map(u=>u.id)}))
 ];
 const paperCache=new Map();
 function paperQuestions(id){

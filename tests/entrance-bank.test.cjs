@@ -38,7 +38,8 @@ function independentlySolve(q){const p=q.params,f=q.form;
  default:throw Error('Missing independent solver: '+q.unit);
  }
 }
-for(const u of D.units)test(`${u.id}: 100 seeded questions per form have independently verified answers`,()=>{
+// Challenge units (u.extension) have their own independent solvers in tests/dsa-extension.test.cjs.
+for(const u of D.units.filter(u=>!u.extension))test(`${u.id}: 100 seeded questions per form have independently verified answers`,()=>{
  for(let f=0;f<4;f++)for(let i=0;i<100;i++){const seed=(i*104729+17903)>>>0,q=B.make(u.id,f,seed),answer=independentlySolve(q);assert.deepEqual(q,B.make(u.id,f,seed));assert.ok(q.steps.length>=2);assert.ok(B.mark(q,q.answerLabel),'exact label accepted: '+q.id);
  if(typeof answer==='string')assert.equal(q.answer,answer);else if(Array.isArray(answer)){near(q.answer.a,answer[0],q.id);near(q.answer.b,answer[1],q.id);}else {near(q.answer,answer,q.text);assert.equal(B.mark(q,String(q.answer+1)),false);}
  if(q.figure){const svg=F.diagram(q.figure,q.id);assert.match(svg,/role="img"/);assert.match(svg,/<title/);assert.doesNotMatch(svg,/NaN|undefined|Infinity/);}
@@ -53,5 +54,5 @@ test('diagram vertices agree with the central-square relationship and keep given
  const q=B.make('decomposition',1,18);assert.doesNotMatch(F.diagram(q.figure,q.id),/stroke-dasharray/);assert.match(F.diagram(q.figure,q.id,true),/stroke-dasharray/);
 });
 test('all curriculum dependencies exist and match valid original foundation units',()=>{
- const C=require('../course-core.js');assert.equal(D.units.length,28);assert.equal(D.units.filter(u=>u.bridge).length,4);for(const u of D.units){assert.ok(C.unit(u.foundation),u.id);assert.ok(u.ideas.length>=3);assert.ok(u.prerequisites.every(id=>D.units.some(v=>v.id===id)));assert.ok(u.check[1][u.check[2]]);}
+ const C=require('../course-core.js');assert.equal(D.units.filter(u=>!u.extension).length,28);assert.equal(D.units.filter(u=>u.bridge).length,4);for(const u of D.units){assert.ok(C.unit(u.foundation),u.id);assert.ok(u.ideas.length>=3);assert.ok(u.prerequisites.every(id=>D.units.some(v=>v.id===id)));assert.ok(u.check[1][u.check[2]]);}
 });

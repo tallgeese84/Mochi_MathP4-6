@@ -8,28 +8,51 @@ let cleanup=()=>{};
 try{
 const T=await import('./vendor/three-r180/three.module.js');
 const scene=new T.Scene();
-let friends=null,friendsSignature='';
+let friends=null,friendsSignature='',envTarget=null;
 const lite=options.quality==='lite'||/Android/i.test(navigator.userAgent);
 const renderer=new T.WebGLRenderer({antialias:!lite,alpha:true,powerPreference:'default'});
-cleanup=()=>{renderer.dispose();renderer.forceContextLoss();renderer.domElement.remove();};
+cleanup=()=>{envTarget?.dispose?.();renderer.dispose();renderer.forceContextLoss();renderer.domElement.remove();};
 renderer.debug.onShaderError=()=>{throw Error('The graphics driver could not draw Mochi (shader compilation).');};
 root.dataset.mochiQuality=lite?'lite':'full';
-renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,lite?1:1.5));renderer.setClearColor(0x000000,0);
-renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;
+// Full quality draws at the tablet's own density (up to 2×); a slow device steps down automatically below.
+let pixelRatio=Math.min(window.devicePixelRatio||1,lite?1:2);renderer.setPixelRatio(pixelRatio);renderer.setClearColor(0x000000,0);
+// Neutral tone mapping keeps the ginger coat and tabby stripes close to their true colours; ACES washed out the cream highlights.
+renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.NeutralToneMapping||T.ACESFilmicToneMapping;renderer.toneMappingExposure=.96;
 renderer.shadowMap.enabled=!lite;renderer.shadowMap.type=T.PCFSoftShadowMap;
 renderer.domElement.setAttribute('role','img');renderer.domElement.setAttribute('aria-label','A rounded 3D tabby kitten with green eyes and a blue collar. Use Walk, Sit and Stroke to interact.');
 stage.prepend(renderer.domElement);
 const camera=new T.PerspectiveCamera(34,1,.1,60);
 let orbit=.40,elevation=.24,orbitGoal=.40;
-const hemi=new T.HemisphereLight(0xfff7f1,0xbba4cd,2.35);scene.add(hemi);
-const key=new T.DirectionalLight(0xfff3df,3.2);key.position.set(-3.5,6,4.5);key.castShadow=true;key.shadow.mapSize.set(1024,1024);key.shadow.camera.left=-3.5;key.shadow.camera.right=3.5;key.shadow.camera.top=4;key.shadow.camera.bottom=-3;key.shadow.normalBias=.035;key.shadow.bias=-.00025;key.shadow.radius=4;scene.add(key);
+const hemi=new T.HemisphereLight(T.NeutralToneMapping?0xfffbf8:0xfff7f1,T.NeutralToneMapping?0xc8c0d6:0xbba4cd,2.35);scene.add(hemi);
+const key=new T.DirectionalLight(T.NeutralToneMapping?0xfff8ee:0xfff3df,3.2);key.position.set(-3.5,6,4.5);key.castShadow=true;key.shadow.mapSize.set(lite?1024:2048,lite?1024:2048);key.shadow.camera.left=-3.5;key.shadow.camera.right=3.5;key.shadow.camera.top=4;key.shadow.camera.bottom=-3;key.shadow.normalBias=.035;key.shadow.bias=-.00025;key.shadow.radius=4;scene.add(key);
 const fill=new T.DirectionalLight(0xe5dcff,1.4);fill.position.set(4,3,1);scene.add(fill);
-const rim=new T.DirectionalLight(0xffdfc7,2.0);rim.position.set(-1,3,-4);scene.add(rim);
-const shadowMat=new T.ShadowMaterial({color:0x684b79,opacity:.16});
+const rim=new T.DirectionalLight(T.NeutralToneMapping?0xffeadb:0xffdfc7,2.0);rim.position.set(-1,3,-4);scene.add(rim);
+// A soft studio for reflections: warm sky above, lilac floor below, and light panels matching the
+// key, fill and rim lights. Fur sheen, eyes and collar pick up gentle highlights from it.
+if(!lite){
+ try{
+  const pm=new T.PMREMGenerator(renderer),studio=new T.Scene(),skyGeo=new T.SphereGeometry(10,32,16),cols=[],c=new T.Color(),top=new T.Color('#fbfaff'),mid=new T.Color('#f2f0f6'),low=new T.Color('#d9d2e2');
+  for(let i=0;i<skyGeo.attributes.position.count;i++){const y=skyGeo.attributes.position.getY(i)/10;c.copy(mid).lerp(y>0?top:low,Math.abs(y));cols.push(c.r,c.g,c.b);}
+  skyGeo.setAttribute('color',new T.Float32BufferAttribute(cols,3));
+  const skyMat=new T.MeshBasicMaterial({side:T.BackSide,vertexColors:true});studio.add(new T.Mesh(skyGeo,skyMat));
+  const panelGeo=new T.PlaneGeometry(1,1),panels=[];
+  for(const [pos,size,rgb] of [[[-3.5,6,4.5],[5,4],[3,3,3]],[[4,3,1],[3,3],[1.5,1.5,1.65]],[[-1,3,-4],[4,2],[1.9,1.85,1.8]]]){
+   const m=new T.MeshBasicMaterial({color:new T.Color(...rgb),side:T.DoubleSide}),panel=new T.Mesh(panelGeo,m);
+   panel.position.set(...pos).normalize().multiplyScalar(8);panel.scale.set(size[0],size[1],1);panel.lookAt(0,0,0);studio.add(panel);panels.push(m);
+  }
+  envTarget=pm.fromScene(studio,.035);scene.environment=envTarget.texture;scene.environmentIntensity=.45;hemi.intensity=1.25;
+  pm.dispose();skyGeo.dispose();skyMat.dispose();panelGeo.dispose();panels.forEach(m=>m.dispose());
+ }catch(error){envTarget=null;scene.environment=null;}
+}
+const shadowMat=new T.ShadowMaterial({color:0x684b79,opacity:lite?.16:.28});
 const receiver=new T.Mesh(new T.PlaneGeometry(200,200),shadowMat);receiver.rotation.x=-Math.PI/2;receiver.position.y=-.02;receiver.receiveShadow=true;scene.add(receiver);
+// A second shadow catcher just above the rug darkens only where Mochi blocks the key light.
+const rugShadow=new T.Mesh(new T.CircleGeometry(2.35,96),new T.ShadowMaterial({color:0x5a3f6c,opacity:lite?0:.22,depthWrite:false}));rugShadow.rotation.x=-Math.PI/2;rugShadow.position.y=.004;rugShadow.receiveShadow=true;rugShadow.renderOrder=1;if(!lite)scene.add(rugShadow);
 const mat=(color,roughness=.65,extra={})=>new T.MeshStandardMaterial({color,roughness,...extra});
-const palettes={ginger:new T.Color('#bd8154'),warm:new T.Color('#e1b57e'),stripe:new T.Color('#77543f'),cream:new T.Color('#fff3df')};
-const floorMat=mat('#eadff2',.92),cushionMat=mat('#c4a5d6',.98),seamMat=mat('#dfc9ec',.85),pink=mat('#df9b99',.55),earPink=mat('#e5afa3',.78),noseMat=mat('#b97778',.35),dark=mat('#553c36',.85);
+const palettes={ginger:new T.Color('#bd8154'),warm:new T.Color('#e1b57e'),stripe:new T.Color('#77543f'),cream:new T.Color(T.NeutralToneMapping?'#fbf8f3':'#fff3df')};
+const floorMat=mat(T.NeutralToneMapping?'#e3dfe9':'#eadff2',.92),cushionMat=mat(T.NeutralToneMapping?'#c2b0d2':'#c4a5d6',.98),seamMat=mat('#dfc9ec',.85),pink=mat('#df9b99',.55),earPink=mat('#e5afa3',.78),noseMat=mat('#b97778',.35),dark=mat('#553c36',.85);
+// Keep studio reflections off the rug so Mochi's contact shadow stays visible.
+floorMat.envMapIntensity=0;cushionMat.envMapIntensity=.4;
 let seed=27;const random=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};
 const furCanvas=document.createElement('canvas');furCanvas.width=1024;furCanvas.height=512;const fc=furCanvas.getContext('2d');fc.fillStyle='#f9f5ed';fc.fillRect(0,0,1024,512);
 for(let i=0;i<32000;i++){const x=random()*1024,y=random()*512,len=5+random()*17,curve=Math.sin(x*.018+y*.026)*3;fc.strokeStyle=i%3?`rgba(112,91,73,${.035+random()*.14})`:`rgba(255,255,247,${.15+random()*.3})`;fc.lineWidth=.45+random()*.8;fc.beginPath();fc.moveTo(x,y);fc.quadraticCurveTo(x+curve,y+len*.45,x+curve*1.5+(random()-.5)*2,y+len);fc.stroke();}
@@ -37,7 +60,7 @@ const furTex=new T.CanvasTexture(furCanvas);furTex.colorSpace=T.SRGBColorSpace;f
 const furHeight=furTex.clone();furHeight.colorSpace=T.NoColorSpace;furHeight.needsUpdate=true;
 const coat={map:furTex,bumpMap:lite?null:furHeight,bumpScale:.013,roughness:.96,sheen:lite?0:.65,sheenRoughness:.9,sheenColor:new T.Color('#f0d5b7'),specularIntensity:.18};
 const furMaterial=new T.MeshPhysicalMaterial({...coat,color:0xffffff,vertexColors:true});
-const whiteFur=new T.MeshPhysicalMaterial({...coat,color:'#fff5e5',sheenColor:new T.Color('#fff5e7')});
+const whiteFur=new T.MeshPhysicalMaterial({...coat,color:T.NeutralToneMapping?'#fcfaf6':'#fff5e5',sheenColor:new T.Color(T.NeutralToneMapping?'#fbf8f4':'#fff5e7')});
 const plainFur=new T.MeshPhysicalMaterial({...coat,color:'#ca9b76'});
 const smooth=(a,b,x)=>{const t=T.MathUtils.clamp((x-a)/(b-a),0,1);return t*t*(3-2*t);};
 const col=new T.Color();
@@ -483,8 +506,10 @@ function draw(dt){
 }
 function animate(now){
  frame=null;if(dead||!root.isConnected){dispose();return;}if(suspended||!playing||!inView||document.hidden){last=null;return;}
- if(now-lastPaint>=1000/(lite?24:30)-1){const dt=last===null?0:Math.min((now-last)/1000,.08);last=now;lastPaint=now;try{draw(dt);}catch(error){playing=false;options.onError?.(error);return;}}frame=requestAnimationFrame(animate);
+ if(now-lastPaint>=1000/(lite?24:30)-1){const dt=last===null?0:Math.min((now-last)/1000,.08);if(last!==null)adapt(now-last);last=now;lastPaint=now;try{draw(dt);}catch(error){playing=false;options.onError?.(error);return;}}frame=requestAnimationFrame(animate);
 }
+// If paints keep arriving late (under ~20 frames a second), draw fewer pixels. Never goes below 1.25×.
+const paintGaps=[];function adapt(gap){if(lite||gap>250)return;paintGaps.push(gap);if(paintGaps.length<45)return;const sorted=[...paintGaps].sort((x,y)=>x-y),median=sorted[sorted.length>>1];paintGaps.length=0;if(median>50&&pixelRatio>1.25){pixelRatio=Math.max(1.25,pixelRatio-.375);renderer.setPixelRatio(pixelRatio);root.dataset.mochiPixelRatio=String(pixelRatio);}}
 function wake(){if(frame===null&&!suspended&&playing&&inView&&!document.hidden&&!dead){last=null;lastPaint=-Infinity;frame=requestAnimationFrame(animate);}}
 const ro=new ResizeObserver(resize);ro.observe(stage);
 const io=new IntersectionObserver(entries=>{inView=entries[0].isIntersecting;if(inView)wake();else halt();},{threshold:0,rootMargin:'80px'});io.observe(stage);

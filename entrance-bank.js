@@ -16,6 +16,7 @@ function make(unit,form,seed){
  const r=random((seed^parseInt(hash(unit),36)^Math.imul(form+1,2654435761))>>>0),pick=a=>a[r(0,a.length-1)];let q;
  const out=(text,answer,steps,params={},extra={})=>q={unit,strand:u.strand,form,seed,id:`ep1:${unit}:${form}:${seed}`,text,answer,steps,params,level:form===0?1:form===1?2:3,...extra};
  if(u.bridge){const G=root.MochiGeometryBridge||(typeof require==='function'?require('./geometry-bridge.js'):null),v=G.make(unit,form,seed,r);if(v)out(v.text,v.answer,v.steps,v.params,v);}
+ if(u.extension){const X=root.MochiDSAExtension||(typeof require==='function'?require('./dsa-extension.js'):null),v=X.make(unit,form,seed,r);if(v)out(v.text,v.answer,v.steps,v.params,v);}
  else if(unit==='relationships'){
   if(form===0){const x=r(3,14),a=r(3,8),b=r(4,20);out(`A number is multiplied by ${a}, then ${b} is added. The result is ${a*x+b}. What is the number?`,x,[`Let the number be x: ${a}x + ${b} = ${a*x+b}.`,`Subtract ${b}, then divide by ${a}: x = ${x}.`,`Check: ${a} × ${x} + ${b} = ${a*x+b}.`],{x,a,b});}
   if(form===1){const small=r(13,45),difference=r(7,21),total=2*small+difference;out(`Two trays contain ${total} counters altogether. The first tray contains ${difference} more than the second. How many counters are in the second tray?`,small,[`Remove the difference: ${total} − ${difference} = ${2*small}.`,`This is twice the smaller amount: ${2*small} ÷ 2 = ${small}.`,`The other tray has ${small+difference}; together they have ${total}.`],{total,difference});}
