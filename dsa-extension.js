@@ -64,10 +64,43 @@ const puzzles=[
  {a:'PURR',b:'YARN',c:'NAPPY',value:15669,check:'6088 + 9581 = 15669',hint:'The answer is one digit longer, so N = 1.'}
 ];
 const diffSquareTotals=[24,32,40,45,48,60,64,72,80,96];
+/* Revision 2 families. */
+const mirror=([a,b])=>({ends:[[a,b],[b,a]],sum:90,steps:[`The segment ${b} right, ${a} up is the mirror image of ${a} right, ${b} up in the 45° diagonal through O.`,`So its angle with the horizontal equals the first segment’s angle with the vertical line through O.`,`A segment’s angles with the horizontal and with the vertical add to 90°.`,'Sum = 90°.']});
+const angleSets2={
+ 0:[angleSets[0],angleSets[2],
+  {ends:[[5,1],[3,2]],sum:45,steps:['The marked angles belong to O→(5,1) and O→(3,2).','From P(15,10), five times as far as (3,2), move 2 left and 3 up to Q(13,13). That move is at right angles to OP and a fifth as long, so angle POQ equals the angle of O→(5,1).','Q is 13 right and 13 up: a 45° diagonal.','Sum = 45°.']},
+  {ends:[[7,1],[4,3]],sum:45,steps:['The marked angles belong to O→(7,1) and O→(4,3).','From P(28,21), seven times as far as (4,3), move 3 left and 4 up to Q(25,25). That move is at right angles to OP and a seventh as long, so angle POQ equals the angle of O→(7,1).','Q is 25 right and 25 up: a 45° diagonal.','Sum = 45°.']},
+  ...[[2,1],[3,1],[3,2],[4,1]].map(mirror),
+  {ends:[[1,2],[1,3]],sum:135,steps:['O→(1,2) is the mirror image of O→(2,1) in the 45° diagonal, so its angle is 90° minus the angle of O→(2,1). Likewise O→(1,3) makes 90° minus the angle of O→(3,1).','The angles of O→(2,1) and O→(3,1) add to 45°: from P(6,2) move 1 left and 3 up to Q(5,5), a 45° diagonal. Triangle OPQ is right-angled at P with legs in the ratio 1 : 2.','Sum = 90° + 90° − 45° = 135°.']}],
+ 1:[angleSets[1],angleSets[3],
+  {ends:[[1,1],[2,1],[1,2]],sum:135,steps:['O→(1,1) is a square’s diagonal: 45°.','O→(1,2) is the mirror image of O→(2,1) in that diagonal, so its angle with the horizontal equals the angle of O→(2,1) with the vertical. Together those two make 90°.','Sum = 45° + 90° = 135°.']},
+  {ends:[[1,1],[3,1],[1,3]],sum:135,steps:['O→(1,1) is a square’s diagonal: 45°.','O→(1,3) is the mirror image of O→(3,1) in that diagonal, so its angle with the horizontal equals the angle of O→(3,1) with the vertical. Together those two make 90°.','Sum = 45° + 90° = 135°.']},
+  {ends:[[1,1],[1,2],[1,3]],sum:180,steps:['O→(1,1) is a square’s diagonal: 45°.','O→(1,2) and O→(1,3) are the mirror images of O→(2,1) and O→(3,1) in that diagonal, so their angles are 90° minus the angles of O→(2,1) and O→(3,1).','The angles of O→(2,1) and O→(3,1) add to 45°: from P(6,2) move 1 left and 3 up to Q(5,5), a 45° diagonal.','So O→(1,2) and O→(1,3) together make 180° − 45° = 135°, and the sum is 45° + 135° = 180°.']}]
+};
+const factorConditions=[
+ {id:'6-not-4',desc:'multiples of 6 but not multiples of 4',rng:{2:[1,1],3:[1,9],5:[0,9]},why:{2:'at least one 2 for 6, but not two 2s (that would make a multiple of 4)',3:'at least one 3 for 6',5:'any power'}},
+ {id:'12-not-8',desc:'multiples of 12 but not multiples of 8',rng:{2:[2,2],3:[1,9],5:[0,9]},why:{2:'at least two 2s for 12, but not three (that would make a multiple of 8)',3:'at least one 3 for 12',5:'any power'}},
+ {id:'15-not-9',desc:'multiples of 15 but not multiples of 9',rng:{2:[0,9],3:[1,1],5:[1,9]},why:{2:'any power',3:'at least one 3 for 15, but not two (that would make a multiple of 9)',5:'at least one 5 for 15'}},
+ {id:'odd-15',desc:'odd multiples of 15',rng:{2:[0,0],3:[1,9],5:[1,9]},why:{2:'none at all, so the factor is odd',3:'at least one 3 for 15',5:'at least one 5 for 15'}},
+ {id:'10-not-25',desc:'multiples of 10 but not multiples of 25',rng:{2:[1,9],3:[0,9],5:[1,1]},why:{2:'at least one 2 for 10',3:'any power',5:'exactly one 5: at least one for 10, but two would make a multiple of 25'}},
+ {id:'18-not-27',desc:'multiples of 18 but not multiples of 27',rng:{2:[1,9],3:[2,2],5:[0,9]},why:{2:'at least one 2 for 18',3:'exactly two 3s: at least two for 18, but three would make a multiple of 27',5:'any power'}},
+ {id:'square',desc:'perfect squares',square:true}
+];
+function factorCondition(r,pick){
+ for(let t=0;t<500;t++){
+  const e={2:r(2,5),3:r(1,4),5:r(1,3)},N=2**e[2]*3**e[3]*5**e[5];if(N>30000||N<360)continue;const c=pick(factorConditions);
+  const opts={};for(const p of [2,3,5]){const L=[];for(let k=0;k<=e[p];k++)if(c.square?k%2===0:k>=c.rng[p][0]&&k<=c.rng[p][1])L.push(k);opts[p]=L;}
+  const count=opts[2].length*opts[3].length*opts[5].length;if(count<3)continue;
+  if(!c.square&&![2,3,5].some(p=>c.rng[p][1]<e[p]))continue;
+  const line=p=>`Power of ${p}: ${c.square?'must be even':c.why[p]}: ${opts[p].join(', ')} — ${opts[p].length} choice${opts[p].length===1?'':'s'}.`;
+  return {N,id:c.id,desc:c.desc,count,steps:[`${N} = 2^${e[2]} × 3^${e[3]} × 5^${e[5]}. A factor chooses a power of each prime, up to the power in ${N}.`,c.square?'A factor is a perfect square exactly when every prime appears an even number of times.':`Turn the condition into a rule for each prime.`,line(2),line(3),line(5),`Count = ${opts[2].length} × ${opts[3].length} × ${opts[5].length} = ${count}.`]};
+ }
+ throw Error('No factor condition');
+}
 function squarePairs(D){const out=[];for(let x=1;x*x<D;x++){if(D%x)continue;const y=D/x;if((x+y)%2||y-x<2)continue;out.push({x,y,n:(y-x)/2,m:(y+x)/2});}return out;}
 
 /* ---------- generators ---------- */
-function make(id,form,seed,r){
+function make(id,form,seed,r,rev=2){
  let q=null;const out=(text,answer,steps,params={},extra={})=>q={text,answer,steps,params,...extra};
  const pick=a=>a[r(0,a.length-1)];
  if(id==='ch-totals'){
@@ -77,7 +110,7 @@ function make(id,form,seed,r){
   }
   if(form===1){
    const [k1,k2,k3]=pick(leftoverTriples),L=[k1+1,k2+1,k3+1].reduce(lcm,1),m=r(1,3),T=2*L*m,qr=T/(k1+1),pr=T/(k2+1),pq=T/(k3+1),S=(qr+pr+pq)/2,P=S-qr,Q=S-pr,R=S-pq,pile=T-S,g=P-R;
-   if(g<=0)return make(id,form,seed+1,r);
+   if(g<=0)return make(id,form,seed+1,r,rev);
    out(`Three friends, Pia, Qi and Ravi, each own a different number of stickers. They find a pile of spare stickers. Pia says, “If I take the whole pile, I will have ${k1} times as many as Qi and Ravi have together.” Qi says, “If I take the whole pile, I will have ${k2} times as many as Pia and Ravi together.” Ravi says, “If I take the whole pile, I will have ${k3} times as many as Pia and Qi together.” Pia has ${g} more stickers than Ravi. How many stickers does Qi have?`,Q,[`Let G be the grand total, including the pile. Pia’s statement makes G = ${k1+1} × (Qi + Ravi), so Qi + Ravi = G/${k1+1}.`,`Likewise Pia + Ravi = G/${k2+1} and Pia + Qi = G/${k3+1}.`,`Adding: 2 × (Pia + Qi + Ravi) = G × (1/${k1+1} + 1/${k2+1} + 1/${k3+1}).`,`Pia − Ravi = (Pia + Qi) − (Qi + Ravi) = G/${k3+1} − G/${k1+1} = ${g}, so G = ${T}.`,`Then Pia + Qi + Ravi = ${S}, and Qi = ${S} − (Pia + Ravi) = ${S} − ${pr} = ${Q}.`,`Check: Pia ${P}, Qi ${Q}, Ravi ${R}, pile ${pile}. Pia + pile = ${P+pile} = ${k1} × ${Q+R}.`],{k1,k2,k3,T,P,Q,R,pile});
   }
   if(form===2){
@@ -127,7 +160,7 @@ function make(id,form,seed,r){
  }
  else if(id==='ch-angles'){
   if(form===0||form===1){
-   const v=angleSets[(form===0?0:1)+2*r(0,1)],ends=v.ends.map(([x,y])=>{const m=x*y===1||x+y>6?1:r(1,2);return [x*m,y*m];});
+   const v=rev>=2?pick(angleSets2[form]):angleSets[(form===0?0:1)+2*r(0,1)],ends=v.ends.map(([x,y])=>{const m=x*y===1||x+y>6?1:r(1,2);return [x*m,y*m];});
    const desc=ends.map(([x,y])=>`${x} right and ${y} up`).join('; '),scaled=ends.filter((e,i)=>e[0]!==v.ends[i][0]).map((e,i)=>e);
    const note=scaled.length?[`A segment keeps its angle when both moves are scaled by the same number: ${ends.map((e,i)=>e[0]!==v.ends[i][0]?`${e[0]} right, ${e[1]} up has the same angle as ${v.ends[i][0]} right, ${v.ends[i][1]} up`:'').filter(Boolean).join('; ')}.`]:[];
    out(`On a grid of unit squares, segments start at corner O and go to points that are: ${desc}. Find the sum of the angles that these segments make with the horizontal grid line through O.`,v.sum,[...note,...v.steps],{ends},{suffix:'°',figure:{kind:'ch-grid-angles',ends}});
@@ -143,6 +176,7 @@ function make(id,form,seed,r){
   if(form===0||form===1){
    const a=r(1,4),b=r(1,3),p=pick([5,7]),c=r(1,2),N=2**a*3**b*p**c;
    if(form===0)out(`How many positive factors does ${N} have?`,(a+1)*(b+1)*(c+1),[`${N} = 2^${a} × 3^${b} × ${p}^${c}.`,`A factor uses 2 to a power from 0 to ${a} (${a+1} choices), 3 from 0 to ${b} (${b+1} choices) and ${p} from 0 to ${c} (${c+1} choices).`,`Factors = ${a+1} × ${b+1} × ${c+1} = ${(a+1)*(b+1)*(c+1)}.`],{N});
+   else if(rev>=2){const c=factorCondition(r,pick);out(`How many factors of ${c.N} are ${c.desc}?`,c.count,c.steps,{N:c.N,cond:c.id});}
    else{const odd=r(0,1)===0;
     out(odd?`How many factors of ${N} are odd?`:`How many factors of ${N} are multiples of ${2*p}?`,odd?(b+1)*(c+1):a*(b+1)*c,odd?[`${N} = 2^${a} × 3^${b} × ${p}^${c}.`,`An odd factor must use 2⁰: only 1 choice for the power of 2.`,`Odd factors = 1 × ${b+1} × ${c+1} = ${(b+1)*(c+1)}.`]:[`${N} = 2^${a} × 3^${b} × ${p}^${c}.`,`A multiple of ${2*p} needs at least one 2 and at least one ${p}: powers of 2 from 1 to ${a} (${a} choices), of ${p} from 1 to ${c} (${c} choices), and of 3 from 0 to ${b} (${b+1} choices).`,`Count = ${a} × ${b+1} × ${c} = ${a*(b+1)*c}.`],{N,odd});}
   }
@@ -158,9 +192,15 @@ function make(id,form,seed,r){
  else if(id==='ch-sequences'){
   if(form===0){
    const a=r(1,3),b=r(-3,4),c=r(1,9),t=n=>a*n*n+b*n+c,terms=[1,2,3,4,5].map(t);
-   if(terms.some(x=>x<=0))return make(id,form,seed+7,r);
+   if(terms.some(x=>x<=0))return make(id,form,seed+7,r,rev);
    const d=terms.slice(1).map((x,i)=>x-terms[i]);
-   out(`What is the next term? ${terms.join(', ')}, …`,t(6),[`Differences: ${d.join(', ')}.`,`The differences increase by ${2*a} each time.`,`Next difference: ${d.at(-1)} + ${2*a} = ${d.at(-1)+2*a}.`,`Next term: ${terms.at(-1)} + ${d.at(-1)+2*a} = ${t(6)}.`],{a,b,c});
+   if(rev>=2){
+    const far=r(0,1)===0,n=r(10,20),dn=k=>d[0]+2*a*(k-1),sum=(n-1)*(d[0]+dn(n-1))/2;
+    if(!far&&d[0]<1)return make(id,form,seed+7,r,rev);
+    if(far)out(`The differences between neighbouring terms of this sequence go up by the same amount each time: ${terms.join(', ')}, … What is the ${n}th term?`,t(n),[`Differences: ${d.join(', ')}. They go up by ${2*a} each time.`,`The difference from term k to term k + 1 is ${d[0]} + ${2*a} × (k − 1). From term 1 to term ${n} there are ${n-1} differences, the last being ${d[0]} + ${2*a} × ${n-2} = ${dn(n-1)}.`,`These differences form an evenly spaced list, so their sum is (${d[0]} + ${dn(n-1)}) × ${n-1} ÷ 2 = ${sum}.`,`Term ${n} = term 1 + all the differences = ${terms[0]} + ${sum} = ${t(n)}.`,`Check with a short case: term 5 = ${terms[0]} + ${d.join(' + ')} = ${terms[4]}.`],{a,b,c,n,ask:'far'});
+    else{const more=[];for(let k=6;k<=n;k++)more.push(t(k));out(`The differences between neighbouring terms of this sequence go up by the same amount each time: ${terms.join(', ')}, … Which term of the sequence is equal to ${t(n)}?`,n,[`Differences: ${d.join(', ')}. They go up by ${2*a} each time, so the terms keep increasing and each value appears at most once.`,`Next differences: ${Array.from({length:n-5},(_,i)=>dn(5+i)).join(', ')}.`,`Terms 6 onwards: ${more.join(', ')}.`,`${t(n)} is term ${n}.`],{a,b,c,n,ask:'which'});}
+   }
+   else out(`What is the next term? ${terms.join(', ')}, …`,t(6),[`Differences: ${d.join(', ')}.`,`The differences increase by ${2*a} each time.`,`Next difference: ${d.at(-1)} + ${2*a} = ${d.at(-1)+2*a}.`,`Next term: ${terms.at(-1)} + ${d.at(-1)+2*a} = ${t(6)}.`],{a,b,c});
   }
   if(form===1){
    const x=r(1,6),y=r(x+1,x+7),s=[x,y];while(s.length<8)s.push(s.at(-1)+s.at(-2));
@@ -236,7 +276,7 @@ function diagram(spec,id='figure',help=false){
  }
  return '';
 }
-const api={units,make,diagram,leftoverTriples,grazingSets,escalators,puzzles,squarePairs,angleSets,hexes};
+const api={units,make,diagram,leftoverTriples,grazingSets,escalators,puzzles,squarePairs,angleSets,angleSets2,factorConditions,hexes};
 root.MochiDSAExtension=api;
 if(typeof module!=='undefined')module.exports=api;
 })(typeof globalThis!=='undefined'?globalThis:this);

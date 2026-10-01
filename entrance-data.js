@@ -132,7 +132,10 @@ const G=root.MochiGeometryBridge||(typeof require==='function'?require('./geomet
 if(G)units.push(...G.units);
 const X=root.MochiDSAExtension||(typeof require==='function'?require('./dsa-extension.js'):null);
 if(X)units.push(...X.units);
+// Further challenge modules register themselves as MochiDSA_<name> and are loaded from dsa-<name>.js.
+const DSA_MODULES=['puzzles','numbers'];
+for(const name of DSA_MODULES){let M=root['MochiDSA_'+name];if(!M&&typeof require==='function'){try{M=require('./dsa-'+name+'.js');}catch(_){M=null;}}if(M)units.push(...M.units.map(u=>({...u,extension:true,module:name})));}
 const stages=[{until:'2026-11',title:'Repair and build',detail:'Secure the reference whole, equations, cube meaning and systematic counting.'},{until:'2027-02',title:'Connect methods',detail:'Develop rates, number theory, geometry and unfamiliar transfer.'},{until:'2027-04',title:'Choose independently',detail:'Mix methods without topic labels and revisit ideas after delays.'},{until:'2027-06',title:'Practise full papers',detail:'Use reserved papers, review reasoning, and verify with external unseen work.'}];
-root.MochiEntranceData={version:1,goalMonth:'2027-06',target:85,strands,units,stages,scope:'Working benchmark: the supplied PD STEM Education NUS High DSA preparation booklet (2024), not an official entrance paper. Original lessons and figures; some explicitly labelled foundation bridges and extensions. June 2027 is a preparation goal, not an announced test date.'};
+root.MochiEntranceData={DSA_MODULES,version:1,goalMonth:'2027-06',target:85,strands,units,stages,scope:'Working benchmark: the supplied PD STEM Education NUS High DSA preparation booklet (2024), not an official entrance paper. Original lessons and figures; some explicitly labelled foundation bridges and extensions. The selection-test date (first Saturday of July 2027, as in 2026) is a working estimate a grown-up can change.'};
 if(typeof module!=='undefined')module.exports=root.MochiEntranceData;
 })(typeof globalThis!=='undefined'?globalThis:this);

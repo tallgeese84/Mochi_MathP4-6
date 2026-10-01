@@ -8,11 +8,13 @@ const near=(a,b,msg,tol=1e-6)=>assert.ok(Math.abs(a-b)<=tol*Math.max(1,Math.abs(
 const each=(unit,form,fn)=>{for(const s of SEEDS){const q=B.make(unit,form,s);fn(q,s);}};
 
 test('six challenge units exist, stay out of reserved papers and link to real prerequisites',()=>{
- const ext=D.units.filter(u=>u.extension);
- assert.equal(ext.length,6);assert.equal(D.units.length,34);
+ // Units from separate challenge modules (dsa-<name>.js) carry u.module and are tested in their own files.
+ const ext=D.units.filter(u=>u.extension&&!u.module);
+ assert.equal(ext.length,6);assert.equal(D.units.filter(u=>!u.module).length,34);
  for(const u of ext){assert.ok(u.ideas.length>=3);assert.ok(u.prerequisites.every(id=>D.units.some(v=>v.id===id&&!v.extension)));assert.ok(u.check[1][u.check[2]]);}
 });
 
+// The original checks and papers are generated at bank revision 1, so they are identical to v6.8.0.
 test('reserved papers and starting checks contain exactly the same questions as v6.8.0',()=>{
  const crypto=require('node:crypto'),E=require('../entrance-core.js'),S=require('../science-path-core.js');
  const frozen={"maths:baseline-a":"f5f5633bd5d3b9a3","maths:baseline-b":"65ad6105ad02585c","maths:mixed-a":"4b67752da3c8d57e","maths:mixed-b":"3da5ea3b2fe93507","maths:mixed-c":"0a28210161991bc7","science:baseline-a":"ab467f76e854ad16","science:baseline-b":"7954eab5eafc0e71","science:mixed-a":"17924a13181be34a","science:mixed-b":"eb10c3d6dee17a85","science:mixed-c":"6afa70fc815ee5ae"};
@@ -83,9 +85,11 @@ test('shaded region: grid sampling agrees with the exact π answer',()=>{
   near(hit*(s/n)**2,q.answer.a+q.answer.b*Math.PI,'area s='+s,2e-3);}
 });
 
-test('grid angles: atan2 sums match',()=>{for(const f of [0,1])each('ch-angles',f,q=>{
+test('grid angles: atan2 sums match',()=>{for(const f of [0,1])for(const rev of [1,2])for(const s of SEEDS){const q=B.make('ch-angles',f,s,rev);
  const sum=q.params.ends.reduce((s,[x,y])=>s+Math.atan2(y,x)*180/Math.PI,0);near(sum,q.answer,'angles');
-});});
+ const fromText=[...q.text.matchAll(/(\d+) right and (\d+) up/g)].reduce((s,m)=>s+Math.atan2(+m[2],+m[1])*180/Math.PI,0);near(fromText,q.answer,'angles from text');
+}});
+test('grid angles at revision 2 give at least three different answers per form',()=>{for(const f of [0,1]){const answers=new Set(SEEDS.map(s=>B.make('ch-angles',f,s).answer));assert.ok(answers.size>=3,`form ${f}: ${[...answers]}`);const old=new Set(SEEDS.map(s=>B.make('ch-angles',f,s,1).answer));assert.equal(old.size,1);}});
 
 test('three squares: unit-cell counting gives the area and the outline length',()=>{for(const f of [2,3])each('ch-angles',f,q=>{
  const {a,b,c,p1,p2}=q.params,xs=[0,a-p1,a-p1+b-p2],sz=[a,b,c],W=a+b+c-p1-p2,H=Math.max(a,b,c);
@@ -95,10 +99,13 @@ test('three squares: unit-cell counting gives the area and the outline length',(
 });});
 
 test('factor counts: direct enumeration of divisors',()=>{for(const f of [0,1])each('ch-number',f,q=>{
- const N=q.params.N,divs=[];for(let d=1;d<=N;d++)if(N%d===0)divs.push(d);
+ const N=+q.text.match(/factors (?:of|does) (\d+)/)[1],divs=[];for(let d=1;d<=N;d++)if(N%d===0)divs.push(d);
  if(f===0)return assert.equal(q.answer,divs.length);
- const m=q.text.match(/multiples of (\d+)/);assert.equal(q.answer,m?divs.filter(d=>d%+m[1]===0).length:divs.filter(d=>d%2).length);
+ const t=q.text,but=t.match(/multiples of (\d+) but not multiples of (\d+)/),odd=t.match(/odd multiples of (\d+)/),sq=/perfect squares/.test(t);
+ const keep=but?d=>d%+but[1]===0&&d%+but[2]!==0:odd?d=>d%2===1&&d%+odd[1]===0:sq?d=>Number.isInteger(Math.sqrt(d)):null;
+ assert.ok(keep,'recognised condition: '+t);assert.equal(q.answer,divs.filter(keep).length,t);
 });});
+test('factor counts at revision 1 keep the original odd / multiple questions',()=>{for(const s of SEEDS.slice(0,60)){const q=B.make('ch-number',1,s,1),N=q.params.N,divs=[];for(let d=1;d<=N;d++)if(N%d===0)divs.push(d);const m=q.text.match(/multiples of (\d+)/);assert.equal(q.answer,m?divs.filter(d=>d%+m[1]===0).length:divs.filter(d=>d%2).length);}});
 
 test('difference of squares: search every square up to the limit',()=>each('ch-number',2,q=>{
  const [d1,d2]=nums(q.text);const A=new Set();for(let n=1;n<200;n++){const v=n*n+d1,m=Math.round(Math.sqrt(v+d2));if(m*m===v+d2)A.add(v);}
@@ -113,7 +120,13 @@ test('letter sums: exhaustive search confirms exactly one solution and the state
 });
 
 test('sequences: rules recomputed from the printed terms',()=>{
- each('ch-sequences',0,q=>{const t=nums(q.text.split('?')[1]);const d=t.slice(1).map((v,i)=>v-t[i]),dd=d[1]-d[0];assert.ok(d.slice(1).every((v,i)=>v-d[i]===dd));assert.equal(q.answer,t.at(-1)+d.at(-1)+dd);});
+ each('ch-sequences',0,q=>{const t=nums(q.text.split(':')[1].split('…')[0]);const d=t.slice(1).map((v,i)=>v-t[i]),dd=d[1]-d[0];assert.ok(d.slice(1).every((v,i)=>v-d[i]===dd));
+  // Extend the sequence term by term from the printed terms.
+  const ext=[...t];let diff=d.at(-1);while(ext.length<40){diff+=dd;ext.push(ext.at(-1)+diff);}
+  const far=q.text.match(/What is the (\d+)th term/),which=q.text.match(/is equal to (\d+)\?/);
+  if(far)assert.equal(q.answer,ext[+far[1]-1]);else{assert.ok(which);const hits=ext.map((v,i)=>v===+which[1]?i+1:0).filter(Boolean);assert.deepEqual(hits,[q.answer]);}
+  assert.ok(q.answer>=10||which,'asks for a far term, not just the next one');});
+ for(const s of SEEDS.slice(0,60)){const q=B.make('ch-sequences',0,s,1),t=nums(q.text.split('?')[1]),d=t.slice(1).map((v,i)=>v-t[i]),dd=d[1]-d[0];assert.equal(q.answer,t.at(-1)+d.at(-1)+dd);}
  each('ch-sequences',1,q=>{const t=nums(q.text.split(':')[1]).slice(0,5);while(t.length<8)t.push(t.at(-1)+t.at(-2));assert.equal(q.answer,t[7]);});
  each('ch-sequences',2,q=>{const [six,seven]=nums(q.text).filter(n=>n>7).slice(-2);let found=[];for(let a=1;a<60;a++)for(let b=1;b<60;b++){const s=[a,b];while(s.length<7)s.push(s.at(-1)+s.at(-2));if(s[5]===six&&s[6]===seven)found.push(a);}assert.deepEqual(found,[q.answer]);});
  each('ch-sequences',3,q=>{const t=nums(q.text.split('?')[1]);const d=t.slice(1).map((v,i)=>v-t[i]),k=d[1]/d[0];assert.ok(d.slice(1).every((v,i)=>v===d[i]*k));assert.equal(q.answer,t.at(-1)+d.at(-1)*k+d.at(-1)*k*k);});

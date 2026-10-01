@@ -9,10 +9,13 @@ function bridge(s,d){
  for(const a of s.science?.attempts||[]){const id=mapping[a.skill];if(!id)continue;if(!groups.has(id))groups.set(id,[]);groups.get(id).push(a);}
  return [...groups].filter(([id,a])=>!d.lessons[id]?.completedAt&&a.length>=2&&a.slice(-2).every(x=>!x.firstCorrect||x.concept&&!x.concept.firstCorrect||x.explanationFlag)).map(([unit,a])=>({unit,at:a.at(-1).answeredAt||a.at(-1).at})).filter(x=>!d.lessons[x.unit]?.lastViewedAt||d.lessons[x.unit].lastViewedAt<x.at).sort((a,b)=>b.at-a.at)[0]||null;
 }
+// Existing papers are frozen: the original 24 units, generated at bank revision 1.
 const paperDefinitions=[
- {id:'baseline-a',kind:'baseline',title:'Science starting-point check · A',minutes:0,units:['fairtest','graphs','circuits','heat','plants','matter']},
- {id:'baseline-b',kind:'baseline',title:'Science starting-point check · B',minutes:0,units:['measurement','models','forces','respiration','ecology','water']},
- ...['A','B','C'].map(letter=>({id:'mixed-'+letter.toLowerCase(),kind:'paper',title:'Science reasoning paper '+letter,minutes:60,units:D.units.map(u=>u.id)}))
+ {id:'baseline-a',kind:'baseline',rev:1,title:'Science starting-point check · A',minutes:0,units:['fairtest','graphs','circuits','heat','plants','matter']},
+ {id:'baseline-b',kind:'baseline',rev:1,title:'Science starting-point check · B',minutes:0,units:['measurement','models','forces','respiration','ecology','water']},
+ ...['A','B','C'].map(letter=>({id:'mixed-'+letter.toLowerCase(),kind:'paper',rev:1,title:'Science reasoning paper '+letter,minutes:60,units:(D.originalUnits||D.units.map(u=>u.id)).slice()})),
+ // DSA-style science mocks: every unit, including the lower-secondary ones, in 70 minutes with no topic labels.
+ ...[24,16,9,4].map((weeks,k)=>{const ids=D.units.map(u=>u.id),order=ids.map(id=>[parseInt(B.hash('sci-mock-'+k+':'+id),36),id]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);return {id:'mock-'+(k+1),kind:'mock',rev:B.REV||1,title:'DSA-style science mock '+(k+1),minutes:70,weeks,units:order,marks:order.map(()=>1)};})
 ];
 root.MochiSciencePath=core.create(D,B,{stateKey:'sciencePath',prefix:'science-path-',fingerprintPrefix:'sp-paper-v1:',paperDefinitions,bridge,limits:[
  'Official DSA guidance supplies broad aims, not a released science test blueprint.',

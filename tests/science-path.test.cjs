@@ -7,15 +7,16 @@ function wrong(q){const [c,r]=q.answer.split(':');return c+':r'+((+r.slice(1)+1)
 function taught(d,id,t=now){for(let i=0;i<3;i++)E.visit(d,id,i,t);E.concept(d,id,E.unit(id).check[2],t+1);assert.ok(E.complete(d,id,t+2));}
 function answer(d,id='measurement',phase='apply',seed=21,t=now+10000,miss=false){E.finishPractice(d);const v=E.startPractice(d,id,{phase,seed,now:t}),q=E.question(v);E.touchDraft(d,{answer:miss?wrong(q):q.answer,working:'Synthetic explanation referring to the measured evidence.'},t+1);return E.respond(d,t+2).attempt;}
 function fill(d,id,t=now){E.startPaper(d,id,t);E.paperQuestions(id).forEach((q,i)=>E.savePaperAnswer(d,id,i,{answer:q.answer,working:'Synthetic explanation for adult review'},t+10+i));return E.submitPaper(d,id,t+1000);}
-test('science scope has 24 substantive lessons, four strands and valid prerequisite links',()=>{
- assert.equal(D.units.length,24);for(const s of Object.keys(D.strands))assert.equal(D.units.filter(u=>u.strand===s).length,6);
+test('science scope has 24 original substantive lessons (plus sx- bridge units), four strands and valid prerequisite links',()=>{
+ const core=D.units.filter(u=>!u.id.startsWith('sx-'));assert.equal(core.length,24);assert.deepEqual(D.originalUnits,core.map(u=>u.id));for(const s of Object.keys(D.strands))assert.equal(core.filter(u=>u.strand===s).length,6);
  for(const u of D.units){assert.ok(u.ideas.join(' ').split(/\s+/).length>=100,u.id);assert.equal(u.ideas.length,3);assert.ok(u.check[1][u.check[2]]);assert.equal(C.unit(u.foundation).subject,'science');assert.ok(u.prerequisites.every(id=>E.unit(id)));assert.ok(u.scope&&u.source);}
  function visit(id,ancestors=[]){assert.ok(!ancestors.includes(id),'cycle '+id);for(const p of E.unit(id).prerequisites)visit(p,[...ancestors,id]);}D.units.forEach(u=>visit(u.id));
  assert.match(D.scope,/not the DSA test/);assert.match(D.sources.find(x=>/SPSO sample/.test(x.name)).role,/NOT an entrance/);
 });
-for(const u of D.units)test(`${u.id}: all four forms over 100 distributed seeds have distinct options, complete reasons and safe marking`,()=>{
- for(let f=0;f<4;f++)for(let i=0;i<100;i++){
-  const q=B.make(u.id,f,Math.imul(i+1,2654435761)>>>0);assert.ok(q.text.length>30&&q.steps.length>=2&&q.rubric.length===3);assert.equal(q.strand,u.strand);
+// The 24 original units at both bank revisions; sx- units are covered in science-dsa.test.cjs.
+for(const u of D.units.filter(u=>!u.id.startsWith('sx-')))test(`${u.id}: all four forms over 100 distributed seeds have distinct options, complete reasons and safe marking`,()=>{
+ for(const rev of [1,2])for(let f=0;f<4;f++)for(let i=0;i<100;i++){
+  const q=B.make(u.id,f,Math.imul(i+1,2654435761)>>>0,rev);if(q.kind){assert.ok(B.mark(q,q.answer),q.id);assert.equal(B.validAnswer(q,''),false);continue;}assert.ok(q.text.length>30&&q.steps.length>=2&&q.rubric.length===3);assert.equal(q.strand,u.strand);
   if(q.options)assert.equal(new Set(q.options).size,4,q.id);else assert.equal(new Set(q.statements).size,3,q.id);
   assert.equal(new Set(q.reasons).size,3);assert.ok(B.mark(q,q.answer));assert.equal(B.mark(q,wrong(q)),false);assert.equal(B.mark(q,'<script>alert(1)</script>'),false);
   assert.equal(B.validAnswer(q,''),false);assert.equal(B.validAnswer(q,q.answer.split(':')[0]+':r-1'),false);
@@ -24,7 +25,7 @@ for(const u of D.units)test(`${u.id}: all four forms over 100 distributed seeds 
 });
 test('quantitative conclusions are independently recalculated from visible givens, not stored solutions',()=>{
  for(let i=0;i<100;i++){
-  const seed=Math.imul(i+11,2246822519)>>>0,get=(id,f)=>B.make(id,f,seed);
+  const seed=Math.imul(i+11,2246822519)>>>0,get=(id,f)=>B.make(id,f,seed,1);
   let q=get('measurement',0),n=numbers(q.text);assert.equal(first(q.answerLabel),n[1]-n[0]);
   q=get('measurement',1);assert.equal(first(q.answerLabel),q.figure.rows.reduce((t,r)=>t+first(r[1]),0)/q.figure.rows.length);
   q=get('normalise',0);n=numbers(q.text);const a=n[0]/n[1],b=n[2]/n[3];assert.equal(q.answerLabel,a>b?'A':a===b?'Equal':'B');
@@ -44,16 +45,16 @@ test('quantitative conclusions are independently recalculated from visible given
  }
 });
 test('circuit keys follow topology including a broken common return, not distance on the page',()=>{
- for(let i=0;i<150;i++)for(const f of [0,1,3]){const q=B.make('circuits',f,i),open=q.figure.open;assert.match(q.answerLabel,open==='common'?/Neither/:new RegExp('Only (?:bulb )?'+(open==='A'?'B':'A')));}
+ for(const rev of [1,2])for(let i=0;i<150;i++)for(const f of [0,1,3]){const q=B.make('circuits',f,i,rev),open=q.figure.open;assert.match(q.answerLabel,open==='common'?/Neither/:new RegExp('Only (?:bulb )?'+(open==='A'?'B':'A')));}
 });
 test('statement ordering and choice ordering vary but rearranging an identical prompt cannot create novelty',()=>{
- const keys=new Set(),repeats=new Map();for(let i=0;i<100;i++){const q=B.make('circuits',2,i);keys.add(q.answer.split(':')[0]);repeats.set(q.fingerprint,q.text);}
+ const keys=new Set(),repeats=new Map();for(let i=0;i<100;i++){const q=B.make('circuits',2,i,1);keys.add(q.answer.split(':')[0]);repeats.set(q.fingerprint,q.text);}
  assert.ok(keys.size>=3);assert.equal(repeats.size,1,'only option order changed');
 });
 test('scientific statements retain their truth when shuffled and eclipse variants depend on alignment',()=>{
  for(let i=0;i<100;i++){
-  const q=B.make('earth',3,i),truth=q.answer.split(':')[0].slice(1);q.statements.forEach((s,k)=>{const expected=/configuration produces/.test(s)?q.figure.aligned:/Ordinary Moon phases/.test(s);assert.equal(truth[k],expected?'1':'0',s);});
-  const ice=B.make('matter',3,i),mass=first(ice.text),bits=ice.answer.split(':')[0].slice(1);ice.statements.forEach((s,k)=>{const expected=/Total mass stays/.test(s)?first(s)===mass:/change in volume/.test(s);assert.equal(bits[k],expected?'1':'0');});
+  const q=B.make('earth',3,i,1),truth=q.answer.split(':')[0].slice(1);q.statements.forEach((s,k)=>{const expected=/configuration produces/.test(s)?q.figure.aligned:/Ordinary Moon phases/.test(s);assert.equal(truth[k],expected?'1':'0',s);});
+  const ice=B.make('matter',3,i,1),mass=first(ice.text),bits=ice.answer.split(':')[0].slice(1);ice.statements.forEach((s,k)=>{const expected=/Total mass stays/.test(s)?first(s)===mass:/change in volume/.test(s);assert.equal(bits[k],expected?'1':'0');});
  }
 });
 test('separate science state is additive; earlier choice-only success cannot grant new evidence',()=>{
@@ -74,7 +75,7 @@ test('application progresses to changed-structure practice and recall requires a
  E.visit(d,'measurement',0,now+20*day);answer(d,'measurement','recall',222,now+20*day+100);assert.equal(E.evidence(d,'measurement',now+21*day).delayed,1);
 });
 test('reserved science papers have 24 questions, six per strand and no overlap across five forms',()=>{
- const seen=new Set();for(const def of E.paperDefinitions){const qs=E.paperQuestions(def.id);assert.equal(qs.length,def.kind==='paper'?24:6);assert.equal(def.minutes,def.kind==='paper'?60:0);if(def.kind==='paper')for(const strand of Object.keys(D.strands))assert.equal(qs.filter(q=>q.strand===strand).length,6);for(const q of qs){assert.ok(!seen.has(q.fingerprint),q.id);seen.add(q.fingerprint);}assert.deepEqual(E.paperQuestions(def.id),qs);}
+ const seen=new Set();for(const def of E.paperDefinitions){const qs=E.paperQuestions(def.id);if(def.kind==='mock'){assert.equal(qs.length,E.D.units.length);assert.equal(def.minutes,70);}else{assert.equal(qs.length,def.kind==='paper'?24:6);assert.equal(def.minutes,def.kind==='paper'?60:0);}if(def.kind==='paper')for(const strand of Object.keys(D.strands))assert.equal(qs.filter(q=>q.strand===strand).length,6);for(const q of qs){assert.ok(!seen.has(q.fingerprint),q.id);seen.add(q.fingerprint);}assert.deepEqual(E.paperQuestions(def.id),qs);}
 });
 test('submitted papers are frozen; original deadlines survive backup and late edits are blocked',()=>{
  const d=E.fresh(),p=E.startPaper(d,'mixed-a',now),q=E.paperQuestions('mixed-a')[0];E.savePaperAnswer(d,p.id,0,{answer:wrong(q),working:'first'},now+2);E.savePaperAnswer(d,p.id,0,{answer:q.answer,working:'revised'},now+3);assert.equal(E.scorePaper(d,p.id),null);E.submitPaper(d,p.id,now+10);const score=E.scorePaper(d,p.id);assert.equal(score.correct,1);assert.equal(score.results[0].components.reason,true);assert.notEqual(score.results[0].answerDisplay,q.answer);assert.equal(E.savePaperAnswer(d,p.id,0,{answer:wrong(q)},now+20),false);

@@ -1,3 +1,16 @@
+# v7.2.0 — DSA readiness
+
+- **Gets through the whole course.** Reviews now come back after growing gaps (7, 14, 30, 60, 90 days) instead of every week forever. A method missed four times is set aside for a few days instead of blocking the path. Starting checks and papers count as evidence. In simulations, a learner who misses 30% of first tries now reaches all 40 maths units in about five to six months; before, the challenge units were never reached.
+- **Mixed sets.** Due reviews arrive as a short set with no topic title, method hint or lesson link, so Euna practises choosing the method.
+- **Mistakes come back.** Missed first tries go into a log she can tag (misread, wrong method, calculation slip, rushed, not sure). The same question returns three days later for a second look.
+- **One-line plan.** On new-twist and mixed maths questions she writes her plan before checking.
+- **DSA-style mocks.** Six maths mocks (24 questions, rising difficulty, 1–4 marks, 55 marks, 90 minutes, no question ever repeated) and four science mocks (all 30 units, 70 minutes). They are planned on dates counting back from the selection test, which defaults to Saturday 3 July 2027 and can be changed in the grown-up panel. The header counts down the weeks.
+- **New maths.** Nine challenge units: logic and strategy; 3D views, painted cubes, folding and counting shapes; counting routes, arrangements and Venn diagrams; digits and divisibility; clocks, calendars, tracks and trains; most and least. Fixes: whole-number rates answers, Yes/No balance in invariants, varied angle questions, harder "challenge" items, simplified ratios, money to 2 decimal places.
+- **New science.** Six units (cells, levers and pulleys, pressure, sound and pendulums, acids and chemical change, life cycles and reproduction). Number-entry and written answers marked by key ideas, naming variables, fair-test plans and bar charts. Distractors are believable, so the right answer is no longer the longest one.
+- **Wider reading.** A daily "Did you know?" question on Today (72 in all) and weekend camp-style investigations with questions to explain to a grown-up.
+- **For the grown-up.** A readiness section in each path's grown-up panel: weeks left, pace, accuracy and help by strand, mistakes by reason, mock results and the test date. The planner's "Next" now matches Today.
+- **History stays stable.** Question banks have revisions; every attempt and paper records its revision, so past answers keep their marks. The original checks and papers are unchanged. Details in `docs/DSA_READINESS.md`.
+
 # v7.1.0 — Mochi is a Maine Coon
 
 - Mochi is now a Maine Coon. He keeps his ginger tabby coat, green eyes, white socks and blue collar, and gains the breed’s look: tall ears with lynx tips, a fluffy cream mane and bib with a scalloped edge, mutton-chop cheek ruffs, a broad muzzle, shaggy “britches” on his back legs, big snowshoe paws and a long, bushy tail. He is a little bigger and longer than other cats, and grows into it from kittenhood.
