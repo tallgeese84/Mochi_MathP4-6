@@ -146,19 +146,38 @@ export function buildCat(T,info,{growth=4,lite=false}={}){
   // Sits just under the chin so it reads clearly from the front, with a little gold bell.
   const collarMat=keep(new T.MeshStandardMaterial({color:pal.collar,roughness:.45}));
   const band=new T.Group();band.position.set(0,-R*.16,R*.26);neck.add(band);
-  const ring=mesh(keep(new T.TorusGeometry(R*.6,R*.08,10,40)),collarMat,band,[0,0,0],null);ring.rotation.x=Math.PI/2-.6;
-  const bell=mesh(small,keep(new T.MeshStandardMaterial({color:'#f2c94c',roughness:.25,metalness:.6})),band,[0,-R*.2,R*.6],[R*.13,R*.13,R*.13]);bell.name='bell';
+  const ring=mesh(keep(new T.TorusGeometry(R*.6,R*.08,10,40)),collarMat,band,[0,0,0],null);ring.rotation.x=-(Math.PI/2-.6);
+  const bell=mesh(small,keep(new T.MeshStandardMaterial({color:'#f2c94c',roughness:.25,metalness:.6})),band,[0,-R*.47,R*.5],[R*.13,R*.13,R*.13]);bell.name='bell';
  }
  const wear={head:new T.Group(),eyes:new T.Group(),neck:new T.Group()};
  wear.head.position.set(0,R*.82,0);head.add(wear.head);wear.eyes.position.set(0,R*.04,R*1.0);head.add(wear.eyes);wear.neck.position.set(0,-R*.16,R*.26);neck.add(wear.neck);
 
  // ---------------- pose blending ----------------
- const pose={sit:0,lie:0,crouch:0,headPitch:0,headYaw:0,headTilt:0,tailUp:.6,tailCurl:0,eye:1,happy:0,mouth:0,ears:0,blush:0,frontRaise:0,frontRaiseSide:1,wave:0,walk:0,purr:0,lean:0,lick:0};
+ const pose={sit:0,lie:0,crouch:0,headPitch:0,headYaw:0,headTilt:0,tailUp:.6,tailCurl:0,eye:1,happy:0,mouth:0,ears:0,blush:0,frontRaise:0,frontRaiseSide:1,wave:0,walk:0,purr:0,lean:0,lick:0,wiggle:0};
  const target={...pose};let phase=0,blinkT=2+Math.random()*3,blink=0,time=0;
+ // Locomotion: the gait cycle advances with distance travelled, so planted paws never slide.
+ /* hip to paw centre: the part the eye follows */ const legWorld=(legLen+legR*.6);const pawAhead=legR*.35/legWorld;let gait=0,moveW=0,airW=0,bank=0,look=0,wW=1,tW=0,gW=0;
+ const GAITS={walk:{off:[.25,.75,0,.5],duty:.62,stride:1.6},trot:{off:[0,.5,.5,0],duty:.5,stride:2.2},gallop:{off:[.5,.6,0,.1],duty:.38,stride:3.2}};
+ // Half the stance travel, in leg lengths. With the leg lengthened by 1/cos(θ) the paw stays on the floor
+ // and moves ℓ·tan(θ) horizontally, so a planted paw travels exactly as far as the body.
+ for(const g of Object.values(GAITS)){g.half=g.stride*g.duty/2;g.amp=Math.atan(g.half);}
+ const ease=u=>u*u*(3-2*u);
+ // Stance: the paw moves in a straight line along the floor at the body's speed.
+ function legCycle(p,g){let th,lift=0;if(p<g.duty)th=Math.atan(g.half*(2*(p/g.duty)-1));else{const u=(p-g.duty)/(1-g.duty);th=g.amp-2*g.amp*ease(u);lift=Math.sin(Math.PI*u);}return [th,lift,(1-pawAhead*Math.sin(th))/Math.cos(th)];}
+ let gaitName='walk';
  const damp=(a,b,k,dt)=>a+(b-a)*(1-Math.exp(-k*dt));
- function update(dt,still=false){
+ function update(dt,still=false,motion={}){
   time+=dt;for(const k of Object.keys(pose))pose[k]=still?target[k]:damp(pose[k],target[k],k==='eye'?18:6,dt);
-  const p=pose;phase+=dt*(p.walk>.01?(5+p.walk*6):0);
+  const p=pose;
+  const speed=Math.max(0,(motion.speed||0)/S),turn=motion.turn||0,rel=speed/legWorld,air=motion.air?1:0;
+  const stepping=rel<.6&&Math.abs(turn)>.7&&!air;
+  // Discrete gaits with hysteresis, cross-faded quickly, so legs never follow two rhythms for long.
+  if(gaitName==='walk'&&rel>6.5)gaitName='trot';else if(gaitName==='trot'&&rel<5)gaitName='walk';else if(gaitName==='trot'&&rel>11.5)gaitName='gallop';else if(gaitName==='gallop'&&rel<9)gaitName='trot';
+  wW=damp(wW,gaitName==='walk'?1:0,12,dt);gW=damp(gW,gaitName==='gallop'?1:0,12,dt);tW=Math.max(0,1-wW-gW);
+  const stride=(GAITS.walk.stride*wW+GAITS.trot.stride*tW+GAITS.gallop.stride*gW)*legWorld;
+  gait=(gait+(stepping?Math.abs(turn)*dt*.32:speed*dt/stride))%1;
+  moveW=damp(moveW,air?0:Math.min(1,Math.max(rel/1.2,stepping?.7:0)),10,dt);airW=damp(airW,air,14,dt);
+  bank=damp(bank,Math.max(-.14,Math.min(.14,-turn*rel*.012)),6,dt);look=damp(look,Math.max(-.4,Math.min(.4,turn*.14)),5,dt);
   // blink
   blinkT-=dt;if(blinkT<0){blink=1;blinkT=2.5+Math.random()*4;}blink=Math.max(0,blink-dt*7);
   const open=Math.max(.06,p.eye*(1-Math.sin(Math.min(1,blink)*Math.PI)*.94));
@@ -169,38 +188,44 @@ export function buildCat(T,info,{growth=4,lite=false}={}){
   mouthOpen.scale.setScalar(Math.max(.001,p.mouth));mouthGroup.visible=p.mouth<.35;
   // body: sitting pitches up around the hips, lying lowers everything
   const breathe=Math.sin(time*(p.lie>.5?1.6:2.6))*.012*(1+p.lie);
-  body.rotation.x=-.62*p.sit+.12*p.crouch+Math.sin(phase)*.02*p.walk;
-  body.rotation.z=Math.sin(time*40)*.004*p.purr;
-  body.position.y=hipY-p.sit*bodyH*.35-p.lie*(legLen*.95)-p.crouch*legLen*.35+Math.abs(Math.sin(phase))*.015*p.walk;
-  torso.scale.set(bodyW*(1+breathe),bodyH*(1+breathe),bodyLen);
+  const P2=gait*Math.PI*2,bob=(-Math.cos(2*P2)*(.012*wW+.02*tW)+Math.sin(P2)*.045*gW)*moveW;
+  body.rotation.x=-.62*p.sit+.12*p.crouch+Math.sin(P2+.6)*.13*gW*moveW-.12*airW;
+  body.rotation.z=Math.sin(time*40)*.004*p.purr+Math.sin(P2)*.035*wW*moveW+bank;
+  body.position.y=hipY-p.sit*bodyH*.35-p.lie*(legLen*.95)-p.crouch*legLen*.35+bob;
+  torso.scale.set(bodyW*(1+breathe),bodyH*(1+breathe),bodyLen*(1+Math.sin(P2)*.07*gW*moveW));
   // legs
-  for(const L of legs){
-   const sw=Math.sin(phase+(L.front?0:Math.PI)+(L.side>0?Math.PI:0))*.55*p.walk;
+  legs.forEach((L,li)=>{
+   let sw=0,lift=0;
+   let reach=0;for(const [g,w] of [[GAITS.walk,wW],[GAITS.trot,tW],[GAITS.gallop,gW]]){if(w<.01)continue;const [ang,l,len]=legCycle((gait+g.off[li])%1,g);sw+=ang*w;lift+=l*w;reach+=(len-1)*w;}
+   sw*=moveW;lift*=moveW;reach*=moveW;sw+=(L.front?-.85:.95)*airW;
+   // The planted leg flexes to absorb the body's bob, so the paw stays on the floor.
+   const dy=(L.front?bob:bob*.6)/legWorld*moveW*(1-Math.min(1,lift*3));
+   const stretch=(1+reach+dy)*(1-.3*lift);L.lower.scale.y=stretch;L.lift=lift;L.paw.rotation.x=(L.front?.9:-.5)*lift;
    if(L.front){
     let rx=sw+.62*p.sit-1.45*p.lie;
     if(L.side===p.frontRaiseSide&&p.frontRaise>0)rx-=p.frontRaise*(2.2+Math.sin(time*9)*.25*p.wave);
     if(L.side===p.frontRaiseSide&&p.lick>0)rx-=p.lick*(1.9);
     L.pivot.rotation.x=rx;L.pivot.rotation.z=(L.side===p.frontRaiseSide?Math.sin(time*8)*.35*p.wave:0);
-    L.lower.scale.y=1+.55*p.sit*(1-p.lie);
+    L.lower.scale.y=(1+.55*p.sit*(1-p.lie))*stretch;
    }else{
-    L.pivot.position.y=L.baseY-p.sit*bodyH*.35-p.lie*legLen*.95-p.crouch*legLen*.3;
-    L.pivot.rotation.x=sw-1.2*p.sit-1.35*p.lie+.3*p.crouch;
+    L.pivot.position.y=L.baseY-p.sit*bodyH*.35-p.lie*legLen*.95-p.crouch*legLen*.3+bob*.6;
+    L.pivot.rotation.x=sw-1.2*p.sit-1.35*p.lie+.3*p.crouch+Math.sin(time*16)*.08*p.wiggle;
    }
-  }
+  });
   // head
-  neck.rotation.x=.62*p.sit*(1-p.lie*.3)+p.headPitch-.12*p.crouch+p.lie*.15;
-  head.rotation.y=p.headYaw;head.rotation.z=p.headTilt+Math.sin(time*14)*.03*p.lick;
+  neck.rotation.x=.62*p.sit*(1-p.lie*.3)+p.headPitch-.12*p.crouch+p.lie*.15-(Math.sin(P2+.6)*.13*gW*moveW-.12*airW)*.8-bob*1.5;
+  head.rotation.y=p.headYaw+look;head.rotation.z=p.headTilt+Math.sin(time*14)*.03*p.lick;
   head.rotation.x=p.lick*.35;
   ears.forEach((e,i)=>{const s=i?1:-1;e.rotation.z=-s*(.32+p.ears*.5)+Math.sin(time*1.3+i*2)*.02;e.rotation.x=-.08-p.ears*.3;});
   // tail
-  const sway=Math.sin(time*(1.6+p.walk*2))*(.25+p.walk*.2)*(1-p.lie*.6),up=p.tailUp;
+  const sway=(Math.sin(time*1.6)*.25*(1-moveW)+Math.sin(P2)*.16*moveW)*(1-p.lie*.6)+Math.sin(time*13)*.35*p.wiggle,up=Math.min(1,p.tailUp+.15*moveW);
   tailRoot.rotation.x=-2.05+up*1.65-p.lie*.9+p.sit*.4;
   tail.forEach((s,i)=>{const f=i/tail.length;s.rotation.x=(up*.16)*(f>.55?1.6:.2)+(p.sit*.15)*f;s.rotation.z=sway*(.15+f*.25)+p.tailCurl*.25*(p.lie>.5?1:0);});
  }
  function setPose(next){Object.assign(target,next);}
- function reset(){Object.assign(target,{sit:0,lie:0,crouch:0,headPitch:0,headYaw:0,headTilt:0,tailUp:.6,tailCurl:0,eye:1,happy:0,mouth:0,ears:0,blush:0,frontRaise:0,wave:0,walk:0,purr:0,lean:0,lick:0});}
+ function reset(){Object.assign(target,{sit:0,lie:0,crouch:0,headPitch:0,headYaw:0,headTilt:0,tailUp:.6,tailCurl:0,eye:1,happy:0,mouth:0,ears:0,blush:0,frontRaise:0,wave:0,walk:0,purr:0,lean:0,lick:0,wiggle:0});}
  function dispose(){disposables.forEach(d=>d.dispose?.());cat.removeFromParent();}
- const parts={head,neck,body,torso,legs,tail,eyes,ears,wear,mouthOpen,R,headR:R*S,height:(hipY+bodyH+R*1.6)*S,scale:S,bodyLen:bodyLen*S};
+ const parts={head,neck,body,torso,legs,tail,eyes,ears,wear,mouthOpen,R,headR:R*S,bodyW:bodyW*S,height:(hipY+bodyH+R*1.6)*S,scale:S,bodyLen:bodyLen*S};
  cat.userData.parts=parts;
  return {group:cat,parts,pose:target,current:pose,update,setPose,reset,dispose,palette:pal,growth:g};
 }
@@ -213,7 +238,7 @@ export function buildWear(T,id,headR){
  if(id==='crown'){const gold=new T.MeshStandardMaterial({color:'#f2c14e',roughness:.25,metalness:.7});add(new T.CylinderGeometry(R*.42,R*.4,R*.22,24,1,true),gold,[0,R*.1,0]);for(let i=0;i<5;i++){const a=i/5*Math.PI*2;add(new T.ConeGeometry(R*.08,R*.24,8),gold,[Math.sin(a)*R*.41,R*.32,Math.cos(a)*R*.41]);add(new T.SphereGeometry(R*.055,10,8),m(i%2?'#ef6f8f':'#45c4a0'),[Math.sin(a)*R*.43,R*.1,Math.cos(a)*R*.43]);}}
  if(id==='specs'){const rim=m('#3b2b28');for(const s of [-1,1])add(new T.TorusGeometry(R*.3,R*.035,8,28),rim,[s*R*.38,0,0],[0,s*.22,0]);add(new T.CylinderGeometry(R*.025,R*.025,R*.18,6),rim,[0,R*.04,0],[0,0,Math.PI/2]);}
  if(id==='shades'){const black=new T.MeshStandardMaterial({color:'#1d1a24',roughness:.15,metalness:.3});for(const s of [-1,1])add(new T.SphereGeometry(R*.33,20,14),black,[s*R*.38,0,0],[0,s*.22,0],[1,.8,.22]);add(new T.CylinderGeometry(R*.03,R*.03,R*.2,6),black,[0,R*.06,0],[0,0,Math.PI/2]);}
- if(id==='bow'){const pink=m('#ef6f8f');for(const s of [-1,1])add(new T.ConeGeometry(R*.16,R*.32,12),pink,[s*R*.17,-R*.18,R*.62],[0,0,s*Math.PI/2]);add(new T.SphereGeometry(R*.09,12,10),m('#d94f72'),[0,-R*.18,R*.65]);}
- if(id==='scarf'){const green=m('#2fa37a');add(new T.TorusGeometry(R*.62,R*.13,12,36),green,[0,0,0],[Math.PI/2-.6,0,0]);add(new T.BoxGeometry(R*.22,R*.55,R*.09),green,[R*.24,-R*.42,R*.58],[.3,0,.18]);}
+ if(id==='bow'){const pink=m('#ef6f8f');for(const s of [-1,1])add(new T.ConeGeometry(R*.16,R*.32,12),pink,[s*R*.17,-R*.36,R*.55],[0,0,s*Math.PI/2]);add(new T.SphereGeometry(R*.09,12,10),m('#d94f72'),[0,-R*.36,R*.58]);}
+ if(id==='scarf'){const green=m('#2fa37a');add(new T.TorusGeometry(R*.62,R*.13,12,36),green,[0,0,0],[-(Math.PI/2-.6),0,0]);add(new T.BoxGeometry(R*.22,R*.55,R*.09),green,[R*.22,-R*.68,R*.5],[.3,0,.18]);}
  g.userData.wearId=id;return g;
 }
