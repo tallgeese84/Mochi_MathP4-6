@@ -144,7 +144,7 @@ function make(unit,form,seed,rev=REV){
  }
  if(!q)throw Error('Unimplemented template');
  q.answerLabel??=typeof q.answer==='object'?`${q.answer.a}+${q.answer.b}π`:String(round(Number(q.answer))===Number(q.answer)?q.answer:q.answer);
- q.rev=rev;q.fingerprint=hash(q.text+'|'+JSON.stringify(q.figure||{}));return q;
+ q.fingerprint=hash(q.text+'|'+JSON.stringify(q.figure||{}));return q;
 }
 // Restricted arithmetic parser, never eval. A pair [a,b] represents a + bπ.
 function parse(input,suffix=''){
