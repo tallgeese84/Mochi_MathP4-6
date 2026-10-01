@@ -2,7 +2,7 @@
    draw Mochi plus three friends smoothly. Every pose is a set of numbers blended each frame. */
 export const CAT_VERSION=1;
 
-const MOCHI={name:'Mochi',coat:'#e39a57',stripe:'#b8642f',cream:'#fff5ea',inner:'#f4b0aa',nose:'#ee8f93',eyes:'#79c349',pattern:'tabby',shape:'round',socks:true,bib:true,collar:'#59a9e8'};
+const MOCHI={name:'Mochi',coat:'#e39a57',stripe:'#b8642f',cream:'#fff5ea',inner:'#f4b0aa',nose:'#ee8f93',eyes:'#79c349',pattern:'tabby',shape:'coon',socks:true,bib:true,collar:'#59a9e8'};
 
 function shade(T,hex,amount){const c=new T.Color(hex);const hsl={};c.getHSL(hsl);c.setHSL(hsl.h,hsl.s,Math.max(0,Math.min(1,hsl.l+amount)));return '#'+c.getHexString();}
 export function palette(T,info){
@@ -31,9 +31,10 @@ export function buildCat(T,info,{growth=4,lite=false}={}){
  const pal=palette(T,info),g=Math.max(0,Math.min(4,growth|0)),shape=pal.shape;
  const disposables=[];const keep=x=>{disposables.push(x);return x;};
  const seg=lite?[28,20]:[48,32];
- const fluffy=shape==='fluffy'||shape==='tufted',slender=shape==='slender';
+ // Maine Coon (Mochi and Kumo): big, long and shaggy, with lynx-tipped ears, a mane and a plume of a tail.
+ const coon=shape==='coon'||shape==='tufted',fluffy=shape==='fluffy'||coon,slender=shape==='slender';
  // Kittens: big head, short legs. Grown cats: longer body and legs.
- const S=.8+g*.08,headR=.36-g*.014,bodyLen=(.30+g*.045)*(slender?1.08:1),bodyW=(.25+g*.012)*(fluffy?1.12:slender?.9:1),bodyH=.23+g*.012,legLen=(.13+g*.028)*(slender?1.12:1),legR=(.062+g*.004)*(slender?.85:fluffy?1.1:1);
+ const S=(.8+g*.08)*(coon?1.05:1),headR=.36-g*.014,bodyLen=(.30+g*.045)*(slender?1.08:coon?1.16:1),bodyW=(.25+g*.012)*(fluffy?1.12:slender?.9:1),bodyH=(.23+g*.012)*(coon?1.04:1),legLen=(.13+g*.028)*(slender?1.12:coon?1.06:1),legR=(.062+g*.004)*(slender?.85:coon?1.18:fluffy?1.1:1);
  const C=k=>new T.Color(pal[k]);
  const mat=(o)=>keep(lite?new T.MeshStandardMaterial({roughness:.86,...o}):new T.MeshPhysicalMaterial({roughness:.82,sheen:.55,sheenRoughness:.75,sheenColor:new T.Color('#fff2e3'),...o}));
  const fur=mat({vertexColors:true}),plain=mat({color:pal.coat}),cream=mat({color:pal.cream}),inner=keep(new T.MeshStandardMaterial({color:pal.inner,roughness:.7})),nose=keep(new T.MeshStandardMaterial({color:pal.nose,roughness:.45})),dark=keep(new T.MeshStandardMaterial({color:'#4a312b',roughness:.6}));
@@ -70,6 +71,21 @@ export function buildCat(T,info,{growth=4,lite=false}={}){
  }
  const headGeo=colored('head'),bodyGeo=colored('body');
  const mesh=(geo,m,parent,pos,scale,shadow=true)=>{const x=new T.Mesh(geo,m);x.position.set(...pos);if(scale)x.scale.set(...scale);x.castShadow=shadow&&!lite;x.receiveShadow=!lite;parent.add(x);return x;};
+ // A soft tuft of long fur: a cone rooted at `pos`, pointing along `dir`.
+ // A rounded teardrop rather than a cone, so long fur reads as soft locks, not spikes.
+ const tuftGeo=keep(new T.LatheGeometry([[0,0],[.6,.08],[.84,.26],[.8,.5],[.62,.72],[.38,.89],[.14,.98],[0,1]].map(([x,y])=>new T.Vector2(x,y)),lite?7:11)),UP=new T.Vector3(0,1,0);
+ const stripeMat=keep(lite?new T.MeshStandardMaterial({color:pal.stripe,roughness:.86}):new T.MeshPhysicalMaterial({color:pal.stripe,roughness:.82,sheen:.55,sheenRoughness:.75,sheenColor:new T.Color('#fff2e3')}));
+ // Locks that share a parent and colour are merged into one mesh (one draw call) once the cat is built.
+ const tufts=new Map(),tm=new T.Matrix4(),tq=new T.Quaternion();
+ const tuft=(parent,m,pos,dir,len,rad,shadow=false)=>{const key=parent.uuid+m.uuid;if(!tufts.has(key))tufts.set(key,{parent,m,shadow:false,mats:[]});const b=tufts.get(key);
+  tq.setFromUnitVectors(UP,new T.Vector3(...dir).normalize());b.mats.push(tm.compose(new T.Vector3(...pos),tq,new T.Vector3(rad,len,rad)).clone());b.shadow||=shadow;};
+ function mergeTufts(){const src=tuftGeo,P=src.attributes.position,N=src.attributes.normal,I=src.index.array,nm=new T.Matrix3(),v=new T.Vector3();
+  for(const {parent,m,shadow,mats} of tufts.values()){const pos=new Float32Array(P.count*3*mats.length),nor=new Float32Array(pos.length),idx=new Uint32Array(I.length*mats.length);
+   mats.forEach((M,k)=>{nm.getNormalMatrix(M);for(let i=0;i<P.count;i++){const o=(k*P.count+i)*3;v.fromBufferAttribute(P,i).applyMatrix4(M);pos[o]=v.x;pos[o+1]=v.y;pos[o+2]=v.z;v.fromBufferAttribute(N,i).applyMatrix3(nm).normalize();nor[o]=v.x;nor[o+1]=v.y;nor[o+2]=v.z;}
+    for(let j=0;j<I.length;j++)idx[k*I.length+j]=I[j]+k*P.count;});
+   const geo=keep(new T.BufferGeometry());geo.setAttribute('position',new T.BufferAttribute(pos,3));geo.setAttribute('normal',new T.BufferAttribute(nor,3));geo.setIndex(new T.BufferAttribute(idx,1));
+   const x=mesh(geo,m,parent,[0,0,0],null,shadow);x.name='fur';}
+  tufts.clear();}
 
  const cat=new T.Group();cat.name=pal.name||'Cat';cat.userData.isCat=true;
  const scaler=new T.Group();scaler.scale.setScalar(S);cat.add(scaler);
@@ -77,17 +93,36 @@ export function buildCat(T,info,{growth=4,lite=false}={}){
  const body=new T.Group();body.position.set(0,hipY,-bodyLen*.62);scaler.add(body);// pivot at back hips
  const torso=mesh(bodyGeo,fur,body,[0,bodyH*.15,bodyLen*.62],[bodyW,bodyH,bodyLen]);
  mesh(sphere,pal.bib?cream:plain,body,[0,bodyH*.05,bodyLen*1.18],[bodyW*.82,bodyH*.95,bodyLen*.42]);// chest
- if(fluffy)mesh(sphere,pal.bib?cream:plain,body,[0,bodyH*.55,bodyLen*1.25],[bodyW*1.05,bodyH*.9,bodyLen*.4]);// ruff
+ if(fluffy&&!coon)mesh(sphere,pal.bib?cream:plain,body,[0,bodyH*.55,bodyLen*1.25],[bodyW*1.05,bodyH*.9,bodyLen*.4]);// ruff
+ let fringe=null,mane=null;
+ if(coon){
+  // The mane: a shaggy collar of fur around the shoulders, cream at the front, with a layered bib below.
+  const bibMat=pal.bib?cream:plain;
+  mesh(sphere,bibMat,body,[0,bodyH*.25,bodyLen*1.3],[bodyW*.98,bodyH,bodyLen*.4]);
+  // Side ruff sweeping back over the shoulders.
+  mane=new T.Group();mane.position.set(0,bodyH*.5,bodyLen*1.18);body.add(mane);
+  for(const s of [-1,1])for(const [k,a] of [[0,1.15],[1,1.6],[2,2.1],[3,2.6]]){if(lite&&k===3)continue;const hx=s*Math.sin(a),hz=Math.cos(a);
+   tuft(mane,k===2?stripeMat:k===0?bibMat:plain,[hx*bodyW*.56,-bodyH*k*.06,hz*bodyW*.4],[hx*.6,-.65,hz*.3-.95],bodyH*(.78-k*.05),bodyH*.38,true);}
+  // A scalloped edge to the bib, below the bell.
+  // It hangs with gravity, so it still drapes downwards when he sits up.
+  fringe=new T.Group();fringe.position.set(0,-bodyH*.2,bodyLen*1.3);body.add(fringe);
+  const nb=lite?4:7;for(let i=0;i<nb;i++){const a=-1.1+2.2*i/(nb-1),long=i%2===(nb%2?0:1);
+   tuft(fringe,bibMat,[Math.sin(a)*bodyW*.62,0,Math.cos(a)*bodyW*.22],[Math.sin(a)*.55,-1,.25],bodyH*(long?.5:.4),bodyH*.27,true);}
+ }
  // Head
  const neck=new T.Group();neck.position.set(0,bodyH*.75,bodyLen*1.28);body.add(neck);
  const head=new T.Group();head.position.set(0,headR*.62,headR*.28);neck.add(head);
  mesh(headGeo,fur,head,[0,0,0],[headR*1.08,headR,headR*.96]);
  const R=headR;
  for(const s of [-1,1]){
-  mesh(sphere,cream,head,[s*R*.2,-R*.28,R*.78],[R*.26,R*.2,R*.2]);// muzzle pads
-  if(fluffy||g<3){const tuft=mesh(keep(new T.ConeGeometry(R*.16,R*.42,10)),fur===fur?plain:plain,head,[s*R*1.0,-R*.25,R*.12],null);tuft.rotation.z=s*2.0;tuft.rotation.x=.25;}
+  mesh(sphere,cream,head,[s*R*.2,-R*.28,R*.78],coon?[R*.29,R*.23,R*.21]:[R*.26,R*.2,R*.2]);// muzzle pads (broad and square on a Maine Coon)
+  if(coon){// mutton-chop cheek ruff framing the face
+   tuft(head,plain,[s*R*.8,-R*.1,R*.08],[s*.85,-.3,-.6],R*.44,R*.22);
+   tuft(head,plain,[s*R*.76,-R*.34,R*.12],[s*.85,-.7,-.55],R*.48,R*.24);
+   tuft(head,pal.bib?cream:plain,[s*R*.5,-R*.42,R*.22],[s*.7,-1,.05],R*.5,R*.26);
+  }else if(fluffy||g<3){const cheek=mesh(keep(new T.ConeGeometry(R*.16,R*.42,10)),plain,head,[s*R*1.0,-R*.25,R*.12],null);cheek.rotation.z=s*2.0;cheek.rotation.x=.25;}
  }
- const chin=mesh(sphere,cream,head,[0,-R*.47,R*.6],[R*.2,R*.13,R*.16]);
+ const chin=mesh(sphere,cream,head,[0,-R*.47,R*.6],coon?[R*.25,R*.16,R*.18]:[R*.2,R*.13,R*.16]);
  mesh(sphere,nose,head,[0,-R*.14,R*.94],[R*.085,R*.06,R*.06]);
  // Mouth: a soft "w" made from two short arcs, plus an open mouth for eating and yawning.
  const mouthGroup=new T.Group();mouthGroup.position.set(0,-R*.27,R*.9);head.add(mouthGroup);
@@ -109,12 +144,15 @@ export function buildCat(T,info,{growth=4,lite=false}={}){
  if(!lite){const pts=[];for(const s of [-1,1])for(let i=0;i<3;i++){const y=-R*.18-i*R*.07;pts.push(new T.Vector3(s*R*.3,y,R*.85),new T.Vector3(s*R*1.05,y+(1-i)*R*.12,R*.62));}const wg=keep(new T.BufferGeometry().setFromPoints(pts));const wm=keep(new T.LineBasicMaterial({color:'#ffffff',transparent:true,opacity:.85}));head.add(new T.LineSegments(wg,wm));}
  // Ears
  const ears=[];
- const earGeo=keep(new T.ConeGeometry(R*.4,R*.78,lite?14:22,1)),innerGeo=keep(new T.ConeGeometry(R*.27,R*.58,lite?12:18,1));
+ const earH=coon?.96:.78,earGeo=keep(new T.ConeGeometry(R*(coon?.42:.4),R*earH,lite?14:22,1)),innerGeo=keep(new T.ConeGeometry(R*.27,R*(earH-.2),lite?12:18,1));
  for(const s of [-1,1]){
   const ear=new T.Group();ear.position.set(s*R*.5,R*.68,R*.08);ear.rotation.set(-.08,0,-s*.32);head.add(ear);
-  mesh(earGeo,pal.pattern==='point'?keep(new T.MeshStandardMaterial({color:pal.stripe,roughness:.85})):plain,ear,[0,R*.2,0],[1,1,.5]);
-  mesh(innerGeo,inner,ear,[0,R*.17,R*.1],[1,1,.32],false);
-  if(shape==='tufted'){const t=mesh(keep(new T.ConeGeometry(R*.05,R*.3,6)),dark,ear,[0,R*.58,0],null,false);t.rotation.z=s*.1;}
+  const ey=coon?R*.29:R*.2;
+  mesh(earGeo,pal.pattern==='point'?keep(new T.MeshStandardMaterial({color:pal.stripe,roughness:.85})):plain,ear,[0,ey,0],[1,1,.5]);
+  mesh(innerGeo,inner,ear,[0,ey-R*.03,R*.1],[1,1,.32],false);
+  if(coon){// lynx tips
+   tuft(ear,stripeMat,[0,ey+R*earH*.42,0],[-s*.12,1,0],R*.34,R*.055);
+  }
   ears.push(ear);
  }
  // Legs (pivot at the top), white socks for Mochi.
@@ -123,17 +161,19 @@ export function buildCat(T,info,{growth=4,lite=false}={}){
  for(const [front,s] of [[1,-1],[1,1],[0,-1],[0,1]]){
   const pivot=new T.Group();
   if(front){pivot.position.set(s*bodyW*.55,-bodyH*.2,bodyLen*1.15);body.add(pivot);}
-  else{pivot.position.set(s*bodyW*.62,hipY-bodyH*.25,-bodyLen*.62);scaler.add(pivot);mesh(sphere,plain,pivot,[0,0,0],[bodyW*.5,bodyH*.66,bodyLen*.44]);}
+  else{pivot.position.set(s*bodyW*.62,hipY-bodyH*.25,-bodyLen*.62);scaler.add(pivot);mesh(sphere,plain,pivot,[0,0,0],[bodyW*.5,bodyH*.66,bodyLen*.44]);
+   // Shaggy "britches" on the back of the thighs.
+   if(coon){tuft(pivot,plain,[s*bodyW*.1,-bodyH*.05,-bodyLen*.1],[s*.1,-1,-.75],bodyH*.85,bodyH*.4,true);tuft(pivot,stripeMat,[s*bodyW*.14,bodyH*.15,-bodyLen*.14],[s*.15,-.6,-1],bodyH*.7,bodyH*.36);if(!lite)tuft(pivot,pal.bib?cream:plain,[s*bodyW*.04,-bodyH*.25,0],[0,-1,-.4],bodyH*.75,bodyH*.36);}}
   const lower=new T.Group();pivot.add(lower);
   mesh(legGeo,front?plain:plain,lower,[0,-legLen*.5-legR*.3,0],null);
-  const paw=mesh(sphere,pawMat,lower,[0,-legLen-legR*.6,legR*.35],[legR*1.25,legR*.8,legR*1.5]);
+  const paw=mesh(sphere,pawMat,lower,[0,-legLen-legR*.6,legR*.35],coon?[legR*1.32,legR*.8,legR*1.6]:[legR*1.25,legR*.8,legR*1.5]);
   legs.push({pivot,lower,paw,front:!!front,side:s,baseY:pivot.position.y});
  }
  // Tail: a chain of short segments that bends smoothly.
  const tail=[];let parent=new T.Group();parent.position.set(0,bodyH*.35,-bodyLen*.18);body.add(parent);const tailRoot=parent;
- const tailCount=lite?6:9,tailLen=(.42+g*.05)*(fluffy?1.05:1);
+ const tailCount=lite?6:9,tailLen=(.42+g*.05)*(coon?1.2:fluffy?1.05:1);
  for(let i=0;i<tailCount;i++){
-  const r=(fluffy?.085:.062)*(1-i/tailCount*.4)*(1+g*.04);
+  const r=(coon?.108:fluffy?.085:.062)*(1-i/tailCount*(coon?.22:.4))*(1+g*.04);
   const ring=pal.pattern==='tabby'&&i%2===1,tip=i===tailCount-1&&pal.pattern!=='solid';
   const m=ring||tip?keep(new T.MeshStandardMaterial({color:pal.stripe,roughness:.85})):plain;
   const segG=new T.Group();segG.position.set(0,i?tailLen/tailCount:0,0);parent.add(segG);
@@ -146,9 +186,11 @@ export function buildCat(T,info,{growth=4,lite=false}={}){
   // Sits just under the chin so it reads clearly from the front, with a little gold bell.
   const collarMat=keep(new T.MeshStandardMaterial({color:pal.collar,roughness:.45}));
   const band=new T.Group();band.position.set(0,-R*.16,R*.26);neck.add(band);
-  const ring=mesh(keep(new T.TorusGeometry(R*.6,R*.08,10,40)),collarMat,band,[0,0,0],null);ring.rotation.x=-(Math.PI/2-.6);
-  const bell=mesh(small,keep(new T.MeshStandardMaterial({color:'#f2c94c',roughness:.25,metalness:.6})),band,[0,-R*.47,R*.5],[R*.13,R*.13,R*.13]);bell.name='bell';
+  const cr=coon?.6+g*.03:.6;// a Maine Coon's collar sits over his mane
+  const ring=mesh(keep(new T.TorusGeometry(R*cr,R*.08,10,40)),collarMat,band,[0,0,0],null);ring.rotation.x=-(Math.PI/2-.6);
+  const bell=mesh(small,keep(new T.MeshStandardMaterial({color:'#f2c94c',roughness:.25,metalness:.6})),band,[0,-R*.47*cr/.6,R*.5*cr/.6],[R*.13,R*.13,R*.13]);bell.name='bell';
  }
+ mergeTufts();
  const wear={head:new T.Group(),eyes:new T.Group(),neck:new T.Group()};
  wear.head.position.set(0,R*.82,0);head.add(wear.head);wear.eyes.position.set(0,R*.04,R*1.0);head.add(wear.eyes);wear.neck.position.set(0,-R*.16,R*.26);neck.add(wear.neck);
 
@@ -190,6 +232,8 @@ export function buildCat(T,info,{growth=4,lite=false}={}){
   const breathe=Math.sin(time*(p.lie>.5?1.6:2.6))*.012*(1+p.lie);
   const P2=gait*Math.PI*2,bob=(-Math.cos(2*P2)*(.012*wW+.02*tW)+Math.sin(P2)*.045*gW)*moveW;
   body.rotation.x=-.62*p.sit+.12*p.crouch+Math.sin(P2+.6)*.13*gW*moveW-.12*airW;
+  // Long fur hangs with gravity whatever the body is doing; the bib fringe tucks away when he sits.
+  if(fringe){fringe.rotation.x=-body.rotation.x;fringe.scale.setScalar(Math.max(.2,1-.8*p.sit));}if(mane)mane.rotation.x=-body.rotation.x*.8;
   body.rotation.z=Math.sin(time*40)*.004*p.purr+Math.sin(P2)*.035*wW*moveW+bank;
   body.position.y=hipY-p.sit*bodyH*.35-p.lie*(legLen*.95)-p.crouch*legLen*.35+bob;
   torso.scale.set(bodyW*(1+breathe),bodyH*(1+breathe),bodyLen*(1+Math.sin(P2)*.07*gW*moveW));

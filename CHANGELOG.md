@@ -1,3 +1,12 @@
+# v7.1.0 — Mochi is a Maine Coon
+
+- Mochi is now a Maine Coon. He keeps his ginger tabby coat, green eyes, white socks and blue collar, and gains the breed’s look: tall ears with lynx tips, a fluffy cream mane and bib with a scalloped edge, mutton-chop cheek ruffs, a broad muzzle, shaggy “britches” on his back legs, big snowshoe paws and a long, bushy tail. He is a little bigger and longer than other cats, and grows into it from kittenhood.
+- Long fur hangs with gravity, so the mane and bib drape naturally when he sits up and tuck away instead of poking forward.
+- His collar sits over his mane, and scales with him as he grows.
+- Kumo, the Maine Coon in Cat Friends, shares the same look.
+- The flat portrait (the “Ask Mochi” avatar, the home screen and picture mode) is a Maine Coon too: tufted ears, a cheek ruff and a plumed tail.
+- The fur is drawn efficiently: locks that move together are merged into one mesh, so Mochi costs only slightly more to draw than before. New tests check the breed features, the drawing budget, and that long fur hangs down when he sits.
+
 # v7.0.1 — Mochi walks instead of gliding, and cats no longer pass through each other
 
 - The leg cycle now advances with the distance Mochi actually travels, not with the clock. A planted paw stays where it touched the floor while his body passes over it, then lifts, curls and swings forward. Measured paw slide fell from about 100% of body movement to roughly 5–15%.

@@ -36,6 +36,10 @@ When a need runs a little low, Mochi shows a gentle wish (“Wants to play…”
 
 He wanders, grooms, watches the window, naps in his bed (more often at night), sits in his box and climbs his cat tree when Euna has bought them. The room’s lighting follows the real clock: sunny day, golden evening, moonlit night with the lamp on. Up to three unlocked friends from the cat collection visit and can be petted.
 
+## What Mochi looks like
+
+Mochi is a ginger tabby Maine Coon with green eyes, white socks and a blue collar with a bell. He has tall lynx-tipped ears, a cream mane and bib, cheek ruffs, shaggy britches, big paws and a long bushy tail. Kumo, the Maine Coon friend, shares the same build in brown. Long fur is made of soft teardrop locks merged into a few meshes per body part, and the mane and bib hang with gravity whatever pose he is in. `tests/mochi-home-cat.test.cjs` checks the breed features and the drawing budget.
+
 ## How Mochi moves
 
 Mochi’s legs follow the floor rather than a clock. His gait cycle advances with the distance he actually covers, so a planted paw stays put while his body moves over it. He walks, trots or gallops depending on speed, eases in and out of motion, steps when turning on the spot, and crouches and wiggles before a pounce. Cats are solid to each other: each has a two-circle footprint, steers around other cats, and is gently pushed apart if they still touch, with friends yielding to Mochi. `tests/mochi-home-scene.test.cjs` measures paw slide and the gap between cats directly.

@@ -1235,12 +1235,12 @@ function isCorrect(input,q){
 
 /* The cat ships inside the markup; this just reads her back out. */
 const BUILTIN_PHOTO = ($('catImg').getAttribute('src') || '');
-const APP_VERSION = '7.0.1';
+const APP_VERSION = '7.1.0';
 const BUILD_KIND  = 'site';
 const BUILD_DATE  = '2026-10-01';
 const BUILD = BUILD_KIND + ' v' + APP_VERSION + ' \u00b7 ' + BUILD_DATE;
 const PHOTO_KEY = 'cat-photo-v1';
-const MOCHI_AVATAR = 'mochi-flat-avatar.svg?v=7.0.1';
+const MOCHI_AVATAR = 'mochi-flat-avatar.svg?v=7.1.0';
 function photoSource(url){
   return url==='__builtin__'||/^(?:\.\/)?mochi-(?:builtin\.webp|flat\.svg)(?:\?[^#]*)?$/.test(url)?BUILTIN_PHOTO:url;
 }
@@ -2551,5 +2551,5 @@ async function hydratePhoto(){
 }
 
 if('serviceWorker' in navigator){
-  document.addEventListener('mochi:ready', ()=> navigator.serviceWorker.register('sw.js?v=7.0.1',{updateViaCache:'none'}).catch(()=>{}),{once:true});
+  document.addEventListener('mochi:ready', ()=> navigator.serviceWorker.register('sw.js?v=7.1.0',{updateViaCache:'none'}).catch(()=>{}),{once:true});
 }
