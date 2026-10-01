@@ -182,12 +182,48 @@ export async function mountMochiHome(root,options={}){
  let mode='idle',act=null,queue=[],needs={tummy:70,energy:85,clean:80,fun:65,love:70},sleeping=false,lookTarget=null,elevated=0;
  const obstacles=()=>[[SPOTS.bed,.6],[[2.15,-1.55],.4],[[2.32,-2.05],.35],[[-2.32,-.45],.3],[[1.62,.92],.3],[[2.15,.45],.28],...(owned.tree?[[SPOTS.tree,.5]]:[]),...(owned.box?[[SPOTS.box,.48]]:[])];
  function clampRoom(v){v.x=THREEclamp(v.x,ROOM.minX,ROOM.maxX);v.z=THREEclamp(v.z,ROOM.minZ,ROOM.maxZ);return v;}
+ // ---------------- personal space ----------------
+ // Each cat is a circle on the floor sized from its body. Walking cats steer around others,
+ // and a final pass nudges apart any that still touch. Friends make way for Mochi.
+ // Two floor circles per cat: head-and-chest in front, haunches behind. Cats are long, so one circle is not enough.
+ function circlesOf(cat,x,z,yaw,scale=1){const p=cat.parts,fx=Math.sin(yaw),fz=Math.cos(yaw),f=(p.bodyLen*.66+p.headR*.3)*scale,b=-p.bodyLen*.5*scale;
+  return [{x:x+fx*f,z:z+fz*f,r:p.headR*1.0*scale},{x:x+fx*b,z:z+fz*b,r:Math.max(p.bodyW*1.05,p.headR*.7)*scale}];}
+ function radiusOf(cat,scale=1){const p=cat.parts;return Math.max(p.headR,p.bodyW*1.05)*scale;}
+ function catsList(){const list=[{id:'mochi',cat:mochi,g:{position:pos},yaw:heading,scale:1}];for(const [id,f] of friends)list.push({id,f,cat:f.cat,g:f.cat.group,yaw:f.cat.group.rotation.y,scale:.8});return list;}
+ function others(except){const out=[];for(const c of catsList())if(c.id!==except)out.push(...circlesOf(c.cat,c.g.position.x,c.g.position.z,c.id==='mochi'?heading:c.g.rotation.y,c.scale));return out;}
+ function avoidHeading(x,z,want,r,except,dist){
+  // Bend the heading sideways around cats ahead (more strongly the closer they are), plus a little push away.
+  const bx=Math.sin(want),bz=Math.cos(want);let vx=bx,vz=bz;
+  for(const o of others(except)){const dx=o.x-x,dz=o.z-z,l=Math.hypot(dx,dz),clear=r+o.r+.1;if(l<1e-4||l>clear+.7||l>dist+o.r)continue;
+   const ahead=(dx*bx+dz*bz)/l;if(ahead<-.25)continue;
+   const cross=dx*bz-dz*bx,side=cross>0?-1:1,w=Math.min(3,(clear+.7-l)/.7)*(.4+Math.max(0,ahead));
+   vx+=side*bz*w-dx/l*w*.3;vz+=-side*bx*w-dz/l*w*.3;}
+  return Math.atan2(vx,vz);
+ }
+ function separate(){
+  const aloft=['climb','perch','boxsit'].includes(act?.name)||elevated>.4;
+  const items=catsList().map(c=>({...c,pos:c.id==='mochi'?pos:c.g.position,weight:c.id==='mochi'?((sleeping||aloft)?0:.25):1}));
+  // A cat pressed against furniture or a wall cannot give way, so the other cat yields instead.
+  const walls=it=>{const v=it.pos,bx=v.x,bz=v.z;if(it.id!=='mochi')for(const [[ox,oz],r] of obstacles()){const dx=v.x-ox,dz=v.z-oz,l=Math.hypot(dx,dz);if(l<r){v.x=ox+dx/l*r;v.z=oz+dz/l*r;}}if(it.id!=='mochi'||!sleeping)clampRoom(v);if(Math.hypot(v.x-bx,v.z-bz)>1e-5&&it.weight>0)it.weight=.02;};
+  // Resolve cat contacts and walls together over a few rounds, so a cat pinned against furniture still ends up clear.
+  for(let pass=0;pass<6;pass++){
+   for(let i=0;i<items.length;i++)for(let j=i+1;j<items.length;j++){
+    const A=items[i],B=items[j];if((A.id==='mochi'||B.id==='mochi')&&aloft)continue;
+    const ca=circlesOf(A.cat,A.pos.x,A.pos.z,A.id==='mochi'?heading:A.g.rotation.y,A.scale),cb=circlesOf(B.cat,B.pos.x,B.pos.z,B.id==='mochi'?heading:B.g.rotation.y,B.scale);
+    let best=null;for(const a of ca)for(const b of cb){let dx=b.x-a.x,dz=b.z-a.z,l=Math.hypot(dx,dz);const pen=a.r+b.r+.005-l;if(pen>0&&(!best||pen>best.pen)){if(l<1e-4){dx=B.pos.x-A.pos.x||1;dz=B.pos.z-A.pos.z;l=Math.hypot(dx,dz);}best={pen,nx:dx/l,nz:dz/l};}}
+    if(!best)continue;const wa=A.weight,wb=B.weight,tot=wa+wb||1;
+    A.pos.x-=best.nx*best.pen*wa/tot;A.pos.z-=best.nz*best.pen*wa/tot;B.pos.x+=best.nx*best.pen*wb/tot;B.pos.z+=best.nz*best.pen*wb/tot;
+    for(const it of [A,B])if(it.f&&it.weight>0&&it.f.activity==='rest')it.f.wait=Math.min(it.f.wait,.2);
+   }
+   items.forEach(walls);
+  }
+ }
  // Velocity-based steering: ease in, brake before arriving, and slow down to turn rather than sliding sideways.
- let curSpeed=0;
+ let curSpeed=0,mochiGoal=null;
  function steer(from,to,speed,dt,allowInto){
   const d=new T.Vector3(to.x-from.x,0,to.z-from.z),dist=d.length();
   if(dist<.04&&curSpeed<.2){curSpeed=0;return true;}
-  const run=speed>1.5,want=Math.atan2(d.x,d.z);let diff=((want-heading+Math.PI*3)%(Math.PI*2))-Math.PI;
+  const run=speed>1.5,want=avoidHeading(from.x,from.z,Math.atan2(d.x,d.z),radiusOf(mochi),'mochi',dist);let diff=((want-heading+Math.PI*3)%(Math.PI*2))-Math.PI;
   const maxTurn=(run?6.5:4.2)*dt;heading+=Math.max(-maxTurn,Math.min(maxTurn,diff*Math.min(1,dt*9)));
   const decel=run?5:2.6,accel=run?6:2.4,align=Math.max(0,Math.cos(diff)),wantSpeed=Math.min(speed,Math.sqrt(2*decel*Math.max(0,dist-.03)))*(align>.35?align:0);
   curSpeed+=Math.max(-decel*1.6*dt,Math.min(accel*dt,wantSpeed-curSpeed));
@@ -200,7 +236,7 @@ export async function mountMochiHome(root,options={}){
  function start(a){act={t:0,...a};act.enter?.();}
  function next(){act=null;if(queue.length)start(queue.shift());}
  function interrupt(list,keepTreat){queue=[];act?.exit?.();act=null;sleeping=false;elevated=0;rollAngle=0;if(!keepTreat)showTreat(null);list.forEach((a,i)=>i?queue.push(a):start(a));}
- const walkTo=(spot,speed=.8,into=false,then)=>({name:'walk',enter(){P({...base,tailUp:.85})},update(dt){const done=steer(pos,new T.Vector3(spot[0],0,spot[1]),speed,dt,into);mochi.current.walk>.1&&Math.random()<.01&&0;return done;},exit(){P({walk:0})}});
+ const walkTo=(spot,speed=.8,into=false,then)=>({name:'walk',enter(){P({...base,tailUp:.85});mochiGoal=spot;},update(dt){const done=steer(pos,new T.Vector3(spot[0],0,spot[1]),speed,dt,into);mochi.current.walk>.1&&Math.random()<.01&&0;return done;},exit(){P({walk:0})}});
  const face=(yaw)=>({name:'face',update(dt){let diff=((yaw-heading+Math.PI*3)%(Math.PI*2))-Math.PI;heading+=diff*Math.min(1,dt*6);return Math.abs(diff)<.05;}});
  const faceCamera=()=>({name:'faceCam',update(dt){const yaw=Math.atan2(camera.position.x-pos.x,camera.position.z-pos.z);let diff=((yaw-heading+Math.PI*3)%(Math.PI*2))-Math.PI;heading+=diff*Math.min(1,dt*6);return Math.abs(diff)<.08;}});
  const hold=(name,pose,secs,each)=>({name,enter(){P({...base,...pose})},update(dt){each?.(dt,this);return this.t>=secs;}});
@@ -270,7 +306,7 @@ export async function mountMochiHome(root,options={}){
     update(dt){
      if(ahead){
       if(this.t<.42){const yaw=Math.atan2(target.x-pos.x,target.z-pos.z);let diff=((yaw-heading+Math.PI*3)%(Math.PI*2))-Math.PI;heading+=diff*Math.min(1,dt*10);return false;}
-      if(!this.leap){this.leap={x:pos.x,z:pos.z,tx:target.x,tz:target.z};mochi.setPose({crouch:0,wiggle:0});}
+      if(!this.leap){let tx=target.x,tz=target.z;for(const o of others('mochi')){const dx=tx-o.x,dz=tz-o.z,l=Math.hypot(dx,dz),need=o.r+radiusOf(mochi)+.05;if(l<need){const bx=pos.x-o.x,bz=pos.z-o.z,bl=Math.hypot(bx,bz)||1;tx=o.x+bx/bl*need;tz=o.z+bz/bl*need;}}this.leap={x:pos.x,z:pos.z,tx,tz};mochi.setPose({crouch:0,wiggle:0});}
       const k=Math.min(1,(this.t-.42)/.42),e=k*k*(3-2*k);pos.x=this.leap.x+(this.leap.tx-this.leap.x)*e*.92;pos.z=this.leap.z+(this.leap.tz-this.leap.z)*e*.92;for(const [[ox,oz],r] of obstacles()){const dx=pos.x-ox,dz=pos.z-oz,l=Math.hypot(dx,dz);if(l<r){pos.x=ox+dx/l*r;pos.z=oz+dz/l*r;}}clampRoom(pos);elevated=reduced?0:Math.sin(k*Math.PI)*.22;
       if(k>=1){elevated=0;mochi.setPose({crouch:.35,frontRaise:0});return this.t>1.0;}return false;}
      if(this.t>.12&&this.t<.4)mochi.setPose({frontRaise:1});else mochi.setPose({frontRaise:0});return this.t>.55;},
@@ -329,14 +365,28 @@ export async function mountMochiHome(root,options={}){
  canvas.addEventListener('pointerdown',onDown);canvas.addEventListener('pointermove',onMove);canvas.addEventListener('pointerup',onUp);canvas.addEventListener('pointercancel',()=>{press=null;});canvas.addEventListener('pointerleave',()=>{brush.visible=false;});
 
  function petFriend(id){const f=friends.get(id);if(!f)return false;f.cat.setPose({sit:1,happy:1,blush:1,purr:1,tailUp:1});f.activity='petted';f.wait=2.2;const v=new T.Vector3();f.cat.parts.head.getWorldPosition(v);emit('heart',v.add(new T.Vector3(0,.2,0)),3);return true;}
+ // A free spot on the floor: away from furniture, from Mochi and his destination, and from other cats.
+ function clearSpot(except){
+  let best=null,bestScore=-1;
+  for(let k=0;k<14;k++){const c=[ROOM.minX+.5+Math.random()*(ROOM.maxX-ROOM.minX-1),ROOM.minZ+.9+Math.random()*(ROOM.maxZ-ROOM.minZ-1.3)];
+   let score=Math.min(...obstacles().map(([[ox,oz],r])=>Math.hypot(c[0]-ox,c[1]-oz)-r),...others(except).map(o=>Math.hypot(c[0]-o.x,c[1]-o.z)-o.r-.25));
+   if(mochiGoal)score=Math.min(score,Math.hypot(c[0]-mochiGoal[0],c[1]-mochiGoal[1])-.6);
+   if(score>bestScore){bestScore=score;best=c;}if(score>.4)break;}
+  return best;
+ }
+ function makeWay(){
+  // A resting friend sitting where Mochi is heading gets up and moves.
+  if(!mochiGoal)return;for(const f of friends.values()){if(f.activity!=='rest')continue;const g=f.cat.group.position;if(Math.hypot(g.x-mochiGoal[0],g.z-mochiGoal[1])<radiusOf(mochi)+radiusOf(f.cat,.8)+.15)f.wait=0;}
+ }
  function updateFriends(dt){
+  makeWay();
   for(const f of friends.values()){
    const g=f.cat.group;f.wait-=dt;
    const before={x:g.position.x,z:g.position.z,h:g.rotation.y};f.speed=f.speed||0;
    if(f.activity==='walk'&&f.target){const d=new T.Vector3(f.target[0]-g.position.x,0,f.target[1]-g.position.z),l=d.length();
     if(l<.05&&f.speed<.15){f.speed=0;f.activity='rest';f.wait=4+Math.random()*7;f.cat.setPose({sit:Math.random()<.6?1:0,lie:Math.random()<.25?1:0,eye:1,happy:0});}
-    else{const yaw=Math.atan2(d.x,d.z);let diff=((yaw-g.rotation.y+Math.PI*3)%(Math.PI*2))-Math.PI;g.rotation.y+=Math.max(-3.5*dt,Math.min(3.5*dt,diff*Math.min(1,dt*8)));const align=Math.max(0,Math.cos(diff)),want=Math.min(.6,Math.sqrt(2*2.2*Math.max(0,l-.03)))*(align>.4?align:0);f.speed+=Math.max(-3.5*dt,Math.min(2*dt,want-f.speed));const st=Math.min(l,f.speed*dt);g.position.x+=Math.sin(g.rotation.y)*st;g.position.z+=Math.cos(g.rotation.y)*st;}}
-   else if(f.wait<=0){f.activity='walk';f.target=[ROOM.minX+.5+Math.random()*(ROOM.maxX-ROOM.minX-1),ROOM.minZ+1+Math.random()*(ROOM.maxZ-ROOM.minZ-1.4)];if(Math.hypot(f.target[0]-pos.x,f.target[1]-pos.z)<.8)f.target[0]+=1;f.cat.setPose({sit:0,lie:0,happy:0,purr:0,blush:0});}
+    else{const yaw=avoidHeading(g.position.x,g.position.z,Math.atan2(d.x,d.z),radiusOf(f.cat,.8),f.info.id,l);let diff=((yaw-g.rotation.y+Math.PI*3)%(Math.PI*2))-Math.PI;g.rotation.y+=Math.max(-3.5*dt,Math.min(3.5*dt,diff*Math.min(1,dt*8)));const align=Math.max(0,Math.cos(diff)),want=Math.min(.6,Math.sqrt(2*2.2*Math.max(0,l-.03)))*(align>.4?align:0);f.speed+=Math.max(-3.5*dt,Math.min(2*dt,want-f.speed));const st=Math.min(l,f.speed*dt);g.position.x+=Math.sin(g.rotation.y)*st;g.position.z+=Math.cos(g.rotation.y)*st;}}
+   else if(f.wait<=0){f.activity='walk';f.target=clearSpot(f.info.id);f.cat.setPose({sit:0,lie:0,happy:0,purr:0,blush:0});}
    f.cat.update(dt,reduced,{speed:dt>0?Math.hypot(g.position.x-before.x,g.position.z-before.z)/dt:0,turn:dt>0?(((g.rotation.y-before.h+Math.PI*3)%(Math.PI*2))-Math.PI)/dt:0});
   }
  }
@@ -357,7 +407,8 @@ export async function mountMochiHome(root,options={}){
   lastPos.x=pos.x;lastPos.z=pos.z;lastHeading=heading;if(act?.name!=='walk'&&act?.name!=='chase')curSpeed=Math.max(0,curSpeed-4*dt);
   mochi.group.position.set(pos.x,elevated,pos.z);mochi.group.rotation.set(0,heading,rollAngle);
   if(lookTarget&&mode.startsWith('play:')){const local=Math.atan2(lookTarget.x-pos.x,lookTarget.z-pos.z)-heading;mochi.setPose({headYaw:THREEclamp(((local+Math.PI*3)%(Math.PI*2))-Math.PI,-.7,.7)});}
-  mochi.update(dt,false,motion);updateFriends(dt);updateSprites(dt);placeCamera(dt);
+  if(act?.name!=='walk')mochiGoal=null;
+  mochi.update(dt,false,motion);updateFriends(dt);separate();mochi.group.position.x=pos.x;mochi.group.position.z=pos.z;updateSprites(dt);placeCamera(dt);
   if(owned.tree){const d=owned.tree.getObjectByName('dangle');if(d)d.position.x=.45+Math.sin(performance.now()/500)*.04;}
  }
  function frameLoop(now){

@@ -1,4 +1,4 @@
-# v7.0.1 — Mochi walks instead of gliding
+# v7.0.1 — Mochi walks instead of gliding, and cats no longer pass through each other
 
 - The leg cycle now advances with the distance Mochi actually travels, not with the clock. A planted paw stays where it touched the floor while his body passes over it, then lifts, curls and swings forward. Measured paw slide fell from about 100% of body movement to roughly 5–15%.
 - Gaits change with speed: a four-beat walk, a trot, and a bounding gallop with a stretching spine when he chases toys. Gaits switch cleanly rather than blending two rhythms.
@@ -7,7 +7,9 @@
 - Pounces have a crouch and a wiggle before the leap, legs tucked and stretched in mid-air, and a soft landing. Leaps no longer land inside furniture.
 - Visiting friends walk with the same gait engine.
 - The collar now dips under the chin at the front, with the bell hanging from it. The bow tie and scarf follow it.
-- New tests: planted paws slide less than 20% of body motion with steady paw height, and Mochi eases into and out of movement.
+- Cats have personal space. Each cat takes up two soft circles on the floor (front and haunches). Cats steer around one another, a resting friend gets up and moves when Mochi needs to pass, friends pick free spots to sit, and any remaining overlap is pushed apart every frame, with friends making way for Mochi. Cats stay solid during chases and pounces; only cats up on the tree or in the box are exempt.
+- Scene tests now use a fixed random seed, so they give the same result every run. An unlucky random start had made one test fail on GitHub.
+- New tests: planted paws slide less than 20% of body motion with steady paw height, Mochi eases into and out of movement, and cats never overlap while roaming, passing or chasing the laser.
 
 # v7.0.0 — Mochi’s Home: a new 3D pet to care for
 

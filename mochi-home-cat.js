@@ -225,7 +225,7 @@ export function buildCat(T,info,{growth=4,lite=false}={}){
  function setPose(next){Object.assign(target,next);}
  function reset(){Object.assign(target,{sit:0,lie:0,crouch:0,headPitch:0,headYaw:0,headTilt:0,tailUp:.6,tailCurl:0,eye:1,happy:0,mouth:0,ears:0,blush:0,frontRaise:0,wave:0,walk:0,purr:0,lean:0,lick:0,wiggle:0});}
  function dispose(){disposables.forEach(d=>d.dispose?.());cat.removeFromParent();}
- const parts={head,neck,body,torso,legs,tail,eyes,ears,wear,mouthOpen,R,headR:R*S,height:(hipY+bodyH+R*1.6)*S,scale:S,bodyLen:bodyLen*S};
+ const parts={head,neck,body,torso,legs,tail,eyes,ears,wear,mouthOpen,R,headR:R*S,bodyW:bodyW*S,height:(hipY+bodyH+R*1.6)*S,scale:S,bodyLen:bodyLen*S};
  cat.userData.parts=parts;
  return {group:cat,parts,pose:target,current:pose,update,setPose,reset,dispose,palette:pal,growth:g};
 }

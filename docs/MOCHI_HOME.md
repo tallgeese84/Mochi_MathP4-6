@@ -38,7 +38,7 @@ He wanders, grooms, watches the window, naps in his bed (more often at night), s
 
 ## How Mochi moves
 
-Mochi’s legs follow the floor rather than a clock. His gait cycle advances with the distance he actually covers, so a planted paw stays put while his body moves over it. He walks, trots or gallops depending on speed, eases in and out of motion, steps when turning on the spot, and crouches and wiggles before a pounce. `tests/mochi-home-scene.test.cjs` measures paw slide directly.
+Mochi’s legs follow the floor rather than a clock. His gait cycle advances with the distance he actually covers, so a planted paw stays put while his body moves over it. He walks, trots or gallops depending on speed, eases in and out of motion, steps when turning on the spot, and crouches and wiggles before a pounce. Cats are solid to each other: each has a two-circle footprint, steers around other cats, and is gently pushed apart if they still touch, with friends yielding to Mochi. `tests/mochi-home-scene.test.cjs` measures paw slide and the gap between cats directly.
 
 ## Technical notes
 

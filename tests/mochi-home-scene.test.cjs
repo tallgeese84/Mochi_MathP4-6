@@ -1,5 +1,7 @@
 const test=require('node:test'),assert=require('node:assert/strict');
 const F=require('../cat-friends-core.js');
+// Scene behaviour uses Math.random; seed it so every run (here and on GitHub) is identical.
+let seed=+(process.env.SCENE_SEED||12345);Math.random=()=>((seed=(seed*16807)%2147483647)/2147483647);
 async function setup(opts={}){
  const T0=await import('../vendor/three-r180/three.module.js'),cat=await import('../mochi-home-cat.js');
  const listeners={};const canvas={className:'',style:{},setAttribute(){},addEventListener(k,f){listeners[k]=f;},removeEventListener(){},remove(){},getBoundingClientRect:()=>({left:0,top:0,width:800,height:500}),setPointerCapture(){}};
@@ -61,12 +63,41 @@ test('paws stay planted while walking: the gait follows distance travelled, not 
  }
 });
 test('Mochi eases into motion and brakes before arriving instead of starting and stopping at full speed',async()=>{
- const {api,run}=await setup();const D=api.debug;D.pos.set(-1,0,.8);api.react('tilt');run(3);
- const speeds=[];let last={x:D.pos.x,z:D.pos.z};api.greet();
+ const {api}=await setup();const D=api.debug;
+ // Start well away from the rug so the greeting always walks him over.
+ D.pos.set(2.1,0,1.8);api.greet();
+ const speeds=[];let last={x:D.pos.x,z:D.pos.z};
  for(let i=0;i<150;i++){D.tick(1/30);speeds.push(Math.hypot(D.pos.x-last.x,D.pos.z-last.z)*30);last={x:D.pos.x,z:D.pos.z};}
  const moving=speeds.findIndex(v=>v>.05);assert.ok(moving>=0);
  assert.ok(speeds[moving]<.4,'starts gently');
  const peak=Math.max(...speeds),stopAt=speeds.findIndex((v,i)=>i>moving&&v<.02);
  assert.ok(stopAt<0||speeds[stopAt-3]<peak*.8,'slows down before stopping');
  api.dispose();
+});
+
+function minGap(api){
+ // Same two-circle footprint as the scene: head-and-chest and haunches.
+ const D=api.debug,cats=[{g:D.mochi.group,c:D.mochi,s:1},...[...D.friends.values()].map(f=>({g:f.cat.group,c:f.cat,s:.8}))];
+ const circ=x=>{const p=x.c.parts,y=x.g.rotation.y,fx=Math.sin(y),fz=Math.cos(y),f=(p.bodyLen*.66+p.headR*.3)*x.s,b=-p.bodyLen*.5*x.s,P=x.g.position;return [{x:P.x+fx*f,z:P.z+fz*f,r:p.headR*x.s},{x:P.x+fx*b,z:P.z+fz*b,r:Math.max(p.bodyW*1.05,p.headR*.7)*x.s}];};
+ let worst=Infinity;
+ for(let i=0;i<cats.length;i++)for(let j=i+1;j<cats.length;j++)for(const a of circ(cats[i]))for(const b of circ(cats[j]))worst=Math.min(worst,Math.hypot(a.x-b.x,a.z-b.z)/(a.r+b.r));
+ return worst;
+}
+test('cats never pass through each other while Mochi and three friends roam the room',async()=>{
+ const {api}=await setup();api.setFriends(F.catalog.slice(0,3));let worst=Infinity;
+ for(let i=0;i<30*90;i++){api.debug.tick(1/30);if(i%90===0&&i)api.greet();worst=Math.min(worst,minGap(api));}
+ assert.ok(worst>.97,`closest pair reached ${(worst*100).toFixed(0)}% of touching distance`);
+ api.dispose();
+});
+test('a friend in Mochi’s path is walked around or gets up and makes way',async()=>{
+ const {api}=await setup();api.setFriends([F.catalog[0]]);const D=api.debug,f=[...D.friends.values()][0];
+ f.cat.group.position.set(.15,0,.75);f.activity='rest';f.wait=60;D.pos.set(-1.9,0,.75);
+ api.greet();let worst=Infinity,closest=Infinity;for(let i=0;i<30*8;i++){D.tick(1/30);worst=Math.min(worst,minGap(api));closest=Math.min(closest,Math.hypot(D.pos.x-.15,D.pos.z-.75));}
+ assert.ok(worst>.97,`overlap ${(worst*100).toFixed(0)}%`);assert.ok(closest<.25,`Mochi still reaches his spot (closest ${closest.toFixed(2)})`);assert.ok(Math.hypot(f.cat.group.position.x-.15,f.cat.group.position.z-.75)>.3,'the friend moved aside');
+ api.dispose();
+});
+test('playing chase never sends Mochi through a friend',async()=>{
+ const {api}=await setup();api.setFriends(F.catalog.slice(3,6));api.setMode('play:laser');const D=api.debug;let worst=Infinity;
+ for(let i=0;i<30*40;i++){if(i%45===0)D.setToy(-2+Math.random()*4,-1.6+Math.random()*3.4);D.tick(1/30);worst=Math.min(worst,minGap(api));}
+ assert.ok(worst>.95,`overlap ${(worst*100).toFixed(0)}%`);api.dispose();
 });
