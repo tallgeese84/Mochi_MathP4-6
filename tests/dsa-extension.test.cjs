@@ -8,8 +8,8 @@ const near=(a,b,msg,tol=1e-6)=>assert.ok(Math.abs(a-b)<=tol*Math.max(1,Math.abs(
 const each=(unit,form,fn)=>{for(const s of SEEDS){const q=B.make(unit,form,s);fn(q,s);}};
 
 test('six challenge units exist, stay out of reserved papers and link to real prerequisites',()=>{
- const ext=D.units.filter(u=>u.extension);
- assert.equal(ext.length,6);assert.equal(D.units.length,34);
+ const ext=D.units.filter(u=>u.extension&&!u.module);
+ assert.equal(ext.length,6);assert.equal(D.units.filter(u=>!u.module).length,34);
  for(const u of ext){assert.ok(u.ideas.length>=3);assert.ok(u.prerequisites.every(id=>D.units.some(v=>v.id===id&&!v.extension)));assert.ok(u.check[1][u.check[2]]);}
 });
 
