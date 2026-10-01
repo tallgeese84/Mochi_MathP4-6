@@ -4,6 +4,32 @@ const range=(a,b)=>Array.from({length:b-a+1},(_,i)=>a+i),sum=a=>a.reduce((n,x)=>
 const common=(a,b)=>{let n=a;while(n%b)n+=a;return n;};
 const coordinate=(N)=>{let x=0,y=0,dir=0,s=0;for(let length=1;s<N;length++){for(let twice=0;twice<2&&s<N;twice++,dir++){let moved=0;while(moved<length&&s<N){const v=[[1,0],[0,1],[-1,0],[0,-1]][dir%4];x+=v[0];y+=v[1];s++;moved++;}if(s===N)return {x,y,last:moved};}}return {x,y,last:0};};
 const brutePacks=(budget,costs,counts)=>{let max=0;for(let a=0;a*costs[0]<=budget;a++)for(let b=0;a*costs[0]+b*costs[1]<=budget;b++)for(let c=0;c<=(costs[2]?Math.floor((budget-a*costs[0]-b*costs[1])/costs[2]):0);c++)max=Math.max(max,a*counts[0]+b*counts[1]+c*(counts[2]||0));return max;};
+// Revision-2 solvers read the printed question, not the generator's parameters.
+function solveStatements(t){
+ const boxes=[...t.matchAll(/([A-D]): “The \w+ is (not )?in ([A-D])\.”/g)].map(m=>({speaker:m[1],not:!!m[2],ref:m[3]}));
+ const people=[...t.matchAll(/([A-Z][a-z]+): “(I|[A-Z][a-z]+) did( not)? (?:do )?it\.”/g)].map(m=>({speaker:m[1],not:!!m[3],ref:m[2]==='I'?m[1]:m[2]}));
+ const st=boxes.length?boxes:people,cands=st.map(x=>x.speaker),k=/Exactly one (?:label is true|of them is telling the truth)/.test(t)?1:cands.length-1;
+ assert.ok(st.length>=3);const fits=cands.filter(c=>st.filter(x=>x.not?c!==x.ref:c===x.ref).length===k);assert.equal(fits.length,1,'unique: '+t);return fits[0];
+}
+function solveNumberStatements(t){
+ const list=[...t.matchAll(/\(\d\) ([^(]+?\.)(?= \(|\s*What)/g)].map(m=>m[1]);assert.equal(list.length,4);
+ const test=(st,n)=>{let m;if(m=st.match(/multiple of (\d+)/))return n%+m[1]===0;if(m=st.match(/greater than (\d+)/))return n>+m[1];if(m=st.match(/less than (\d+)/))return n<+m[1];if(m=st.match(/digits add up to (\d+)/))return String(n).split('').reduce((a,c)=>a+ +c,0)===+m[1];if(/square/.test(st))return Number.isInteger(Math.sqrt(n));if(/odd/.test(st))return n%2===1;if(/even/.test(st))return n%2===0;throw Error('Unknown statement '+st);};
+ const hits=range(1,60).filter(n=>list.filter(st=>test(st,n)).length===3);assert.equal(hits.length,1,t);return hits[0];
+}
+function solveDigitClues(t){
+ const S=+t.match(/digits add up to (\d+)/)[1],k=+t.match(/hundreds digit is (\d+) more than its units digit/)[1],m=+t.match(/divisible by (\d+)/)[1],diff=/all different/.test(t);
+ const hits=range(100,999).filter(n=>{const d=String(n).split('').map(Number);return d[0]+d[1]+d[2]===S&&d[0]-d[2]===k&&n%m===0&&(!diff||new Set(d).size===3);});assert.equal(hits.length,1,t);return hits[0];
+}
+function solveReach(t){
+ const [start,a,b,target]=[+t.match(/Start with (\d+)/)[1],+t.match(/add (\d+)/)[1],+t.match(/subtract (\d+)/)[1],+t.match(/reach (\d+)/)[1]];
+ const seen=new Set([start]),queue=[start];while(queue.length){const v=queue.shift();for(const w of [v+a,v-b])if(w>=-400&&w<=800&&!seen.has(w)){seen.add(w);queue.push(w);}}
+ return seen.has(target)?'Yes':'No';
+}
+function solveThreeSets(N,a,b,c){
+ for(let t=0;t<=Math.min(a,b,c);t++)for(let ab=0;ab<=a-t;ab++)for(let ac=0;ac<=a-t-ab;ac++)for(let bc=0;bc<=b-t-ab&&bc<=c-t-ac;bc++){const xa=a-t-ab-ac,xb=b-t-ab-bc,xc=c-t-ac-bc;if(xb<0||xc<0)continue;if(xa+xb+xc+ab+ac+bc+t<=N)return t;}
+ return null;
+}
+function solveFive(T,L){let best=null;for(let s=1;s<L;s++)for(let y=s+1;y<L;y++)for(let z=y+1;z<L;z++){const w=T-L-s-y-z;if(w>z&&w<L)best=Math.max(best??0,s);}return best;}
 function independentlySolve(q){const p=q.params,f=q.form;
  switch(q.unit){
  case 'geo-measure':return /space|volume|fill|inside/.test(p.quantity)?'cm³':/area|surface|face|cover/.test(p.quantity)?'cm²':'cm';
@@ -16,7 +42,7 @@ function independentlySolve(q){const p=q.params,f=q.form;
  case 'remainders':return [()=>p.whole-p.whole/3-(p.whole-p.whole/3)/4,()=>range(0,300).find(n=>3*n/4-p.fixed===p.left),()=>4*(p.left+p.fixed),()=>range(0,p.total).find(a=>((p.total-a)+a/3)*3/4===p.finalB)][f]();
  case 'simultaneous':return [()=>range(0,p.total).find(n=>4*n+2*(p.total-n)===p.wheels),()=>range(1,100).find(n=>Math.abs((p.one-2*n)/3-(p.two-4*n))<1e-8),()=>range(1,40).find(c=>5*(c-p.years)+p.years===3*(c+p.years)-p.years),()=>{for(let n=1;n<50;n++)for(let b=1;b<50;b++)if(3*n+2*b===p.one&&2*n+5*b===p.two)return 4*n+3*b;}][f]();
  case 'ratios':return [()=>p.white+p.white*p.a/p.b,()=>range(1,500).find(k=>2*k/(3*k+p.added)===3/8)*5,()=>range(1,500).find(k=>5*k-p.moved===3*k+p.moved)*8,()=>1/(1/p.a+1/p.b)][f]();
- case 'rates':return [()=>p.target*p.time/p.count,()=>1/(1/p.a+1/p.b),()=>p.target/(p.count/p.time-p.first/4),()=>p.first*(p.rate-p.inflow)/(2*p.rate-p.inflow)][f]();
+ case 'rates':return [()=>p.target*p.time/p.count,()=>1/(1/p.a+1/p.b),()=>p.target/(p.count/p.time-p.first/4),()=>p.first*(p.rate-p.inflow)/((p.pumps||2)*p.rate-p.inflow)][f]();
  case 'motion':return [()=>p.distance/(p.a+p.b),()=>2*p.leg/(p.leg/p.a+p.leg/p.b),()=>p.distance*p.messenger/(p.a+p.b),()=>2*p.walk/(1/p.withTime+1/p.againstTime)][f]();
  case 'capacity':return [()=>p.usedLarge*p.small/p.large,()=>range(0,p.large).filter(n=>(p.usedLarge+n)/p.large+p.usedSmall/p.small<=1+1e-10).at(-1),()=>range(0,p.a).find(n=>n/p.a>=p.taken/p.b),()=>p.count+Math.floor((p.capacity-p.count*5)/3)][f]();
  case 'area':return [()=>p.b*p.h/2,()=>p.area*p.b/p.a,()=>p.total*p.b/(p.a+p.b+p.c),()=>p.base*p.areaB/(p.areaA+p.areaB)][f]();
@@ -32,9 +58,11 @@ function independentlySolve(q){const p=q.params,f=q.form;
  case 'sums':return [()=>sum(range(p.first,p.last)),()=>sum(range(1,p.last).map(n=>n%2?n:-n)),()=>p.a*p.a-p.b*p.b,()=>sum(range(p.start,p.end).map(n=>n*n))][f]();
  case 'patterns':return [()=>4+sum(range(1,p.n-1).map(()=>3)),()=>(p.sticks-1)/3,()=>sum(range(0,p.n-1).map(i=>p.first+i*p.increment)),()=>{let n=0;for(let i=1;i<100;i++){n+=i;if(n>=p.N)return i;}}][f]();
  case 'spirals':return f===1?coordinate(p.length).last:f===3?coordinate(p.N-1).y:coordinate(p.N-1).x;
- case 'cases':return f<2?['A','B','C'].find(x=>[x===p.b,x!==p.b,x!==p.c].filter(Boolean).length===1):f===2?range(10,99).find(n=>n%10>0&&Math.floor(n/10)>n%10&&Math.floor(n/10)-(n%10)===p.difference&&n+10*(n%10)+Math.floor(n/10)===p.total):range(1,100).filter(x=>p.a*x+p.b*(x+1)===p.total).map(x=>2*x+1)[0];
- case 'invariants':return f===0?(p.start%2!==p.target%2?'No':'Yes'):f===1?range(1,p.N).filter(n=>factors(n).length%2).length:f===2?p.colours*(p.need-1)+1:p.n/2+1;
- case 'bounds':return f===0||f===2?brutePacks(p.budget,p.costs,p.counts):f===1?range(0,p.total).find(n=>p.a+p.b-n<=p.total):p.total-(p.a-p.both)-p.b;
+ case 'cases':if(p.statements&&f<2)return solveStatements(q.text);if(p.variant==='statements')return solveNumberStatements(q.text);if(p.variant==='digits')return solveDigitClues(q.text);
+  return f<2?['A','B','C'].find(x=>[x===p.b,x!==p.b,x!==p.c].filter(Boolean).length===1):f===2?range(10,99).find(n=>n%10>0&&Math.floor(n/10)>n%10&&Math.floor(n/10)-(n%10)===p.difference&&n+10*(n%10)+Math.floor(n/10)===p.total):range(1,100).filter(x=>p.a*x+p.b*(x+1)===p.total).map(x=>2*x+1)[0];
+ case 'invariants':return f===0?solveReach(q.text):f===1?range(1,p.N).filter(n=>factors(n).length%2).length:f===2?p.colours*(p.need-1)+1:p.n/2+1;
+ case 'bounds':if(p.variant==='three-sets')return solveThreeSets(p.N,p.a,p.b,p.c);if(p.variant==='five-numbers')return solveFive(p.T,p.L);
+  return f===0||f===2?brutePacks(p.budget,p.costs,p.counts):f===1?range(0,p.total).find(n=>p.a+p.b-n<=p.total):p.total-(p.a-p.both)-p.b;
  default:throw Error('Missing independent solver: '+q.unit);
  }
 }
