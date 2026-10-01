@@ -58,7 +58,7 @@ function foldNet(amount=0){
  const configs=[['A',0,0,p=>p],['B',1,0,p=>hinge(p,[.5,0,0],-t,ry)],['C',-1,0,p=>hinge(p,[-.5,0,0],t,ry)],['D',0,1,p=>hinge(p,[0,.5,0],t,rx)],['E',0,-1,p=>hinge(p,[0,-.5,0],-t,rx)],['F',0,2,p=>hinge(hinge(p,[0,1.5,0],t,rx),[0,.5,0],t,rx)]];
  return configs.map(([label,x,y,fn])=>({label,points:square(x,y).map(fn),doubleSided:true}));
 }
-function make(id,form,seed,r){
+function make(id,form,seed,r,rev=2){
  let q;const out=(text,answer,steps,params={},extra={})=>q={text,answer,steps,params,...extra};
  const a=r(2,8),b=r(2,7),c=r(2,6);
  if(id==='geo-measure'){
