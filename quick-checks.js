@@ -168,6 +168,42 @@ const maths={
   q('Three adjacent openings make a straight angle. What is their total?',['90°','180°','360°'],1,'Subtract the known parts from 180°.'),
   q('Three adjacent openings make a straight angle. What is their total?',['90°','180°','360°'],1,'Subtract the known parts from 180°.')
  ],
+ 'ch-totals':[
+  q('Saturday’s adult tickets fell by 10% on Sunday. Sunday’s adult tickets are what fraction of Saturday’s?',['0.1','0.9','1.1'],1,'A 10% fall keeps 90% of the original, so multiply Saturday’s number by 0.9.'),
+  q('Pia plus the pile is 5 times what Qi and Ravi have together. The grand total is how many times what Qi and Ravi have?',['5','6','4'],1,'The grand total is Pia plus the pile (5 parts) plus Qi and Ravi (1 part): 6 parts.'),
+  q('Working backwards, Hoops kept “half minus 1”. Hoops now has 9. How many did it have before?',['20','18','16'],0,'Half minus 1 is 9, so half is 10 and the whole is 20.'),
+  q('Grass keeps growing. Cow + goat take 30 days and the cow alone takes 60. What does subtracting the two daily rates tell you?',['The growth rate','The goat’s rate','The total grass'],1,'Growth and the cow appear in both, so they cancel. What is left is the goat’s daily eating.')
+ ],
+ 'ch-motion':[
+  q('The shop is 40 m from the midpoint, on Ben’s side. How much further does Mia ride than Ben?',['40 m','80 m','20 m'],1,'Mia rides half the gap plus 40 m; Ben rides half the gap minus 40 m. The difference is 80 m.'),
+  q('Starting and arriving together, Mia rides 80 m further and gains 20 m every minute. How long do they ride?',['4 minutes','100 minutes','60 minutes'],0,'The extra distance builds up at the speed difference: 80 ÷ 20 = 4 minutes.'),
+  q('Walking UP an up-escalator, how are the visible steps made up?',['My steps − escalator steps','My steps + escalator steps','Escalator steps only'],1,'Both you and the escalator move you upward, so the two step counts add to the visible steps.'),
+  q('Running down an up-escalator, how are the visible steps made up?',['My steps − escalator steps','My steps + escalator steps','Escalator steps only'],0,'The escalator carries you back up, so your steps exceed the visible steps by what the escalator moves.')
+ ],
+ 'ch-circles':[
+  q('Rectangle OCDE has O at the centre and D on the arc. Which length equals CE?',['OC','OD, a radius','DE'],1,'The diagonals of a rectangle are equal, and OD is a radius.'),
+  q('Why can the sides of a hexagon in a circle be rearranged without changing its area?',['Each side and the centre make a triangle that depends only on that side.','The hexagon is regular.','All circles have the same area.'],0,'The hexagon is made of six centre triangles. Moving them round the circle keeps each one’s area.'),
+  q('A circle sits exactly inside a square, and the square sits exactly inside a bigger circle. The bigger circle’s area is…',['twice the smaller circle’s','four times the smaller circle’s','the same'],0,'The square’s diagonal is the big diameter and its side is the small diameter, so R² = 2r².'),
+  q('Two semicircles overlap inside a quarter circle. When you subtract both semicircles, what happens to their overlap?',['It is subtracted twice, so add it back once.','It is subtracted once, which is correct.','It can be ignored.'],0,'Inclusion–exclusion: anything counted in both semicircles was removed twice.')
+ ],
+ 'ch-angles':[
+  q('A segment goes 3 right and 1 up. Which move is at right angles to it?',['1 left and 3 up','3 left and 1 up','1 right and 3 up'],0,'Turning through a right angle swaps the moves and changes one direction.'),
+  q('Two grid angles together make the angle of a segment that goes 5 right and 5 up. What is their sum?',['45°','90°','50°'],0,'Equal right and up moves make a square’s diagonal: 45°.'),
+  q('Three squares overlap in two rectangles. What is the total area?',['Sum of squares − both overlaps','Sum of squares + both overlaps','Sum of squares − twice each overlap'],0,'Each overlap was counted in two squares, so remove it once.'),
+  q('The middle square is taller than the left square. Which vertical edge between them can you see?',['The difference in their heights','The left square’s full height','None'],0,'Only the part of the taller square sticking up above the shorter one is on the outline.')
+ ],
+ 'ch-number':[
+  q('N = 2³ × 3² × 5. How many choices are there for the power of 2 in a factor?',['3','4','2'],1,'The power can be 0, 1, 2 or 3: four choices.'),
+  q('For an ODD factor of 2³ × 3² × 5, how many choices are there for the power of 2?',['One: 2⁰','Four','Three'],0,'Any factor using 2¹ or more is even, so only 2⁰ is allowed.'),
+  q('m² − n² = 32 with whole numbers. Which factor pair of 32 can be (m − n) and (m + n)?',['1 and 32','2 and 16','Both'],1,'The factors must be both even or both odd. 1 and 32 have different parity.'),
+  q('In a letter sum, the answer has one more digit than either number added. What is its first digit?',['0','1','9'],1,'Two numbers of the same length add to less than twice the largest, so the extra digit is a carry of 1.')
+ ],
+ 'ch-sequences':[
+  q('2, 5, 10, 17, 26, … The differences 3, 5, 7, 9 go up by 2. What is the next term?',['35','37','36'],1,'Next difference 11; 26 + 11 = 37.'),
+  q('In a Fibonacci-type sequence, how is each new term made?',['Add the two terms before it.','Double the term before it.','Add 1 to the term before it.'],0,'Each term after the first two is the sum of the previous two.'),
+  q('Each term is the sum of the two before. The 6th term is 21 and the 7th is 34. What is the 5th?',['13','55','8'],0,'Work backwards by subtracting: 34 − 21 = 13.'),
+  q('2, 3, 5, 9, 17, … What happens to the differences 1, 2, 4, 8?',['They double.','They go up by 1.','They stay the same.'],0,'Doubling differences give 16 next, so the next term is 33.')
+ ],
  bounds:[
   q('To find the most tokens for a budget, what is the safest approach?',['Buy as many of the biggest pack as possible.','Check each possible number of one pack type, and fill the rest well.','Buy only the cheapest pack.'],1,'The best choice is not always the biggest pack. A short organised list avoids missing the best case.'),
   q('Two group counts add to more than everyone in the class. What does the excess tell you?',['At least that many must be in both.','At most that many are in both.','Nothing.'],0,'If the total of two groups exceeds the class size, the overlap must make up the difference.'),
