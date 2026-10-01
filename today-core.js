@@ -14,6 +14,8 @@ function task(state,subject,now=Date.now()){
  // the learner deliberately continues; never discard an unsent or incorrect draft.
  const draft=d.draft,answer=draft&&d.attempts.find(a=>a.id===draft.id);
  const recent=Object.entries(d.lessons).filter(([id,l])=>E.unit(id)&&l.visited.length&&!l.completedAt).sort((a,b)=>b[1].lastViewedAt-a[1].lastViewedAt)[0];
+ if(draft&&!answer?.correct&&draft.phase==='mixed')return {subject,kind:'mixed',title:'Mixed set',resume:true,touched:draft.updatedAt||draft.at,detail:'Your mixed-set question and working are saved. No topic labels: decide which method it needs.'};
+ if(draft&&!answer?.correct&&draft.phase==='redo')return {subject,kind:'redo',attempt:draft.redoOf,unit:draft.unit,title:'Fix a past mistake',resume:true,touched:draft.updatedAt||draft.at,detail:'Your saved second try is waiting.'};
  if(draft&&!answer?.correct){
   const bridge=subject==='maths'&&answer?.responses.length&&E.prerequisite?.(d,draft.unit,now);
   if(bridge)return {subject,kind:'lesson',unit:bridge,title:E.unit(bridge).title,resume:true,touched:draft.updatedAt||draft.at,detail:'Build this idea visually first. Your earlier question and working stay saved.'};
@@ -22,6 +24,8 @@ function task(state,subject,now=Date.now()){
  }
  if(recent)return {subject,kind:'lesson',unit:recent[0],title:E.unit(recent[0]).title,resume:true,touched:recent[1].lastViewedAt,detail:'Continue your saved lesson, then try the idea.'};
  const r=E.recommend({...s,[key[subject]]:{...d,draft:null}},now);
+ if(r.kind==='mixed-set')return {subject,kind:'mixed',title:'Mixed set',resume:!!(d.mixed&&!d.mixed.completedAt),touched:d.mixed&&!d.mixed.completedAt?d.mixed.at:0,detail:r.due?'Some methods are due for a review. A few questions with no topic labels: decide which method each one needs.':'A few questions from methods you know, with no topic labels: decide which method each one needs.'};
+ if(r.kind==='redo')return {subject,kind:'redo',attempt:r.attempt,unit:r.unit,title:'Fix a past mistake',resume:false,touched:0,detail:'A question you missed a few days ago. Read it fresh and try again.'};
  if(r.kind==='mixed'){
   // Home never opens or previews a reserved paper. When the course is explored,
   // choose existing unreserved practice with the least recent evidence instead.

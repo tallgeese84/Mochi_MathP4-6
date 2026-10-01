@@ -13,7 +13,9 @@ function bridge(s,d){
 const paperDefinitions=[
  {id:'baseline-a',kind:'baseline',rev:1,title:'Science starting-point check · A',minutes:0,units:['fairtest','graphs','circuits','heat','plants','matter']},
  {id:'baseline-b',kind:'baseline',rev:1,title:'Science starting-point check · B',minutes:0,units:['measurement','models','forces','respiration','ecology','water']},
- ...['A','B','C'].map(letter=>({id:'mixed-'+letter.toLowerCase(),kind:'paper',rev:1,title:'Science reasoning paper '+letter,minutes:60,units:(D.originalUnits||D.units.map(u=>u.id)).slice()}))
+ ...['A','B','C'].map(letter=>({id:'mixed-'+letter.toLowerCase(),kind:'paper',rev:1,title:'Science reasoning paper '+letter,minutes:60,units:(D.originalUnits||D.units.map(u=>u.id)).slice()})),
+ // DSA-style science mocks: every unit, including the lower-secondary ones, in 70 minutes with no topic labels.
+ ...[24,16,9,4].map((weeks,k)=>{const ids=D.units.map(u=>u.id),order=ids.map(id=>[parseInt(B.hash('sci-mock-'+k+':'+id),36),id]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);return {id:'mock-'+(k+1),kind:'mock',rev:B.REV||1,title:'DSA-style science mock '+(k+1),minutes:70,weeks,units:order,marks:order.map(()=>1)};})
 ];
 root.MochiSciencePath=core.create(D,B,{stateKey:'sciencePath',prefix:'science-path-',fingerprintPrefix:'sp-paper-v1:',paperDefinitions,bridge,limits:[
  'Official DSA guidance supplies broad aims, not a released science test blueprint.',

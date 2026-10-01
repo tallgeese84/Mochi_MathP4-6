@@ -50,7 +50,7 @@ function goal(subject,id,E){
  const u=E?.unit?.(id);return u?.why||u?.title||'Understand the relationship, then use it in a new situation.';
 }
 function progress(E,d,id,now=Date.now()){
- const e=E.evidence(d,id,now),mixed=(d.attempts||[]).some(a=>a.unit===id&&a.mode==='paper'&&a.independent),steps=[
+ const e=E.evidence(d,id,now),mixed=(d.attempts||[]).some(a=>a.unit===id&&(a.mode==='paper'||a.mode==='mock')&&a.independent),steps=[
   {id:'learn',label:'Learn',done:e.taught},
   {id:'apply',label:'Apply',done:e.apply>=2},
   {id:'connect',label:'Transfer',done:e.transfer>=1},

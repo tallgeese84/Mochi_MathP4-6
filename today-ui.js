@@ -46,6 +46,8 @@ function launch(){
  if(t.kind==='paper')ui.open('paper',t.paper);
  else if(t.kind==='question')ui.open('practice',t.unit);
  else if(t.kind==='lesson')ui.open('lesson',t.unit);
+ else if(t.kind==='mixed')ui.mixed();
+ else if(t.kind==='redo')ui.redo(t.attempt);
  else {
   if(d?.draft&&d.attempts.find(a=>a.id===d.draft.id)?.correct)E.finishPractice(d);
   ui.practice(t.unit,t.kind==='recall'?'recall':undefined);

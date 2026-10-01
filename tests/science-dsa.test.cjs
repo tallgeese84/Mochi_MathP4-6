@@ -205,7 +205,7 @@ test('every new unit and form has its own quick check',()=>{
 });
 
 test('existing papers use only the original 24 units at revision 1; new units do not enter them',()=>{
- for(const def of E.paperDefinitions){assert.equal(def.rev,1);assert.ok(def.units.every(u=>ORIGINAL.includes(u)));if(def.kind==='paper')assert.deepEqual(def.units,ORIGINAL);
+ for(const def of E.paperDefinitions.filter(p=>p.kind!=='mock')){assert.equal(def.rev,1);assert.ok(def.units.every(u=>ORIGINAL.includes(u)));if(def.kind==='paper')assert.deepEqual(def.units,ORIGINAL);
   for(const q of E.paperQuestions(def.id)){assert.deepEqual(q,B.make(q.unit,q.form,q.seed,1));assert.equal(q.kind,undefined);}}
 });
 

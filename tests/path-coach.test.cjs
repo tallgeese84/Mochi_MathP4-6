@@ -2,7 +2,7 @@ const test=require('node:test'),assert=require('node:assert/strict');
 const C=require('../path-coach.js'),M=require('../entrance-core.js'),S=require('../science-path-core.js');
 const now=new Date(2026,8,26,12).getTime(),DAY=86400000;
 function teach(d,E,id,at=now-10000){for(let p=0;p<3;p++)E.visit(d,id,p,at+p);E.concept(d,id,E.unit(id).check[2],at+4);E.complete(d,id,at+5);}
-function answer(d,E,id,phase,seed,at){E.finishPractice(d);E.startPractice(d,id,{phase,seed,now:at});const q=E.question(d.draft);E.touchDraft(d,{answer:q.answerLabel||q.answer},at+1);return E.respond(d,at+2).attempt;}
+function answer(d,E,id,phase,seed,at){E.finishPractice(d);E.startPractice(d,id,{phase,seed,now:at});const q=E.question(d.draft);E.touchDraft(d,{answer:q.answerLabel||q.answer,working:'My plan for this one'},at+1);return E.respond(d,at+2).attempt;}
 
 test('known Maths and Science weak areas get concise targeted diagnostic forks',()=>{
  const count=C.diagnostic('maths','counting',M);assert.match(count.prompt,/opposite order/);assert.equal(count.correct,0);assert.match(count.explain,/same pair|does not create/i);

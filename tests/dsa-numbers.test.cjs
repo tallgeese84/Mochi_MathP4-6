@@ -171,6 +171,6 @@ test('clock and track figures render inside their frames',()=>{
  const tracks=SEEDS.map(s=>B.make('nx-cycles',2,s)).filter(q=>q.figure?.kind==='nx-track');assert.ok(tracks.length>40);
 });
 
-test('module units stay out of the reserved mixed papers',()=>{
- const E=require('../entrance-core.js');for(const p of E.paperDefinitions)assert.ok(p.units.every(id=>!IDS.includes(id)),p.id);
+test('module units stay out of the reserved mixed papers (they appear only in the DSA-style mocks)',()=>{
+ const E=require('../entrance-core.js');for(const p of E.paperDefinitions.filter(p=>p.kind!=='mock'))assert.ok(p.units.every(id=>!IDS.includes(id)),p.id);
 });

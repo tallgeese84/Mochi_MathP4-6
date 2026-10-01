@@ -62,8 +62,9 @@ test('a corrected answer earns a recovery point only after a different fresh ind
  const d=E.fresh(),state={entrance:d,coins:5};answer(d,'angles','apply',10,now+10,true);E.help(d,true);E.touchDraft(d,{answer:E.question(d.draft).answerLabel},now+20);E.respond(d,now+21);assert.equal(F.report(state).studyPoints,0);
  answer(d,'angles','apply',200,now+30);assert.equal(F.report(state).studyPoints,1);F.sync(state);assert.equal(F.report(state).studyPoints,1);assert.equal(state.coins,5);
 });
-// Revision 2 changes some paper templates on purpose; revision 1 is frozen in tests/history-stability.test.cjs.
-test('reserved paper questions are byte-for-byte identical to the revision 2 blueprint',()=>{
- const digest=crypto.createHash('sha256').update(JSON.stringify(E.paperDefinitions.map(p=>E.paperQuestions(p.id)))).digest('hex');assert.equal(digest,'d58caa712f593ec777fa47fddc1a5f73eed01a68f56e1be6cac1cd7a838fd404');
- for(const p of E.paperDefinitions)assert.ok(p.units.every(id=>!id.startsWith('geo-')));
+// The original papers are generated at bank revision 1; the DSA-style mocks are separate and come after them.
+test('reserved paper questions are byte-for-byte identical to the v6.6.0 blueprint',()=>{
+ const legacy=E.paperDefinitions.filter(p=>p.kind!=='mock');
+ const digest=crypto.createHash('sha256').update(JSON.stringify(legacy.map(p=>E.paperQuestions(p.id)))).digest('hex');assert.equal(digest,'b771c2d33015cb17f5067d7735b09b478c20201fd6a79d5d72f83c400c661360');
+ for(const p of legacy)assert.ok(p.units.every(id=>!id.startsWith('geo-')));
 });

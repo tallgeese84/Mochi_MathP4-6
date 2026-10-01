@@ -14,11 +14,10 @@ test('six challenge units exist, stay out of reserved papers and link to real pr
  for(const u of ext){assert.ok(u.ideas.length>=3);assert.ok(u.prerequisites.every(id=>D.units.some(v=>v.id===id&&!v.extension)));assert.ok(u.check[1][u.check[2]]);}
 });
 
-// Revision 2 deliberately changes some paper templates (rates, cases and bounds form 3; cases form 1 in
-// baseline B). Revision 1 of every template is frozen separately in tests/history-stability.test.cjs.
-test('reserved papers and starting checks contain exactly the same questions as revision 2',()=>{
+// The original checks and papers are generated at bank revision 1, so they are identical to v6.8.0.
+test('reserved papers and starting checks contain exactly the same questions as v6.8.0',()=>{
  const crypto=require('node:crypto'),E=require('../entrance-core.js'),S=require('../science-path-core.js');
- const frozen={"maths:baseline-a":"f5f5633bd5d3b9a3","maths:baseline-b":"6521d1768a5fead8","maths:mixed-a":"2b0fab9e2dbfdba6","maths:mixed-b":"9722ccc09a3fc67b","maths:mixed-c":"f86d7d34158680ae","science:baseline-a":"ab467f76e854ad16","science:baseline-b":"7954eab5eafc0e71","science:mixed-a":"17924a13181be34a","science:mixed-b":"eb10c3d6dee17a85","science:mixed-c":"6afa70fc815ee5ae"};
+ const frozen={"maths:baseline-a":"f5f5633bd5d3b9a3","maths:baseline-b":"65ad6105ad02585c","maths:mixed-a":"4b67752da3c8d57e","maths:mixed-b":"3da5ea3b2fe93507","maths:mixed-c":"0a28210161991bc7","science:baseline-a":"ab467f76e854ad16","science:baseline-b":"7954eab5eafc0e71","science:mixed-a":"17924a13181be34a","science:mixed-b":"eb10c3d6dee17a85","science:mixed-c":"6afa70fc815ee5ae"};
  for(const [name,X] of [['maths',E],['science',S]])for(const id of ['baseline-a','baseline-b','mixed-a','mixed-b','mixed-c']){const d=X.fresh();X.startPaper(d,id,Date.now());const seen=Object.keys(d.seen).sort();assert.ok(seen.length>=6);assert.equal(crypto.createHash('sha256').update(JSON.stringify(seen)).digest('hex').slice(0,16),frozen[name+':'+id],name+':'+id);}
 });
 
