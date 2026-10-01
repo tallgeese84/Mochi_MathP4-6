@@ -66,7 +66,7 @@ function init(){
  document.getElementById('catNextPage').onclick=()=>{page++;last='';paint(true);};
  document.addEventListener('mochi:state-saved',()=>paint());document.addEventListener('mochi:cloud-merged',()=>paint(true));document.addEventListener('mochi:cat-friends-changed',()=>paint(true));document.addEventListener('mochi:activity',()=>paint());
  const before=JSON.stringify(S.catFriends);paint(true);if(before!==JSON.stringify(S.catFriends))save(S);
- root.MochiCatFriendsUI={refresh:()=>paint(true)};
+ root.MochiCatFriendsUI={refresh:()=>paint(true),portrait};
 }
 root.MochiCatFriendsPortrait=portrait;
 if(root.MochiReady)init();else document.addEventListener('mochi:ready',init,{once:true});

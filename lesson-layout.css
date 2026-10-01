@@ -59,3 +59,20 @@ body.has-focus-panel #studioSurface .studio-grid { width: 100%; max-width: 1100p
  #focusDock { justify-content: center; }
 }
 @media print { #focusDock,.question-why,.plan-links { display: none !important; } }
+
+/* v6.8.0: say why a button is waiting, and invite a written reason. */
+.ep-gate{margin:.5rem 0 0;font-size:15px;color:var(--ink-soft,#6b5a86);display:flex;gap:.4rem;align-items:center}
+.ep-gate::before{content:"→";font-weight:700;color:#7b52a0}
+.ep-explain-label{display:block;margin:1rem 0 .35rem;font-weight:600;font-size:15px}
+.ep-explain-label span{font-weight:400;font-size:13px;opacity:.75}
+.ep-explain{width:100%;box-sizing:border-box;min-height:84px;padding:.7rem .8rem;border:1px solid #d8cbe8;border-radius:12px;font:inherit;font-size:16px;background:#fff;color:inherit;resize:vertical}
+.ep-explain:focus{outline:3px solid #b99ad8;outline-offset:1px}
+.bm-figure{margin:1rem 0;padding:.5rem .25rem;border-radius:14px;background:#fbf8ff;border:1px solid #ece3f6}
+.bm-figure figcaption{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#8a76a6;padding:0 .75rem .25rem}
+.bm-svg{width:100%;max-width:560px;height:auto;display:block}
+.bm-unit{fill:#e9defa;stroke:#7b52a0;stroke-width:1.5}
+.bm-extra{fill:#ffe3b8;stroke:#c0822a;stroke-width:1.5}
+.bm-brace{fill:none;stroke:#7b52a0;stroke-width:1.5}
+.bm-label{font:600 14px system-ui,sans-serif;fill:#3a2d50}
+.bm-small{font:13px system-ui,sans-serif;fill:#3a2d50}
+.bm-note{font:italic 13px system-ui,sans-serif;fill:#6b5a86}

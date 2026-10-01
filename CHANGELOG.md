@@ -1,3 +1,16 @@
+# v6.8.0 — Matched Quick checks, Mochi at Euna’s side, tablet-sized home
+
+- Add a Quick check for every question type in all 28 Maths units and 24 Science units (`quick-checks.js`). A miss now opens a check about the relationship in the question on screen. Correct choices are spread across positions instead of always first.
+- Widen three quest goals (relationships, area, volume) so they describe every question type in the unit.
+- Say what is still needed when **Finish lesson** or **Continue discovery** is waiting. Add a “Why? Explain in your own words” box to concept checks; it writes to the existing lesson-notes field, so no new data is stored or synced.
+- Draw bar models (`bar-models.js`) in the relationships lesson, sum-and-difference and ratio worked examples, and revealed solutions. Never on independent questions or papers, and never stored in question data, so fingerprints are unchanged.
+- Rebuild the home screen for tablets: larger type, a Mochi companion with a speech bubble, coins, Cat Points and the next cat friend with progress. Two columns in landscape.
+- Show Mochi beside each Maths and Science practice question (`mochi-buddy.js`), reacting to independent, supported, retry and pause outcomes with guilt-free lines and a small celebration (still under reduced motion). Correct feedback turns green.
+- Fix primary buttons turning pale with white text after a tap on touch screens, and make disabled primary buttons legible.
+- Replace grown-up phrasing on Euna’s screens (“not independent evidence”, “benchmark mapping”, phase names) with plain wording. Parent views are unchanged.
+- Add `tests/data-compat.test.cjs`: cloud sync, cloud backup, Drive mirror, review export and network code are frozen byte-for-byte, and the saved-state and sync identifiers are checked.
+- Correct stale version references in the README.
+
 # v6.7.1 — Separate help reporting from checking answers
 
 - Move the guess/outside-help checkbox above the reasoning pad in Maths and Science.
