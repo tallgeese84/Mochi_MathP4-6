@@ -182,34 +182,40 @@ export async function mountMochiHome(root,options={}){
  let mode='idle',act=null,queue=[],needs={tummy:70,energy:85,clean:80,fun:65,love:70},sleeping=false,lookTarget=null,elevated=0;
  const obstacles=()=>[[SPOTS.bed,.6],[[2.15,-1.55],.4],[[2.32,-2.05],.35],[[-2.32,-.45],.3],[[1.62,.92],.3],[[2.15,.45],.28],...(owned.tree?[[SPOTS.tree,.5]]:[]),...(owned.box?[[SPOTS.box,.48]]:[])];
  function clampRoom(v){v.x=THREEclamp(v.x,ROOM.minX,ROOM.maxX);v.z=THREEclamp(v.z,ROOM.minZ,ROOM.maxZ);return v;}
+ // Velocity-based steering: ease in, brake before arriving, and slow down to turn rather than sliding sideways.
+ let curSpeed=0;
  function steer(from,to,speed,dt,allowInto){
-  const d=new T.Vector3(to.x-from.x,0,to.z-from.z),dist=d.length();if(dist<.03)return true;
-  const want=Math.atan2(d.x,d.z);let diff=((want-heading+Math.PI*3)%(Math.PI*2))-Math.PI;heading+=diff*Math.min(1,dt*7);
-  const step=Math.min(dist,speed*dt*Math.max(.2,Math.cos(diff)));from.x+=Math.sin(heading)*step;from.z+=Math.cos(heading)*step;
+  const d=new T.Vector3(to.x-from.x,0,to.z-from.z),dist=d.length();
+  if(dist<.04&&curSpeed<.2){curSpeed=0;return true;}
+  const run=speed>1.5,want=Math.atan2(d.x,d.z);let diff=((want-heading+Math.PI*3)%(Math.PI*2))-Math.PI;
+  const maxTurn=(run?6.5:4.2)*dt;heading+=Math.max(-maxTurn,Math.min(maxTurn,diff*Math.min(1,dt*9)));
+  const decel=run?5:2.6,accel=run?6:2.4,align=Math.max(0,Math.cos(diff)),wantSpeed=Math.min(speed,Math.sqrt(2*decel*Math.max(0,dist-.03)))*(align>.35?align:0);
+  curSpeed+=Math.max(-decel*1.6*dt,Math.min(accel*dt,wantSpeed-curSpeed));
+  const step=Math.min(dist,curSpeed*dt);from.x+=Math.sin(heading)*step;from.z+=Math.cos(heading)*step;
   if(!allowInto)for(const [[ox,oz],r] of obstacles()){const dx=from.x-ox,dz=from.z-oz,l=Math.hypot(dx,dz);if(l<r){from.x=ox+dx/l*r;from.z=oz+dz/l*r;}}
-  clampRoom(from);return dist<.06;
+  clampRoom(from);return dist<.05&&curSpeed<.25;
  }
  const P=x=>mochi.setPose(x);
  const base={sit:0,lie:0,crouch:0,headPitch:0,headYaw:0,headTilt:0,tailUp:.6,tailCurl:0,eye:1,happy:0,mouth:0,ears:0,blush:0,frontRaise:0,wave:0,walk:0,purr:0,lick:0};
  function start(a){act={t:0,...a};act.enter?.();}
  function next(){act=null;if(queue.length)start(queue.shift());}
  function interrupt(list,keepTreat){queue=[];act?.exit?.();act=null;sleeping=false;elevated=0;rollAngle=0;if(!keepTreat)showTreat(null);list.forEach((a,i)=>i?queue.push(a):start(a));}
- const walkTo=(spot,speed=1.1,into=false,then)=>({name:'walk',enter(){P({...base,walk:speed>1.6?1:.75,tailUp:.8})},update(dt){const done=steer(pos,new T.Vector3(spot[0],0,spot[1]),speed,dt,into);mochi.current.walk>.1&&Math.random()<.01&&0;return done;},exit(){P({walk:0})}});
+ const walkTo=(spot,speed=.8,into=false,then)=>({name:'walk',enter(){P({...base,tailUp:.85})},update(dt){const done=steer(pos,new T.Vector3(spot[0],0,spot[1]),speed,dt,into);mochi.current.walk>.1&&Math.random()<.01&&0;return done;},exit(){P({walk:0})}});
  const face=(yaw)=>({name:'face',update(dt){let diff=((yaw-heading+Math.PI*3)%(Math.PI*2))-Math.PI;heading+=diff*Math.min(1,dt*6);return Math.abs(diff)<.05;}});
  const faceCamera=()=>({name:'faceCam',update(dt){const yaw=Math.atan2(camera.position.x-pos.x,camera.position.z-pos.z);let diff=((yaw-heading+Math.PI*3)%(Math.PI*2))-Math.PI;heading+=diff*Math.min(1,dt*6);return Math.abs(diff)<.08;}});
  const hold=(name,pose,secs,each)=>({name,enter(){P({...base,...pose})},update(dt){each?.(dt,this);return this.t>=secs;}});
- const eatAt=(spot,secs,fromBowl)=>[walkTo(spot,1.3),fromBowl?face(Math.atan2(1.62-spot[0],.92-spot[1])):face(heading),hold('eat',{headPitch:.75,crouch:.35,tailUp:.9,ears:.1},secs,(dt,a)=>{mochi.setPose({mouth:.4+Math.sin(a.t*14)*.4});if(fromBowl&&Math.random()<dt*2.2&&kibble.count>0)kibble.count--;if(Math.random()<dt*1.2)emit('note',headPos(),1,.1);}),hold('lick',{sit:1,happy:1,blush:.6,mouth:.25,tailUp:.9},1.4,()=>{}),{name:'done',update(){if(!fromBowl)showTreat(null);kibble.count=fromBowl?0:kibble.count;return true;}}];
+ const eatAt=(spot,secs,fromBowl)=>[walkTo(spot,1.05),fromBowl?face(Math.atan2(1.62-spot[0],.92-spot[1])):face(heading),hold('eat',{headPitch:.75,crouch:.35,tailUp:.9,ears:.1},secs,(dt,a)=>{mochi.setPose({mouth:.4+Math.sin(a.t*14)*.4});if(fromBowl&&Math.random()<dt*2.2&&kibble.count>0)kibble.count--;if(Math.random()<dt*1.2)emit('note',headPos(),1,.1);}),hold('lick',{sit:1,happy:1,blush:.6,mouth:.25,tailUp:.9},1.4,()=>{}),{name:'done',update(){if(!fromBowl)showTreat(null);kibble.count=fromBowl?0:kibble.count;return true;}}];
  function headPos(){const v=new T.Vector3();mochi.parts.head.getWorldPosition(v);return v;}
  const sleepAct=(manual)=>({name:'sleep',limit:40+Math.random()*30,enter(){sleeping=true;P({...base,lie:1,eye:0,tailCurl:1,headPitch:.3,headTilt:.35,tailUp:.2});},update(dt){if(Math.random()<dt*.7)emit('zed',headPos().add(new T.Vector3(.1,.15,0)),1,.05);if(manual){options.onNap?.(dt*.09);return false;}return this.t>this.limit||(needs.energy>=98&&this.t>12);},exit(){sleeping=false;}});
  function idlePick(){
   const night=tod==='night',r=Math.random(),spot=()=>[ROOM.minX+.6+Math.random()*(ROOM.maxX-ROOM.minX-1.2),ROOM.minZ+.8+Math.random()*(ROOM.maxZ-ROOM.minZ-1.2)];
-  if((needs.energy<55||night&&r<.45)&&!sleeping)return [walkTo(SPOTS.bed,.9,true),face(.4),sleepAct(false),hold('stretch',{crouch:.8,tailUp:1,mouth:.8,eye:.3},1.4)];
-  if(owned.box&&r<.16)return [walkTo(SPOTS.box,1,true),face(.9),hold('boxsit',{sit:1,happy:.0,tailUp:.4},6+Math.random()*6,(dt,a)=>{elevated=.02;}),{name:'out',update(){elevated=0;return true;}}];
-  if(owned.tree&&r<.3)return [walkTo([SPOTS.tree[0]+.55,SPOTS.tree[1]+.35],1,false),face(Math.atan2(SPOTS.tree[0]-.15-pos.x,SPOTS.tree[1]-.12-pos.z)),climb([SPOTS.tree[0]-.15,SPOTS.tree[1]-.12],1.22),hold('perch',{lie:1,eye:.8,tailCurl:.6},6+Math.random()*8),climb([SPOTS.tree[0]+.6,SPOTS.tree[1]+.4],0)];
-  if(r<.42)return [walkTo([SPOTS.window[0],SPOTS.window[1]],1),face(Math.PI),hold('gaze',{sit:1,headPitch:-.35,tailUp:.5},5+Math.random()*5,(dt,a)=>mochi.setPose({tailUp:.4+Math.sin(a.t*2)*.15}))];
+  if((needs.energy<55||night&&r<.45)&&!sleeping)return [walkTo(SPOTS.bed,.65,true),face(.4),sleepAct(false),hold('stretch',{crouch:.8,tailUp:1,mouth:.8,eye:.3},1.4)];
+  if(owned.box&&r<.16)return [walkTo(SPOTS.box,.75,true),face(.9),hold('boxsit',{sit:1,happy:.0,tailUp:.4},6+Math.random()*6,(dt,a)=>{elevated=.02;}),{name:'out',update(){elevated=0;return true;}}];
+  if(owned.tree&&r<.3)return [walkTo([SPOTS.tree[0]+.55,SPOTS.tree[1]+.35],.8,false),face(Math.atan2(SPOTS.tree[0]-.15-pos.x,SPOTS.tree[1]-.12-pos.z)),climb([SPOTS.tree[0]-.15,SPOTS.tree[1]-.12],1.22),hold('perch',{lie:1,eye:.8,tailCurl:.6},6+Math.random()*8),climb([SPOTS.tree[0]+.6,SPOTS.tree[1]+.4],0)];
+  if(r<.42)return [walkTo([SPOTS.window[0],SPOTS.window[1]],.75),face(Math.PI),hold('gaze',{sit:1,headPitch:-.35,tailUp:.5},5+Math.random()*5,(dt,a)=>mochi.setPose({tailUp:.4+Math.sin(a.t*2)*.15}))];
   if(r<.58)return [hold('groom',{sit:1,lick:1,eye:.4,frontRaiseSide:-1},3+Math.random()*2,(dt,a)=>mochi.setPose({lick:.8+Math.sin(a.t*5)*.2}))];
   if(r<.78)return [faceCamera(),hold('hello',{sit:1,headTilt:.25,tailUp:.9},3+Math.random()*3)];
-  return [walkTo(spot(),.9),hold('look',{headYaw:(Math.random()-.5)*1.2},2+Math.random()*2)];
+  return [walkTo(spot(),.7),hold('look',{headYaw:(Math.random()-.5)*1.2},2+Math.random()*2)];
  }
  const climb=(spot,height)=>({name:'climb',from:null,update(dt){if(!this.from){this.from={x:pos.x,z:pos.z,y:elevated};P({...base,crouch:.4,tailUp:1});}const k=Math.min(1,this.t/.7);pos.x=this.from.x+(spot[0]-this.from.x)*k;pos.z=this.from.z+(spot[1]-this.from.z)*k;elevated=this.from.y+(height-this.from.y)*k+Math.sin(k*Math.PI)*.35;if(k>=1){elevated=height;return true;}return false;}});
  function react(anim){
@@ -219,7 +225,7 @@ export async function mountMochiHome(root,options={}){
    const id=anim.slice(6),from=nearBed()?STAGE_SPOT:[pos.x,pos.z],lead=toStage();
    interrupt([]);showTreat(id,from);
    const t=[treatItem.position.x,treatItem.position.z],d=new T.Vector3(from[0]-t[0],0,from[1]-t[1]).normalize().multiplyScalar(.3),spot=[t[0]+d.x,t[1]+d.z];
-   interrupt([...lead,walkTo(spot,1.2),face(Math.atan2(t[0]-spot[0],t[1]-spot[1])),...eatAt(spot,3,false).slice(2)],true);return;}
+   interrupt([...lead,walkTo(spot,.95),face(Math.atan2(t[0]-spot[0],t[1]-spot[1])),...eatAt(spot,3,false).slice(2)],true);return;}
   if(anim==='purr'){if(act?.name==='sleep'&&mode==='nap')return;if(act?.name!=='purr')interrupt([hold('purr',{sit:1,happy:1,blush:1,purr:1,headTilt:.3,tailUp:.95,ears:.15},2.2)]);else act.t=Math.max(0,act.t-1);emit('heart',headPos().add(new T.Vector3(0,.2,0)),2);return;}
   if(anim==='shine'){emit('star',headPos(),8,.6);interrupt([hold('shine',{sit:1,happy:1,blush:1,tailUp:1},2)]);return;}
   if(anim==='hop'||anim==='trick:hop'){interrupt([hold('hop',{happy:1,blush:1,tailUp:1},1.6,(dt,a)=>{elevated=reduced?0:Math.abs(Math.sin(a.t*Math.PI*2.4))*.35;}),{name:'land',update(){elevated=0;return true;}}]);emit('star',headPos(),6,.5);return;}
@@ -237,14 +243,14 @@ export async function mountMochiHome(root,options={}){
  let rollAngle=0;
  const STAGE_SPOT=[.15,.75];
  function nearBed(){return sleeping||Math.hypot(pos.x-SPOTS.bed[0],pos.z-SPOTS.bed[1])<.7||elevated>.1;}
- function toStage(){return nearBed()||Math.hypot(pos.x-STAGE_SPOT[0],pos.z-STAGE_SPOT[1])>1.6?[...(sleeping?[hold('stretch',{crouch:.9,mouth:1,eye:.2,tailUp:1},1.3)]:[]),...(elevated>.1&&owned.tree?[climb([SPOTS.tree[0]+.6,SPOTS.tree[1]+.4],0)]:[]),walkTo(STAGE_SPOT,1.4)]:[];}
+ function toStage(){return nearBed()||Math.hypot(pos.x-STAGE_SPOT[0],pos.z-STAGE_SPOT[1])>1.6?[...(sleeping?[hold('stretch',{crouch:.9,mouth:1,eye:.2,tailUp:1},1.3)]:[]),...(elevated>.1&&owned.tree?[climb([SPOTS.tree[0]+.6,SPOTS.tree[1]+.4],0)]:[]),walkTo(STAGE_SPOT,1.0)]:[];}
  function greet(){if(mode!=='idle')return;interrupt([...toStage(),faceCamera(),hold('hello',{sit:1,happy:1,blush:.8,tailUp:1,headTilt:.2},2.6)]);setTimeout(()=>emit('heart',headPos().add(new T.Vector3(0,.2,0)),2),2200);}
 
  // ---------------- modes ----------------
  function setMode(m){
   if(m===mode)return;mode=m;showToy(m.startsWith('play:')?m.slice(5):null);
   if(m==='brush'){interrupt([faceCamera(),hold('brush',{sit:1,happy:.6,tailUp:.9,blush:.5},1e9)]);focus(true);}
-  else if(m==='nap'){interrupt([walkTo(SPOTS.bed,.9,true),face(.4),sleepAct(true)]);focus(false);}
+  else if(m==='nap'){interrupt([walkTo(SPOTS.bed,.65,true),face(.4),sleepAct(true)]);focus(false);}
   else if(m.startsWith('play:')){focus(false);interrupt([hold('ready',{crouch:.5,tailUp:1,ears:.2},.6)]);}
   else{focus(false);if(act?.name==='brush'||act?.name==='sleep'||act?.name==='chase')interrupt([hold('stretch',{crouch:.8,tailUp:1,mouth:.6,eye:.4},1.2)]);}
  }
@@ -258,8 +264,17 @@ export async function mountMochiHome(root,options={}){
   if(act&&act.name!=='chase'&&act.name!=='pounce'&&act.name!=='swat'&&act.name!=='ready')return;
   if(act?.name==='ready'&&act.t<.6)return;
   const dist=Math.hypot(target.x-pos.x,target.z-pos.z);swatCool-=dt;
-  if(dist>.55){if(act?.name!=='chase')start({name:'chase',enter(){P({...base,walk:1,tailUp:1,ears:.25})},update(){return false;}});steer(pos,new T.Vector3(target.x,0,target.z),needs.energy<40?1.2:2.1,dt,false);lookTarget=target;if(Math.random()<dt*.3)options.onPlay?.(.06);}
-  else if(swatCool<=0){swatCool=1.1;const ahead=dist>.35;start({name:ahead?'pounce':'swat',enter(){P({...base,crouch:ahead?.0:.3,frontRaise:ahead?0:1,frontRaiseSide:Math.random()<.5?-1:1,tailUp:1,ears:.3,happy:Math.random()<.3?1:0});},update(dt){if(ahead){const k=Math.min(1,this.t/.45);elevated=reduced?0:Math.sin(k*Math.PI)*.25;steer(pos,new T.Vector3(target.x,0,target.z),2.4,dt,false);if(k>=1){elevated=0;return true;}return false;}return this.t>.5;},exit(){elevated=0;}});
+  if(dist>.55){if(act?.name!=='chase')start({name:'chase',enter(){P({...base,tailUp:1,ears:.25})},update(){return false;}});steer(pos,new T.Vector3(target.x,0,target.z),needs.energy<40?1.3:2.3,dt,false);lookTarget=target;if(Math.random()<dt*.3)options.onPlay?.(.06);}
+  else if(swatCool<=0){swatCool=1.35;const ahead=dist>.33,side=Math.random()<.5?-1:1;curSpeed=0;
+   start({name:ahead?'pounce':'swat',enter(){P({...base,crouch:ahead?1:.3,wiggle:ahead?1:0,frontRaise:0,frontRaiseSide:side,tailUp:1,ears:.35,happy:0});},
+    update(dt){
+     if(ahead){
+      if(this.t<.42){const yaw=Math.atan2(target.x-pos.x,target.z-pos.z);let diff=((yaw-heading+Math.PI*3)%(Math.PI*2))-Math.PI;heading+=diff*Math.min(1,dt*10);return false;}
+      if(!this.leap){this.leap={x:pos.x,z:pos.z,tx:target.x,tz:target.z};mochi.setPose({crouch:0,wiggle:0});}
+      const k=Math.min(1,(this.t-.42)/.42),e=k*k*(3-2*k);pos.x=this.leap.x+(this.leap.tx-this.leap.x)*e*.92;pos.z=this.leap.z+(this.leap.tz-this.leap.z)*e*.92;for(const [[ox,oz],r] of obstacles()){const dx=pos.x-ox,dz=pos.z-oz,l=Math.hypot(dx,dz);if(l<r){pos.x=ox+dx/l*r;pos.z=oz+dz/l*r;}}clampRoom(pos);elevated=reduced?0:Math.sin(k*Math.PI)*.22;
+      if(k>=1){elevated=0;mochi.setPose({crouch:.35,frontRaise:0});return this.t>1.0;}return false;}
+     if(this.t>.12&&this.t<.4)mochi.setPose({frontRaise:1});else mochi.setPose({frontRaise:0});return this.t>.55;},
+    exit(){elevated=0;mochi.setPose({wiggle:0,crouch:0,frontRaise:0});}});
    options.onPlay?.(.22);emit(toyKind==='laser'?'star':'heart',new T.Vector3(target.x,.3,target.z),2,.2);
    if(toyKind==='yarn'||toyKind==='plush'){const a=heading+(Math.random()-.5)*1.2;toyVel.set(Math.sin(a)*2.2,0,Math.cos(a)*2.2);}
   }
@@ -307,7 +322,7 @@ export async function mountMochiHome(root,options={}){
    else if(hitCat()&&mode==='idle'){options.onStroke?.(1);}
    else if(fr){petFriend(fr);options.onTap?.('friend',fr);}
    else if(mode==='idle'){const n=hitNamed();if(n==='bowl'||n==='bed'||n==='basket')options.onTap?.(n);else if(n==='box'||n==='tree'){interrupt(n==='box'?[walkTo(SPOTS.box,1.2,true),face(.9),hold('boxsit',{sit:1,tailUp:.4},6)]:[walkTo([SPOTS.tree[0]+.55,SPOTS.tree[1]+.35],1.2),climb([SPOTS.tree[0]-.15,SPOTS.tree[1]-.12],1.22),hold('perch',{lie:1,eye:.8},6),climb([SPOTS.tree[0]+.6,SPOTS.tree[1]+.4],0)]);}
-    else{const f=floorPoint();if(f){interrupt([...(sleeping?[hold('stretch',{crouch:.9,mouth:1,eye:.2,tailUp:1},1.2)]:[]),walkTo([f.x,f.z],1.4),faceCamera(),hold('arrive',{sit:1,tailUp:.9},2)]);}}}
+    else{const f=floorPoint();if(f){interrupt([...(sleeping?[hold('stretch',{crouch:.9,mouth:1,eye:.2,tailUp:1},1.2)]:[]),walkTo([f.x,f.z],1.1),faceCamera(),hold('arrive',{sit:1,tailUp:.9},2)]);}}}
   }
   press=null;strokeAcc=0;
  }
@@ -317,9 +332,12 @@ export async function mountMochiHome(root,options={}){
  function updateFriends(dt){
   for(const f of friends.values()){
    const g=f.cat.group;f.wait-=dt;
-   if(f.activity==='walk'&&f.target){const d=new T.Vector3(f.target[0]-g.position.x,0,f.target[1]-g.position.z),l=d.length();if(l<.05){f.activity='rest';f.wait=4+Math.random()*7;f.cat.setPose({walk:0,sit:Math.random()<.6?1:0,lie:Math.random()<.25?1:0,eye:1,happy:0});}else{const yaw=Math.atan2(d.x,d.z);g.rotation.y+=(((yaw-g.rotation.y+Math.PI*3)%(Math.PI*2))-Math.PI)*Math.min(1,dt*5);g.position.x+=Math.sin(g.rotation.y)*Math.min(l,dt*.7);g.position.z+=Math.cos(g.rotation.y)*Math.min(l,dt*.7);}}
-   else if(f.wait<=0){f.activity='walk';f.target=[ROOM.minX+.5+Math.random()*(ROOM.maxX-ROOM.minX-1),ROOM.minZ+1+Math.random()*(ROOM.maxZ-ROOM.minZ-1.4)];if(Math.hypot(f.target[0]-pos.x,f.target[1]-pos.z)<.8)f.target[0]+=1;f.cat.setPose({sit:0,lie:0,walk:.7,happy:0,purr:0,blush:0});}
-   f.cat.update(dt,reduced);
+   const before={x:g.position.x,z:g.position.z,h:g.rotation.y};f.speed=f.speed||0;
+   if(f.activity==='walk'&&f.target){const d=new T.Vector3(f.target[0]-g.position.x,0,f.target[1]-g.position.z),l=d.length();
+    if(l<.05&&f.speed<.15){f.speed=0;f.activity='rest';f.wait=4+Math.random()*7;f.cat.setPose({sit:Math.random()<.6?1:0,lie:Math.random()<.25?1:0,eye:1,happy:0});}
+    else{const yaw=Math.atan2(d.x,d.z);let diff=((yaw-g.rotation.y+Math.PI*3)%(Math.PI*2))-Math.PI;g.rotation.y+=Math.max(-3.5*dt,Math.min(3.5*dt,diff*Math.min(1,dt*8)));const align=Math.max(0,Math.cos(diff)),want=Math.min(.6,Math.sqrt(2*2.2*Math.max(0,l-.03)))*(align>.4?align:0);f.speed+=Math.max(-3.5*dt,Math.min(2*dt,want-f.speed));const st=Math.min(l,f.speed*dt);g.position.x+=Math.sin(g.rotation.y)*st;g.position.z+=Math.cos(g.rotation.y)*st;}}
+   else if(f.wait<=0){f.activity='walk';f.target=[ROOM.minX+.5+Math.random()*(ROOM.maxX-ROOM.minX-1),ROOM.minZ+1+Math.random()*(ROOM.maxZ-ROOM.minZ-1.4)];if(Math.hypot(f.target[0]-pos.x,f.target[1]-pos.z)<.8)f.target[0]+=1;f.cat.setPose({sit:0,lie:0,happy:0,purr:0,blush:0});}
+   f.cat.update(dt,reduced,{speed:dt>0?Math.hypot(g.position.x-before.x,g.position.z-before.z)/dt:0,turn:dt>0?(((g.rotation.y-before.h+Math.PI*3)%(Math.PI*2))-Math.PI)/dt:0});
   }
  }
 
@@ -328,14 +346,18 @@ export async function mountMochiHome(root,options={}){
  function wakeLoop(){activeUntil=performance.now()+4000;}
  function resize(){const w=stage.clientWidth||600,h=stage.clientHeight||420;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
  const ro=typeof ResizeObserver!=='undefined'?new ResizeObserver(resize):null;ro?.observe(stage);resize();
+ const lastPos={x:pos.x,z:pos.z},motion={speed:0,turn:0,air:false};let lastHeading=heading;
  function tick(dt){
   setTimeOfDay();
   if(mode.startsWith('play:'))playUpdate(dt);
   if(!act){if(mode==='idle'){const plan=idlePick();plan.forEach((a,i)=>i?queue.push(a):start(a));}else if(mode==='brush'){start(hold('brush',{sit:1,happy:.6,tailUp:.9,blush:.5},1e9));}}
   if(act){act.t+=dt;if(act.update(dt)){act.exit?.();next();}}
+  const moved=Math.hypot(pos.x-lastPos.x,pos.z-lastPos.z),dHead=((heading-lastHeading+Math.PI*3)%(Math.PI*2))-Math.PI;
+  motion.speed=dt>0?moved/dt:0;motion.turn=dt>0?dHead/dt:0;motion.air=elevated>.04&&act?.name!=='boxsit'&&act?.name!=='perch';
+  lastPos.x=pos.x;lastPos.z=pos.z;lastHeading=heading;if(act?.name!=='walk'&&act?.name!=='chase')curSpeed=Math.max(0,curSpeed-4*dt);
   mochi.group.position.set(pos.x,elevated,pos.z);mochi.group.rotation.set(0,heading,rollAngle);
   if(lookTarget&&mode.startsWith('play:')){const local=Math.atan2(lookTarget.x-pos.x,lookTarget.z-pos.z)-heading;mochi.setPose({headYaw:THREEclamp(((local+Math.PI*3)%(Math.PI*2))-Math.PI,-.7,.7)});}
-  mochi.update(dt,false);updateFriends(dt);updateSprites(dt);placeCamera(dt);
+  mochi.update(dt,false,motion);updateFriends(dt);updateSprites(dt);placeCamera(dt);
   if(owned.tree){const d=owned.tree.getObjectByName('dangle');if(d)d.position.x=.45+Math.sin(performance.now()/500)*.04;}
  }
  function frameLoop(now){
@@ -361,7 +383,7 @@ export async function mountMochiHome(root,options={}){
   setNeeds(n){needs={...needs,...n};},
   fillBowl(){kibble.count=24;},
   get mode(){return mode;},get activity(){return act?.name||'none';},get timeOfDay(){return tod;},
-  debug:{scene,camera,renderer,get mochi(){return mochi},pos,tick:dt=>tick(dt),render:()=>renderer.render(scene,camera),friends}
+  debug:{scene,camera,renderer,get mochi(){return mochi},pos,tick:dt=>tick(dt),render:()=>renderer.render(scene,camera),friends,setToy:(x,z)=>toyPos.set(x,0,z)}
  };
 }
 

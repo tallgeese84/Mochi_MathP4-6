@@ -48,3 +48,25 @@ test('play, brushing and naps report progress back to the care rules',async()=>{
 test('lite quality and reduced motion still work',async()=>{
  const {api,run}=await setup({quality:'lite',reducedMotion:true});api.react('trick:roll');run(4);api.react('hop');run(2);api.dispose();
 });
+
+test('paws stay planted while walking: the gait follows distance travelled, not the clock',async()=>{
+ const T=await import('../vendor/three-r180/three.module.js'),C=await import('../mochi-home-cat.js');
+ for(const growth of [0,4])for(const speed of [.65,1.0]){
+  const c=C.buildCat(T,null,{growth});const scene=new T.Scene();scene.add(c.group);const dt=1/60;let x=0,v=0,slip=0,n=0,hmin=1e9,hmax=-1e9;const prev=c.parts.legs.map(()=>null);
+  for(let i=0;i<600;i++){v=Math.min(speed,v+2.5*dt);x+=v*dt;c.group.position.z=x;c.update(dt,false,{speed:v,turn:0});scene.updateMatrixWorld(true);
+   c.parts.legs.forEach((L,k)=>{const q=L.paw.getWorldPosition(new T.Vector3());if(prev[k]&&i>240&&L.lift<1e-6&&prev[k].lift<1e-6){slip+=Math.abs(q.z-prev[k].z);n++;if(!L.front){hmin=Math.min(hmin,q.y);hmax=Math.max(hmax,q.y);}}prev[k]=Object.assign(q,{lift:L.lift});});}
+  const ratio=slip/n/(speed*dt);
+  assert.ok(ratio<.2,`growth ${growth} speed ${speed}: planted paws slide ${(ratio*100).toFixed(0)}% of body motion`);
+  assert.ok(hmax-hmin<.012,`planted hind paws stay on the floor (height varies ${((hmax-hmin)*1000).toFixed(1)} mm)`);
+ }
+});
+test('Mochi eases into motion and brakes before arriving instead of starting and stopping at full speed',async()=>{
+ const {api,run}=await setup();const D=api.debug;D.pos.set(-1,0,.8);api.react('tilt');run(3);
+ const speeds=[];let last={x:D.pos.x,z:D.pos.z};api.greet();
+ for(let i=0;i<150;i++){D.tick(1/30);speeds.push(Math.hypot(D.pos.x-last.x,D.pos.z-last.z)*30);last={x:D.pos.x,z:D.pos.z};}
+ const moving=speeds.findIndex(v=>v>.05);assert.ok(moving>=0);
+ assert.ok(speeds[moving]<.4,'starts gently');
+ const peak=Math.max(...speeds),stopAt=speeds.findIndex((v,i)=>i>moving&&v<.02);
+ assert.ok(stopAt<0||speeds[stopAt-3]<peak*.8,'slows down before stopping');
+ api.dispose();
+});
