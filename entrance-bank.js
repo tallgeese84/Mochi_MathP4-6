@@ -11,12 +11,17 @@ function hash(s){let h=2166136261;for(const c of s){h=Math.imul(h^c.charCodeAt(0
 function modPow(b,n,m){let v=1;while(n-- >0)v=v*b%m;return v;}
 function exposed(edge,hole=0){const c=new Set();for(let x=0;x<edge;x++)for(let y=0;y<edge;y++)for(let z=0;z<edge;z++)if(!(hole&&x>=1&&x<=hole&&y>=1&&y<=hole))c.add([x,y,z].join(','));let faces=0;for(const key of c){const p=key.split(',').map(Number);for(const [d,k]of [[0,-1],[0,1],[1,-1],[1,1],[2,-1],[2,1]]){const q=p.slice();q[d]+=k;if(!c.has(q.join(',')))faces++;}}return faces;}
 function bestPacks(budget,costs,counts){let best=0,winner=[];function visit(i,remaining,total,chosen){if(i===costs.length){if(total>best){best=total;winner=chosen;}return;}for(let n=0;n<=Math.floor(remaining/costs[i]);n++)visit(i+1,remaining-n*costs[i],total+n*counts[i],[...chosen,n]);}visit(0,budget,0,[]);return {best,winner};}
-function make(unit,form,seed){
+/* Revisions keep history stable: an attempt or paper stores the revision it was generated with, and
+   every change to an existing template is gated on rev>=n so older attempts regenerate unchanged. */
+const REV=2;
+const moduleOf=u=>{if(!u.module)return root.MochiDSAExtension||(typeof require==='function'?require('./dsa-extension.js'):null);const key='MochiDSA_'+u.module;return root[key]||(typeof require==='function'?require('./dsa-'+u.module+'.js'):null);};
+function make(unit,form,seed,rev=REV){
  const u=D.units.find(x=>x.id===unit);if(!u||!Number.isInteger(form)||form<0||form>3||!Number.isSafeInteger(seed)||seed<0||seed>4294967295)throw Error('Invalid question identity');
+ if(!Number.isInteger(rev)||rev<1)rev=1;if(rev>REV)rev=REV;
  const r=random((seed^parseInt(hash(unit),36)^Math.imul(form+1,2654435761))>>>0),pick=a=>a[r(0,a.length-1)];let q;
  const out=(text,answer,steps,params={},extra={})=>q={unit,strand:u.strand,form,seed,id:`ep1:${unit}:${form}:${seed}`,text,answer,steps,params,level:form===0?1:form===1?2:3,...extra};
- if(u.bridge){const G=root.MochiGeometryBridge||(typeof require==='function'?require('./geometry-bridge.js'):null),v=G.make(unit,form,seed,r);if(v)out(v.text,v.answer,v.steps,v.params,v);}
- if(u.extension){const X=root.MochiDSAExtension||(typeof require==='function'?require('./dsa-extension.js'):null),v=X.make(unit,form,seed,r);if(v)out(v.text,v.answer,v.steps,v.params,v);}
+ if(u.bridge){const G=root.MochiGeometryBridge||(typeof require==='function'?require('./geometry-bridge.js'):null),v=G.make(unit,form,seed,r,rev);if(v)out(v.text,v.answer,v.steps,v.params,v);}
+ if(u.extension){const X=moduleOf(u),v=X.make(unit,form,seed,r,rev);if(v)out(v.text,v.answer,v.steps,v.params,v);}
  else if(unit==='relationships'){
   if(form===0){const x=r(3,14),a=r(3,8),b=r(4,20);out(`A number is multiplied by ${a}, then ${b} is added. The result is ${a*x+b}. What is the number?`,x,[`Let the number be x: ${a}x + ${b} = ${a*x+b}.`,`Subtract ${b}, then divide by ${a}: x = ${x}.`,`Check: ${a} × ${x} + ${b} = ${a*x+b}.`],{x,a,b});}
   if(form===1){const small=r(13,45),difference=r(7,21),total=2*small+difference;out(`Two trays contain ${total} counters altogether. The first tray contains ${difference} more than the second. How many counters are in the second tray?`,small,[`Remove the difference: ${total} − ${difference} = ${2*small}.`,`This is twice the smaller amount: ${2*small} ÷ 2 = ${small}.`,`The other tray has ${small+difference}; together they have ${total}.`],{total,difference});}
@@ -139,7 +144,7 @@ function make(unit,form,seed){
  }
  if(!q)throw Error('Unimplemented template');
  q.answerLabel??=typeof q.answer==='object'?`${q.answer.a}+${q.answer.b}π`:String(round(Number(q.answer))===Number(q.answer)?q.answer:q.answer);
- q.fingerprint=hash(q.text+'|'+JSON.stringify(q.figure||{}));return q;
+ q.rev=rev;q.fingerprint=hash(q.text+'|'+JSON.stringify(q.figure||{}));return q;
 }
 // Restricted arithmetic parser, never eval. A pair [a,b] represents a + bπ.
 function parse(input,suffix=''){
@@ -155,5 +160,5 @@ function parse(input,suffix=''){
  try{const a=expr();return i===tokens.length&&a.every(Number.isFinite)?a.map(n=>n===0?0:n):null;}catch(_){return null;}
 }
 function mark(q,input){if(typeof q.answer==='string')return String(input).trim().toLowerCase()===q.answer.toLowerCase();const a=parse(input,q.suffix),b=typeof q.answer==='object'?[q.answer.a,q.answer.b]:[q.answer,0];return !!a&&a.every((x,i)=>Math.abs(x-b[i])<=1e-9*Math.max(1,Math.abs(b[i])));}
-root.MochiEntranceBank={make,mark,parse,hash,fraction,modPow,exposed,bestPacks};if(typeof module!=='undefined')module.exports=root.MochiEntranceBank;
+root.MochiEntranceBank={REV,make,mark,parse,hash,fraction,modPow,exposed,bestPacks};if(typeof module!=='undefined')module.exports=root.MochiEntranceBank;
 })(typeof globalThis!=='undefined'?globalThis:this);
