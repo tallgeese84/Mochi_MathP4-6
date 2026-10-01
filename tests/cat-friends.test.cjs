@@ -78,16 +78,15 @@ test('family sync retains collection bonuses and roster edits',()=>{
 
 test('collection UI is paginated and companion scripts stay versioned offline',()=>{
  const html=fs.readFileSync(require.resolve('../index.html'),'utf8'),sw=fs.readFileSync(require.resolve('../sw.js'),'utf8'),ui=fs.readFileSync(require.resolve('../cat-friends-ui.js'),'utf8');
- for(const file of ['cat-friends-core.js','cat-friends-scene.js','cat-friends-ui.js','cat-friends.css']){assert.equal(html.split(file+'?v=').length-1,1);assert.ok(sw.includes(file+'?v='+require('../release.json').version));}
- assert.match(ui,/const PAGE=12/);assert.match(ui,/Cat Points/);assert.match(ui,/100 cats total/);assert.doesNotMatch(ui,/for\(const cat of F\.catalog\)\{/,'do not render all 99 portraits at mount');
+ for(const file of ['cat-friends-core.js','cat-friends-ui.js','cat-friends.css','mochi-home-core.js','mochi-home-ui.js','mochi-home.css']){assert.equal(html.split(file+'?v=').length-1,1);assert.ok(sw.includes(file+'?v='+require('../release.json').version));}
+ assert.ok(sw.includes('mochi-home-scene.js?v='+require('../release.json').version)&&sw.includes('mochi-home-cat.js?v='+require('../release.json').version),'3D home cached offline');assert.match(ui,/const PAGE=12/);assert.match(ui,/Cat Points/);assert.match(ui,/100 cats total/);assert.doesNotMatch(ui,/for\(const cat of F\.catalog\)\{/,'do not render all 99 portraits at mount');
 });
 
-test('real Three.js companion scene still limits the room to three visiting friends and releases resources',async()=>{
- const T=await import('../vendor/three-r180/three.module.js');const M=require('../cat-friends-scene.js'),scene=new T.Scene(),pet=[];
- const api=M.mount(T,scene,{lite:true,onPet:c=>pet.push(c.id)}),camera=new T.PerspectiveCamera();camera.position.set(2,3,8);
- api.set(['miso','suki','kumo','yuki']);assert.equal(api.count,3);api.tick(.02,camera);
- const group=scene.getObjectByName('Cat friends');assert.equal(group.children.length,3);assert.equal(api.pet('miso'),true);assert.deepEqual(pet,['miso']);
- api.set(['yuki']);assert.equal(api.count,1);assert.equal(api.pet('miso'),false);assert.equal(api.pet('yuki'),true);
- for(let i=0;i<10;i++)api.set(['miso','suki','yuki']);assert.equal(group.children.length,4,'models are created lazily only for cats actually visited');
- api.dispose();api.dispose();assert.equal(scene.children.length,0);assert.equal(api.count,0);
+test('every one of the 99 friends can be drawn in Mochi’s Home with a breed-appropriate look, and releases its resources',async()=>{
+ const T=await import('../vendor/three-r180/three.module.js'),C=await import('../mochi-home-cat.js');
+ const patterns=new Set();
+ for(const info of F.catalog){const cat=C.buildCat(T,info,{growth:4,lite:true});patterns.add(cat.palette.pattern);assert.equal(cat.palette.coat,info.coat);assert.equal(cat.palette.eyes,info.eyes);cat.update(1/30);const scene=new T.Scene();scene.add(cat.group);cat.dispose();assert.equal(scene.children.length,0);}
+ assert.deepEqual([...patterns].sort(),['point','solid','tabby']);
+ const mochi=C.buildCat(T,null,{growth:0});assert.equal(mochi.palette.name,'Mochi');assert.ok(mochi.parts.height>0);
+ const grown=C.buildCat(T,null,{growth:4});assert.ok(grown.parts.height>mochi.parts.height,'Mochi grows taller as Euna learns');
 });

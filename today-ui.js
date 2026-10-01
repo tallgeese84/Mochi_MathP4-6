@@ -94,7 +94,8 @@ function go(subject,kind){
 }
 function paintCompanion(m,cat){
  const t=m.next,says=$('todayMochiSays');
- if(says)says.textContent=m.restDay&&!t?'Rest day. I’m napping too.':m.finished&&!t?'You did it! Come and play?':m.completed>0?'Nice work. One more quest?':t?.resume?'Let’s pick up where we left off.':'Ready when you are.';
+ const careWish=(m.finished||m.restDay)&&!t&&root.MochiHome&&S?.home?root.MochiHome.wish(root.MochiHome.advance(root.MochiHome.validate(S.home))):null;
+ if(says)says.textContent=careWish?({tummy:'I’m a little peckish. Snack time?',energy:'Yawn… nap together?',clean:'Brush my fur?',fun:'Play with me?',love:'Cuddle time?'})[careWish.need]:m.restDay&&!t?'Rest day. I’m napping too.':m.finished&&!t?'You did it! Come and play?':m.completed>0?'Nice work. One more quest?':t?.resume?'Let’s pick up where we left off.':'Ready when you are.';
  if($('todayCoins'))$('todayCoins').textContent=String(Math.max(0,Math.floor(Number(S?.coins)||0)));
  if($('todayCatPoints'))$('todayCatPoints').textContent=String(cat?.points||0);
  const box=$('todayNextCat');if(!box)return;

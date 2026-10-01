@@ -1,4 +1,4 @@
-/* Load Mochi's 3D room on demand; learning and purchases stay in the existing app. */
+/* Load Mochi's Home (3D pet care) on demand; learning and purchases stay in the existing app. */
 (function(root){
 'use strict';
 function init(){
@@ -6,8 +6,8 @@ function init(){
  if(!view||!host)return;
  const modeKey='mochi-room-view-v1',script=document.querySelector('script[src*="mochi-room.js"]');
  const version=new URL(script.src,document.baseURI).searchParams.get('v');
- const moduleURL=new URL('mochi-room-scene.js',script.src);moduleURL.searchParams.set('v',version);
- let api=null,pending=null,failed=false,forwarding=false,preferPicture=false,quality=/Android/i.test(navigator.userAgent)?'lite':'full',failure='',retry=0;
+ const moduleURL=new URL('mochi-home-scene.js',script.src);moduleURL.searchParams.set('v',version);
+ let wasShown=false,api=null,pending=null,failed=false,forwarding=false,preferPicture=false,quality=/Android/i.test(navigator.userAgent)?'lite':'full',failure='',retry=0;
  try{preferPicture=localStorage.getItem(modeKey)==='picture';}catch(_){}
  const visible=()=>view.style.display!=='none'&&!view.hidden;
  function saveMode(){try{localStorage.setItem(modeKey,preferPicture?'picture':'3d');}catch(_){} }
@@ -26,15 +26,11 @@ function init(){
    api.setWear(S.worn||{});
    const pet=root.MochiPlanner?.pet(root.MochiPlanner.init(S));
    api.setGrowth(pet?.level||0);
+   api.setToys?.(S.home?.toys||['feather','yarn']);root.MochiHomeUI?.refresh?.();
   }catch(error){fail(error);}
  }
  async function loadScene(){
-  // A failed classic-script request must not quietly remove every companion.
-  if(typeof root.MochiCatFriendsScene?.mount!=='function'){
-   const url=new URL('cat-friends-scene.js',script.src);url.searchParams.set('v',version);
-   await import(url.href);
-  }
-  if(typeof root.MochiCatFriends?.sync!=='function'||typeof root.MochiCatFriendsScene?.mount!=='function')throw Error('Cat Friends files are incomplete. Refresh while online; your saved progress is kept.');
+  if(typeof root.MochiCatFriends?.sync!=='function')throw Error('Cat Friends files are incomplete. Refresh while online; your saved progress is kept.');
   let scene=await import(moduleURL.href);
   if(scene.CAT_FRIENDS_VERSION!==1){
    const fresh=new URL(moduleURL.href);fresh.searchParams.set('repair',String(Date.now()));
@@ -45,13 +41,14 @@ function init(){
  }
  function paint(){
   const active=!preferPicture&&!failed;
-  host.hidden=!active;picture.hidden=active;
+  host.hidden=!active;picture.hidden=active;view.classList.toggle('home-3d',active&&!!api);
   $('room3dMode').setAttribute('aria-pressed',String(active));
   $('roomPictureMode').setAttribute('aria-pressed',String(!active));
   $('petBtn').parentElement.hidden=active&&!!api;
   $('room3dStatus').textContent=failed?'3D could not start: '+failure+' Your selected cat portraits are above; picture mode is still available.':pending?'Mochi is waking up…':'';
   $('room3dRetry').hidden=!failed;
-  api?.setVisible(active&&visible());
+  const shown=active&&visible();if(shown&&api&&!wasShown)root.MochiHomeUI?.visit?.();wasShown=shown&&!!api;
+  api?.setVisible(shown);
  }
  async function ensure(){
   if(!visible()||preferPicture||failed||api||pending){paint();return;}
@@ -63,9 +60,12 @@ function init(){
      friends:root.MochiCatFriends?.sync(S).selected||[],
      level:root.MochiPlanner?.pet(root.MochiPlanner.init(S)).level||0,
      onPet(){forwarding=true;try{petCat();}finally{forwarding=false;}},
+     onStroke(n){forwarding=true;try{if(root.MochiHomeUI?.stroke)root.MochiHomeUI.stroke(n);else petCat();}finally{forwarding=false;}},
+     onBrush:n=>root.MochiHomeUI?.brush?.(n),onPlay:n=>root.MochiHomeUI?.play?.(n),onNap:n=>root.MochiHomeUI?.nap?.(n),onTap:(k,id)=>root.MochiHomeUI?.tap?.(k,id),
+     toys:S.home?.toys||['feather','yarn'],worn:S.worn||{},reducedMotion:!!root.matchMedia?.('(prefers-reduced-motion: reduce)').matches,
      onError:fail
     });
-    sync();
+    sync();root.MochiHomeUI?.attach?.(api);
    }catch(error){fail(error);console.warn('Mochi room unavailable:',error.message);}
    finally{pending=null;paint();}
   })();
@@ -75,7 +75,7 @@ function init(){
  $('roomPictureMode').onclick=()=>{preferPicture=true;saveMode();paint();};
  $('room3dRetry').onclick=()=>{api?.dispose();api=null;host.querySelectorAll('canvas').forEach(n=>n.remove());failed=false;failure='';quality='lite';moduleURL.searchParams.set('retry',String(++retry));preferPicture=false;saveMode();ensure();};
  document.addEventListener('mochi:pet',()=>{if(!forwarding&&api&&!preferPicture&&!failed)api.pet();});
- document.addEventListener('mochi:fed',e=>{if(api&&!preferPicture&&!failed)api.feed(e.detail?.name);});
+ document.addEventListener('mochi:fed',e=>{if(api&&!preferPicture&&!failed)api.feed(e.detail?.name,e.detail?.id);});
  document.addEventListener('mochi:cat-friends-changed',sync);
  document.addEventListener('mochi:state-saved',sync);
  document.addEventListener('mochi:cloud-merged',sync);
@@ -83,7 +83,7 @@ function init(){
  const observer=new MutationObserver(()=>{paint();if(visible())ensure();});
  observer.observe(view,{attributes:true,attributeFilter:['style','hidden']});
  paint();if(visible())ensure();
- root.MochiRoom={refresh:sync,open:ensure,petFriend:id=>!preferPicture&&!failed&&!!api?.petFriend(id)};
+ root.MochiRoom={refresh:sync,open:ensure,scene:()=>(!preferPicture&&!failed?api:null),petFriend:id=>!preferPicture&&!failed&&!!api?.petFriend(id)};
 }
 if(root.MochiReady)init();else document.addEventListener('mochi:ready',init,{once:true});
 })(window);

@@ -1,3 +1,16 @@
+# v7.0.0 — Mochi’s Home: a new 3D pet to care for
+
+- Replace the 3D room with **Mochi’s Home**, built from scratch: a cosy diorama room that follows the real time of day (sunny window, golden evening, moonlit night with a lamp), with a bed, food and water bowls, a toy basket, a plant and a picture of a paw print.
+- New stylised 3D Mochi (`mochi-home-cat.js`): big expressive eyes, blinking, happy and sleepy faces, a blush when he’s happy, whiskers, a curling tabby tail, white socks, a blue collar and bell. He grows through five stages, from tiny kitten to grown cat, as Euna learns. All 99 collectible friends are redrawn in the same style with breed-appropriate tabby, colourpoint or solid coats.
+- Tamagotchi-style care (`mochi-home-core.js`): Tummy, Energy, Fluffiness, Playfulness and Cuddles. Feed, brush, play and nap are always free. Treats, new toys (box, laser dot, fish plush, cat tree) and accessories cost coins earned by learning.
+- No guilt: needs drift only to a comfortable floor, time away is a nap, Mochi is never sad, sick or gone, and bond never decreases. Tests check every message for guilt words.
+- Bond grows with care (capped per day so it stays a habit) and unlocks seven tricks: sit, high five, spin, roll over, wave, chase tail and happy hop. Four daily paw stamps: a meal, a brush, playtime and cuddles.
+- Mochi has his own life: he wanders, grooms, gazes out of the window, naps in his bed (more at night), sits in his box and climbs his cat tree. He greets Euna each time she visits.
+- Touch play: tap to pet (hearts and a soft synthesised purr, with a sound switch), drag the brush over his fur, drag a feather wand or laser dot for him to chase, tap the floor to roll yarn or toss the fish, tap the floor and he trots over.
+- The home screen’s Mochi mentions his wish (“Cuddle time?”) only after the day’s study plan is done.
+- Remove the old 748 KB room scene and companion script; the new home loads faster. Picture mode, the WebGL fallback, lighter Android graphics and the three-friend limit are kept.
+- Saved progress, coins, accessories, cat collection, family sync and the review export are unchanged. Care data is a new `home` record that syncs with the rest of the state.
+
 # v6.9.0 — DSA challenge units and a clearer 3D Mochi
 
 - Add six challenge units (`dsa-extension.js`) after the core pathway: totals in stages, same-time motion, hidden radii and circle patterns, grid angles and overlapping squares, factors/squares/letter sums, and sequence rules.
