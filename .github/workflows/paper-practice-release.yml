@@ -1,0 +1,66 @@
+name: Paper-style practice release validation
+on:
+  push:
+    branches: [codex/paper-practice-v7-5-0]
+permissions:
+  contents: write
+jobs:
+  validate:
+    if: github.ref == 'refs/heads/codex/paper-practice-v7-5-0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Assemble checksum-locked reviewed sources
+        run: python3 scripts/assemble-paper-practice.py
+      - run: npm ci --ignore-scripts
+      - name: Full regression and curriculum checks
+        run: |
+          set -euo pipefail
+          npm run check:release
+          npm run check:course
+          npm test | tee "$RUNNER_TEMP/paper-tests.log"
+      - name: Actual Chrome practice and lesson screens
+        run: |
+          set -euo pipefail
+          python3 -m http.server 8765 --bind 127.0.0.1 > "$RUNNER_TEMP/paper-server.log" 2>&1 &
+          server=$!
+          trap 'kill "$server"' EXIT
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:8765/release.json && break || sleep 0.2; done
+          chrome=$(command -v google-chrome || command -v google-chrome-stable)
+          timeout 85s "$chrome" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --user-data-dir="$RUNNER_TEMP/paper-chrome" --window-size=1280,1800 --timeout=60000 --virtual-time-budget=22000 --screenshot="$RUNNER_TEMP/paper-practice.png" --dump-dom http://127.0.0.1:8765/tests/fixtures/paper-practice-browser.html > "$RUNNER_TEMP/paper-browser.html" 2> "$RUNNER_TEMP/paper-browser.log"
+          grep -q 'data-result="passed"' "$RUNNER_TEMP/paper-browser.html"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: paper-practice-validation
+          path: |
+            ${{ runner.temp }}/paper-practice.png
+            ${{ runner.temp }}/paper-browser.html
+            ${{ runner.temp }}/paper-browser.log
+            ${{ runner.temp }}/paper-tests.log
+          retention-days: 2
+      - name: Commit verified sources to working branch only
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,json,os,subprocess
+          expected=json.loads(Path(os.environ['RUNNER_TEMP'],'paper-expected.json').read_text())
+          for name,checksum in expected.items():
+              assert hashlib.sha256(Path(name).read_bytes()).hexdigest()==checksum,name+' changed during tests'
+          subprocess.run(['git','add','-A'],check=True)
+          changed=subprocess.check_output(['git','diff','--cached','--name-only','6988e5e04febb0b7979a26d7733477fb3ef93f74'],text=True).splitlines()
+          assert sorted(changed)==sorted(expected),'Unexpected production changes: '+str(changed)
+          PY
+          git diff --check --cached
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Finalize v7.5.0 paper-style daily practice after full regression and browser checks'
+          git push origin HEAD:refs/heads/codex/paper-practice-v7-5-0
