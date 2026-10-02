@@ -43,9 +43,15 @@ function burst(fx){
 const STAGE_ORDER=['Learn','Apply','Connect','Revisit after a week','Mixed-paper practice'];
 function stageProgress(e){const i=STAGE_ORDER.indexOf(e.stage);return e.taught?Math.max(.08,i/ (STAGE_ORDER.length-1)):0;}
 function trail(P,E,d,strandKey,nextId,now=Date.now()){
- const units=E.D.units.filter(u=>u.strand===strandKey);
+ const units=E.D.units.filter(u=>u.strand===strandKey),seen=ringMemory();
  return `<ol class="ux-trail">${units.map((u,i)=>{const e=E.evidence(d,u.id,now),p=stageProgress(e),done=e.delayed>0||e.stage==='Mixed-paper practice',ready=u.prerequisites.every(id=>E.evidence(d,id,now).apply>=1),state=done?'done':u.id===nextId?'next':e.taught?'started':ready?'open':'later',star=u.extension||u.id.startsWith('sx-');
-  return `<li data-state="${state}"><button type="button" class="ux-node" data-lesson="${u.id}" aria-label="${esc(u.title)}: ${state==='done'?'done':state==='next'?'next step':state==='started'?'in progress':'not started'}"><span class="ux-ring" style="--p:${p.toFixed(2)}"><span>${done?PAW:i+1}</span></span>${star?'<span class="ux-star" aria-hidden="true">★</span>':''}<span class="ux-node-name">${esc(u.title.replace(/^Challenge · /,''))}</span></button></li>`;}).join('')}</ol>`;
+  return `<li data-state="${state}" data-unit="${u.id}"><button type="button" class="ux-node" data-lesson="${u.id}" aria-label="${esc(u.title)}: ${state==='done'?'done':state==='next'?'next step':state==='started'?'in progress':'not started'}"><span class="ux-ring" data-p="${p.toFixed(2)}" style="--p:${(seen[u.id]??p).toFixed(2)}"><span>${done?PAW:i+1}</span></span>${star?'<span class="ux-star" aria-hidden="true">★</span>':''}<span class="ux-node-name">${esc(u.title.replace(/^Challenge · /,''))}</span></button></li>`;}).join('')}</ol>`;
+}
+/* Rings remember what this device last showed, so new progress visibly fills in. A per-device nicety only. */
+function ringMemory(){try{return JSON.parse(root.localStorage?.getItem('mochi-rings')||'{}')||{};}catch(_){return {};}}
+function animateRings(host){
+ const rings=[...host.querySelectorAll('.ux-ring[data-p]')];if(!rings.length)return;const mem=ringMemory();
+ requestAnimationFrame(()=>requestAnimationFrame(()=>{for(const r of rings){const li=r.closest('[data-unit]'),id=li?.dataset.unit,to=+r.dataset.p;if(!id)continue;if((mem[id]??0)<1&&to>=1&&mem[id]!==undefined)li.setAttribute('data-just-done','');r.style.setProperty('--p',String(to));mem[id]=to;}try{root.localStorage?.setItem('mochi-rings',JSON.stringify(mem));}catch(_){}}));
 }
 /* Mock papers placed on the months between now and the test. */
 function mockTimeline(E,d,now=Date.now()){
@@ -53,6 +59,6 @@ function mockTimeline(E,d,now=Date.now()){
  const months=[];for(let t=new Date(new Date(start).getFullYear(),new Date(start).getMonth()+1,1).getTime();t<end;t=new Date(new Date(t).getFullYear(),new Date(t).getMonth()+1,1).getTime())months.push(t);
  return `<figure class="ux-timeline" aria-label="Mock papers before the selection test"><div class="ux-tl-track"><span class="ux-tl-fill" style="width:${pos(now)}%"></span>${months.map(t=>`<span class="ux-tl-month" style="left:${pos(t)}%">${new Date(t).toLocaleDateString(undefined,{month:'short'})}</span>`).join('')}${plan.mocks.map((x,i)=>`<span class="ux-tl-mock" data-status="${x.status}" style="left:${pos(x.at)}%" title="${esc(x.title)} · ${esc(x.date)}">${x.status==='done'?PAW:i+1}</span>`).join('')}<span class="ux-tl-now" style="left:${pos(now)}%" aria-hidden="true"></span><span class="ux-tl-test" style="left:100%">🏁</span></div><figcaption><span>Today</span><span>Mock papers</span><span>Selection test</span></figcaption></figure>`;
 }
-root.MochiUX={PAW,esc,masteryDots,hintBox,hintLabel,keypad,wireKeypad,burst,stageProgress,trail,mockTimeline};
+root.MochiUX={animateRings,ringMemory,PAW,esc,masteryDots,hintBox,hintLabel,keypad,wireKeypad,burst,stageProgress,trail,mockTimeline};
 if(typeof module!=='undefined')module.exports=root.MochiUX;
 })(typeof window!=='undefined'?window:globalThis);

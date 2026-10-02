@@ -26,7 +26,13 @@ function go(id){
  else if(id==='mochi'&&typeof root.studioShow==='function')root.studioShow('room');
  paint(true);root.scrollTo?.({top:0,behavior:'instant'});
 }
+let screen='',enterTimer=0;
+/* A short settle-in animation whenever the screen changes (not on every redraw). */
+function screenKey(){const now=current();for(const x of ['maths','science']){const u=ui(x);if(u?.visible?.()){const v=u.view();return now+':'+x+':'+v.kind+':'+(v.unit||v.paper||'');}}return now;}
+function enter(){const k=screenKey();if(k===screen)return;const first=!screen;screen=k;if(first)return;let calm=false;try{calm=root.matchMedia?.('(prefers-reduced-motion: reduce)').matches;}catch(_){}if(calm)return;
+ const b=document.body;b.classList.remove('ux-enter');void b.offsetWidth;b.classList.add('ux-enter');clearTimeout(enterTimer);enterTimer=setTimeout(()=>b.classList.remove('ux-enter'),520);}
 function paint(force=false){
+ enter();
  if(!nav)return;const b=document.body,inPaper=b.classList.contains('entrance-paper')||b.classList.contains('science-path-paper'),now=current();
  const sig=now+'|'+inPaper;if(!force&&sig===last)return;last=sig;
  nav.hidden=inPaper;b.classList.toggle('ux-has-nav',!inPaper);

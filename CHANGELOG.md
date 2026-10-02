@@ -1,3 +1,11 @@
+# v7.4.0 — Moments of delight
+
+- **Mochi says hello.** On Today, a 3D Mochi waves when Euna arrives, follows her finger and sways gently. Tap him to visit his room. It loads after the page is ready, and lighter Android tablets or the reduced-motion setting keep the picture.
+- **Celebrations that are earned.** A short full-screen moment with tumbling paw prints, a ring that fills into a medal and big bold words. It appears when she masters a topic (her first challenge question solved on her own), finishes a mixed practice set, submits a paper or mock (with her marks), or Mochi learns a new trick. It lasts about three seconds and a tap closes it. Reduced motion shows a still card instead.
+- **Smooth transitions.** Each new screen settles in with a quick fade and lift. It happens only when the screen changes, not on every tap, and it is off with reduced motion.
+- **A skill map with depth.** Topic rings are raised and glossy and lift when touched. Rings fill to show new progress since she last looked, and a finished topic pops into its paw stamp.
+- Question screens, lessons and papers stay calm: no 3D, and no motion while she is working.
+
 # v7.3.0 — A more visual, streamlined app
 
 - **One way round the app.** A bottom bar with four places: Today, Learn, Papers and Mochi. It hides during a timed paper so it cannot be left by accident. The path tabs are shorter: Overview, Topics, Papers and Classroom.

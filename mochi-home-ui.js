@@ -43,7 +43,7 @@ function refresh(){if(!$('mhNeeds'))return;H.advance(home());paintNeeds();paintD
 function after(r){
  if(!r)return;persist();refresh();
  if(r.text)say(r.text);
- for(const t of r.newTricks||[]){celebrate(`Mochi learned a new trick: ${t.name}!`);}
+ for(const t of r.newTricks||[]){celebrate(`Mochi learned a new trick: ${t.name}!`);window.MochiCelebrate?.show({kind:'trick',title:'New trick!',detail:`Mochi learnt ${t.name}.`,sub:'Keep caring for Mochi to teach him more.'});}
  if(r.routine&&home().routine.done.length===H.ROUTINE.length)setTimeout(()=>celebrate('All four paw stamps today. Mochi feels so loved!'),900);
 }
 function celebrate(text){const t=$('mhToast');if(!t)return;t.textContent=text;t.hidden=false;t.classList.remove('mh-pop');void t.offsetWidth;t.classList.add('mh-pop');chime();clearTimeout(t._t);t._t=setTimeout(()=>t.hidden=true,4200);}

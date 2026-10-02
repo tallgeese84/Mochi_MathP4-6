@@ -135,6 +135,7 @@ function resultsView(){
 }
 function wireNavigation(){
  root.MochiReadinessUI?.wireTags(host,E,data(),()=>save(S));
+ root.MochiUX?.animateRings?.(host);
  $('epHome').onclick=()=>root.MochiTodayUI?root.MochiTodayUI.open():open('home');$('epLessons').onclick=()=>open('lessons');$('epPapers').onclick=()=>open('papers');$('epFoundations').onclick=()=>{leave();root.courseOpen('maths');};
  for(const b of host.querySelectorAll('[data-lesson]'))b.onclick=()=>open('lesson',b.dataset.lesson);
  for(const b of host.querySelectorAll('[data-foundation]'))b.onclick=()=>{leave();root.courseOpen('maths',b.dataset.foundation);};
@@ -165,10 +166,10 @@ function wire(){
  if(view.kind==='practice'){
   wireEditor();root.MochiUX?.wireKeypad('ep',()=>capture(true));
   if($('epCheckAnswer'))$('epCheckAnswer').onclick=()=>{
-   capture();const result=E.respond(data());if(!result.ok){message=result.reason;render();return;}
+   capture();const cu=data().draft?.unit,eb=cu?E.evidence(data(),cu):null,mb=!!(data().mixed&&!data().mixed.completedAt);const result=E.respond(data());if(!result.ok){message=result.reason;render();return;}
    const a=result.attempt,quiet=['mixed','redo'].includes(a.phase);fx=a.correct?(a.independent&&!a.seenBefore?'solo':'correct'):'retry';message=a.correct?'':quiet?(a.responses.length>=2?'Study the worked solution. This question will come back in a few days.':'Not quite. Try again, or look at the worked solution.'):result.needsLesson?'Study the worked solution or the lesson, then try a similar question.':'Not quite. Try the quick check below, then try again.';
    if(a.phase==='guided'&&root.MochiPlanner){const d=MochiPlanner.day(MochiPlanner.init(S),'maths');d.exitIds=[...new Set([...d.exitIds,'entrance:'+a.id])].slice(-8);d.updatedAt=Date.now();}
-   save(S);render();root.MochiBuddy?.react('ep',{subject:'maths',correct:!!a.correct,independent:!!a.independent,responses:a.responses?.length||1,needsLesson:!!result.needsLesson});
+   save(S);render();{const ea=cu&&E.evidence(data(),cu),A=result.attempt;if(A?.correct&&eb&&!eb.transfer&&ea?.transfer)root.MochiCelebrate?.show({kind:'topic',title:'Topic mastered!',detail:E.unit(cu).title,sub:'You solved a challenge question on your own.'});else if(mb&&data().mixed?.completedAt)root.MochiCelebrate?.show({kind:'set',title:'Mixed practice complete!',detail:'Well done!'});}root.MochiBuddy?.react('ep',{subject:'maths',correct:!!a.correct,independent:!!a.independent,responses:a.responses?.length||1,needsLesson:!!result.needsLesson});
   };
   wireDiagnostic();
   if($('epHint'))$('epHint').onclick=()=>{capture();E.help(data());hintLevel=Math.min(3,hintLevel+1);if(hintLevel>=3)E.help(data(),true);render();save(S);};
@@ -187,7 +188,7 @@ function wire(){
   for(const b of host.querySelectorAll('[data-paper-index]'))b.onclick=()=>go(+b.dataset.paperIndex);
   $('epPaperPrev').onclick=()=>go(Math.max(0,p.index-1));$('epPaperNext').onclick=()=>go(Math.min(qs.length-1,p.index+1));
   $('epPaperFlag').onclick=()=>{capture();p.flags=p.flags.includes(p.index)?p.flags.filter(x=>x!==p.index):[...p.flags,p.index];render();save(S);};
-  $('epSubmitPaper').onclick=()=>{capture();const blanks=qs.filter((_,i)=>!p.answers[i]?.answer.trim()).length;if(!confirm(`Submit this paper${blanks?' with '+blanks+' unanswered question(s)':''}? You cannot edit it after submission.`))return;E.submitPaper(data(),p.id);save(S);open('results',p.id);};
+  $('epSubmitPaper').onclick=()=>{capture();const blanks=qs.filter((_,i)=>!p.answers[i]?.answer.trim()).length;if(!confirm(`Submit this paper${blanks?' with '+blanks+' unanswered question(s)':''}? You cannot edit it after submission.`))return;const sc=E.submitPaper(data(),p.id);save(S);open('results',p.id);if(sc)root.MochiCelebrate?.show(sc.kind==='mock'?{kind:'mock',title:'Mock paper complete!',detail:`${sc.marks} / ${sc.markTotal} marks`,sub:'Go through your working, then try the next mock.'}:{kind:'mock',title:'Paper complete!',detail:`${sc.correct} / ${sc.total} correct`});};
   $('epPausePaper').onclick=()=>{capture();if(!confirm('Pause and continue as supported practice? The paper will no longer count as an independent timed check.'))return;E.interruptPaper(data(),p.id);if(root.MochiTodayUI)root.MochiTodayUI.open();else open('home');};
   tickPaper();
  }
