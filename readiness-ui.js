@@ -4,7 +4,7 @@
 (function(root){
 'use strict';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const TAG_LABEL={misread:'I misread it',method:'Wrong method',calculation:'Calculation slip',time:'Rushed or ran out of time',unsure:'Not sure yet'};
+const TAG_LABEL={misread:'I misread the question',method:'I used the wrong method',calculation:'I made a careless mistake',time:'I ran out of time',unsure:'I am not sure'};
 const STATUS={covered:'Every method has been practised in a changed form.',starting:'Just getting started: the pace estimate appears after four weeks.','on-track':'On track for the test date.','a-little-behind':'A little behind the pace needed.',behind:'Behind the pace needed: consider more study days or fewer new lessons per day.'};
 const DAY=86400000;
 function niceDate(key){const [y,m,d]=String(key).split('-').map(Number);if(!y)return '';return new Date(y,m-1,d,12).toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'});}
@@ -15,16 +15,16 @@ function countdown(P,E,d,now=Date.now()){
 /* One line for Euna: how much is left and the next mock. No "behind" judgement on her screen. */
 function planStrip(P,E,d,now=Date.now()){
  const p=E.plan(d,now),next=p.mocks.find(m=>m.status!=='done');
- return `<div class="${P}-evidence-strip rd-plan"><span><strong>${p.remaining}</strong>methods still to try in a new twist · about ${Math.max(1,Math.ceil(p.perWeek))} a week</span>${next?`<span><strong>${esc(next.title)}</strong>${next.status==='due'?'ready now':next.status==='started'?'in progress':esc(niceDate(next.date))}</span>`:''}</div>`;
+ return `<div class="${P}-evidence-strip rd-plan"><span><strong>${p.remaining}</strong>🎯 topics left · about ${Math.max(1,Math.ceil(p.perWeek))} a week</span>${next?`<span><strong>${esc(next.title)}</strong>${next.status==='due'?'ready now':next.status==='started'?'in progress':esc(niceDate(next.date))}</span>`:''}</div>`;
 }
 function mockCard(P,E,d,now=Date.now()){
  const m=E.dueMock(d,now);if(!m)return '';
- return `<section class="${P}-card rd-mock" aria-label="Mock paper ready"><p class="${P}-kicker">MOCK PAPER READY</p><h2>${esc(m.title)}</h2><p>${m.minutes} minutes, no calculator, no hints. Best on a weekend with a quiet table. The score is for comparing with your next mock, not a prediction.</p><button data-start-paper="${esc(m.id)}" class="${P}-primary">Start when ready</button></section>`;
+ return `<section class="${P}-card rd-mock" aria-label="Mock paper ready"><p class="${P}-kicker">Mock paper</p><h2>${esc(m.title)}</h2><p>${m.minutes} minutes, no calculator, no hints. Best on a weekend with a quiet table. The score is for comparing with your next mock, not a prediction.</p><button data-start-paper="${esc(m.id)}" class="${P}-primary">Start when ready</button></section>`;
 }
 /* Shown after a missed first try: Euna picks what went wrong. It shapes her redo and the grown-up view. */
 function tagChips(P,E,d,attempt){
  if(!attempt||attempt.firstCorrect||attempt.skipped||attempt.phase==='guided'||attempt.phase==='redo')return '';const tag=d.errors?.[attempt.id]?.tag||'';
- return `<div class="rd-tags" data-rd-attempt="${esc(attempt.id)}"><p><strong>What went wrong the first time?</strong> It comes back in a few days for a second look.</p><div>${E.TAGS.map(t=>`<button type="button" data-rd-tag="${t}" aria-pressed="${t===tag}">${esc(TAG_LABEL[t])}</button>`).join('')}</div></div>`;
+ return `<div class="rd-tags" data-rd-attempt="${esc(attempt.id)}"><p><strong>What went wrong?</strong> This question will come back in a few days.</p><div>${E.TAGS.map(t=>`<button type="button" data-rd-tag="${t}" aria-pressed="${t===tag}">${esc(TAG_LABEL[t])}</button>`).join('')}</div></div>`;
 }
 function wireTags(host,E,d,save){
  for(const box of host.querySelectorAll('[data-rd-attempt]'))for(const b of box.querySelectorAll('[data-rd-tag]'))b.onclick=()=>{if(E.tagError(d,box.dataset.rdAttempt,b.dataset.rdTag)){for(const x of box.querySelectorAll('[data-rd-tag]'))x.setAttribute('aria-pressed',String(x===b));save();}};
