@@ -59,8 +59,10 @@ function studyInit(){
      const friendsRestored=window.MochiCatFriends&&raw.catFriends?MochiCatFriends.validate(raw.catFriends):null;
      const entranceRestored=window.MochiEntrance&&raw.entrance?MochiEntrance.validate(raw.entrance):null;
      const sciencePathRestored=window.MochiSciencePath&&raw.sciencePath?MochiSciencePath.validate(raw.sciencePath):null;
+     const p6Restored=window.MochiP6&&raw.p6?MochiP6.validate(raw.p6):null;
      const planRestored=window.MochiPlanner&&raw.planner?MochiPlanner.validate(raw.planner):null;
      if(!confirm('Replace learning history on this device with this backup? API settings and Mochi’s room are kept.'))return;
+     window.MochiP6UI?.leave();if(p6Restored)S.p6=p6Restored;
      window.MochiEntranceUI?.pause();window.MochiSciencePathUI?.pause();
      if(typeof coursePause==='function')coursePause();
      window.MochiPlanUI?.pause();if(planRestored)S.planner=planRestored;
