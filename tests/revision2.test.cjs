@@ -1,15 +1,15 @@
 // Revision 2 fixes from the content audit. Revision 1 stays frozen (tests/history-stability.test.cjs);
-// these tests check the new behaviour at the default revision and recompute every changed template.
+// these tests check the new behaviour at explicitly pinned revision 2 and recompute every changed template.
 const test=require('node:test'),assert=require('node:assert/strict');
 globalThis.window=globalThis;
 require('../entrance-data.js');
-const B=require('../entrance-bank.js');
+const Bank=require('../entrance-bank.js'),B={...Bank,make:(u,f,s,rev=2)=>Bank.make(u,f,s,rev)};
 const SEEDS=Array.from({length:300},(_,i)=>(i*104729+7)>>>0);
 const nums=t=>[...t.matchAll(/\d+(?:\.\d+)?/g)].map(m=>Number(m[0]));
 const range=(a,b)=>Array.from({length:b-a+1},(_,i)=>a+i);
 
-test('the bank is at revision 2 and revision 1 is still available',()=>{
- assert.equal(B.REV,2);const a=B.make('invariants',0,5,1),b=B.make('invariants',0,5);assert.equal(a.answer,'No');assert.deepEqual(b,B.make('invariants',0,5,2));
+test('revision 2 remains explicitly available alongside frozen revision 1',()=>{
+ assert.ok(B.REV>=2);const a=B.make('invariants',0,5,1),b=B.make('invariants',0,5);assert.equal(a.answer,'No');assert.deepEqual(b,B.make('invariants',0,5,2));
 });
 
 test('rates: every form gives a whole-number answer over 300 seeds',()=>{

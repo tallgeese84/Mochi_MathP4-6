@@ -1,4 +1,4 @@
-const test=require('node:test'),assert=require('node:assert/strict'),D=require('../entrance-data.js'),B=require('../entrance-bank.js'),F=require('../entrance-figures.js');
+const test=require('node:test'),assert=require('node:assert/strict'),D=require('../entrance-data.js'),Bank=require('../entrance-bank.js'),B={...Bank,make:(u,f,s,rev=2)=>Bank.make(u,f,s,rev)},F=require('../entrance-figures.js');
 const near=(a,b,m)=>assert.ok(Math.abs(a-b)<1e-8,`${m}: ${a} versus ${b}`);
 const range=(a,b)=>Array.from({length:b-a+1},(_,i)=>a+i),sum=a=>a.reduce((n,x)=>n+x,0),factors=n=>range(1,n).filter(x=>n%x===0);
 const common=(a,b)=>{let n=a;while(n%b)n+=a;return n;};

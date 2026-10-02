@@ -1,0 +1,29 @@
+{
+  "baseline": "6988e5e04febb0b7979a26d7733477fb3ef93f74",
+  "questions": {
+    "1": "7b685dc08f137a7f03cb6486021b86bd89487e9d2ddba6645909e3e4241ea7cf",
+    "2": "5a1e247988951af6ce7fc04c2bd4f5753e29ac27ac0101d59072c5cfbd5be790"
+  },
+  "papers": {
+    "maths:baseline-a": "ace39461a150163ff9fa38935cab49a43f597a8b1353121378e4abea7c453627",
+    "maths:baseline-b": "6c1657f2b5651fe2f2d3d404c010da1214e665d2cbf7953e3e7a371ec331c2c5",
+    "maths:mixed-a": "c28f0fd7134eabfb7ea53b5d920c7df3fad130d516041bdad68a1bb7d557c3e7",
+    "maths:mixed-b": "ccd43c0f77cfba6760a67cc62b605080b2b865d54eede651d98db8f0679c5d0f",
+    "maths:mixed-c": "b60f56b5ed285284232c21d52e5f622dbe65227b82ab0b099e1041076dc867ed",
+    "maths:mock-1": "5b70ac23a748f9092129fe253c60b1a7160f79f3dda33af179a4d31bd486c814",
+    "maths:mock-2": "2e5acb2607d17f9441929ca2f0bf835921bd8d4282a8336015f6e24ba2210699",
+    "maths:mock-3": "a948231be8f0d8bcbe4f74dad233cf05c7d572ec75859f475cc641ad2418cc71",
+    "maths:mock-4": "059febe954d280621da681584263d4b4eb96c82948f7227b1d0a14404e2a1f04",
+    "maths:mock-5": "16191dd7a3618c0c2c945202e567b8168899b02c88f2c58fcb43af7c2930595a",
+    "maths:mock-6": "4b4929ff93237ce5748aae03f2869a44bec5a680b493468011135ac74d5084c6",
+    "science:baseline-a": "ac4e08a5b41878e24e8a3c6ed062880dfd78a00d2f20982154882d6db87fab84",
+    "science:baseline-b": "ff66bb1c69fc7ddadb71e56c5f77fbb57fcfea7146858372a3a3b13d75649dd4",
+    "science:mixed-a": "8d9f174500c139b2c08a8ffd574f4684c6c7f4a5ca8fc78f506870ef060b1b47",
+    "science:mixed-b": "a92e2a5f81450932babcf1efb1f9bdf0bcbd9a5769a04aa875e45d3c979a53f4",
+    "science:mixed-c": "6462b1922a6987e442b98a03db051b03a321be54c4199eb5435a0936e5ece4a5",
+    "science:mock-1": "82127c4e9a2b22c46f05371fbfd904f784ea2b044b7431f8112b8a4a4baacee6",
+    "science:mock-2": "dafe64b517baafd53db6d97168175b8658940a6244c4e0e68fae548d8a48d857",
+    "science:mock-3": "e1d57884c8def6f0dcf5711f553a07be7b22059f84ede7d14d371ed62087592f",
+    "science:mock-4": "1f9cd82233b969d037b7f9d0b5131612d6493450595b98f2dc42e9b9ef4a98d1"
+  }
+}

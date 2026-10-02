@@ -1,7 +1,7 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 globalThis.window=globalThis;
-require('../entrance-data.js');require('../entrance-figures.js');const B=require('../entrance-bank.js'),M=require('../bar-models.js');
-const bank=globalThis.MochiEntranceBank||B;
+require('../entrance-data.js');require('../entrance-figures.js');const Bank=require('../entrance-bank.js'),B={...Bank,make:(u,f,s,rev=2)=>Bank.make(u,f,s,rev)},M=require('../bar-models.js');
+const bank=B; // Historical bar models remain pinned to their revision-2 questions.
 test('bar models are drawn for sum/difference and ratio worked examples',()=>{
  for(const [unit,form] of [['relationships',1],['ratios',0],['ratios',2]])for(let seed=1;seed<40;seed++){
   const q=bank.make(unit,form,seed),svg=M.model(q);

@@ -85,7 +85,7 @@ function rev2Bounds3(r,pick){
 }
 /* Revisions keep history stable: an attempt or paper stores the revision it was generated with, and
    every change to an existing template is gated on rev>=n so older attempts regenerate unchanged. */
-const REV=2;
+const REV=3;
 const moduleOf=u=>{if(!u.module)return root.MochiDSAExtension||(typeof require==='function'?require('./dsa-extension.js'):null);const key='MochiDSA_'+u.module;return root[key]||(typeof require==='function'?require('./dsa-'+u.module+'.js'):null);};
 function make(unit,form,seed,rev=REV){
  const u=D.units.find(x=>x.id===unit);if(!u||!Number.isInteger(form)||form<0||form>3||!Number.isSafeInteger(seed)||seed<0||seed>4294967295)throw Error('Invalid question identity');
@@ -219,6 +219,9 @@ function make(unit,form,seed,rev=REV){
   if(form===3&&rev>=2)out(...rev2Bounds3(r,pick));
   else if(form===3){const a=r(15,30),b=r(12,25),both=r(5,10),total=a+b-both+r(2,20);out(`Of ${total} pupils, ${a} join robotics, ${b} join music, and ${both} join both. How many join neither club?`,total-a-b+both,[`Count the union once: ${a} + ${b} − ${both} = ${a+b-both}.`,`Neither = total − union = ${total} − ${a+b-both} = ${total-a-b+both}.`],{total,a,b,both});}
  }
+ const PB=root.MochiPaperPractice||(typeof require==='function'?require('./paper-practice.js'):null);
+ const advanced=rev>=3&&form===2?PB?.make(unit,seed):null;
+ if(advanced)q={unit,strand:u.strand,form,seed,id:`ep1:${unit}:${form}:${seed}`,level:3,...advanced};
  if(!q)throw Error('Unimplemented template');
  q.answerLabel??=typeof q.answer==='object'?`${q.answer.a}+${q.answer.b}π`:String(round(Number(q.answer))===Number(q.answer)?q.answer:q.answer);
  q.fingerprint=hash(q.text+'|'+JSON.stringify(q.figure||{}));return q;
@@ -226,7 +229,7 @@ function make(unit,form,seed,rev=REV){
 // Restricted arithmetic parser, never eval. A pair [a,b] represents a + bπ.
 function parse(input,suffix=''){
  let s=String(input).trim().toLowerCase().replace(/−|–/g,'-').replace(/×/g,'*').replace(/÷/g,'/').replace(/π/g,'pi').replace(/,/g,'').replace(/^\$\s*/,'');
- const units={cm:['cm','centimetres','centimeters'],m:['m','metres','meters'],'cm²':['cm²','cm2','square centimetres'],'cm³':['cm³','cm3','cubic centimetres'],'m²':['m²','m2','square metres'],hours:['hours','hour','h'],minutes:['minutes','minute','min'],seconds:['seconds','second','s'],years:['years','year'],litres:['litres','liters','l'],'km/h':['km/h'],km:['km'],'°':['°','degrees','deg']};
+ const units={kg:['kg','kilograms','kilogrammes'],cm:['cm','centimetres','centimeters'],m:['m','metres','meters'],'cm²':['cm²','cm2','square centimetres'],'cm³':['cm³','cm3','cubic centimetres'],'m²':['m²','m2','square metres'],hours:['hours','hour','h'],minutes:['minutes','minute','min'],seconds:['seconds','second','s'],years:['years','year'],litres:['litres','liters','l'],'km/h':['km/h'],km:['km'],'°':['°','degrees','deg']};
  for(const u of units[suffix]||[]){if(s.endsWith(u)){s=s.slice(0,-u.length).trim();break;}}
  s=s.replace(/(-?\d+)\s+(\d+)\s*\/\s*(\d+)/g,(_,a,b,c)=>a[0]==='-'?`(-(${a.slice(1)}+${b}/${c}))`:`(${a}+${b}/${c})`).replace(/\s+/g,'').replace(/(\d|\))(?=pi|\()/g,'$1*').replace(/pi(?=\d|\()/g,'pi*');
  if(!s||s.length>180)return null;const tokens=s.match(/pi|(?:\d+(?:\.\d*)?|\.\d+)|[()+*/-]/g)||[];if(tokens.join('')!==s||tokens.length>100)return null;let i=0;

@@ -90,7 +90,7 @@ function startMixed(d,now=Date.now()){
  const rows=D.units.map(u=>evidence(d,u.id,now)),ready=rows.filter(e=>e.taught&&e.apply>=1);if(ready.length<2)return null;
  // Two questions, or three when several methods are due: reviews stay about a third of a typical day.
  const overdue=ready.filter(e=>e.overdue),size=overdue.length>=2?MIXED_SIZE:Math.min(2,MIXED_SIZE),due=overdue.sort((a,b)=>a.due-b.due).slice(0,size),rest=shuffle(ready.filter(e=>!due.includes(e)).sort((a,b)=>a.last-b.last).slice(0,8));
- const chosen=[...due,...rest].slice(0,size),items=shuffle(chosen.map(e=>{const form=e.overdue?(e.delayed%2?2:1):(e.transfer?2:1);return {unit:e.id,form,seed:freshSeed(d,e.id,form),recall:!!e.overdue};}));
+ const chosen=[...due,...rest].slice(0,size),items=shuffle(chosen.map(e=>{const form=e.overdue?(e.delayed%2?2:1):(e.transfer?2:1);return {unit:e.id,form,seed:freshSeed(d,e.id,form),rev:REV,recall:!!e.overdue};}));
  d.mixed={id:prefix+'mix-'+uid(),at:now,items,completedAt:0};d.mixedLog=[...(d.mixedLog||[]),{id:d.mixed.id,at:now,completedAt:0}].slice(-120);return d.mixed;
 }
 function mixedNext(d){const m=d.mixed;if(!m)return null;for(const [index,it] of m.items.entries()){const done=d.attempts.some(a=>a.mixedId===m.id&&a.unit===it.unit&&a.seed===it.seed&&a.form===it.form&&(a.correct||a.responses.length>=2||a.revealed));if(!done)return {...it,index,total:m.items.length};}return null;}
@@ -98,7 +98,7 @@ function closeMixed(d,now=Date.now()){const m=d.mixed;if(!m||m.completedAt||mixe
 function startMixedItem(d,now=Date.now()){
  const m=startMixed(d,now);if(!m)return null;const it=mixedNext(d);if(!it){closeMixed(d,now);return null;}
  if(d.draft&&d.draft.mixedId===m.id&&d.draft.unit===it.unit&&d.draft.seed===it.seed)return d.draft;
- return startPractice(d,it.unit,{phase:'mixed',form:it.form,seed:it.seed,mixedId:m.id,recall:it.recall,now,force:true});
+ return startPractice(d,it.unit,{phase:'mixed',form:it.form,seed:it.seed,rev:it.rev??options.mixedLegacyRev??REV,mixedId:m.id,recall:it.recall,now,force:true});
 }
 /* Error log: every first-answer miss outside guided practice, with an optional reason tag.
    A missed question comes back unchanged a few days later; a first-try success clears it. */
@@ -113,7 +113,7 @@ function startPractice(d,id,{phase,seed,form,rev,mixedId='',recall=false,redoOf=
  phase=phase||(!l.completedAt&&!e.taught?'guided':e.overdue?'recall':e.apply<2?'apply':'transfer');
  if(!PHASES.includes(phase))throw Error('Unsupported practice phase');
  if(!(phase==='mixed'||phase==='redo')||!Number.isInteger(form))form=phase==='guided'?0:phase==='apply'?1:phase==='transfer'?2:(e.delayed%2?2:1);
- rev=phase==='redo'&&Number.isInteger(rev)?Math.min(Math.max(rev,1),REV):REV;
+ rev=['redo','mixed'].includes(phase)&&Number.isInteger(rev)?Math.min(Math.max(rev,1),REV):REV;
  let value=seed??Math.floor(Math.random()*4294967296),q=B.make(id,form,value,rev),exhausted=false;
  if(d.seen[q.fingerprint]&&!['recall','mixed','redo'].includes(phase)){
   // Look further for an unseen variant. If this form's pool is used up, reuse the one seen longest ago and
@@ -160,7 +160,7 @@ function mathsMocks(){
  const perm=(list,salt)=>list.map(id=>[parseInt(B.hash(salt+':'+id),36),id]).sort((a,b)=>a[0]-b[0]||(a[1]<b[1]?-1:1)).map(x=>x[1]);
  return [25,21,17,12,8,4].map((weeks,k)=>{const c=perm(core,'mock-core-'+Math.floor(k/2)).slice((k%2)*12,(k%2)*12+12),b=perm(bridges,'mock-bridge-'+k).slice(0,3),x=perm(ext,'mock-ext-'+k).slice(0,9);
   const cAll=perm(core,'mock-core-'+Math.floor(k/2)),xAll=perm(ext,'mock-ext-'+k);
-  return {id:'mock-'+(k+1),kind:'mock',rev:REV,title:'DSA-style mock '+(k+1),minutes:90,weeks,units:[...c,...b,...x],spares:[...Array(12).fill(cAll.filter(u=>!c.includes(u))),...Array(3).fill(perm(bridges,'mock-bridge-'+k).slice(3)),...Array(9).fill(xAll.slice(9))],marks:[...Array(6).fill(1),...Array(9).fill(2),...Array(5).fill(3),...Array(4).fill(4)]};});
+  return {id:'mock-'+(k+1),kind:'mock',rev:options.mockRevision||REV,title:'DSA-style mock '+(k+1),minutes:90,weeks,units:[...c,...b,...x],spares:[...Array(12).fill(cAll.filter(u=>!c.includes(u))),...Array(3).fill(perm(bridges,'mock-bridge-'+k).slice(3)),...Array(9).fill(xAll.slice(9))],marks:[...Array(6).fill(1),...Array(9).fill(2),...Array(5).fill(3),...Array(4).fill(4)]};});
 }
 const paperCache=new Map();
 function paperQuestions(id){
@@ -243,7 +243,7 @@ function validate(raw){
  for(const a of d.attempts){if(a.mode==='paper'||a.mode==='baseline'){const p=d.papers[a.paperId];if(!p?.submittedAt||p.assisted||p.interrupted||p.conflicted){a.helped=true;a.independent=false;}}}
  for(const [id,v]of Object.entries(raw.reviews||{}).slice(-5000))if(v)review(d,id,v.verdict,v.note,stamp(v.at));
  for(const x of (Array.isArray(raw.external)?raw.external:[]).slice(-30)){if(!text(x?.id,120)||!text(x?.name,150)||!stamp(x?.at)||!Number.isFinite(x.total)||x.total<=0||!Number.isFinite(x.score)||x.score<0||x.score>x.total)continue;d.external.push({id:text(x.id,120),name:text(x.name,150),score:x.score,total:x.total,unseen:!!x.unseen,independent:!!x.independent,timed:!!x.timed,at:x.at});}
- const m=raw.mixed;if(m&&text(m.id,120)&&stamp(m.at)&&Array.isArray(m.items)){const items=m.items.slice(0,8).filter(x=>identity(x)&&x.form>=1&&x.form<=2).map(x=>({unit:x.unit,form:x.form,seed:x.seed,recall:!!x.recall}));if(items.length)d.mixed={id:text(m.id,120),at:m.at,items,completedAt:stamp(m.completedAt)};}
+ const m=raw.mixed;if(m&&text(m.id,120)&&stamp(m.at)&&Array.isArray(m.items)){const items=m.items.slice(0,8).filter(x=>identity(x)&&x.form>=1&&x.form<=2).map(x=>({unit:x.unit,form:x.form,seed:x.seed,rev:Number.isInteger(x.rev)?revOf(x):(options.mixedLegacyRev||REV),recall:!!x.recall}));if(items.length)d.mixed={id:text(m.id,120),at:m.at,items,completedAt:stamp(m.completedAt)};}
  for(const x of (Array.isArray(raw.mixedLog)?raw.mixedLog:[]).slice(-120))if(text(x?.id,120)&&stamp(x.at))d.mixedLog.push({id:text(x.id,120),at:x.at,completedAt:stamp(x.completedAt)});
  for(const [id,e] of Object.entries(raw.errors||{}).slice(-3000)){if(!safeId(id)||!e||typeof e!=='object')continue;d.errors[id]={tag:TAGS.includes(e.tag)?e.tag:'',at:stamp(e.at),redoneAt:stamp(e.redoneAt),lastTry:stamp(e.lastTry)};}
  if(isDate(raw.testDate)){d.testDate=raw.testDate;d.testDateAt=stamp(raw.testDateAt);}

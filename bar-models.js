@@ -19,7 +19,8 @@ function svg(height,body,alt){
  return `<figure class="bm-figure"><svg viewBox="0 0 480 ${height}" role="img" aria-label="${esc(alt)}" class="bm-svg">${body}</svg><figcaption>Bar model</figcaption></figure>`;
 }
 function model(q){
- if(!q||!q.params)return '';const p=q.params;
+ if(!q||!q.params||q.paperStandard)return ''; // Old numeric bar examples must not be attached to new structures.
+ const p=q.params;
  if(q.unit==='relationships'&&q.form===1&&p.total!=null&&p.difference!=null){
   const w=3*U,ex=Math.max(36,Math.min(80,w*p.difference/Math.max(1,(p.total-p.difference)/2)));
   const big=`<rect x="${X}" y="30" width="${w}" height="${H}" rx="3" class="bm-unit"/><text x="${X+w/2}" y="52" text-anchor="middle" class="bm-small">?</text><rect x="${X+w}" y="30" width="${ex}" height="${H}" rx="3" class="bm-extra"/><text x="${X+w+ex/2}" y="52" text-anchor="middle" class="bm-small">${esc(p.difference)}</text><text x="${X-12}" y="52" text-anchor="end" class="bm-label">First</text>`;
