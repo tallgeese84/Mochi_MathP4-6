@@ -40,7 +40,7 @@ function diagram(f,id='science',support=false){
    body=body.replace(`M${left} 55V235 H${right}V112`,`M${left} 55V235H211 M249 235H351 M389 235H${right}V112`);
    body+=bulb(230,235,'A')+bulb(370,235,'B');
   }
-  body+=txt(300,295,'Connections shown; predict the outcome.',16);desc=`${f.parallel?'Two parallel bulb branches':'Two bulbs in one series loop'} with ${f.open==='common'?'an open common connection':'an open switch on branch '+f.open}. Bulbs are drawn without showing whether they light.`;
+  body+=txt(300,295,'Connections shown; predict the outcome.',16);desc=`${f.parallel?'Two parallel bulb branches':'Two bulbs in one series loop'} with ${f.open==='common'?'an open common connection':f.open==='none'?'all shown connections closed':'an open switch on branch '+f.open}. Bulbs are drawn without showing whether they light.`;
  }
  if(f.type==='flow'||f.type==='foodweb'){
   const labels=f.labels,cols=labels.length,cell=520/cols;for(let i=0;i<cols;i++){

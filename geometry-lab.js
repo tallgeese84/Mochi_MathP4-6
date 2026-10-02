@@ -3,14 +3,14 @@
 (function(root){
 'use strict';
 const G=root.MochiGeometryBridge,V=root.MochiGeometryVisuals;
-const available=new Set(['geo-measure','geo-layers','geo-surface','geo-angles','volume','spatial','area','angles']);
-const defaults=id=>id==='geo-measure'?'length':id==='geo-angles'||id==='angles'?'angles':id==='area'?'area':id==='spatial'?'net':id==='geo-surface'?'surface':'layers';
+const available=new Set(['geo-one-face','geo-face-pairs','geo-measure','geo-layers','geo-surface','geo-angles','volume','spatial','area','angles']);
+const defaults=id=>id==='geo-one-face'?'areaTiles':id==='geo-face-pairs'?'net':id==='geo-measure'?'length':id==='geo-angles'||id==='angles'?'angles':id==='area'?'area':id==='spatial'?'net':id==='geo-surface'?'surface':'layers';
 function panel(id,practice=false){if(!available.has(id))return '';return `<details class="geometry-lab" id="geometryLab" ${practice?'':'open'}><summary>${practice?'Visual help · explore a different example':'See it in 2D and 3D'}</summary><div id="geometryLabBody"></div><p class="geometry-foot">${practice?'Opening visual help records support on this question. The model is a separate teaching example, not an answer calculator.':'Explore, predict what will change, then check using a fresh question with the model closed.'}</p></details>`;}
 function mount(host,id,{practice=false,onHelp=()=>{}}={}){
  const box=host.querySelector('#geometryLab'),body=box?.querySelector('#geometryLabBody');if(!box||!body)return null;
  let state={mode:defaults(id),n:3,layers:3,count:2,edge:2,gap:0,fold:0,yaw:-.6,pitch:.4,rotation:0,shift:0},supported=false,drag=null,dead=false;
  const markHelp=()=>{if(practice&&!supported){onHelp();supported=true;}};
- const modes=id==='geo-measure'?['length','areaTiles','layers']:id==='geo-angles'||id==='angles'?['angles']:id==='area'?['area']:id==='spatial'?['net']:['layers','surface','joins','net'];
+ const modes=id==='geo-one-face'?['areaTiles','surface']:id==='geo-face-pairs'?['net','surface']:id==='geo-measure'?['length','areaTiles','layers']:id==='geo-angles'||id==='angles'?['angles']:id==='area'?['area']:id==='spatial'?['net']:['layers','surface','joins','net'];
  const titles={length:'Trace a length',areaTiles:'Cover a square',layers:'Fill with layers',surface:'Cover the outside',joins:'See hidden faces',net:'Fold a cube net',angles:'Inside or outside?',area:'Shared-height triangles'};
  const button=(mode)=>`<button type="button" data-geo-mode="${mode}" aria-pressed="${state.mode===mode}">${titles[mode]}</button>`;
  const slider=(key,label,min,max,value,step=1)=>`<label>${label}<input type="range" data-geo-slider="${key}" min="${min}" max="${max}" step="${step}" value="${value}"><output data-geo-value="${key}">${value}</output></label>`;

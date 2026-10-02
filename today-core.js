@@ -32,7 +32,7 @@ function task(state,subject,now=Date.now()){
   const u=E.D.units.map(u=>E.evidence(d,u.id,now)).sort((a,b)=>a.last-b.last)[0];
   return {subject,kind:'practice',unit:u.id,title:u.title,resume:false,touched:0,detail:'Apply a familiar method to a fresh practice question.'};
  }
- return {subject,kind:r.kind==='learn'?'lesson':r.kind==='recall'?'recall':'practice',unit:r.unit,title:E.unit(r.unit).title,resume:false,touched:0,detail:r.kind==='learn'?'Learn a new topic, study the worked example, then try a question.':r.kind==='recall'?'Revise this topic without looking at the lesson.':'Try the next question.'};
+ return {subject,kind:r.kind==='learn'?'lesson':r.kind==='recall'?'recall':'practice',unit:r.unit,...(r.phase?{phase:r.phase}:{}),title:E.unit(r.unit).title,resume:false,touched:0,detail:r.kind==='learn'?'Learn a new topic, study the worked example, then try a question.':r.kind==='recall'?'Revise this topic without looking at the lesson.':'Try the next question.'};
 }
 function model(state,now=Date.now()){
  const p=state.planner||P.fresh(),date=P.localDay(now),time=P.elapsed(p,date);

@@ -156,6 +156,18 @@ const maths={
   q('You know the base area and the volume. How do you find the height?',['Volume × base area.','Volume ÷ base area.','Base area − volume.'],1,'Each 1 cm layer holds one base area of cubes. The number of layers is the height.'),
   q('You know the volume and the area of one cross-section. How do you find the remaining length?',['Volume ÷ cross-section area.','Volume × cross-section area.','Cross-section area ÷ volume.'],0,'Volume = cross-section area × length, so divide.')
  ],
+ 'geo-one-face':[
+  q('Which measurements belong to the area of one rectangular face?',['The two edges on that face.','All three dimensions of the solid.','All six faces.'],0,'Trace the two edges on the named face. Multiply them to count square units.'),
+  q('A label covers only the front face. Which dimensions do you multiply?',['Length × height of that face.','Length × width × height.','Six times one edge.'],0,'Covering is a two-dimensional area, not the volume inside.'),
+  q('A rectangular face has area 20 cm² and width 5 cm. How do you find its other edge?',['20 ÷ 5','20 × 5','20 ÷ 3'],0,'Area = width × other edge. Divide by the known width.'),
+  q('You know one face’s area and one of its edges. The other edge is…',['Area ÷ known edge.','Area × known edge.','Area ÷ 3.'],0,'Rebuild the original area to check the missing edge.')
+ ],
+ 'geo-face-pairs':[
+  q('The top and bottom faces match. If one has area A, together they cover…',['2 × A','6 × A','A × height'],0,'Count these two matching faces, not every face or the volume.'),
+  q('A cuboid has which three pairs of matching faces?',['Top/bottom, front/back and left/right.','All six faces always have the same area.','Only the visible three faces.'],0,'Match opposite rectangles, then add each pair once.'),
+  q('Two matching labels together cover 40 cm². Each label is 5 cm wide. What is its other edge?',['40 ÷ 2 ÷ 5','40 ÷ 5','40 × 2 × 5'],0,'Find the area of one label before finding its missing edge.'),
+  q('To find an edge from the total area of two matching rectangles, first…',['Divide the total area by two.','Multiply by two.','Divide by three.'],0,'Two equal rectangles share the total equally.')
+ ],
  'geo-surface':[
   q('One face of a cube with edge a has area…',['a × a','a × a × a','6 × a'],0,'Each face is a square with side a.'),
   q('A closed cuboid’s faces come in how many matching pairs?',['Two pairs.','Three pairs.','Six different faces.'],1,'Front/back, top/bottom and left/right each match.'),

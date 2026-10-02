@@ -15,9 +15,9 @@ const paperDefinitions=[
  {id:'baseline-b',kind:'baseline',rev:1,title:'Science starting-point check · B',minutes:0,units:['measurement','models','forces','respiration','ecology','water']},
  ...['A','B','C'].map(letter=>({id:'mixed-'+letter.toLowerCase(),kind:'paper',rev:1,title:'Science reasoning paper '+letter,minutes:60,units:(D.originalUnits||D.units.map(u=>u.id)).slice()})),
  // DSA-style science mocks: every unit, including the lower-secondary ones, in 70 minutes with no topic labels.
- ...[24,16,9,4].map((weeks,k)=>{const ids=D.units.map(u=>u.id),order=ids.map(id=>[parseInt(B.hash('sci-mock-'+k+':'+id),36),id]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);return {id:'mock-'+(k+1),kind:'mock',rev:B.REV||1,title:'DSA-style science mock '+(k+1),minutes:70,weeks,units:order,marks:order.map(()=>1)};})
+ ...[24,16,9,4].map((weeks,k)=>{const ids=D.units.map(u=>u.id),order=ids.map(id=>[parseInt(B.hash('sci-mock-'+k+':'+id),36),id]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);return {id:'mock-'+(k+1),kind:'mock',rev:2,title:'DSA-style science mock '+(k+1),minutes:70,weeks,units:order,marks:order.map(()=>1)};})
 ];
-root.MochiSciencePath=core.create(D,B,{stateKey:'sciencePath',prefix:'science-path-',fingerprintPrefix:'sp-paper-v1:',paperDefinitions,bridge,limits:[
+root.MochiSciencePath=core.create(D,B,{stateKey:'sciencePath',writingReview:true,noRepeatCredit:true,mixedLegacyRev:2,prefix:'science-path-',fingerprintPrefix:'sp-paper-v1:',paperDefinitions,bridge,limits:[
  'Official DSA guidance supplies broad aims, not a released science test blueprint.',
  'NUS High SPSO samples are supplementary references and are explicitly separate from DSA.',
  'These original questions and 60-minute practice limits are not calibrated entrance-test equivalents.',
@@ -25,5 +25,8 @@ root.MochiSciencePath=core.create(D,B,{stateKey:'sciencePath',prefix:'science-pa
  'Correct conclusions and structured reasons are marked separately; free text and handwriting require adult review.',
  'External results and explanation reviews are parent-reported evidence.'
 ]});
+const E=root.MochiSciencePath,Practice=root.MochiSciencePractice||(typeof require==='function'?require('./science-practice.js'):null),normal=E.recommend;
+E.recommend=(s,now=Date.now())=>Practice.route(E,s,normal(s,now),now);
+E.practiceRoute=(s,id,phase,now=Date.now())=>phase?{kind:'practice',unit:id,phase}:Practice.route(E,s,{kind:'practice',unit:id},now,true);
 if(typeof module!=='undefined')module.exports=root.MochiSciencePath;
 })(typeof globalThis!=='undefined'?globalThis:this);

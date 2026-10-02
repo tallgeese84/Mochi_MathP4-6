@@ -5,11 +5,14 @@ const E=root.MochiEntrance,F=root.MochiEntranceFigures,C=root.MochiPathCoach,$=i
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let hintFor='',hintLevel=0,fx='',cardsFor='',cardsShown=1,stepsFor='',stepsShown=1,view={kind:'home'},host=null,paused=false,pen=false,pointer=null,strokes=[],message='',exampleForm=0,lastParent='',tutorEpoch=0,tutorController=null,tutorChat=[],geometryLab=null;
 const data=()=>E.init(S),visible=()=>!!host&&!host.hidden;
+// Identity belongs to the rendered editor. A navigation must never save old DOM into a new draft.
+let editorRecord=null;
+function ownsEditor(kind){return editorRecord?.kind===kind&&(kind==='practice'?editorRecord.id===data().draft?.id:editorRecord.id===view.paper&&editorRecord.index===data().papers[view.paper]?.index);}
 function drawing(ink){return `<svg viewBox="0 0 800 320" class="ep-saved-ink" aria-label="Saved handwritten working">${(ink||[]).map(s=>`<polyline points="${s.map(([x,y])=>`${x*800},${y*320}`).join(' ')}" fill="none" stroke="#29232f" stroke-width="2.4" stroke-linecap="round"/>`).join('')}</svg>`;}
 function capture(persist=false){
  if(paused||!visible())return;
- if(view.kind==='practice'&&data().draft&&$('epAnswer')){E.touchDraft(data(),{answer:$('epAnswer').value,working:$('epWorking').value,strokes,guess:$('epGuess')?.checked});const a=data().attempts.find(x=>x.id===data().draft.id);if(a?.correct&&$('epWorking').value!==(a.responses.at(-1).working||'')){a.reflection=$('epWorking').value.slice(0,6000);a.reflectionInk=E.ink(strokes);a.reflectionAt=Date.now();}}
- if(view.kind==='paper'&&$('epAnswer')){const p=data().papers[view.paper];if(p&&!p.submittedAt)E.savePaperAnswer(data(),p.id,p.index,{answer:$('epAnswer').value,working:$('epWorking').value,strokes});}
+ if(view.kind==='practice'&&ownsEditor('practice')&&data().draft&&$('epAnswer')){E.touchDraft(data(),{answer:$('epAnswer').value,working:$('epWorking').value,strokes,guess:$('epGuess')?.checked});const a=data().attempts.find(x=>x.id===data().draft.id);if(a?.correct&&$('epWorking').value!==(a.responses.at(-1).working||'')){a.reflection=$('epWorking').value.slice(0,6000);a.reflectionInk=E.ink(strokes);a.reflectionAt=Date.now();}}
+ if(view.kind==='paper'&&ownsEditor('paper')&&$('epAnswer')){const p=data().papers[view.paper];if(p&&!p.submittedAt)E.savePaperAnswer(data(),p.id,p.index,{answer:$('epAnswer').value,working:$('epWorking').value,strokes});}
  if(view.kind==='lesson'&&$('epLessonNotes')){const l=E.lesson(data(),view.unit);l.notes=$('epLessonNotes').value.slice(0,6000);l.updatedAt=Date.now();}
  if(persist)save(S);
 }
@@ -64,7 +67,7 @@ function render(){
  geometryLab?.dispose();geometryLab=null;
  const nav=`<nav class="ep-nav" aria-label="Mathematics pathway"><button id="epHome" ${view.kind==='home'?'aria-current="page"':''}>Overview</button><button id="epLessons" ${view.kind==='lessons'||view.kind==='lesson'?'aria-current="page"':''}>Topics</button><button id="epPapers" ${view.kind==='papers'||view.kind==='paper'?'aria-current="page"':''}>Papers</button><button id="epFoundations">Classroom</button></nav>`;
  let html='';if(view.kind==='home')html=home();else if(view.kind==='lessons')html=lessonList();else if(view.kind==='lesson')html=lessonView();else if(view.kind==='practice')html=practiceView();else if(view.kind==='papers')html=paperList();else if(view.kind==='paper')html=paperView();else if(view.kind==='results')html=resultsView();
- document.body.classList.toggle('entrance-paper',view.kind==='paper');host.innerHTML=nav+html;wireNavigation();wire();paintParent();
+ document.body.classList.toggle('entrance-paper',view.kind==='paper');host.innerHTML=nav+html;editorRecord=view.kind==='practice'?{kind:'practice',id:data().draft?.id}:view.kind==='paper'?{kind:'paper',id:view.paper,index:data().papers[view.paper]?.index}:null;wireNavigation();wire();paintParent();
 }
 function home(){
  const d=data(),r=E.recommend(S),report=E.report(d),u=r.unit&&E.unit(r.unit),active=r.kind==='paper'?E.paperDefinitions.find(p=>p.id===r.paper)?.title:r.kind==='mixed-set'||r.kind==='resume'&&d.draft?.phase==='mixed'?'Mixed practice':r.kind==='redo'?'Second try':u?.title||'Mixed practice';
@@ -114,7 +117,7 @@ function wireDiagnostic(){
 function practiceView(){
  const v=data().draft;if(!v){view={kind:'home'};return home();}view.unit=v.unit;const q=E.question(v),a=data().attempts.find(x=>x.id===v.id),u=E.unit(v.unit),done=!!a?.correct,X=root.MochiUX;
  if(hintFor!==v.id){hintFor=v.id;hintLevel=0;}const f=fx;fx='';
- const mix=v.phase==='mixed',second=v.phase==='redo',item=mix?E.mixedNext(data()):null,finished=mix&&(done||(a?.responses.length||0)>=2||v.revealed),mixTitle=item?`Mixed practice · Question ${item.index+1} of ${item.total}`:'Mixed practice';
+ const mix=v.phase==='mixed',second=v.phase==='redo',item=mix&&data().mixed?{index:data().mixed.items.findIndex(x=>x.unit===v.unit&&x.seed===v.seed&&x.form===v.form),total:data().mixed.items.length}:null,finished=mix&&(done||(a?.responses.length||0)>=2||v.revealed),mixTitle=item?`Mixed practice · Question ${item.index+1} of ${item.total}`:'Mixed practice';
  const status=done?(a.independent?(!a.seenBefore?(a.phase==='transfer'?'Well done! You solved a challenge question on your own.':a.phase==='recall'||a.phase==='mixed'?'Well done! You remembered how to do this.':'Well done! You solved it on your own.'):'Correct. You have seen this question before.'):'Correct. Next time, try it without help.'):'',phase={guided:'Guided practice',apply:'Practice',transfer:'Challenge question',recall:'Revision',mixed:'Mixed practice',redo:'Second try'}[v.phase];
  let feedback=message||status;if(a&&!a.correct&&!message&&(mix||second))feedback=a.responses.length>=2||v.revealed?'Study the worked solution. This question will come back in a few days.':'Not quite. Try again, or look at the worked solution.';else if(a&&!a.correct&&!message)feedback=a.responses.length>=2?'Study the worked solution, then try a similar question.':'Not quite. Try the quick check below, then try again.';
  const support=v.revealed?`${(root.MochiBarModels?.model(q)||'')}<div class="ux-solution"><strong>Worked solution</strong><ol>${q.steps.map(s=>`<li>${esc(s)}</li>`).join('')}</ol><p class="ux-answer-line">Answer: ${esc(q.answerLabel)}${q.suffix?' '+esc(q.suffix):''}</p></div>`:X?.hintBox(hintLevel,q.hints?.[0]||C?.goal('maths',u.id,E),q.hints?[q.hints[1]]:q.steps)||'';

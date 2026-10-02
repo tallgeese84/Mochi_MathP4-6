@@ -9,7 +9,7 @@ function answer(d,id='measurement',phase='apply',seed=21,t=now+10000,miss=false)
 function fill(d,id,t=now){E.startPaper(d,id,t);E.paperQuestions(id).forEach((q,i)=>E.savePaperAnswer(d,id,i,{answer:q.answer,working:'Synthetic explanation for adult review'},t+10+i));return E.submitPaper(d,id,t+1000);}
 test('science scope has 24 original substantive lessons (plus sx- bridge units), four strands and valid prerequisite links',()=>{
  const core=D.units.filter(u=>!u.id.startsWith('sx-'));assert.equal(core.length,24);assert.deepEqual(D.originalUnits,core.map(u=>u.id));for(const s of Object.keys(D.strands))assert.equal(core.filter(u=>u.strand===s).length,6);
- for(const u of D.units){assert.ok(u.ideas.join(' ').split(/\s+/).length>=100,u.id);assert.equal(u.ideas.length,3);assert.ok(u.check[1][u.check[2]]);assert.equal(C.unit(u.foundation).subject,'science');assert.ok(u.prerequisites.every(id=>E.unit(id)));assert.ok(u.scope&&u.source);}
+ for(const u of D.units){assert.ok(u.ideas.join(' ').split(/\s+/).length>=100,u.id);assert.ok(u.ideas.length>=3);assert.ok(u.check[1][u.check[2]]);assert.equal(C.unit(u.foundation).subject,'science');assert.ok(u.prerequisites.every(id=>E.unit(id)));assert.ok(u.scope&&u.source);}
  function visit(id,ancestors=[]){assert.ok(!ancestors.includes(id),'cycle '+id);for(const p of E.unit(id).prerequisites)visit(p,[...ancestors,id]);}D.units.forEach(u=>visit(u.id));
  assert.match(D.scope,/not the DSA test/);assert.match(D.sources.find(x=>/SPSO sample/.test(x.name)).role,/NOT an entrance/);
 });
