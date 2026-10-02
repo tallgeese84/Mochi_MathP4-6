@@ -34,7 +34,7 @@ test('rotating actual 3D points preserves lengths and produces finite SVG in all
  }
 });
 test('new bridge lessons gate complex solids but do not reset proven existing skills',()=>{
- const d=E.fresh();assert.equal(E.prerequisite(d,'volume',now),'geo-measure');pass(d,'geo-measure');assert.equal(E.prerequisite(d,'volume',now+100),'geo-layers');pass(d,'geo-layers',now+1000);assert.equal(E.prerequisite(d,'volume',now+2000),'geo-surface');pass(d,'geo-surface',now+3000);assert.equal(E.prerequisite(d,'volume',now+4000),null);
+ const d=E.fresh();assert.equal(E.prerequisite(d,'volume',now),'geo-measure');pass(d,'geo-measure');assert.equal(E.prerequisite(d,'volume',now+100),'geo-layers');pass(d,'geo-layers',now+1000);assert.equal(E.prerequisite(d,'volume',now+2000),'geo-one-face');pass(d,'geo-one-face',now+3000);assert.equal(E.prerequisite(d,'volume',now+4000),'geo-face-pairs');pass(d,'geo-face-pairs',now+5000);assert.equal(E.prerequisite(d,'volume',now+6000),'geo-surface');pass(d,'geo-surface',now+7000);assert.equal(E.prerequisite(d,'volume',now+8000),null);
  const proficient=E.fresh();pass(proficient,'volume');assert.equal(E.prerequisite(proficient,'volume',now+100),null);
 });
 test('a struggling saved volume question routes to a visual lesson without erasing that draft or its working',()=>{

@@ -25,10 +25,10 @@ const PHASES=['guided','apply','transfer','recall','mixed','redo'];
 function cleanDraft(v){if(!identity(v)||v.form===3&&v.phase!=='redo'||!text(v.id,120)||!stamp(v.at))return null;return {id:text(v.id,120),unit:v.unit,form:v.form,seed:v.seed,rev:revOf(v),exhausted:!!v.exhausted,mixedId:text(v.mixedId,120),redoOf:text(v.redoOf,120),at:v.at,updatedAt:stamp(v.updatedAt)||v.at,phase:PHASES.includes(v.phase)?v.phase:'apply',helped:!!v.helped,revealed:!!v.revealed,guess:!!v.guess,seenBefore:!!v.seenBefore,lessonViewedAt:stamp(v.lessonViewedAt),recallOf:text(v.recallOf,120),answer:text(v.answer,AMAX),working:text(v.working),strokes:ink(v.strokes)};}
 function cleanAttempt(a){
  if(!identity(a)||!text(a.id,120)||!stamp(a.at))return null;const q=question(a),mode=['practice','baseline','paper','mock'].includes(a.mode)?a.mode:'practice';
- const responses=(Array.isArray(a.responses)?a.responses:[]).slice(0,12).filter(x=>stamp(x.at)).map(x=>({at:stamp(x.at),answer:text(x.answer,AMAX),working:text(x.working),strokes:ink(x.strokes)}));
- if(!responses.length)return null;const final=responses.at(-1),skipped=!final.answer.trim(),firstCorrect=B.mark(q,responses[0].answer)&&!a.conflicted,correct=B.mark(q,final.answer);
+ const responses=(Array.isArray(a.responses)?a.responses:[]).slice(0,12).filter(x=>stamp(x.at)).map(x=>({at:stamp(x.at),answer:text(x.answer,AMAX),working:text(x.working),strokes:ink(x.strokes),...(x.gradingVersion===2?{gradingVersion:2}:{})}));
+ if(!responses.length)return null;const final=responses.at(-1),skipped=!final.answer.trim(),firstCorrect=B.mark(q,responses[0].answer,responses[0].gradingVersion||1)&&!a.conflicted,correct=B.mark(q,final.answer,final.gradingVersion||1);
  const helped=!!a.helped||a.phase==='guided'||mode==='practice'&&a.form===0;
- return {id:text(a.id,120),unit:a.unit,form:a.form,seed:a.seed,rev:revOf(a),exhausted:!!a.exhausted,mixedId:text(a.mixedId,120),redoOf:text(a.redoOf,120),fingerprint:q.fingerprint,at:a.at,updatedAt:stamp(a.updatedAt)||final.at,answeredAt:final.at,mode,paperId:text(a.paperId,40),phase:[...PHASES,'paper','baseline','mock'].includes(a.phase)?a.phase:'apply',responses,helped,revealed:!!a.revealed,guess:!!a.guess,seenBefore:!!a.seenBefore,conflicted:!!a.conflicted,lessonViewedAt:stamp(a.lessonViewedAt),recallOf:text(a.recallOf,120),skipped,firstCorrect,correct,reflection:text(a.reflection),reflectionInk:ink(a.reflectionInk),reflectionAt:stamp(a.reflectionAt),independent:!!(correct&&firstCorrect&&!helped&&!a.revealed&&!a.guess&&!skipped&&!a.conflicted),question:q.text,...(B.parts?{components:B.parts(q,final.answer),firstComponents:B.parts(q,responses[0].answer)}:{})};
+ return {id:text(a.id,120),unit:a.unit,form:a.form,seed:a.seed,rev:revOf(a),exhausted:!!a.exhausted,mixedId:text(a.mixedId,120),redoOf:text(a.redoOf,120),fingerprint:q.fingerprint,at:a.at,updatedAt:stamp(a.updatedAt)||final.at,answeredAt:final.at,mode,paperId:text(a.paperId,40),phase:[...PHASES,'paper','baseline','mock'].includes(a.phase)?a.phase:'apply',responses,helped,revealed:!!a.revealed,guess:!!a.guess,seenBefore:!!a.seenBefore,conflicted:!!a.conflicted,lessonViewedAt:stamp(a.lessonViewedAt),recallOf:text(a.recallOf,120),skipped,firstCorrect,correct,reflection:text(a.reflection),reflectionInk:ink(a.reflectionInk),reflectionAt:stamp(a.reflectionAt),independent:!!(correct&&firstCorrect&&!helped&&!a.revealed&&!a.guess&&!skipped&&!a.conflicted&&!(q.kind==='written'&&final.gradingVersion===2)),question:q.text,...(B.parts?{components:B.parts(q,final.answer,final.gradingVersion||1),firstComponents:B.parts(q,responses[0].answer,responses[0].gradingVersion||1)}:{})};
 }
 function combineAttempts(a,b){
  if(a.unit!==b.unit||a.form!==b.form||a.seed!==b.seed||revOf(a)!==revOf(b))return {...a,conflicted:true};
@@ -38,23 +38,30 @@ function combineAttempts(a,b){
  return {...win,reflection:reflected.reflection,reflectionInk:reflected.reflectionInk,reflectionAt:reflected.reflectionAt,helped:a.helped||b.helped,revealed:a.revealed||b.revealed,guess:a.guess||b.guess,seenBefore:a.seenBefore||b.seenBefore,exhausted:!!(a.exhausted&&b.exhausted),conflicted:a.conflicted||b.conflicted||!extendsA&&!extendsB,lessonViewedAt:Math.max(a.lessonViewedAt||0,b.lessonViewedAt||0)};
 }
 function record(d,raw){let a=cleanAttempt(raw);if(!a)return null;const index=d.attempts.findIndex(x=>x.id===a.id);if(index>=0)a=cleanAttempt(combineAttempts(d.attempts[index],a));else a.seenBefore=a.seenBefore||d.attempts.some(x=>x.fingerprint===a.fingerprint);if(index>=0)d.attempts[index]=a;else d.attempts.push(a);d.attempts=d.attempts.slice(-5000);return a;}
+function isWritten(a){return a.components?.kind==='written';}
+function independentFor(d,a){
+ if(!options.writingReview||!isWritten(a))return a.independent;
+ const review=d.reviews[a.id];
+ return !!(review?.verdict==='valid'&&review.at>=a.answeredAt&&a.responses.length===1&&!a.helped&&!a.revealed&&!a.guess&&!a.conflicted&&!a.skipped);
+}
+function pendingWriting(d,a){return !!(options.writingReview&&isWritten(a)&&!(d.reviews[a.id]?.at>=a.answeredAt&&d.reviews[a.id]?.verdict!=='unreviewed'));}
 function evidence(d,id,now=Date.now()){
- const all=d.attempts.filter(a=>a.unit===id&&a.mode==='practice'&&a.answeredAt<=now),answered=all.filter(a=>!a.skipped),eligible=answered.filter(a=>a.independent&&(!a.seenBefore||a.exhausted)&&a.phase!=='redo'),last=answered.at(-1),forms=new Set(eligible.map(a=>a.form));
+ const all=d.attempts.filter(a=>a.unit===id&&a.mode==='practice'&&a.answeredAt<=now),answered=all.filter(a=>!a.skipped),eligible=answered.filter(a=>independentFor(d,a)&&(!a.seenBefore||a.exhausted&&!options.noRepeatCredit)&&a.phase!=='redo'),last=answered.at(-1),forms=new Set(eligible.map(a=>a.form));
  // Independent, unassisted answers on starting checks and timed papers also count: a starting check
  // shows application; a paper or mock question (form 3) shows transfer, so a known method is not re-taught.
- const credit=d.attempts.filter(a=>a.unit===id&&['baseline','paper','mock'].includes(a.mode)&&a.independent&&a.answeredAt<=now),checkApply=credit.filter(a=>a.mode==='baseline'&&a.form===1),paperTransfer=credit.filter(a=>a.form===3);
+ const credit=d.attempts.filter(a=>a.unit===id&&['baseline','paper','mock'].includes(a.mode)&&independentFor(d,a)&&a.answeredAt<=now),checkApply=credit.filter(a=>a.mode==='baseline'&&a.form===1),paperTransfer=credit.filter(a=>a.form===3);
  const apply=[...eligible.filter(a=>a.form===1),...checkApply],transfer=[...eligible.filter(a=>a.form===2),...paperTransfer];
- const recall=answered.filter(a=>(a.phase==='recall'||a.phase==='mixed')&&a.independent&&a.recallOf&&a.at>=(d.attempts.find(x=>x.id===a.recallOf)?.answeredAt||Infinity)+7*DAY&&a.at>=a.lessonViewedAt+7*DAY);
- const success=[...answered.filter(a=>a.independent&&a.form>=1&&a.phase!=='redo'),...credit].sort((a,b)=>a.answeredAt-b.answeredAt).at(-1),gap=GAPS[Math.min(recall.length,GAPS.length-1)],due=transfer.length&&success?success.answeredAt+gap*DAY:0;
- const recent=answered.filter(a=>a.phase!=='redo');
+ const recall=answered.filter(a=>(a.phase==='recall'||a.phase==='mixed')&&independentFor(d,a)&&a.recallOf&&a.at>=(d.attempts.find(x=>x.id===a.recallOf)?.answeredAt||Infinity)+7*DAY&&a.at>=a.lessonViewedAt+7*DAY);
+ const success=[...eligible.filter(a=>independentFor(d,a)&&a.form>=1&&a.phase!=='redo'),...credit].sort((a,b)=>a.answeredAt-b.answeredAt).at(-1),gap=GAPS[Math.min(recall.length,GAPS.length-1)],due=transfer.length&&success?success.answeredAt+gap*DAY:0;
+ const recent=answered.filter(a=>a.phase!=='redo'&&!pendingWriting(d,a));
  const needsTeaching=recent.length>=2&&recent.slice(-2).every(a=>!a.firstCorrect)&&((d.lessons[id]?.lastViewedAt||0)<recent.at(-1).answeredAt);
  const taught=!!d.lessons[id]?.completedAt||paperTransfer.length>0;
  // Set a unit aside for a few days after repeated misses at its current step, so one stuck method never blocks the path.
- const need=apply.length<2?1:!transfer.length?2:0,lastWin=need?answered.filter(a=>a.form===need&&a.independent).at(-1)?.answeredAt||0:0,misses=need?recent.filter(a=>a.form===need&&a.phase!=='mixed'&&!a.firstCorrect&&a.answeredAt>lastWin):[];
+ const need=apply.length<2?1:!transfer.length?2:0,lastWin=need?answered.filter(a=>a.form===need&&independentFor(d,a)).at(-1)?.answeredAt||0:0,misses=need?recent.filter(a=>a.form===need&&a.phase!=='mixed'&&!a.firstCorrect&&a.answeredAt>lastWin):[];
  const parkedUntil=taught&&misses.length>=PARK_MISSES?misses.at(-1).answeredAt+PARK_DAYS*DAY:0;
  let stage=!taught?'Learn':apply.length<2?'Apply':!transfer.length?'Connect':!recall.length?'Revisit after a week':'Mixed-paper practice';
  const firstTransfer=transfer.map(a=>a.answeredAt).sort((a,b)=>a-b)[0]||0;
- return {id,title:unit(id).title,strand:unit(id).strand,stage,taught,attempts:answered.length,supported:answered.filter(a=>a.correct&&!a.independent).length,independent:eligible.length,apply:apply.length,transfer:transfer.length,credited:checkApply.length+paperTransfer.length,forms:forms.size,delayed:recall.length,due,gap,overdue:!!due&&now>=due,needsTeaching,parked:now<parkedUntil,parkedUntil,firstTransfer,last:last?.answeredAt||0,lastSuccess:success?.id||'',reviewed:answered.filter(a=>d.reviews[a.id]?.verdict==='valid').length};
+ return {id,title:unit(id).title,strand:unit(id).strand,stage,taught,attempts:answered.length,awaitingReview:answered.filter(a=>pendingWriting(d,a)).length,supported:answered.filter(a=>a.correct&&!independentFor(d,a)).length,independent:eligible.length,apply:apply.length,transfer:transfer.length,credited:checkApply.length+paperTransfer.length,forms:forms.size,delayed:recall.length,due,gap,overdue:!!due&&now>=due,needsTeaching,parked:now<parkedUntil,parkedUntil,firstTransfer,last:last?.answeredAt||0,lastSuccess:success?.id||'',reviewed:answered.filter(a=>d.reviews[a.id]?.verdict==='valid').length};
 }
 const legacyMap={gst:'percent',percentWhole:'percent',repeatedRemainder:'remainders',workingBackwards:'remainders',cubeEdge:'volume',systematicCounting:'counting',rectanglesInGrid:'counting',factorsMultiples:'factors',constrainedDigits:'digits',areaTriangle:'area'};
 function bridge(s,d){if(options.bridge)return options.bridge(s,d);const groups=new Map();for(const a of s.learning?.attempts||[]){const id=legacyMap[a.generator];if(!id||a.skipped||!a.tries)continue;if(!groups.has(a.generator))groups.set(a.generator,[]);groups.get(a.generator).push(a);}return [...groups.values()].filter(a=>a.length>=2&&a.slice(-2).every(x=>!x.firstCorrect)).map(a=>({unit:legacyMap[a[0].generator],at:a.at(-1).answeredAt||a.at(-1).at})).filter(x=>!d.lessons[x.unit]?.completedAt&&(!d.lessons[x.unit]?.lastViewedAt||d.lessons[x.unit].lastViewedAt<x.at)).sort((a,b)=>b.at-a.at)[0]||null;}
@@ -68,7 +75,7 @@ function recommend(s,now=Date.now()){
  const rows=D.units.map(u=>evidence(d,u.id,now)),repair=rows.filter(e=>e.needsTeaching&&!e.parked).sort((a,b)=>b.last-a.last)[0];if(repair)return {kind:'learn',unit:repair.id,repair:true,reason:'Go through the lesson again before you try more questions.'};
  const old=bridge(s,d);if(old)return {kind:'learn',unit:old.unit,reason:'Go through this topic first. It will help with the questions that follow.'};
  if(d.mixed&&!d.mixed.completedAt&&mixedNext(d))return {kind:'mixed-set',reason:'Finish your mixed practice. Decide which method to use for each question.'};
- const ready=rows.filter(e=>e.taught&&e.apply>=1),due=rows.filter(e=>e.overdue),sets=setsToday(d,now);
+ const ready=rows.filter(e=>e.taught&&e.apply>=1&&(!options.mixReady||options.mixReady(d,e.id,now))),due=rows.filter(e=>e.overdue),sets=setsToday(d,now);
  // Due reviews come back as one short unlabelled mixed set a day (due methods first), so new learning keeps moving.
  // On days with nothing due, a warm-up set runs every third day.
  if(due.length&&ready.length<2&&!sets)return {kind:'recall',unit:due.sort((a,b)=>a.due-b.due)[0].id,reason:'Revise this topic. Try the question without looking at the lesson.'};
@@ -87,13 +94,13 @@ function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random
    shown with no topic title or method hint. */
 function startMixed(d,now=Date.now()){
  if(d.mixed&&!d.mixed.completedAt&&mixedNext(d))return d.mixed;
- const rows=D.units.map(u=>evidence(d,u.id,now)),ready=rows.filter(e=>e.taught&&e.apply>=1);if(ready.length<2)return null;
+ const rows=D.units.map(u=>evidence(d,u.id,now)),ready=rows.filter(e=>e.taught&&e.apply>=1&&(!options.mixReady||options.mixReady(d,e.id,now)));if(ready.length<2)return null;
  // Two questions, or three when several methods are due: reviews stay about a third of a typical day.
  const overdue=ready.filter(e=>e.overdue),size=overdue.length>=2?MIXED_SIZE:Math.min(2,MIXED_SIZE),due=overdue.sort((a,b)=>a.due-b.due).slice(0,size),rest=shuffle(ready.filter(e=>!due.includes(e)).sort((a,b)=>a.last-b.last).slice(0,8));
  const chosen=[...due,...rest].slice(0,size),items=shuffle(chosen.map(e=>{const form=e.overdue?(e.delayed%2?2:1):(e.transfer?2:1);return {unit:e.id,form,seed:freshSeed(d,e.id,form),rev:REV,recall:!!e.overdue};}));
  d.mixed={id:prefix+'mix-'+uid(),at:now,items,completedAt:0};d.mixedLog=[...(d.mixedLog||[]),{id:d.mixed.id,at:now,completedAt:0}].slice(-120);return d.mixed;
 }
-function mixedNext(d){const m=d.mixed;if(!m)return null;for(const [index,it] of m.items.entries()){const done=d.attempts.some(a=>a.mixedId===m.id&&a.unit===it.unit&&a.seed===it.seed&&a.form===it.form&&(a.correct||a.responses.length>=2||a.revealed));if(!done)return {...it,index,total:m.items.length};}return null;}
+function mixedNext(d){const m=d.mixed;if(!m)return null;for(const [index,it] of m.items.entries()){const done=d.attempts.some(a=>a.mixedId===m.id&&a.unit===it.unit&&a.seed===it.seed&&a.form===it.form&&(a.correct||a.responses.length>=2||a.revealed||pendingWriting(d,a)));if(!done)return {...it,index,total:m.items.length};}return null;}
 function closeMixed(d,now=Date.now()){const m=d.mixed;if(!m||m.completedAt||mixedNext(d))return false;m.completedAt=now;const log=(d.mixedLog||[]).find(x=>x.id===m.id);if(log)log.completedAt=now;else d.mixedLog.push({id:m.id,at:m.at,completedAt:now});return true;}
 function startMixedItem(d,now=Date.now()){
  const m=startMixed(d,now);if(!m)return null;const it=mixedNext(d);if(!it){closeMixed(d,now);return null;}
@@ -103,7 +110,7 @@ function startMixedItem(d,now=Date.now()){
 /* Error log: every first-answer miss outside guided practice, with an optional reason tag.
    A missed question comes back unchanged a few days later; a first-try success clears it. */
 function errorLog(d,now=Date.now(),days=120){
- return d.attempts.filter(a=>!a.skipped&&!a.firstCorrect&&!['redo','guided','baseline'].includes(a.phase)&&a.answeredAt>=now-days*DAY&&a.answeredAt<=now).map(a=>{const e=d.errors[a.id]||{};return {id:a.id,unit:a.unit,strand:unit(a.unit).strand,title:unit(a.unit).title,form:a.form,mode:a.mode,phase:a.phase,at:a.answeredAt,question:a.question,answer:a.responses[0].answer,correctLater:a.correct,tag:e.tag||'',redoneAt:e.redoneAt||0,lastTry:e.lastTry||0};}).reverse();
+ return d.attempts.filter(a=>!pendingWriting(d,a)&&!a.skipped&&!a.firstCorrect&&!['redo','guided','baseline'].includes(a.phase)&&a.answeredAt>=now-days*DAY&&a.answeredAt<=now).map(a=>{const e=d.errors[a.id]||{};return {id:a.id,unit:a.unit,strand:unit(a.unit).strand,title:unit(a.unit).title,form:a.form,mode:a.mode,phase:a.phase,at:a.answeredAt,question:a.question,answer:a.responses[0].answer,correctLater:a.correct,tag:e.tag||'',redoneAt:e.redoneAt||0,lastTry:e.lastTry||0};}).reverse();
 }
 function tagError(d,id,tag,now=Date.now()){if(!safeId(id)||!d.attempts.some(a=>a.id===id)||!TAGS.includes(tag))return false;d.errors[id]={...(d.errors[id]||{}),tag,at:now};return true;}
 function dueRedo(d,now=Date.now()){return errorLog(d,now,60).filter(e=>!e.redoneAt&&d.lessons[e.unit]?.completedAt&&now>=Math.max(e.at,e.lastTry)+REDO_DAYS*DAY).sort((a,b)=>a.at-b.at)[0]||null;}
@@ -127,9 +134,9 @@ function startPractice(d,id,{phase,seed,form,rev,mixedId='',recall=false,redoOf=
  d.draft={id:prefix+uid(),unit:id,form,seed:value,rev,exhausted,mixedId:phase==='mixed'?text(mixedId,120):'',redoOf:phase==='redo'?text(redoOf,120):'',at:now,updatedAt:now,phase,helped:phase==='guided',revealed:false,guess:false,seenBefore,lessonViewedAt:l.lastViewedAt||0,recallOf,answer:'',working:'',strokes:[]};return d.draft;
 }
 function touchDraft(d,fields,now=Date.now()){if(!d.draft)return;Object.assign(d.draft,{answer:text(fields.answer??d.draft.answer,AMAX),working:text(fields.working??d.draft.working),strokes:ink(fields.strokes??d.draft.strokes),guess:d.draft.guess||!!fields.guess,updatedAt:now});}
-function help(d,reveal=false,now=Date.now()){if(!d.draft||d.attempts.find(a=>a.id===d.draft.id)?.correct)return;d.draft.helped=true;d.draft.revealed=d.draft.revealed||reveal;d.draft.updatedAt=now;const a=d.attempts.find(a=>a.id===d.draft.id);if(a)record(d,{...a,helped:true,revealed:a.revealed||reveal,updatedAt:now});}
+function help(d,reveal=false,now=Date.now()){if(!d.draft||d.attempts.find(a=>a.id===d.draft.id)?.correct&&!(options.writingReview&&question(d.draft).kind==='written'))return;d.draft.helped=true;d.draft.revealed=d.draft.revealed||reveal;d.draft.updatedAt=now;const a=d.attempts.find(a=>a.id===d.draft.id);if(a)record(d,{...a,helped:true,revealed:a.revealed||reveal,updatedAt:now});}
 function respond(d,now=Date.now()){
- const v=d.draft;if(!v)return {ok:false};const q=question(v),old=d.attempts.find(x=>x.id===v.id);if(old?.correct)return {ok:true,attempt:old,already:true};
+ const v=d.draft;if(!v)return {ok:false};const q=question(v),old=d.attempts.find(x=>x.id===v.id);if(old?.correct&&!(options.writingReview&&q.kind==='written'))return {ok:true,attempt:old,already:true};
  if(!v.answer.trim())return {ok:false,reason:'Enter an answer first.'};
  if(B.validAnswer&&!B.validAnswer(q,v.answer))return {ok:false,reason:B.invalidReason?.(q,v.answer)||'Select a conclusion (or every statement) and a reason before checking. This incomplete response has not been counted as an error.'};
  if(typeof q.answer!=='string'&&!B.parse(v.answer,q.suffix))return {ok:false,reason:'Check the format of your answer. Use a number, a fraction or an answer in terms of π. This is not counted as a mistake.'};
@@ -138,7 +145,7 @@ function respond(d,now=Date.now()){
  const previous=old?.responses.at(-1);
  if(previous&&previous.answer.trim()===v.answer.trim()&&(previous.working||'')===v.working&&JSON.stringify(previous.strokes||[])===JSON.stringify(v.strokes))return {ok:false,duplicate:true,reason:'You have already given this answer. Change your answer or add a new step to your working. No extra mistake is counted.'};
  if(old?.responses.length>=12)return {ok:false,reason:'Study the worked example, then try a new question.'};
- const responses=[...(old?.responses||[]),{at:now,answer:v.answer,working:v.working,strokes:copy(v.strokes)}];
+ const responses=[...(old?.responses||[]),{at:now,answer:v.answer,working:v.working,strokes:copy(v.strokes),...(options.writingReview&&q.kind==='written'?{gradingVersion:2}:{})}];
  const a=record(d,{...v,mode:'practice',updatedAt:now,responses});
  if(v.phase==='redo'&&safeId(v.redoOf)){const e=d.errors[v.redoOf]||{};d.errors[v.redoOf]={...e,lastTry:now,redoneAt:a.firstCorrect?now:e.redoneAt||0};}
  if(v.phase==='mixed'&&d.mixed?.id===v.mixedId)closeMixed(d,now);
@@ -155,7 +162,7 @@ const paperDefinitions=options.paperDefinitions||[
 /* DSA-style mocks, modelled on reported formats: about 90 minutes, no calculator, whole-number answers,
    questions in rising order of difficulty worth 1–4 marks (55 marks). Each mock draws a different mix. */
 function mathsMocks(){
- const core=D.units.filter(u=>!u.bridge&&!u.extension).map(u=>u.id),bridges=D.units.filter(u=>u.bridge).map(u=>u.id),ext=D.units.filter(u=>u.extension).map(u=>u.id);
+ const core=D.units.filter(u=>!u.bridge&&!u.extension).map(u=>u.id),bridges=D.units.filter(u=>u.bridge&&!u.microBridge).map(u=>u.id),ext=D.units.filter(u=>u.extension).map(u=>u.id);
  if(core.length<24||bridges.length<3||ext.length<9)return [];
  const perm=(list,salt)=>list.map(id=>[parseInt(B.hash(salt+':'+id),36),id]).sort((a,b)=>a[0]-b[0]||(a[1]<b[1]?-1:1)).map(x=>x[1]);
  return [25,21,17,12,8,4].map((weeks,k)=>{const c=perm(core,'mock-core-'+Math.floor(k/2)).slice((k%2)*12,(k%2)*12+12),b=perm(bridges,'mock-bridge-'+k).slice(0,3),x=perm(ext,'mock-ext-'+k).slice(0,9);
@@ -226,9 +233,9 @@ function finishInvestigation(d,id,note='',now=Date.now()){if(!/^[a-z0-9-]{1,24}$
 function review(d,id,verdict,note='',now=Date.now()){if(['__proto__','constructor','prototype'].includes(id)||!d.attempts.some(a=>a.id===id)||!['valid','needs-discussion','unreviewed'].includes(verdict))return false;d.reviews[id]={verdict,note:text(note,1500),at:now};return true;}
 function addExternal(d,entry,now=Date.now()){if(!text(entry.name,150)||!Number.isFinite(entry.score)||!Number.isFinite(entry.total)||entry.total<=0||entry.score<0||entry.score>entry.total)throw Error('Enter a named paper and a valid score/total.');d.external.push({id:uid(),name:text(entry.name,150),score:entry.score,total:entry.total,unseen:!!entry.unseen,independent:!!entry.independent,timed:!!entry.timed,at:now});d.external=d.external.slice(-30);}
 function report(d,now=Date.now()){
- const units=D.units.map(u=>evidence(d,u.id,now)),papers=paperDefinitions.map(p=>scorePaper(d,p.id)).filter(Boolean),qualifying=papers.filter(p=>p.qualifying),reviewed=d.attempts.filter(a=>d.reviews[a.id]?.verdict==='valid'&&a.independent),reviewedStrands=new Set(reviewed.map(a=>unit(a.unit).strand));
+ const units=D.units.map(u=>evidence(d,u.id,now)),papers=paperDefinitions.map(p=>scorePaper(d,p.id)).filter(Boolean),qualifying=papers.filter(p=>p.qualifying),reviewed=d.attempts.filter(a=>d.reviews[a.id]?.verdict==='valid'&&independentFor(d,a)),reviewedStrands=new Set(reviewed.map(a=>unit(a.unit).strand));
  const external=d.external.filter(x=>x.independent&&x.unseen&&x.timed&&100*x.score/x.total>=D.target),breadth=qualifying.length===3&&Object.keys(D.strands).every(k=>{const total=qualifying.reduce((n,p)=>n+p.byStrand[k].total,0),correct=qualifying.reduce((n,p)=>n+p.byStrand[k].correct,0);return total&&correct/total>=.75;});
- return {goalMonth:d.goalMonth,target:D.target,plan:plan(d,now),errors:errorLog(d,now).slice(0,40),units,papers,qualifyingPapers:qualifying.length,reviewedStrands:reviewedStrands.size,externalChecks:external.length,breadth,internalTarget:qualifying.length===3&&breadth&&reviewedStrands.size===Object.keys(D.strands).length,externalReported:external.length>0,limits:options.limits||['The commercial booklet is a working benchmark, not an official entrance paper.','These original items and time limits are not psychometrically calibrated.','85% on three reserved mixed papers is an internal training goal, not an admissions cutoff.','Independent correctness does not automatically validate written reasoning.','Parent-entered external results and explanation reviews are self-reported.','No school admission probability is calculated.']};
+ return {goalMonth:d.goalMonth,target:D.target,...(options.writingReview?{writing:{total:d.attempts.filter(isWritten).length,pending:d.attempts.filter(a=>pendingWriting(d,a)).length,reviewed:d.attempts.filter(a=>isWritten(a)&&d.reviews[a.id]?.verdict==='valid'&&d.reviews[a.id].at>=a.answeredAt).length,automated:'Preliminary key-idea checks, not verified explanations.'}}:{}),plan:plan(d,now),errors:errorLog(d,now).slice(0,40),units,papers,qualifyingPapers:qualifying.length,reviewedStrands:reviewedStrands.size,externalChecks:external.length,breadth,internalTarget:qualifying.length===3&&breadth&&reviewedStrands.size===Object.keys(D.strands).length,externalReported:external.length>0,limits:options.limits||['The commercial booklet is a working benchmark, not an official entrance paper.','These original items and time limits are not psychometrically calibrated.','85% on three reserved mixed papers is an internal training goal, not an admissions cutoff.','Independent correctness does not automatically validate written reasoning.','Parent-entered external results and explanation reviews are self-reported.','No school admission probability is calculated.']};
 }
 function validate(raw){
  const d=fresh();if(!raw)return d;if(raw.version!==1)throw Error('Unsupported entrance-path backup version.');
@@ -274,7 +281,7 @@ function merge(a,b){
  return validate(d);
 }
 function exportData(d){return validate(d);}
-return {D,B,DAY,REV,TAGS,uid,unit,question,fresh,init,lesson,visit,concept,complete,record,evidence,recommend,startPractice,startMixed,startMixedItem,mixedNext,closeMixed,errorLog,tagError,dueRedo,startRedo,testDate,setTestDate,mockSchedule,dueMock,plan,answerFact,finishInvestigation,dayKey,touchDraft,help,respond,finishPractice,paperDefinitions,paperQuestions,startPaper,savePaperAnswer,interruptPaper,submitPaper,scorePaper,review,addExternal,report,validate,merge,exportData,ink};
+return {D,B,independentFor,pendingWriting,DAY,REV,TAGS,uid,unit,question,fresh,init,lesson,visit,concept,complete,record,evidence,recommend,startPractice,startMixed,startMixedItem,mixedNext,closeMixed,errorLog,tagError,dueRedo,startRedo,testDate,setTestDate,mockSchedule,dueMock,plan,answerFact,finishInvestigation,dayKey,touchDraft,help,respond,finishPractice,paperDefinitions,paperQuestions,startPaper,savePaperAnswer,interruptPaper,submitPaper,scorePaper,review,addExternal,report,validate,merge,exportData,ink};
 }
 root.MochiPathCore={create};
 if(typeof module!=='undefined')module.exports=root.MochiPathCore;

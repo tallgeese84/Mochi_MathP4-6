@@ -1,5 +1,14 @@
 # v7.4.0 — Moments of delight
 
+## v7.6.0 — 2 October 2026
+
+- Bind answer/working/ink captures to the active question identity in both subjects.
+- Version written-science feedback, fix the unrelated “mean” false positive, and require adult review for independent written evidence.
+- Add one-face and matching-face-pair geometry steps before complex surface area.
+- Vary circuit representations, add dissolving/repeated-trial reasoning, and bound same-topic practice.
+- Preserve historical marks, question revisions, papers, deadlines, time goals and rewards.
+
+
 - **Mochi says hello.** On Today, a 3D Mochi waves when Euna arrives, follows her finger and sways gently. Tap him to visit his room. It loads after the page is ready, and lighter Android tablets or the reduced-motion setting keep the picture.
 - **Celebrations that are earned.** A short full-screen moment with tumbling paw prints, a ring that fills into a medal and big bold words. It appears when she masters a topic (her first challenge question solved on her own), finishes a mixed practice set, submits a paper or mock (with her marks), or Mochi learns a new trick. It lasts about three seconds and a tap closes it. Reduced motion shows a still card instead.
 - **Smooth transitions.** Each new screen settles in with a quick fade and lift. It happens only when the screen changes, not on every tap, and it is off with reduced motion.

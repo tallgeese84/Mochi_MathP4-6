@@ -63,7 +63,13 @@ function flat(mode,n=3,shift=0){
  }
  return frame(out,mode==='length'?`${n} unit lengths make ${n} centimetres.`:`${n} rows of ${n} unit squares cover ${n*n} square centimetres.`);
 }
-function diagram(spec){if(!spec)return '';if(spec.kind==='geo-block')return blockDiagram(spec);if(spec.kind==='geo-angle')return angleDiagram(spec);if(spec.kind==='geo-straight')return straightDiagram(spec);if(spec.kind==='geo-row'){const m=G.row(spec.count,spec.edge);return project(m.faces,m.centre,-.6,.4,`${m.count} cubes of edge ${m.edge} cm in one row. The touching faces are internal.`);}return '';}
+function faceArea(spec){
+ const n=spec.n===2?2:1,w=160,h=112,xs=n===2?[70,290]:[180];let body='';
+ for(const x of xs){body+=`<rect x="${x}" y="115" width="${w}" height="${h}" fill="#f7f3fb"/>`+label([x+w/2,250],String(spec.w)+' cm')+label([x-18,171],String(spec.h)+' cm','transform="rotate(-90 '+(x-18)+' 171)"');}
+ body+=label([260,65],spec.label||'Only the named face')+label([260,310],n===2?'Two matching faces; not all six.':'One flat face; not the inside volume.','font-size="14"');
+ return frame(body,'Flat view of '+(spec.label||'the named face')+'. '+spec.w+' cm by '+spec.h+' cm; not drawn to scale.');
+}
+function diagram(spec){if(!spec)return '';if(spec.kind==='geo-face-area')return faceArea(spec);if(spec.kind==='geo-block')return blockDiagram(spec);if(spec.kind==='geo-angle')return angleDiagram(spec);if(spec.kind==='geo-straight')return straightDiagram(spec);if(spec.kind==='geo-row'){const m=G.row(spec.count,spec.edge);return project(m.faces,m.centre,-.6,.4,`${m.count} cubes of edge ${m.edge} cm in one row. The touching faces are internal.`);}return '';}
 const paperDiagram=spec=>diagram(spec).replace(/#eee9f5/g,'#ffffff').replace(/#f7f3fb/g,'#eeeeee').replace(/#cdbbdd/g,'#dddddd').replace(/#e1d7ec/g,'#e6e6e6').replace(/#e6e0ee/g,'#eeeeee').replace(/#ddd4e7/g,'#dddddd');
 root.MochiGeometryVisuals={diagram:paperDiagram,project,flat,angleDiagram,straightDiagram,blockDiagram};
 if(typeof module!=='undefined')module.exports=root.MochiGeometryVisuals;

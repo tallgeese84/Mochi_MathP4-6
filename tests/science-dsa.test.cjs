@@ -181,7 +181,7 @@ test('revision 2 removes the longest-answer cue and throwaway options',()=>{
 });
 
 test('revision 1 is still the original wording (spot checks) and revision 2 is the default',()=>{
- assert.equal(B.REV,2);
+ assert.equal(B.REV,3);
  const old=B.make('evidence',1,5,1),neu=B.make('evidence',1,5);assert.ok(old.options.includes('Extra light alone caused the whole difference.'));assert.ok(!neu.options.includes('Extra light alone caused the whole difference.'));
  assert.deepEqual(B.make('heat',0,9,0),B.make('heat',0,9,1),'revisions below 1 clamp to 1');assert.deepEqual(B.make('heat',0,9,99),B.make('heat',0,9,2),'revisions above REV clamp to REV');
  for(const id of ORIGINAL)for(let f=0;f<4;f++){const q=B.make(id,f,77,1);assert.equal(q.kind,undefined);assert.ok(!('rev' in q));}

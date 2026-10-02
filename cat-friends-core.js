@@ -48,7 +48,7 @@ function validate(raw){
   if(c.doubleBonuses.length>=1200)break;
  }
  const known=new Set();for(const a of Array.isArray(raw.studyAwards)?raw.studyAwards:[]){
-  if(!/^(learn|repair):(geo-measure|geo-layers|geo-surface|geo-angles|volume|angles|area|spatial)$/.test(a?.key||'')||known.has(a.key)||!timestamp(a.earnedAt))continue;
+  if(!/^(learn|repair):(geo-measure|geo-layers|geo-one-face|geo-face-pairs|geo-surface|geo-angles|volume|angles|area|spatial)$/.test(a?.key||'')||known.has(a.key)||!timestamp(a.earnedAt))continue;
   if(a.key.startsWith('learn:')&&!a.key.startsWith('learn:geo-'))continue;
   known.add(a.key);c.studyAwards.push({key:a.key,earnedAt:timestamp(a.earnedAt)});
  }
@@ -72,10 +72,10 @@ function awardDoubleTime(state,c,now=Date.now()){
 function awardStudy(state,c){
  const E=root.MochiEntrance,d=state?.entrance;if(!E||!d)return c;
  const known=new Set(c.studyAwards.map(a=>a.key)),award=(key,at)=>{if(!known.has(key)&&timestamp(at)){c.studyAwards.push({key,earnedAt:timestamp(at)});known.add(key);}};
- for(const id of ['geo-measure','geo-layers','geo-surface','geo-angles']){
+ for(const id of ['geo-measure','geo-layers','geo-one-face','geo-face-pairs','geo-surface','geo-angles']){
   const l=d.lessons?.[id];if(l?.visited?.length===3&&l.completedAt)award('learn:'+id,l.completedAt);
  }
- for(const id of ['geo-measure','geo-layers','geo-surface','geo-angles','volume','angles','area','spatial']){
+ for(const id of ['geo-measure','geo-layers','geo-one-face','geo-face-pairs','geo-surface','geo-angles','volume','angles','area','spatial']){
   const attempts=(d.attempts||[]).filter(a=>a.unit===id&&a.mode==='practice'&&a.responses?.length);
   const recovered=attempts.find(a=>a.responses.length>1&&!E.B.mark(E.question(a),a.responses[0].answer)&&E.B.mark(E.question(a),a.responses.at(-1).answer));
   if(!recovered)continue;

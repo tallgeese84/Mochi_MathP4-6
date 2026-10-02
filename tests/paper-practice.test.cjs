@@ -42,7 +42,7 @@ for(const id of PB.topicIds)test(`paper practice: independently solve 500 ${id} 
  assert.equal(variants.size,2);for(const p of prints)assert.ok(p.size>=15,`${id}: sufficient distinct variants, got ${p.size}`);
 });
 test('all prior revision 1 and 2 question objects and all 20 reserved paper objects stay byte-identical',()=>{
- const snap=require('./fixtures/pre-paper-practice-v740.json');for(const [rev,want]of Object.entries(snap.questions))assert.equal(h(E.D.units.flatMap(u=>[0,1,2,3].flatMap(f=>Array.from({length:40},(_,i)=>B.make(u.id,f,i*7919+1,+rev))))),want,'all questions, revision '+rev);
+ const snap=require('./fixtures/pre-paper-practice-v740.json');for(const [rev,want]of Object.entries(snap.questions))assert.equal(h(E.D.units.filter(u=>!u.microBridge).flatMap(u=>[0,1,2,3].flatMap(f=>Array.from({length:40},(_,i)=>B.make(u.id,f,i*7919+1,+rev))))),want,'all questions, revision '+rev);
  for(const [subject,C]of [['maths',E],['science',S]])for(const def of C.paperDefinitions)assert.equal(h({def,questions:C.paperQuestions(def.id)}),snap.papers[subject+':'+def.id],subject+':'+def.id);
 });
 const now=Date.UTC(2026,9,2,17),taught=(d,id,t=now-100000)=>{for(let i=0;i<3;i++)E.visit(d,id,i,t);E.concept(d,id,E.unit(id).check[2],t+1);E.complete(d,id,t+2);};

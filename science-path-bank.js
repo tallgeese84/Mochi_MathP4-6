@@ -170,10 +170,11 @@ function shuffle(a,r){const x=a.slice();for(let i=x.length-1;i>0;i--){const j=r.
 /* History stability: attempts and papers are re-marked by regenerating (unit, form, seed). Revision 1
    output of every original template is frozen (tests/history-stability.test.cjs). Changes to an
    original template live in the revision-2 table; new sx- units are revision-independent. */
-const REV=2;
+const REV=3;
 const helpers={pair,statements,table,line,bar,numeric,written,roles,idea};
 const load=(name,file)=>root[name]||(typeof require==='function'?require(file):null);
 const S2=load('MochiSciencePathRev2','./science-path-rev2.js')?.(helpers)||{};
+const S3=load('MochiSciencePractice','./science-practice.js')?.bank(helpers)||{};
 const SX=load('MochiSciencePathSX','./science-path-sx.js')?.(helpers)||{};
 for(const [id,forms] of Object.entries(SX))S[id]=forms;
 const ROLE_NAMES=['Changed','Measured','Kept the same'];
@@ -182,7 +183,7 @@ const skillsFor=form=>form===0?['concept']:form===1?['application','evidence']:f
 function make(id,form,seed,rev=REV){
  const u=D.units.find(x=>x.id===id);if(!u||!S[id]||!Number.isInteger(form)||form<0||form>3||!Number.isSafeInteger(seed)||seed<0||seed>4294967295)throw Error('Unknown science-path question');
  if(!Number.isInteger(rev)||rev<1)rev=1;if(rev>REV)rev=REV;
- const spec=(rev>=2&&S2[id]?.[form]||S[id][form])(rng(seed));
+ const spec=(rev>=3&&S3[id]?.[form]||rev>=2&&S2[id]?.[form]||S[id][form])(rng(seed));
  if(spec.kind)return makeKind(u,id,form,seed,spec);
  const canonical={text:spec.text,claim:spec.claim,wrong:spec.wrong,statements:spec.statements,reason:spec.reason,wrongReasons:spec.wrongReasons,figure:spec.figure};
  // Option order does not manufacture an unseen question. Semantic givens are fingerprinted.
@@ -251,12 +252,13 @@ function rolesParts(q,answer){
  const want=q.answer.slice(1),got=m[1],rows=[...got].map((c,i)=>c===want[i]),right=k=>rows.every((ok,i)=>ok||want[i]!==String(k)&&got[i]!==String(k));
  return {valid:true,claim:right(0)&&right(1),reason:rows.every(Boolean),kind:'roles',rows};
 }
-function parts(q,answer){
- if(q.kind==='numeric')return numericParts(q,answer);if(q.kind==='written')return writtenParts(q,answer);if(q.kind==='roles')return rolesParts(q,answer);
+const Writing=root.MochiScienceWriting||(typeof require==='function'?require('./science-writing.js'):null);
+function parts(q,answer,gradingVersion=1){
+ if(q.kind==='numeric')return numericParts(q,answer);if(q.kind==='written'){const p=writtenParts(q,answer);return gradingVersion>=2&&Writing?Writing.assess(q,answer,p):p;}if(q.kind==='roles')return rolesParts(q,answer);
  const s=String(answer||''),m=s.match(/^(c\d+|s[01]{3}):r(\d+)$/);if(!m)return {valid:false,claim:false,reason:false};const ck=m[1],ri=+m[2],valid=ri<q.reasons.length&&(q.statements?/^s[01]{3}$/.test(ck):/^c\d+$/.test(ck)&&+ck.slice(1)<q.options.length),expected=q.answer.split(':');return {valid,claim:valid&&ck===expected[0],reason:valid&&'r'+ri===expected[1]};
 }
-function mark(q,a){const p=parts(q,a);return p.valid&&p.claim&&p.reason;}
-function ideaReport(q,a){const p=writtenParts(q,a);return {found:q.ideas.filter((_,i)=>p.ideas[i]).map(x=>x.label),missing:q.ideas.filter((_,i)=>!p.ideas[i]).map(x=>x.label),contradictions:p.contradictions||[],valid:p.valid};}
+function mark(q,a,gradingVersion=1){const p=parts(q,a,gradingVersion);return p.valid&&p.claim&&p.reason;}
+function ideaReport(q,a){const p=parts(q,a,2);return {found:q.ideas.filter((_,i)=>p.ideas[i]).map(x=>x.label),missing:q.ideas.filter((_,i)=>!p.ideas[i]).map(x=>x.label),contradictions:p.contradictions||[],valid:p.valid};}
 function describe(q,a){
  if(q.kind==='numeric'){const s=String(a||'').trim();return s||'Not completed';}
  if(q.kind==='written'){const s=String(a||'').trim();if(!s)return 'Not completed';const p=ideaReport(q,s);return `${s} — Key ideas found: ${p.found.join('; ')||'none'}. Missing: ${p.missing.join('; ')||'none'}.${p.contradictions.length?' Conflicts with the evidence: '+p.contradictions.join('; ')+'.':''}`;}

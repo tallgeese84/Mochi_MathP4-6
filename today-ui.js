@@ -50,7 +50,7 @@ function launch(){
  else if(t.kind==='redo')ui.redo(t.attempt);
  else {
   if(d?.draft&&d.attempts.find(a=>a.id===d.draft.id)?.correct)E.finishPractice(d);
-  ui.practice(t.unit,t.kind==='recall'?'recall':undefined);
+  ui.practice(t.unit,t.kind==='recall'?'recall':t.phase);
  }
  if(t.kind!=='paper')root.MochiPlanUI?.start(t.subject);
  paint();root.scrollTo?.({top:0,behavior:'instant'});
