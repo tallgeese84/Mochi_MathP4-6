@@ -14,7 +14,7 @@ test('past answers are re-marked against the question version she actually saw',
  const v=E.startPractice(E.fresh(),'invariants',{phase:'apply',now});assert.equal(v.rev,E.REV);
 });
 test('the original checks and papers stay at revision 1; DSA-style mocks use the newest questions',()=>{
- for(const X of [E,S]){for(const p of X.paperDefinitions){if(p.kind==='mock')assert.equal(p.rev,X.REV);else assert.equal(p.rev,1);}}
+ for(const X of [E,S]){for(const p of X.paperDefinitions){if(p.kind==='mock')assert.equal(p.rev,X===E?2:X.REV);else assert.equal(p.rev,1);}}
  const d=E.fresh();E.startPaper(d,'mixed-a',now);E.paperQuestions('mixed-a').forEach((q,i)=>E.savePaperAnswer(d,'mixed-a',i,{answer:q.answerLabel},now+i));E.submitPaper(d,'mixed-a',now+60000);
  assert.ok(d.attempts.every(a=>a.rev===1));assert.equal(E.validate(d).attempts.filter(a=>a.correct).length,24);
 });

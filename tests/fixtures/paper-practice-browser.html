@@ -1,0 +1,42 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Paper-style practice browser validation</title>
+<style>body{margin:0;background:#faf7fd;font:14px system-ui}#result{padding:10px;white-space:pre-wrap}iframe{border:0;width:100%;height:1700px}</style>
+<pre id="result">Checking original paper-style practice with synthetic progress…</pre><iframe src="about:blank" title="Isolated test app"></iframe><script>
+(async()=>{
+ const sleep=ms=>new Promise(r=>setTimeout(r,ms)),ok=(v,m)=>{if(!v)throw Error(m)},frame=document.querySelector('iframe');
+ try{
+  ok(['localhost','127.0.0.1','[::1]'].includes(location.hostname),'Local test host only');
+  ok(!localStorage.getItem('mochi-tutor-v1')&&!localStorage.getItem('cubs_sync'),'Fresh synthetic test profile only');
+  localStorage.setItem('mochi-room-view-v1','picture');frame.src='../../index.html';
+  for(let i=0;i<200&&!frame.contentWindow.MochiSciencePathUI;i++)await sleep(50);
+  const w=frame.contentWindow,d=frame.contentDocument,E=w.MochiEntrance,UI=w.MochiEntranceUI,PB=w.MochiPaperPractice,errors=[];ok(E&&UI&&PB,'All app and question modules started');
+  w.addEventListener('error',e=>errors.push(e.message));w.addEventListener('unhandledrejection',e=>errors.push(String(e.reason)));w.confirm=()=>true;
+  const $=id=>d.getElementById(id),click=id=>{ok($(id),'Missing '+id);$(id).click()},input=(id,v)=>{$(id).value=v;$(id).dispatchEvent(new w.Event('input',{bubbles:true}))};
+  const fresh=(id,seed)=>{w.MochiTodayUI.open();w.eval('S.entrance=MochiEntrance.fresh()');const data=E.init(w.eval('S'));E.startPractice(data,id,{phase:'transfer',seed});UI.open('practice',id);return data};
+  const seedFor=(id,v)=>{for(let i=0;i<500;i++){const s=i*104729+739;if(PB.make(id,s).params.variant===v)return s}throw Error('Missing variant')};
+  let count=0;
+  for(const id of PB.topicIds)for(const variant of [0,1]){
+   const data=fresh(id,seedFor(id,variant)),q=E.question(data.draft);ok(d.querySelector('.ep-question-text').textContent===q.text,'Correct active question');
+   ok(!$('epSupport').textContent.includes(q.steps.at(-1)),'Solution not shown initially');
+   input('epAnswer',q.answerLabel);input('epWorking','Synthetic test: I will connect the given relationships.');click('epCheckAnswer');
+   ok(data.attempts.at(-1).correct,'Correct mark '+id+'/'+variant);ok(data.attempts.at(-1).independent,'Unaided first answer '+id+'/'+variant);ok(!data.draft.guess,'Check never toggles external-help checkbox');count++;
+  }
+  let data=fresh('area',seedFor('area',0)),q=E.question(data.draft);input('epAnswer','999999');input('epWorking','Synthetic incorrect plan');click('epCheckAnswer');
+  ok($('epDiagnostic').textContent.includes(q.diagnostic.prompt),'New question-specific diagnostic, not legacy form');
+  click('epHint');ok($('epSupport').textContent.includes(q.hints[0]),'Specific first hint');ok(data.draft.helped,'Hint records support');
+  click('epHint');ok($('epSupport').textContent.includes(q.hints[1]),'Specific second hint');input('epAnswer',q.answerLabel);click('epCheckAnswer');ok(!data.attempts.at(-1).independent,'Correction/help never gets independent credit');
+  const backed=w.MochiReviewDownload.make();ok(backed.entrance.attempts.at(-1).rev===3&&backed.entrance.attempts.at(-1).helped,'Backup preserves revision and support');
+  // Old saved work is still regenerated at the recorded revision, not silently replaced.
+  w.MochiTodayUI.open();w.eval('S.entrance=MochiEntrance.fresh()');data=E.init(w.eval('S'));E.startPractice(data,'volume',{phase:'redo',form:2,rev:2,seed:713});UI.open('practice','volume');ok(d.querySelector('.ep-question-text').textContent===E.B.make('volume',2,713,2).text,'Historical question unchanged');
+  // All diagram kinds render without overflow at narrow phone width; no WebGL is needed for these SVGs.
+  frame.style.width='375px';for(const [id,v]of [['motion',0],['area',0],['area',1],['circles',0],['circles',1],['volume',0],['counting',0]]){
+   data=fresh(id,seedFor(id,v));await sleep(35);ok(d.querySelector('#viewEntrance svg.ep-figure'),'Static diagram '+id+v);ok(d.documentElement.scrollWidth<=375,'No overflow '+id+v);ok(!d.querySelector('#viewEntrance').innerHTML.match(/(?:x|y|points|width|height)="[^"]*NaN/),'Finite SVG coordinates');
+  }
+  frame.style.width='100%';w.MochiTodayUI.open();UI.open('lesson','ratios');click('epLessonNext');$('epExample').value='2';$('epExample').dispatchEvent(new w.Event('change'));
+  ok(d.querySelector('.ep-question-text').textContent.includes('Group')||d.querySelector('.ep-question-text').textContent.includes('Red and blue'),'New worked example available');ok(!d.querySelector('.bm-figure'),'No unrelated old numeric bar model');
+  w.MochiTodayUI.open();w.eval('S.entrance=MochiEntrance.fresh()');UI.open('paper','mixed-a');const deadline=w.eval('S.entrance.papers["mixed-a"].deadline');ok(deadline>Date.now(),'Exam deadline present');ok(!$('epHint')&&!$('epTutorInput'),'No tutor/hints during reserved paper');ok(!d.querySelector('#viewEntrance svg[id^="pb-"]'),'No new reserved paper diagrams');w.MochiTodayUI.open();ok(w.eval('S.entrance.papers["mixed-a"].deadline')===deadline,'Original deadline survives');
+  w.MochiSciencePathUI.open('lesson','measurement');ok(w.MochiSciencePathUI.visible(),'Science navigation retained');
+  data=fresh('volume',seedFor('volume',0));await sleep(80);$('epTitle').scrollIntoView({block:'start'});ok(!errors.length,errors.join(';'));
+  document.body.dataset.result='passed';document.getElementById('result').textContent=JSON.stringify({result:'passed',questionTypes:count,questionSpecificHints:true,diagnostics:true,support:true,backup:true,legacyQuestion:true,reservedPaper:true,science:true,narrowLayout:true,errors});
+ }catch(e){document.body.dataset.result='failed';document.getElementById('result').textContent=e.stack||String(e)}
+})();
+</script></html>
