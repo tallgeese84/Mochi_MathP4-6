@@ -1,3 +1,11 @@
+# v7.5.0 — Private P6 paper practice
+
+- Add More → P6 exam practice. Import private source packs once per device; question scans and answer keys stay in IndexedDB, not public source, service-worker caches or the learning mirror.
+- Preserve original diagrams and page references. Exact numerical/ratio/MCQ marking; written explanations and drawings require human review. No inference of reasoning quality from a selected answer.
+- Save answers, typed working and handwriting; keep first responses, support and prior exposure distinct. Repeated taps do not add errors. Learning records join the existing backup and family sync; source packs do not.
+- Foreground P6 practice uses the existing subject clock; the library and import screens do not count. Original DSA papers, marking revisions and deadlines are unchanged.
+- This adds a practice route, not an official DSA format, readiness threshold or new exam date. See docs/P6_PRACTICE.md and docs/REVIEW_V740.md.
+
 # v7.4.0 — Moments of delight
 
 - **Mochi says hello.** On Today, a 3D Mochi waves when Euna arrives, follows her finger and sways gently. Tap him to visit his room. It loads after the page is ready, and lighter Android tablets or the reduced-motion setting keep the picture.

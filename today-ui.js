@@ -27,6 +27,7 @@ function openMenu(){
 function leave(){if(home)home.hidden=true;document.body.classList.remove('today-home');unmountGreeting();}
 function open(){
  if(!home||transition||!permitNavigation())return;
+ root.MochiP6UI?.leave();
  transition=true;closeMenu();root.MochiPlanUI?.pause('Your work is saved. Continue when you are ready.');
  U('maths')?.leave();U('science')?.leave();
  if(typeof courseLeave==='function')courseLeave();if(typeof scDraft==='function')scDraft();if(typeof scAbort==='function')scAbort();if(typeof focusClose==='function')focusClose(false);

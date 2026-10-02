@@ -7,6 +7,7 @@ const label=s=>s==='maths'?'Maths':'Science',data=()=>P.init(S),uid=()=>crypto.r
 let message='Start a subject when you are ready. Take a break between subjects.',lastSave=0,renderTimer=null;
 function visibleSubject(){
  if($('ov').classList.contains('show')||!$('sessionPanel').hidden)return null;
+ if(root.MochiP6UI?.visible())return root.MochiP6UI.subject();
  if(root.MochiEntranceUI?.visible())return 'maths';
  if(root.MochiSciencePathUI?.visible())return 'science';
  if(!$('viewCourse').hidden)return root.courseCurrent().subject;

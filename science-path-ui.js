@@ -19,6 +19,7 @@ function leave(){
 }
 function open(kind='home',id,practicePhase){
  if(!host||paused)return;
+ root.MochiP6UI?.leave();
  root.MochiTodayUI?.leave();
  capture();tutorAbort();if(view.kind==='paper'&&kind!=='paper'&&kind!=='results')E.interruptPaper(data(),view.paper);
  root.MochiEntranceUI?.leave();if(typeof courseLeave==='function')courseLeave();if(typeof scDraft==='function')scDraft();if(typeof scAbort==='function')scAbort();if(typeof focusClose==='function')focusClose(false);

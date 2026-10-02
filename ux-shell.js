@@ -14,12 +14,14 @@ const ITEMS=[['today','Today'],['learn','Learn'],['papers','Papers'],['mochi','M
 let nav=null,subject='maths',last='';
 const ui=s=>s==='science'?root.MochiSciencePathUI:root.MochiEntranceUI;
 function current(){
+ if(root.MochiP6UI?.visible())return 'papers';
  if(root.MochiTodayUI?.visible?.())return 'today';
  for(const s of ['maths','science']){const u=ui(s);if(u?.visible?.()){subject=s;const k=u.view().kind;return ['paper','papers','results'].includes(k)?'papers':'learn';}}
  const room=$('viewRoom');if(room&&room.style.display!=='none'&&!room.hidden)return 'mochi';
  return '';
 }
 function go(id){
+ root.MochiP6UI?.leave();
  if(id==='today')root.MochiTodayUI?.open?.();
  else if(id==='learn')ui(subject)?.open?.('lessons');
  else if(id==='papers')ui(subject)?.open?.('papers');
