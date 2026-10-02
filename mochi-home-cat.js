@@ -13,7 +13,7 @@ export function palette(T,info){
 
 function eyeTexture(T,iris){
  if(typeof document==='undefined'||typeof document.createElement!=='function')return null;
- const c=document.createElement('canvas');c.width=c.height=256;const g=c.getContext('2d');
+ const c=document.createElement('canvas');c.width=c.height=256;const g=c.getContext?.('2d');if(!g)return null;
  g.fillStyle='#2a1d1a';g.fillRect(0,0,256,256);
  const ring=g.createRadialGradient(128,138,20,128,128,122);
  ring.addColorStop(0,shade(T,iris,.18));ring.addColorStop(.62,iris);ring.addColorStop(.9,shade(T,iris,-.22));ring.addColorStop(1,'#2a1d1a');
