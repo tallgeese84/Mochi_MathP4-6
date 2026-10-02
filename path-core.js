@@ -63,23 +63,23 @@ function setsRecently(d,now){const k=[dayKey(now),dayKey(now-DAY),dayKey(now-2*D
 function redosToday(d,now){const k=dayKey(now);return d.attempts.filter(a=>a.phase==='redo'&&dayKey(a.answeredAt)===k).length;}
 function recommend(s,now=Date.now()){
  const d=init(s),draft=d.draft,unfinished=Object.values(d.papers).find(p=>!p.submittedAt);
- if(unfinished)return {kind:'paper',paper:unfinished.id,reason:'Continue the saved paper. Its original deadline is retained.'};
- if(draft)return {kind:'resume',unit:draft.unit,reason:'Continue your saved question and working.'};
- const rows=D.units.map(u=>evidence(d,u.id,now)),repair=rows.filter(e=>e.needsTeaching&&!e.parked).sort((a,b)=>b.last-a.last)[0];if(repair)return {kind:'learn',unit:repair.id,repair:true,reason:'Two first-answer misses suggest revisiting the method before more numerical variants.'};
- const old=bridge(s,d);if(old)return {kind:'learn',unit:old.unit,reason:'Recent foundation attempts suggest checking this relationship. They do not establish an ability level.'};
- if(d.mixed&&!d.mixed.completedAt&&mixedNext(d))return {kind:'mixed-set',reason:'Finish your mixed set. Decide which method each question needs.'};
+ if(unfinished)return {kind:'paper',paper:unfinished.id,reason:'Continue your paper. The time limit has not changed.'};
+ if(draft)return {kind:'resume',unit:draft.unit,reason:'Continue your saved question.'};
+ const rows=D.units.map(u=>evidence(d,u.id,now)),repair=rows.filter(e=>e.needsTeaching&&!e.parked).sort((a,b)=>b.last-a.last)[0];if(repair)return {kind:'learn',unit:repair.id,repair:true,reason:'Go through the lesson again before you try more questions.'};
+ const old=bridge(s,d);if(old)return {kind:'learn',unit:old.unit,reason:'Go through this topic first. It will help with the questions that follow.'};
+ if(d.mixed&&!d.mixed.completedAt&&mixedNext(d))return {kind:'mixed-set',reason:'Finish your mixed practice. Decide which method to use for each question.'};
  const ready=rows.filter(e=>e.taught&&e.apply>=1),due=rows.filter(e=>e.overdue),sets=setsToday(d,now);
  // Due reviews come back as one short unlabelled mixed set a day (due methods first), so new learning keeps moving.
  // On days with nothing due, a warm-up set runs every third day.
- if(due.length&&ready.length<2&&!sets)return {kind:'recall',unit:due.sort((a,b)=>a.due-b.due)[0].id,reason:'Try a delayed question with the lesson closed. Familiar retrieval is not new transfer.'};
- if(due.length&&ready.length>=2&&!sets)return {kind:'mixed-set',due:due.length,reason:'Some methods are due for a review. Try a short mixed set with no topic labels.'};
- if(!setsRecently(d,now)&&ready.length>=3)return {kind:'mixed-set',reason:'Warm up with a short mixed set: decide which method each question needs.'};
- const redo=dueRedo(d,now);if(redo&&!redosToday(d,now))return {kind:'redo',attempt:redo.id,unit:redo.unit,reason:'Try a question you missed a few days ago, with fresh eyes.'};
- const started=rows.find(e=>e.taught&&!e.parked&&e.stage!=='Revisit after a week'&&e.stage!=='Mixed-paper practice');if(started)return {kind:'practice',unit:started.id,reason:started.stage==='Apply'?'Build two independent application examples.':'Try a different problem structure with the help closed.'};
+ if(due.length&&ready.length<2&&!sets)return {kind:'recall',unit:due.sort((a,b)=>a.due-b.due)[0].id,reason:'Revise this topic. Try the question without looking at the lesson.'};
+ if(due.length&&ready.length>=2&&!sets)return {kind:'mixed-set',due:due.length,reason:'Revise topics you have learnt. The questions are from different topics, so decide which method to use.'};
+ if(!setsRecently(d,now)&&ready.length>=3)return {kind:'mixed-set',reason:'Warm up with mixed practice. Decide which method to use for each question.'};
+ const redo=dueRedo(d,now);if(redo&&!redosToday(d,now))return {kind:'redo',attempt:redo.id,unit:redo.unit,reason:'Try again a question you got wrong a few days ago.'};
+ const started=rows.find(e=>e.taught&&!e.parked&&e.stage!=='Revisit after a week'&&e.stage!=='Mixed-paper practice');if(started)return {kind:'practice',unit:started.id,reason:started.stage==='Apply'?'Solve two questions on your own.':'Try a challenge question without help.'};
  const next=D.units.find(u=>!rows.find(e=>e.id===u.id).taught&&u.prerequisites.every(p=>evidence(d,p,now).apply>=1))||D.units.find(u=>!rows.find(e=>e.id===u.id).taught);
- if(next)return {kind:'learn',unit:next.id,reason:'Explore the next method, see an example, then apply it yourself.'};
- const parked=rows.filter(e=>e.parked).sort((a,b)=>a.parkedUntil-b.parkedUntil)[0];if(parked)return {kind:'practice',unit:parked.id,reason:'Come back to a method that was set aside for a few days.'};
- return {kind:'mixed',reason:'Choose an unfamiliar mixed set or a reserved paper; review explanations with an adult.'};
+ if(next)return {kind:'learn',unit:next.id,reason:'Learn a new topic. Study the worked example, then try a question on your own.'};
+ const parked=rows.filter(e=>e.parked).sort((a,b)=>a.parkedUntil-b.parkedUntil)[0];if(parked)return {kind:'practice',unit:parked.id,reason:'Try this topic again. It was put aside for a few days.'};
+ return {kind:'mixed',reason:'You have learnt every topic. Try a paper, then go through your working with a grown-up.'};
 }
 function freshSeed(d,id,form,rev=REV){let value=Math.floor(Math.random()*4294967296),q=B.make(id,form,value,rev);for(let tries=0;tries<64&&d.seen[q.fingerprint];tries++){value=(value+1)>>>0;q=B.make(id,form,value,rev);}return value;}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
@@ -132,12 +132,12 @@ function respond(d,now=Date.now()){
  const v=d.draft;if(!v)return {ok:false};const q=question(v),old=d.attempts.find(x=>x.id===v.id);if(old?.correct)return {ok:true,attempt:old,already:true};
  if(!v.answer.trim())return {ok:false,reason:'Enter an answer first.'};
  if(B.validAnswer&&!B.validAnswer(q,v.answer))return {ok:false,reason:B.invalidReason?.(q,v.answer)||'Select a conclusion (or every statement) and a reason before checking. This incomplete response has not been counted as an error.'};
- if(typeof q.answer!=='string'&&!B.parse(v.answer,q.suffix))return {ok:false,reason:'Check the answer format. Use a number, fraction, or an exact expression with π. This has not been counted as a mathematical error.'};
+ if(typeof q.answer!=='string'&&!B.parse(v.answer,q.suffix))return {ok:false,reason:'Check the format of your answer. Use a number, a fraction or an answer in terms of π. This is not counted as a mistake.'};
  // On new-twist and mixed questions, a one-line plan comes before the first check (not counted as a mistake).
- if(options.requireMethod&&['transfer','mixed'].includes(v.phase)&&!old&&v.working.trim().length<6&&!v.strokes.length)return {ok:false,method:true,reason:'Before checking, write one line about your plan, for example “work backwards from the end” or “list the cases”. This has not been counted as a mistake.'};
+ if(options.requireMethod&&['transfer','mixed'].includes(v.phase)&&!old&&v.working.trim().length<6&&!v.strokes.length)return {ok:false,method:true,reason:'Write your plan in one sentence before you check, for example “Work backwards from the end.” This is not counted as a mistake.'};
  const previous=old?.responses.at(-1);
- if(previous&&previous.answer.trim()===v.answer.trim()&&(previous.working||'')===v.working&&JSON.stringify(previous.strokes||[])===JSON.stringify(v.strokes))return {ok:false,duplicate:true,reason:'That answer and working are already recorded. Change your answer or explain a new step, or open help. No extra mistake was counted.'};
- if(old?.responses.length>=12)return {ok:false,reason:'Revisit the worked example, then try a fresh question.'};
+ if(previous&&previous.answer.trim()===v.answer.trim()&&(previous.working||'')===v.working&&JSON.stringify(previous.strokes||[])===JSON.stringify(v.strokes))return {ok:false,duplicate:true,reason:'You have already given this answer. Change your answer or add a new step to your working. No extra mistake is counted.'};
+ if(old?.responses.length>=12)return {ok:false,reason:'Study the worked example, then try a new question.'};
  const responses=[...(old?.responses||[]),{at:now,answer:v.answer,working:v.working,strokes:copy(v.strokes)}];
  const a=record(d,{...v,mode:'practice',updatedAt:now,responses});
  if(v.phase==='redo'&&safeId(v.redoOf)){const e=d.errors[v.redoOf]||{};d.errors[v.redoOf]={...e,lastTry:now,redoneAt:a.firstCorrect?now:e.redoneAt||0};}

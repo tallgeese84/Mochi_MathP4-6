@@ -1,3 +1,15 @@
+# v7.3.0 — A more visual, streamlined app
+
+- **One way round the app.** A bottom bar with four places: Today, Learn, Papers and Mochi. It hides during a timed paper so it cannot be left by accident. The path tabs are shorter: Overview, Topics, Papers and Classroom.
+- **A focused question screen.** The question appears in a clear, rounded font (no more serif) with a large answer box. Check, Hint and Solution sit in a bar that stays within reach. Working folds into “Show your working” and opens by itself for challenge and mixed questions. On touch screens, a number pad (with fraction bar, space and π) replaces the device keyboard, which can still be chosen.
+- **Hints come one at a time.** Hint 1 gives the idea to use, Hint 2 gives the first step, and the next tap shows the worked solution. Every hint is still recorded as help.
+- **Feedback you can see.** A correct answer sends up paw stamps; solving it on your own adds a “Solved on your own” badge. A wrong answer gives the card a gentle shake. All of this respects the device’s reduced-motion setting.
+- **Progress as pictures.** Each topic shows five steps as dots (Learn, Try, New twist, Remember, Mixed) that fill with paw prints. The Topics page is a skill map: each strand is a trail of numbered rings that fill as a topic is mastered, with challenge topics starred and finished ones stamped.
+- **Lessons step by step.** Ideas appear one card at a time (“Read on”). Worked examples reveal one step at a time, with “Think first: what is the next step?” before each.
+- **Papers at a glance.** A timeline shows the six mock papers between today and the selection test. MOE-style instructions (“Read each question carefully. Show your working clearly in the space provided.”) appear on the Papers page, and mock questions show their marks in brackets, for example [3 marks].
+- **MOE-style English.** Messages Euna sees now use the register of Singapore classrooms and exam papers: “Well done! You solved it on your own.”, “Not quite. Try the quick check below, then try again.”, “Study the worked solution, then try a similar question.”, “Show your working clearly.”, “Leave your answer in terms of π.”, “I made a careless mistake”. Explanations for adults moved into “For grown-ups” sections.
+- Learning records, sync, marks and the v7.2.0 learning rules are unchanged.
+
 # v7.2.0 — DSA readiness
 
 - **Gets through the whole course.** Reviews now come back after growing gaps (7, 14, 30, 60, 90 days) instead of every week forever. A method missed four times is set aside for a few days instead of blocking the path. Starting checks and papers count as evidence. In simulations, a learner who misses 30% of first tries now reaches all 40 maths units in about five to six months; before, the challenge units were never reached.

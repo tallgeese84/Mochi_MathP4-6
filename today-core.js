@@ -14,25 +14,25 @@ function task(state,subject,now=Date.now()){
  // the learner deliberately continues; never discard an unsent or incorrect draft.
  const draft=d.draft,answer=draft&&d.attempts.find(a=>a.id===draft.id);
  const recent=Object.entries(d.lessons).filter(([id,l])=>E.unit(id)&&l.visited.length&&!l.completedAt).sort((a,b)=>b[1].lastViewedAt-a[1].lastViewedAt)[0];
- if(draft&&!answer?.correct&&draft.phase==='mixed')return {subject,kind:'mixed',title:'Mixed set',resume:true,touched:draft.updatedAt||draft.at,detail:'Your mixed-set question and working are saved. No topic labels: decide which method it needs.'};
- if(draft&&!answer?.correct&&draft.phase==='redo')return {subject,kind:'redo',attempt:draft.redoOf,unit:draft.unit,title:'Fix a past mistake',resume:true,touched:draft.updatedAt||draft.at,detail:'Your saved second try is waiting.'};
+ if(draft&&!answer?.correct&&draft.phase==='mixed')return {subject,kind:'mixed',title:'Mixed practice',resume:true,touched:draft.updatedAt||draft.at,detail:'Your question is saved. Decide which method to use.'};
+ if(draft&&!answer?.correct&&draft.phase==='redo')return {subject,kind:'redo',attempt:draft.redoOf,unit:draft.unit,title:'Second try',resume:true,touched:draft.updatedAt||draft.at,detail:'Your saved question is waiting.'};
  if(draft&&!answer?.correct){
   const bridge=subject==='maths'&&answer?.responses.length&&E.prerequisite?.(d,draft.unit,now);
   if(bridge)return {subject,kind:'lesson',unit:bridge,title:E.unit(bridge).title,resume:true,touched:draft.updatedAt||draft.at,detail:'Build this idea visually first. Your earlier question and working stay saved.'};
   if(recent&&recent[0]===draft.unit&&recent[1].lastViewedAt>draft.updatedAt)return {subject,kind:'lesson',unit:recent[0],title:E.unit(recent[0]).title,resume:true,touched:recent[1].lastViewedAt,detail:'Continue your saved lesson, then try the idea.'};
-  return {subject,kind:'question',unit:draft.unit,title:E.unit(draft.unit).title,resume:true,touched:draft.updatedAt||draft.at,detail:'Your answer and working are saved. Pick up where you stopped.'};
+  return {subject,kind:'question',unit:draft.unit,title:E.unit(draft.unit).title,resume:true,touched:draft.updatedAt||draft.at,detail:'Your answer and working are saved. Continue where you stopped.'};
  }
  if(recent)return {subject,kind:'lesson',unit:recent[0],title:E.unit(recent[0]).title,resume:true,touched:recent[1].lastViewedAt,detail:'Continue your saved lesson, then try the idea.'};
  const r=E.recommend({...s,[key[subject]]:{...d,draft:null}},now);
- if(r.kind==='mixed-set')return {subject,kind:'mixed',title:'Mixed set',resume:!!(d.mixed&&!d.mixed.completedAt),touched:d.mixed&&!d.mixed.completedAt?d.mixed.at:0,detail:r.due?'Some methods are due for a review. A few questions with no topic labels: decide which method each one needs.':'A few questions from methods you know, with no topic labels: decide which method each one needs.'};
- if(r.kind==='redo')return {subject,kind:'redo',attempt:r.attempt,unit:r.unit,title:'Fix a past mistake',resume:false,touched:0,detail:'A question you missed a few days ago. Read it fresh and try again.'};
+ if(r.kind==='mixed-set')return {subject,kind:'mixed',title:'Mixed practice',resume:!!(d.mixed&&!d.mixed.completedAt),touched:d.mixed&&!d.mixed.completedAt?d.mixed.at:0,detail:r.due?'Revise topics you have learnt. Decide which method to use for each question.':'Questions from different topics. Decide which method to use for each one.'};
+ if(r.kind==='redo')return {subject,kind:'redo',attempt:r.attempt,unit:r.unit,title:'Second try',resume:false,touched:0,detail:'Try again a question you got wrong a few days ago.'};
  if(r.kind==='mixed'){
   // Home never opens or previews a reserved paper. When the course is explored,
   // choose existing unreserved practice with the least recent evidence instead.
   const u=E.D.units.map(u=>E.evidence(d,u.id,now)).sort((a,b)=>a.last-b.last)[0];
   return {subject,kind:'practice',unit:u.id,title:u.title,resume:false,touched:0,detail:'Apply a familiar method to a fresh practice question.'};
  }
- return {subject,kind:r.kind==='learn'?'lesson':r.kind==='recall'?'recall':'practice',unit:r.unit,title:E.unit(r.unit).title,resume:false,touched:0,detail:r.kind==='learn'?'Explore one idea, see it worked out, then have a go.':r.kind==='recall'?'Revisit an idea with the lesson closed. Help is there if you need it.':'Try the next question selected from your learning evidence.'};
+ return {subject,kind:r.kind==='learn'?'lesson':r.kind==='recall'?'recall':'practice',unit:r.unit,title:E.unit(r.unit).title,resume:false,touched:0,detail:r.kind==='learn'?'Learn a new topic, study the worked example, then try a question.':r.kind==='recall'?'Revise this topic without looking at the lesson.':'Try the next question.'};
 }
 function model(state,now=Date.now()){
  const p=state.planner||P.fresh(),date=P.localDay(now),time=P.elapsed(p,date);

@@ -20,17 +20,18 @@ function hintBox(level,goal,steps){
 function hintLabel(level){return level===0?'Hint':level===1?'Another hint':'Show the solution';}
 /* Number pad for touch screens, so the device keyboard does not cover the question. */
 function keypad(P,pi=false){
- const keys=['7','8','9','4','5','6','1','2','3','0','.','/',' ',pi?'π':'−','⌫'];
+ const keys=['7','8','9','⌫','4','5','6','/','1','2','3','.','0',' ',pi?'π':'−'];
  return `<div class="ux-keypad" id="${P}Keypad" hidden role="group" aria-label="Number pad">${keys.map(k=>`<button type="button" data-key="${esc(k)}" aria-label="${k===' '?'space':k==='⌫'?'delete':k==='/'?'fraction bar':k}">${k===' '?'␣':esc(k)}</button>`).join('')}<button type="button" data-key="kbd" class="ux-key-kbd" aria-label="Use the keyboard instead">⌨︎</button></div>`;
 }
 function wireKeypad(P,onChange){
  const pad=document.getElementById(P+'Keypad'),input=document.getElementById(P+'Answer');if(!pad||!input||input.disabled)return;
  let coarse=false;try{coarse=root.matchMedia?.('(pointer:coarse)').matches;}catch(_){}
  let useKeyboard=false;try{useKeyboard=root.localStorage?.getItem('mochi-keyboard')==='1';}catch(_){}
+ document.body.classList.remove('ux-keypad-on');
  if(!coarse||useKeyboard){pad.hidden=true;return;}
- pad.hidden=false;input.setAttribute('inputmode','none');
+ pad.hidden=false;document.body.classList.add('ux-keypad-on');input.setAttribute('inputmode','none');
  for(const b of pad.querySelectorAll('[data-key]'))b.onclick=()=>{const k=b.dataset.key;
-  if(k==='kbd'){try{root.localStorage?.setItem('mochi-keyboard','1');}catch(_){}pad.hidden=true;input.setAttribute('inputmode','text');input.focus();return;}
+  if(k==='kbd'){try{root.localStorage?.setItem('mochi-keyboard','1');}catch(_){}pad.hidden=true;document.body.classList.remove('ux-keypad-on');input.setAttribute('inputmode','text');input.focus();return;}
   const v=input.value;input.value=k==='⌫'?v.slice(0,-1):v+(k==='−'?'-':k);onChange?.();};
 }
 /* Paw stamps when an answer is right; a gentle shake when it is not yet right. */
