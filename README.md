@@ -87,6 +87,14 @@ The website and installed home-screen app share the same code and release.
 After publication, refresh online and confirm the version in the header matches `release.json`. Do not
 clear app storage or reinstall to update: retain the existing learning history.
 
+## Private nightly priorities
+
+**v7.7.0 — 7 October 2026.** A dated private plan can now guide Daily Quests without
+daily code releases. One-time [relay setup](tools/NIGHTLY_PLAN_SETUP.md) is required;
+the old write-only relay is not upgraded by a GitHub deployment. Saved work, due
+recall, time goals and existing marking remain authoritative. Missing or expired plans
+fall back to the existing adaptive route. See [schema and privacy](docs/NIGHTLY_PLAN.md).
+
 ## Weekly learning and Mochi’s growth
 
 The compact Today panel adds separate Maths and Science clocks and optional daily

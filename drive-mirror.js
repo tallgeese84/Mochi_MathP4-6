@@ -85,7 +85,7 @@ function mount(){
   document.getElementById('driveMirrorShow').onclick=()=>revealSecret(document.getElementById('driveMirrorSecret').type==='password');
   document.getElementById('driveMirrorCopy').onclick=copySecret;
   document.getElementById('driveMirrorGenerate').onclick=()=>{const v=randomSecret();document.getElementById('driveMirrorSecret').value=v;status('Secret generated. Tap Copy secret, then paste it into the Value beside MIRROR_SECRET in Google Apps Script. Save settings here after entering the web-app URL.');};
-  document.getElementById('driveMirrorSave').onclick=()=>{const u=document.getElementById('driveMirrorUrl').value.trim(),s=document.getElementById('driveMirrorSecret').value.trim();if(!/^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/i.test(u)){status('Paste the deployed Apps Script /exec URL.','bad');return;}if(s.length<24){status('Mirror secret must be at least 24 characters.','bad');return;}set(URL_KEY,u);set(SECRET_KEY,s);status('Drive mirror settings saved.','ok');paint();};
+  document.getElementById('driveMirrorSave').onclick=()=>{const u=document.getElementById('driveMirrorUrl').value.trim(),s=document.getElementById('driveMirrorSecret').value.trim();if(!/^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/i.test(u)){status('Paste the deployed Apps Script /exec URL.','bad');return;}if(s.length<24){status('Mirror secret must be at least 24 characters.','bad');return;}set(URL_KEY,u);set(SECRET_KEY,s);status('Drive mirror settings saved.','ok');paint();document.dispatchEvent(new Event('mochi:mirror-settings'));};
   document.getElementById('driveMirrorNow').onclick=()=>mirrorNow('manual');
   paint();
 }

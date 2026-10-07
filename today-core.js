@@ -23,6 +23,7 @@ function task(state,subject,now=Date.now()){
   return {subject,kind:'question',unit:draft.unit,title:E.unit(draft.unit).title,resume:true,touched:draft.updatedAt||draft.at,detail:'Your answer and working are saved. Continue where you stopped.'};
  }
  if(recent)return {subject,kind:'lesson',unit:recent[0],title:E.unit(recent[0]).title,resume:true,touched:recent[1].lastViewedAt,detail:'Continue your saved lesson, then try the idea.'};
+ const nightly=root.MochiNightlyPlan?.next(s,subject,now);if(nightly)return nightly;
  const r=E.recommend({...s,[key[subject]]:{...d,draft:null}},now);
  if(r.kind==='mixed-set')return {subject,kind:'mixed',title:'Mixed practice',resume:!!(d.mixed&&!d.mixed.completedAt),touched:d.mixed&&!d.mixed.completedAt?d.mixed.at:0,detail:r.due?'Revise topics you have learnt. Decide which method to use for each question.':'Questions from different topics. Decide which method to use for each one.'};
  if(r.kind==='redo')return {subject,kind:'redo',attempt:r.attempt,unit:r.unit,title:'Second try',resume:false,touched:0,detail:'Try again a question you got wrong a few days ago.'};

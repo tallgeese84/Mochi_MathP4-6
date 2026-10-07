@@ -36,7 +36,7 @@ function open(kind='home',id,practicePhase){
  const skip=document.querySelector('.skip-link');if(skip){skip.href='#epTitle';skip.textContent='Skip to the learning activity';}
  $('epTitle')?.focus({preventScroll:true});
 }
-function nextRecommended(){if(root.MochiTodayUI?.atBoundary('maths'))return;const r=E.recommend(S);if(r.kind==='paper'){open('paper',r.paper);return;}if(r.kind==='resume'){if(data().draft.phase==='mixed'){mixed();return;}open('practice',data().draft.unit);return;}if(r.kind==='mixed-set'){mixed();return;}if(r.kind==='redo'){redo(r.attempt);return;}if(r.kind==='mixed'){if(root.MochiTodayUI)beginPractice(root.MochiToday.task(S,'maths').unit);else open('papers');return;}if(r.kind==='learn'){open('lesson',r.unit);return;}beginPractice(r.unit,r.kind==='recall'?'recall':undefined);}
+function nextRecommended(){if(root.MochiTodayUI?.atBoundary('maths'))return;if(root.MochiTodayUI?.routeNightly('maths'))return;const r=E.recommend(S);if(r.kind==='paper'){open('paper',r.paper);return;}if(r.kind==='resume'){if(data().draft.phase==='mixed'){mixed();return;}open('practice',data().draft.unit);return;}if(r.kind==='mixed-set'){mixed();return;}if(r.kind==='redo'){redo(r.attempt);return;}if(r.kind==='mixed'){if(root.MochiTodayUI)beginPractice(root.MochiToday.task(S,'maths').unit);else open('papers');return;}if(r.kind==='learn'){open('lesson',r.unit);return;}beginPractice(r.unit,r.kind==='recall'?'recall':undefined);}
 /* A short mixed set: no topic title, no method hint, so she decides which method fits. */
 function mixed(){
  if(root.MochiTodayUI?.atBoundary('maths'))return;capture(true);const d=data();
@@ -162,7 +162,7 @@ function wire(){
   for(const b of host.querySelectorAll('[data-concept]'))b.onclick=()=>{E.concept(data(),view.unit,+b.dataset.concept);render();save(S);};
   $('epLessonPrevious').onclick=()=>{capture();E.visit(data(),view.unit,l.page-1);render();save(S);};
   if($('epLessonNext'))$('epLessonNext').onclick=()=>{capture();E.visit(data(),view.unit,l.page+1);render();save(S);};
-  if($('epCompleteLesson'))$('epCompleteLesson').onclick=()=>{capture();if(E.complete(data(),view.unit)){const id=view.unit;save(S);beginPractice(id,'guided');}};
+  if($('epCompleteLesson'))$('epCompleteLesson').onclick=()=>{capture();if(E.complete(data(),view.unit)){const id=view.unit;root.MochiNightlyPlan?.lessonDone('maths',id);save(S);if(!root.MochiTodayUI?.atBoundary('maths')&&!root.MochiTodayUI?.routeNightly('maths'))beginPractice(id,'guided');}};
   if($('epResumeDraft'))$('epResumeDraft').onclick=()=>open('practice',data().draft.unit);
   $('epLessonNotes').oninput=()=>capture(true);
  }
