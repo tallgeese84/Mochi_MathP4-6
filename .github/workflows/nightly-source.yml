@@ -10,7 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: git archive 1d2b27cb76876c4f9e94eebae14ca56b0461290b | gzip > "$RUNNER_TEMP/mochi-baseline.tar.gz"
+        with:
+          ref: 1d2b27cb76876c4f9e94eebae14ca56b0461290b
+      - run: git archive HEAD | gzip > "$RUNNER_TEMP/mochi-baseline.tar.gz"
       - uses: actions/upload-artifact@v4
         with:
           name: nightly-plan-baseline
