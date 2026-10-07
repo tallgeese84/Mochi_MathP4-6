@@ -21,7 +21,7 @@ jobs:
           python3 scripts/assemble-nightly.py
           git add -A
           echo "Production tree: $(git write-tree)"
-          test "$(git write-tree)" = '233bdfd693f7f95d03b73737af886e14f70190d0'
+          test "$(git write-tree)" = 'e86bef1f72772d57fe63acf80c73f766f2bd4c2d'
       - run: npm ci --ignore-scripts
       - name: Full regression and content validation
         run: |
@@ -53,7 +53,7 @@ jobs:
         run: |
           set -euo pipefail
           git add -A
-          test "$(git write-tree)" = '233bdfd693f7f95d03b73737af886e14f70190d0'
+          test "$(git write-tree)" = 'e86bef1f72772d57fe63acf80c73f766f2bd4c2d'
           git diff --check --cached
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'

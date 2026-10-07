@@ -14,7 +14,7 @@ assert hashlib.sha256(raw).hexdigest()=='125cdae23c95ad4eca17e06cbea6d8eb7812aa4
 changes=json.loads(raw)
 assert len(changes)==22 and len({c['path'] for c in changes})==22
 corrections=json.loads(Path('.nightly-corrections.json').read_text())
-assert len(corrections)==4
+assert len(corrections)==5
 for change in changes+corrections:
     name=change['path']; relative=PurePosixPath(name)
     assert not relative.is_absolute() and '..' not in relative.parts
