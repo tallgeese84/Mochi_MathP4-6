@@ -3,7 +3,7 @@
 (function(root){
 'use strict';
 const T=root.MochiToday,Q=root.MochiQuestRewards,F=root.MochiCatFriends,P=root.MochiPlanner,$=id=>document.getElementById(id),names=T.names;
-let home,bar,menu,guided=false,transition=false,lastHome='',queued=null,lastFocus=null,rewarding=false,rewardNote='';
+let home,bar,menu,guided=false,transition=false,lastHome='',queued=null,lastFocus=null,rewarding=false,rewardNote='',nightlyLaunching=false;
 const engines=()=>({maths:root.MochiEntrance,science:root.MochiSciencePath});
 const U=subject=>subject==='maths'?root.MochiEntranceUI:root.MochiSciencePathUI;
 const stateKey=subject=>subject==='maths'?'entrance':'sciencePath';
@@ -39,8 +39,10 @@ function open(){
  transition=false;document.dispatchEvent(new Event('mochi:activity'));$('todayTitle').focus({preventScroll:true});
  root.scrollTo?.({top:0,behavior:'instant'});
 }
-function launch(){
- const m=T.model(S),t=m.next;if(!t){leave();studioShow('room');return;}
+function launch(){root.MochiNightlyPlan?.adopt();runTask(T.model(S).next);}
+function runTask(t){
+ if(!t){leave();studioShow('room');return;}
+ nightlyLaunching=true;try{
  closeMenu();leave();guided=true;document.body.classList.add('today-guided');
  const ui=U(t.subject),E=engines()[t.subject],d=S[stateKey(t.subject)];
  if(t.kind==='paper')ui.open('paper',t.paper);
@@ -52,8 +54,16 @@ function launch(){
   if(d?.draft&&d.attempts.find(a=>a.id===d.draft.id)?.correct)E.finishPractice(d);
   ui.practice(t.unit,t.kind==='recall'?'recall':t.phase);
  }
+ root.MochiNightlyPlan?.bind(t,ui.view(),S[stateKey(t.subject)]?.draft);
  if(t.kind!=='paper')root.MochiPlanUI?.start(t.subject);
  paint();root.scrollTo?.({top:0,behavior:'instant'});
+ }finally{nightlyLaunching=false;}
+}
+function routeNightly(subject){
+ if(!guided||nightlyLaunching)return false;
+ root.MochiNightlyPlan?.boundary(S,subject);root.MochiNightlyPlan?.adoptAtBoundary(S,subject);
+ if(!root.MochiNightlyPlan?.active())return false;
+ const task=T.task(S,subject);if(!task.nightly)return false;runTask(task);return true;
 }
 function launchBonus(subject=''){
  if(!Q)return;const task=Q.bonusTask(S,Date.now(),subject);if(!task)return;const status=Q.status(S);
@@ -82,7 +92,8 @@ function collectBonus(){
  lastHome='';setTimeout(()=>{rewarding=false;paint();},0);
 }
 function atBoundary(subject){
- if(!guided)return false;
+ if(!guided||nightlyLaunching)return false;
+ root.MochiNightlyPlan?.boundary(S,subject);
  const b=T.model(S).blocks.find(b=>b.subject===subject);
  if(!b?.done)return false;
  open();return true;
@@ -136,6 +147,7 @@ function paintWide(){
  if($('todayMockOpen'))$('todayMockOpen').onclick=()=>{leave();U(mock.subject).open('papers');};
 }
 function paint(){
+ root.MochiNightlyPlan?.paint();
  if(!home)return;
  const m=T.model(S),v=current(),bonus=Q?.status(S),bonusOptions=Q?.bonusOptions?.(S)||[],bonusTask=bonusOptions[0]||Q?.bonusTask(S),cat=F?.report?.(S),study=P?P.elapsed(P.init(S)):null;
  // Existing modules can navigate by their own controls. Never leave two main views visible.
@@ -180,7 +192,7 @@ function paint(){
 function init(){
  if(!T||!root.MochiPlanUI||!U('maths')||!U('science')||$('todayHome'))return;
  home=document.createElement('main');home.id='todayHome';home.hidden=true;
- home.innerHTML=`<div class="today-layout"><div class="today-main"><div class="today-greeting"><img src="euna-avatar.webp" width="44" height="44" alt=""><p id="todayDate"></p></div><h1 id="todayTitle" tabindex="-1"></h1><p id="todayIntro" class="today-intro"></p><section class="today-card" aria-label="Today’s study plan"><div class="today-card-top"><span id="todayNowLabel" class="today-eyebrow"></span><span id="todayTaskSubject" class="today-subject"></span></div><h2 id="todayTaskTitle"></h2><p id="todayTaskDetail"></p><button id="todayStart" class="today-primary" type="button">Start next quest</button><div id="todayQuestStrip" class="today-quest-strip" aria-label="Daily quest progress"></div><div class="today-progress"><span id="todayProgress"></span><progress id="todayProgressBar" max="2" value="0" aria-label="Daily study time goals reached"></progress></div></section><section id="todayBonus" class="today-bonus" hidden><div><strong>Bonus quest</strong><small id="todayBonusText"></small></div><span id="todayBonusCoins" class="today-bonus-coins"></span><p id="todayCatBonus" class="today-cat-bonus"></p><div id="todayBonusChoices" class="today-bonus-choices"></div></section><p id="todayNote" class="today-note"></p><section id="todayWide" class="today-wide" aria-label="Explore and wonder"></section></div><aside class="today-companion" aria-label="Mochi and rewards"><button id="todayMochi" class="today-mochi" type="button"><span class="today-mochi-says" id="todayMochiSays"></span><span class="mochi-greet" id="todayMochiGreet"><img id="todayMochiImage" src="mochi-flat-avatar.svg" width="150" height="150" alt=""></span><span class="today-mochi-visit">Visit Mochi’s room <span aria-hidden="true">→</span></span></button><div class="today-stats"><span class="today-stat"><span class="today-stat-icon" aria-hidden="true">🪙</span><strong id="todayCoins">0</strong><small>coins</small></span><span class="today-stat"><span class="today-stat-icon" aria-hidden="true">🐾</span><strong id="todayCatPoints">0</strong><small>Cat Points</small></span></div><div id="todayNextCat" class="today-next-cat"></div></aside></div>`;
+ home.innerHTML=`<div class="today-layout"><div class="today-main"><div class="today-greeting"><img src="euna-avatar.webp" width="44" height="44" alt=""><p id="todayDate"></p></div><h1 id="todayTitle" tabindex="-1"></h1><p id="todayIntro" class="today-intro"></p><section class="today-card" aria-label="Today’s study plan"><div class="today-card-top"><span id="todayNowLabel" class="today-eyebrow"></span><span id="todayTaskSubject" class="today-subject"></span></div><h2 id="todayTaskTitle"></h2><p id="todayTaskDetail"></p><button id="todayStart" class="today-primary" type="button">Start next quest</button><div id="todayQuestStrip" class="today-quest-strip" aria-label="Daily quest progress"></div><div class="today-progress"><span id="todayProgress"></span><progress id="todayProgressBar" max="2" value="0" aria-label="Daily study time goals reached"></progress></div></section><section id="todayBonus" class="today-bonus" hidden><div><strong>Bonus quest</strong><small id="todayBonusText"></small></div><span id="todayBonusCoins" class="today-bonus-coins"></span><p id="todayCatBonus" class="today-cat-bonus"></p><div id="todayBonusChoices" class="today-bonus-choices"></div></section><p id="todayNote" class="today-note"></p><p id="todayNightlyStatus" class="today-note" aria-live="polite"></p><section id="todayWide" class="today-wide" aria-label="Explore and wonder"></section></div><aside class="today-companion" aria-label="Mochi and rewards"><button id="todayMochi" class="today-mochi" type="button"><span class="today-mochi-says" id="todayMochiSays"></span><span class="mochi-greet" id="todayMochiGreet"><img id="todayMochiImage" src="mochi-flat-avatar.svg" width="150" height="150" alt=""></span><span class="today-mochi-visit">Visit Mochi’s room <span aria-hidden="true">→</span></span></button><div class="today-stats"><span class="today-stat"><span class="today-stat-icon" aria-hidden="true">🪙</span><strong id="todayCoins">0</strong><small>coins</small></span><span class="today-stat"><span class="today-stat-icon" aria-hidden="true">🐾</span><strong id="todayCatPoints">0</strong><small>Cat Points</small></span></div><div id="todayNextCat" class="today-next-cat"></div></aside></div>`;
  $('viewEntrance').before(home);
  bar=document.createElement('section');bar.id='todayFocusBar';bar.hidden=true;bar.setAttribute('aria-label','Current study time');bar.innerHTML='<button id="todayBack" type="button">← Today</button><div><strong id="todayFocusSubject"></strong><span id="todayFocusTime"></span><small id="todayFocusNote"></small></div><button id="todayTimer" type="button" aria-pressed="false">Pause time</button><button id="todayFinish" type="button" hidden>Back to today’s plan</button>';
  home.before(bar);
@@ -197,9 +209,10 @@ function init(){
  $('todayParent').onclick=()=>{closeMenu();$('adultBtn').click();};
  $('todayWeekly').onclick=()=>{closeMenu();focusOpen('sessionPanel',$('todayMore'));$('mochiFocusHome').open=true;$('mochiFocusHome').scrollIntoView({block:'nearest'});};
  const bind=()=>{$('studioHome').onclick=e=>{e.preventDefault();open();};};bind();
- root.MochiTodayUI={open,leave,launch,atBoundary,paint,visible:()=>!home.hidden,refresh:()=>{bind();lastHome='';open();}};
+ root.MochiTodayUI={open,leave,launch,atBoundary,routeNightly,paint,visible:()=>!home.hidden,refresh:()=>{bind();lastHome='';open();}};
  document.body.classList.add('today-enabled');
  document.addEventListener('mochi:activity',paint);
+ document.addEventListener('mochi:nightly-plan',()=>{lastHome='';paint();});
  document.addEventListener('mochi:state-saved',()=>{collectBonus();clearTimeout(queued);queued=setTimeout(paint,100);});
  document.addEventListener('mochi:cat-time-bonus',e=>{const s=e.detail?.subject,p=e.detail?.points||F?.DOUBLE_POINTS||2;rewardToast(`+${p} Cat Points · ${names[s]||'Study'} reached 2×!`);lastHome='';paint();});
  document.addEventListener('mochi:cloud-merged',()=>{bind();lastHome='';paint();});

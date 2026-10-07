@@ -1,5 +1,5 @@
 {
-  "version": "7.6.0",
-  "releasedOn": "2026-10-02",
-  "summary": "Keep each question\u2019s answer, notes and handwriting separate. Add smaller surface-area lessons, varied science questions and bounded repetition. Written-science feedback is provisional, with explanations saved for grown-up review before independent credit. Saved work, existing papers, time goals, cats and rewards are preserved."
+  "version": "7.7.0",
+  "releasedOn": "2026-10-07",
+  "summary": "Private nightly priorities can guide Daily Quests after the one-time Drive relay upgrade. Dated plans update as data, without daily code releases. Saved questions, scheduled reviews, time goals and learning records stay intact; missing plans use built-in learning."
 }

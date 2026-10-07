@@ -1,3 +1,7 @@
+# v7.7.0 — 2026-10-07
+
+Private, dated next-session plans can guide finite Maths/Science lesson and practice queues independently of app releases. Add body-authenticated read-only relay action, strict plan schema/date checks, safe-boundary adoption, offline fallback, parent controls and private read-back receipts. A one-time existing Apps Script relay deployment is required; publication alone does not establish tablet receipt. Preserve learning history, assessment questions/deadlines, minutes and rewards.
+
 # v7.4.0 — Moments of delight
 
 ## v7.6.0 — 2 October 2026

@@ -28,6 +28,7 @@ function build(state,version){
  if(root.MochiQuestRewards&&state.questRewards)data.questRewards=root.MochiQuestRewards.validate(state.questRewards);
  data.source={appVersion:version||'unknown',student:'Euna',timeZone:Intl.DateTimeFormat().resolvedOptions().timeZone||'unknown'};
  if(root.MochiPlanner){data.planner=root.MochiPlanner.validate(root.MochiPlanner.init(state));data.learningPlanReview=root.MochiPlanner.report(state);}
+ if(root.MochiNightlyPlan)data.nightlyPlanReview=root.MochiNightlyPlan.report();
  data.review={schema:1,maths:{...counts(data.learning.attempts),followUps:root.MochiRepair?.pending(data.learning).map(p=>({key:p.key,label:p.label,stage:p.stage,due:p.due,ready:p.ready}))||[]},science:counts(data.science?.attempts||[],true),
   limits:['Practice and diagnostic samples are not calibrated exam scores or percentiles.',
    'Separate independent answers from retries, hints, revealed solutions and guesses.',

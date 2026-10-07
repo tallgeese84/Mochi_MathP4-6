@@ -36,7 +36,7 @@ function open(kind='home',id,practicePhase){
  const skip=document.querySelector('.skip-link');if(skip){skip.href='#spTitle';skip.textContent='Skip to the learning activity';}
  $('spTitle')?.focus({preventScroll:true});
 }
-function nextRecommended(){if(root.MochiTodayUI?.atBoundary('science'))return;const r=E.recommend(S);if(r.kind==='paper'){open('paper',r.paper);return;}if(r.kind==='resume'){if(data().draft.phase==='mixed'){mixed();return;}open('practice',data().draft.unit);return;}if(r.kind==='mixed-set'){mixed();return;}if(r.kind==='redo'){redo(r.attempt);return;}if(r.kind==='mixed'){if(root.MochiTodayUI)beginPractice(root.MochiToday.task(S,'science').unit);else open('papers');return;}if(r.kind==='learn'){open('lesson',r.unit);return;}beginPractice(r.unit,r.kind==='recall'?'recall':r.phase);}
+function nextRecommended(){if(root.MochiTodayUI?.atBoundary('science'))return;if(root.MochiTodayUI?.routeNightly('science'))return;const r=E.recommend(S);if(r.kind==='paper'){open('paper',r.paper);return;}if(r.kind==='resume'){if(data().draft.phase==='mixed'){mixed();return;}open('practice',data().draft.unit);return;}if(r.kind==='mixed-set'){mixed();return;}if(r.kind==='redo'){redo(r.attempt);return;}if(r.kind==='mixed'){if(root.MochiTodayUI)beginPractice(root.MochiToday.task(S,'science').unit);else open('papers');return;}if(r.kind==='learn'){open('lesson',r.unit);return;}beginPractice(r.unit,r.kind==='recall'?'recall':r.phase);}
 /* A short mixed set: no topic title, no method hint, so she decides which method fits. */
 function mixed(){
  if(root.MochiTodayUI?.atBoundary('science'))return;capture(true);const d=data();
@@ -206,7 +206,7 @@ function wire(){
   for(const b of host.querySelectorAll('[data-concept]'))b.onclick=()=>{E.concept(data(),view.unit,+b.dataset.concept);render();save(S);};
   $('spLessonPrevious').onclick=()=>{capture();E.visit(data(),view.unit,l.page-1);render();save(S);};
   if($('spLessonNext'))$('spLessonNext').onclick=()=>{capture();E.visit(data(),view.unit,l.page+1);render();save(S);};
-  if($('spCompleteLesson'))$('spCompleteLesson').onclick=()=>{capture();if(E.complete(data(),view.unit)){const id=view.unit;save(S);beginPractice(id,'guided');}};
+  if($('spCompleteLesson'))$('spCompleteLesson').onclick=()=>{capture();if(E.complete(data(),view.unit)){const id=view.unit;root.MochiNightlyPlan?.lessonDone('science',id);save(S);if(!root.MochiTodayUI?.atBoundary('science')&&!root.MochiTodayUI?.routeNightly('science'))beginPractice(id,'guided');}};
   if($('spResumeDraft'))$('spResumeDraft').onclick=()=>open('practice',data().draft.unit);
   $('spLessonNotes').oninput=()=>capture(true);
  }
