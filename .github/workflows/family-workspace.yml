@@ -1,0 +1,35 @@
+name: Family nightly source workspace
+on:
+  push:
+    branches: [codex/family-nightly-objectives]
+    paths: [.github/workflows/family-workspace.yml]
+permissions:
+  contents: read
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: df59148c485a55e189cbbb4db774055f72d2584b
+          path: mochi
+      - uses: actions/checkout@v4
+        with:
+          repository: tallgeese84/HanaP3Math
+          ref: e2b61675e543dbad3a96b7f85cc49dabd180634e
+          path: hana
+      - uses: actions/checkout@v4
+        with:
+          repository: tallgeese84/PokemonNumbers
+          ref: 1398fca8aac1b840c21741485b39f0106b048548
+          path: jonah
+      - run: |
+          mkdir -p "$RUNNER_TEMP/family-source"
+          for r in mochi hana jonah; do
+            git -C "$r" archive HEAD | gzip > "$RUNNER_TEMP/family-source/$r.tar.gz"
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: family-nightly-baseline
+          path: ${{ runner.temp }}/family-source
+          retention-days: 1
