@@ -49,14 +49,36 @@ apply the supplemental reader and single dispatch line documented in HanaP3Math'
 LAST_EXPORT_AT, original initializer and other settings. Do not migrate it to
 shared weekly storage merely because a shared endpoint exists.
 
+## Owner setup and saved-source check
+
+The owner approved the missing plan-document settings, Docs authorization if
+needed, and updating the same deployment after the read-only check passes.
+The owner copied relay 1.2.0 into Code.gs, removed the duplicate old script from
+the editor, and supplied a screenshot showing all three plan property names.
+Only document-ID prefixes were visible; the subsequent checks establish access.
+
+The October 8, 5:23 PM editor log reports recognised existing Euna and Jonah
+mirrors and a readable Euna plan for October 8, revision 1. No Hana mirror was
+found in this relay's configured folder. Do not create replacement history or
+infer no Hana activity; verify her actual saved app connection in stage 2.
+
+Both sibling diagnostics reported `readable:false`, which does not distinguish
+an empty plan from a read failure. The two private plan Docs contained JSON null
+when read separately through Drive. The tested editor-only companion
+`family-plan-access-check.gs` supplies explicit `readOk` and `state` results
+without modifying relay 1.2.0, settings or learner data. Its live result is pending.
+
 ## Status
 
 Implementation and app integrations are on the existing draft review branches.
 No app PR has been merged or deployed by this work. Shared relay 1.2.0 has not
-been deployed. No Google properties, permissions, secrets, plan documents,
-nightly schedules or learner data were changed. Actual authenticated uploads,
+been deployed by this work; the owner has prepared its saved source and plan
+settings, but no updated deployment has been verified. No secrets, sharing,
+plan documents, nightly schedules or learner data were changed by this work.
+Actual authenticated uploads,
 live plan delivery, app adoption and subsequent practice remain separate checks.
 
-Google deployment, permission/property changes, scheduled plan writes and
-learner-data writes still require the owner's explicit approval. Daily plans
-remain private data and require no daily GitHub commits or app-version changes.
+The approved Google configuration/deployment work must retain the existing URL,
+secret, upload folders and sharing. Daily plans remain private data and require
+no daily GitHub commits or app-version changes. No fabricated progress uploads
+may be used as live tests.

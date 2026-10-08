@@ -4,6 +4,7 @@ const path=require('node:path'),root=__dirname;
 const original=fs.readFileSync(path.join(root,'family-original.gs'),'utf8');
 const corrected=fs.readFileSync(path.join(root,'../family-drive-mirror.gs'),'utf8');
 const eunaOnly=fs.readFileSync(path.join(root,'euna-only-v7.7.0.gs'),'utf8');
+const accessCheck=fs.readFileSync(path.join(root,'../family-plan-access-check.gs'),'utf8');
 const NOW=Date.parse('2026-10-08T12:00:00.000Z'),SECRET='synthetic-test-secret-not-a-real-credential';
 const clone=x=>JSON.parse(JSON.stringify(x));
 function plan(){return {schema:1,id:'synthetic-plan-2026-10-08',revision:1,student:'Euna',timeZone:'America/Chicago',reviewedDate:'2026-10-07',sessionDate:'2026-10-08',generatedAt:'2026-10-08T05:10:00.000Z',sourceExportedAt:'2026-10-08T01:00:00.000Z',subjects:{maths:{focus:'Identify the requested faces.',steps:[{kind:'lesson',unit:'geo-face-pairs'},{kind:'practice',unit:'geo-face-pairs',phase:'guided',count:1},{kind:'practice',unit:'geo-face-pairs',phase:'apply',count:2}]},science:{focus:'Change one factor at a time.',steps:[{kind:'lesson',unit:'fairtest'},{kind:'practice',unit:'fairtest',phase:'apply',count:1}]}}};}
@@ -75,6 +76,29 @@ test('Chicago week naming matches original around DST and year rollover',()=>{fo
 
 function siblingPlan(student){const p=plan();p.student=student;p.id=student.toLowerCase()+'-nightly-2026-10-08';p.subjects={maths:{focus:'Practise the next small step.',skills:student==='Hana'?['p3-place']:['sub']}};if(student==='Jonah')p.subjects.reading={focus:'Blend sounds into a word.',sounds:['s','a'],words:['sat']};return p;}
 function siblingEnv(student,options={}){const e=env(corrected,options),key=student.toUpperCase()+'_NIGHTLY_PLAN_DOC_ID';e.values[key]='fixture-'+student;e.documents.set('fixture-'+student,{mime:'document',text:JSON.stringify(siblingPlan(student))});return e;}
+for(const student of ['Hana','Jonah']) for(const scenario of ['available','null','blank','unconfigured','wrong-id','public','bad-json','wrong-child','docs-error']) {
+ test(student+': editor access check distinguishes '+scenario+' without writes or private logging',()=>{
+  const e=siblingEnv(student,{docsError:scenario==='docs-error'}),key=student.toUpperCase()+'_NIGHTLY_PLAN_DOC_ID',doc=e.documents.get('fixture-'+student);
+  if(scenario==='null')doc.text='null';
+  if(scenario==='blank')doc.text='  ';
+  if(scenario==='unconfigured')delete e.values[key];
+  if(scenario==='wrong-id')e.values[key]='fixture-missing';
+  if(scenario==='public')doc.sharing='ANYONE';
+  if(scenario==='bad-json')doc.text='{';
+  if(scenario==='wrong-child'){const p=siblingPlan(student);p.student='Euna';doc.text=JSON.stringify(p);}
+  const before=clone(e.values),files=e.dump();
+  vm.runInContext(accessCheck,e.context);
+  const r=clone(e.context.checkSiblingPlanAccess()),ok=['available','null','blank'].includes(scenario);
+  assert.equal(r.deploymentVerified,false);
+  assert.deepEqual(r.plans[student],{configured:scenario!=='unconfigured',readOk:ok,state:ok?(scenario==='available'?'available':'empty'):'unavailable'});
+  assert.deepEqual(e.values,before);
+  assert.deepEqual(e.dump(),files);
+  assert.equal(e.writes.length,0);
+  assert(!e.calls.some(c=>['folder','lock','tryLock','releaseLock'].includes(c[0])));
+  const logged=e.logs.join('');
+  for(const privateValue of [SECRET,'fixture-',siblingPlan(student).subjects.maths.focus,siblingPlan(student).id])assert(!logged.includes(privateValue));
+ });
+}
 const siblingRead=(e,student,extra={})=>e.request({action:'read'+student+'NextSession',secret:SECRET,...extra});
 for(const student of ['Hana','Jonah']){
  test(student+': fixed private route returns only that child without writes, locks or settings changes',()=>{const e=siblingEnv(student),before=clone(e.values);const r=siblingRead(e,student);assert.equal(r.ok,true);assert.equal(r.service,'family-learning-mirror');assert.equal(r.student,student);assert.deepEqual(r.plan,siblingPlan(student));assert.deepEqual(e.values,before);assert.equal(e.writes.length,0);assert.deepEqual(e.calls,[['docfile','fixture-'+student],['doc','fixture-'+student]]);assert(read(e).ok);});

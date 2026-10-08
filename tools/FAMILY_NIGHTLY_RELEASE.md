@@ -12,7 +12,8 @@ See [the current connection audit](RELAY_CONNECTION_AUDIT.md).
 
 Prepared 2026-10-08; not deployed. Source changes are committed and pushed on a draft review branch.
 The existing upload block and all its helpers are byte-for-byte identical to the
-original shared family relay. All 102 synthetic relay tests pass.
+original shared family relay. All 120 synthetic relay/checker tests pass (102
+relay checks and 18 companion diagnostic checks).
 Run: `node --test tools/family-relay-tests/family-relay.test.cjs`.
 
 Authenticated POST bodies contain only `action` and the existing `secret`:
@@ -46,6 +47,13 @@ adoption and later activity evidence. Normal uploads must still reach each child
 own file; verify on Drive. A sent opaque request is not a delivery receipt.
 Do not send fabricated learning uploads to production. Roll back the deployment
 version if needed; do not delete records or reset devices.
+
+The 1.2.0 diagnostic's `readable:false` can mean either an empty plan or a failed
+read. To distinguish them before deployment, add `family-plan-access-check.gs`
+as a separate editor file and run `checkSiblingPlanAccess`. `readOk:true` with
+`state:empty` confirms that the configured private document was read successfully
+but contains no plan. `readOk:false` needs investigation. The companion defines
+no web handlers, does not change relay 1.2.0, and writes no data or properties.
 
 Nightly plans are private dated data. They require no app-version bump or daily
 GitHub commit. Scheduler publication, device receipt, adoption, and actual use are
