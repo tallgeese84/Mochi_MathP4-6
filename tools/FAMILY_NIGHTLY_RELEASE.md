@@ -2,7 +2,7 @@
 
 Prepared 2026-10-08; not deployed. Source changes are staged on a review branch.
 The existing upload block and all its helpers are byte-for-byte identical to the
-original shared family relay. All 100 synthetic relay tests pass.
+original shared family relay. All 102 synthetic relay tests pass.
 Run: `node --test tools/family-relay-tests/family-relay.test.cjs`.
 
 Authenticated POST bodies contain only `action` and the existing `secret`:
