@@ -1,3 +1,7 @@
+# v7.7.1 — 2026-10-10
+
+Replace the multiplication gate with a grown-up PIN set per device (salted hash, never synced, backed up or exported; two-minute unlock; one-minute pause after five misses; `?reset-grownup-pin` to reset). Today hides nightly-plan dates and status from Euna and shows a friendly line only when a plan is active; Grown-ups keeps the full status. Add `noindex` and remove Euna's name from the page description. Learning records, papers, coins, cats and nightly plans are unchanged.
+
 # v7.7.0 — 2026-10-07
 
 Private, dated next-session plans can guide finite Maths/Science lesson and practice queues independently of app releases. Add body-authenticated read-only relay action, strict plan schema/date checks, safe-boundary adoption, offline fallback, parent controls and private read-back receipts. A one-time existing Apps Script relay deployment is required; publication alone does not establish tablet receipt. Preserve learning history, assessment questions/deadlines, minutes and rewards.

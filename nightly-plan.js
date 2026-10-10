@@ -54,7 +54,8 @@ function lessonDone(subject,id){if(!enabled())return;if(C.lessonDone(record,subj
 function label(){const p=currentPlan();if(p)return `Nightly priorities · ${p.sessionDate} · based on ${p.reviewedDate}`;return enabled()?'Built-in plan · no nightly priorities loaded for this date':'Built-in adaptive plan';}
 function report(){const p=currentPlan();return {schema:1,enabled:enabled(),lastCheckedAt:lastChecked?new Date(lastChecked).toISOString():null,status:p?'available':'built-in',...(p?{planId:p.id,revision:p.revision,sessionDate:p.sessionDate,reviewedDate:p.reviewedDate,sourceExportedAt:p.sourceExportedAt,receivedAt:new Date(record.receivedAt).toISOString(),adoptedAt:new Date(record.adoptedAt).toISOString(),steps:Object.fromEntries(['maths','science'].map(s=>[s,{index:record.progress[s].index,total:p.subjects[s].steps.length,questionsInStep:record.progress[s].count,activeQuestion:record.progress[s].active?.kind==='practice'?record.progress[s].active.id:null}]))}:{})};}
 function paint(){
- const small=$('todayNightlyStatus');if(small)small.textContent=label();
+ // Euna sees a friendly line only when a plan is in use; plan dates and status stay in Grown-ups.
+ const small=$('todayNightlyStatus');if(small){const on=!!currentPlan();small.textContent=on?'Today’s quests were picked just for you.':'';small.hidden=!on;}
  const out=$('nightlyPlanStatus');if(out)out.textContent=status+' '+(currentPlan()?`Plan ${record.plan.sessionDate}, revision ${record.plan.revision}.`:'');
  const b=$('nightlyPlanRefresh');if(b)b.disabled=busy;const e=$('nightlyPlanEnable');if(e)e.checked=enabled();
 }

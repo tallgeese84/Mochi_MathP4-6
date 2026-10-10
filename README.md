@@ -7,6 +7,8 @@ foundations and September 2027 SPERS-Sec1 planning goal remain available. Intern
 practice targets are not official school cutoffs or validated test equivalents.
 Exact 2027 test and application dates must be checked when published.
 
+**v7.7.1 — 10 October 2026.** Grown-ups opens with a **grown-up PIN** instead of a multiplication question. Plan dates and nightly-priority status now stay in Grown-ups; Today shows only a friendly line when a private plan is in use. The page is marked `noindex`. See [Grown-up PIN](#grown-up-pin).
+
 **v7.0.0 — 1 October 2026.** **Mochi’s Home** replaces the 3D room: a new, from-scratch 3D pet-care game. Euna feeds, brushes, plays with and tucks in Mochi, gives treats, teaches tricks and dresses him up. His needs are cosy and never turn sad, basic care is always free, and coins earned by learning buy treats, toys and accessories. He grows from a tiny kitten to a grown cat as she learns. See [Mochi’s Home](docs/MOCHI_HOME.md).
 
 **v6.9.0 — 30 September 2026.** Maths adds six **challenge units** after the core pathway, with 18 harder, original question types calibrated to the difficulty of the supplied DSA preparation booklet. They include nine types the pathway did not yet practise and nine harder versions of existing ones. Each has a lesson, worked examples, a Quick check and exam-style diagrams. Every answer is re-derived independently in the tests. Reserved papers and starting checks are unchanged. Mochi’s 3D room also looks clearer on tablets: truer fur colour, gentle reflections, sharper detail and a visible shadow. See [the challenge notes](docs/DSA_CHALLENGE.md).
@@ -355,3 +357,9 @@ Release metadata and offline assets are generated from `release.json` and the pa
 ## Geometry bridges (v6.7.0)
 
 Four targeted bridge lessons now connect length, area, cube layers, exposed faces and angle identification. Embedded interactive 2D/3D models work offline and are hidden in reserved papers. See [the teaching and validation notes](docs/GEOMETRY_BRIDGE.md).
+
+## Grown-up PIN
+
+The first time Grown-ups opens on a device, a grown-up chooses a 4–8 digit PIN and types it twice. It is stored on that device only, as a salted hash, and is never synced, mirrored or included in backups or review exports. A correct PIN unlocks for two minutes. Five wrong tries pause entry for a minute.
+
+Forgot the PIN? Open the app address with `?reset-grownup-pin` added, confirm, and set a new one. Learning records, coins and plans are not affected. This is a deterrent for children, not account security.

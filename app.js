@@ -1235,12 +1235,12 @@ function isCorrect(input,q){
 
 /* The cat ships inside the markup; this just reads her back out. */
 const BUILTIN_PHOTO = ($('catImg').getAttribute('src') || '');
-const APP_VERSION = '7.7.0';
+const APP_VERSION = '7.7.1';
 const BUILD_KIND  = 'site';
-const BUILD_DATE  = '2026-10-07';
+const BUILD_DATE  = '2026-10-10';
 const BUILD = BUILD_KIND + ' v' + APP_VERSION + ' \u00b7 ' + BUILD_DATE;
 const PHOTO_KEY = 'cat-photo-v1';
-const MOCHI_AVATAR = 'mochi-flat-avatar.svg?v=7.7.0';
+const MOCHI_AVATAR = 'mochi-flat-avatar.svg?v=7.7.1';
 function photoSource(url){
   return url==='__builtin__'||/^(?:\.\/)?mochi-(?:builtin\.webp|flat\.svg)(?:\?[^#]*)?$/.test(url)?BUILTIN_PHOTO:url;
 }
@@ -2366,18 +2366,46 @@ $('wkClear').onclick = ()=>{ WK.strokes=[]; WK.cur=null; WK.pointerId=null; WK.r
 $('wkPenOnly').onclick = ()=>{ WK.penOnly=!WK.penOnly; $('wkPenOnly').classList.toggle('on', WK.penOnly); $('wkPenOnly').setAttribute('aria-pressed',String(WK.penOnly)); };
 
 /* ---------- grown-ups ---------- */
-let gateAns = 0;
+// v7.7.1: a grown-up PIN replaces the multiplication check, which Euna can solve.
+// It is set the first time Grown-ups opens on a device, stored there as a salted
+// hash (never synced or backed up), and unlocks for two minutes at a time.
+const grownupGate = GrownupGate.create({mode:'pin', key:'mochi_grownup_pin_v1'});
+window.grownupGate = grownupGate;
+grownupGate.resetFromUrl();
+let gateStep = 'enter', gateFirst = '';
+function gatePrompt(msg){
+  const setting = gateStep==='set' || gateStep==='confirm';
+  $('ovTitle').textContent = setting ? 'Set a grown-up PIN' : 'Grown-ups only';
+  $('ovSub').textContent = msg || (gateStep==='set' ? 'For grown-ups: choose a 4–8 digit PIN for this device.'
+    : gateStep==='confirm' ? 'Type the same PIN again.' : 'Enter the grown-up PIN.');
+  $('gateQ').textContent = gateStep==='enter' ? 'Forgot it? See “Grown-up PIN” in the app’s README.'
+    : gateStep==='set' ? 'The PIN stays on this device. It is not synced or backed up.' : '';
+  $('gateBtn').textContent = gateStep==='set' ? 'Next' : gateStep==='confirm' ? 'Save PIN' : 'Enter';
+  $('gateInput').value = '';
+}
 $('adultBtn').onclick = ()=>{
-  const a = ri(12,19), b = ri(13,19);
-  gateAns = a*b;
-  $('gateQ').textContent = `${a} × ${b} = ?`;
-  $('gateInput').value='';
+  $('ov').classList.add('show');
+  if(grownupGate.unlocked()){ openGrownups(); return; }
+  gateStep = grownupGate.hasPin() ? 'enter' : 'set'; gateFirst = '';
   $('gate').style.display=''; $('panel').style.display='none';
-  $('ovTitle').textContent='Grown-ups only'; $('ovSub').textContent='Answer this to continue.';
-  $('ov').classList.add('show');$('gateInput').focus();
+  gatePrompt(); $('gateInput').focus();
 };
 $('gateBtn').onclick = ()=>{
-  if(Number($('gateInput').value) !== gateAns){ $('gateInput').value=''; $('ovSub').textContent='Not quite — try again.'; return; }
+  const v = $('gateInput').value.trim();
+  if(gateStep==='set'){
+    if(!GrownupGate.validPin(v)) return gatePrompt('Use 4 to 8 digits.');
+    gateFirst = v; gateStep = 'confirm'; gatePrompt(); $('gateInput').focus(); return;
+  }
+  if(gateStep==='confirm'){
+    if(v!==gateFirst){ gateStep='set'; gateFirst=''; gatePrompt('Those didn’t match. Start again.'); $('gateInput').focus(); return; }
+    if(!grownupGate.setPin(v)) return gatePrompt('This device could not save the PIN.');
+    grownupGate.unlock(); openGrownups(); return;
+  }
+  const result = grownupGate.attempt(v);
+  if(result!=='ok'){ gatePrompt(result==='wait' ? 'Too many tries. Wait a minute, then try again.' : 'Not quite — try again.'); $('gateInput').focus(); return; }
+  grownupGate.unlock(); openGrownups();
+};
+function openGrownups(){
   $('gate').style.display='none'; $('panel').style.display='';
   $('ovTitle').textContent='Settings';
   $('ovSub').textContent='Topics she gets wrong come round more often.';
@@ -2396,7 +2424,7 @@ $('gateBtn').onclick = ()=>{
       <span class="mpct">${m.a ? pct+'%' : '—'}</span>`;
     list.appendChild(row);
   });
-};
+}
 $('gateInput').addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); $('gateBtn').click(); } });
 $('catSave').onclick = ()=>{
   const v = $('catInput').value.trim().slice(0,14);
@@ -2551,5 +2579,5 @@ async function hydratePhoto(){
 }
 
 if('serviceWorker' in navigator){
-  document.addEventListener('mochi:ready', ()=> navigator.serviceWorker.register('sw.js?v=7.7.0',{updateViaCache:'none'}).catch(()=>{}),{once:true});
+  document.addEventListener('mochi:ready', ()=> navigator.serviceWorker.register('sw.js?v=7.7.1',{updateViaCache:'none'}).catch(()=>{}),{once:true});
 }
