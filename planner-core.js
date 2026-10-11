@@ -3,9 +3,9 @@
 'use strict';
 const C=root.MochiCourse||(typeof require==='function'?require('./course-core.js'):null);
 const Teaching=root.MochiTeaching||(typeof require==='function'?require('./teaching-core.js'):null);
-const DAY=86400000,IDLE_PAUSE_MS=10*60*1000,MAX_TICK_GAP_MS=30000,CLOCK_SKEW_MS=2000,subjects=['maths','science'],days=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const DAY=86400000,MATHS_EXTENSION_MS=5*60000,IDLE_PAUSE_MS=10*60*1000,MAX_TICK_GAP_MS=30000,CLOCK_SKEW_MS=2000,subjects=['maths','science'],days=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 const defaults=[[25,20],[20,25],[25,20],[20,25],[15,15],[30,30],[10,10]];
-const fresh=()=>({version:1,schedule:{updatedAt:0,week:defaults.map(([maths,science])=>({maths,science}))},sessions:[],days:{},milestones:{}});
+const fresh=()=>({version:1,schedule:{updatedAt:0,week:defaults.map(([maths,science])=>({maths,science}))},sessions:[],days:{},milestones:{},mathsExtensions:{}});
 const init=s=>s.planner||(s.planner=fresh());
 const stamp=n=>Number.isFinite(n)&&n>0&&n<8640000000000000?n:0;
 const answered=a=>stamp(a.answeredAt)||stamp(a.responses?.[0]?.at)||stamp(a.at);
@@ -19,7 +19,7 @@ function validate(raw){
  const sessions=new Map();
  for(const v of (Array.isArray(raw.sessions)?raw.sessions:[]).slice(-3000)){
   if(!text(v?.id)||!subjects.includes(v.subject)||!validDay(v.day)||!stamp(v.start)||!stamp(v.end)||v.end<v.start||v.end-v.start>6*3600000)continue;
-  const x={id:text(v.id),subject:v.subject,day:v.day,start:v.start,end:v.end},old=sessions.get(x.id);if(!old||x.end>old.end)sessions.set(x.id,x);
+  const x={id:text(v.id),subject:v.subject,day:v.day,start:v.start,end:v.end,...(v.subject==='maths'&&v.kind==='maths-extension'?{kind:'maths-extension'}:{})},old=sessions.get(x.id);if(!old||x.end>old.end)sessions.set(x.id,x);
  }p.sessions=[...sessions.values()].sort((a,b)=>a.start-b.start||a.id.localeCompare(b.id));
  for(const [date,d] of Object.entries(raw.days||{}).filter(([k])=>validDay(k)).sort().slice(-400)){
   const clean={};for(const s of subjects){const x=d?.[s];if(!x)continue;clean[s]={updatedAt:stamp(x.updatedAt),unit:C.unit(x.unit)?.subject===s?x.unit:'',learnedAt:stamp(x.learnedAt),reflection:text(x.reflection,1500),exitIds:[...new Set((Array.isArray(x.exitIds)?x.exitIds:[]).filter(v=>typeof v==='string').map(v=>text(v)))].slice(-8)};}p.days[date]=clean;
@@ -27,7 +27,11 @@ function validate(raw){
  for(const [key,v] of Object.entries(raw.milestones||{}).slice(0,500)){
   if(!v||!subjects.includes(v.subject)||!['idea','variety','retained'].includes(v.kind)||!text(v.skill,50)||key!==`${v.subject}:${v.skill}:${v.kind}`||!stamp(v.earnedAt))continue;
   p.milestones[key]={subject:v.subject,skill:text(v.skill,50),kind:v.kind,earnedAt:v.earnedAt,evidence:(Array.isArray(v.evidence)?v.evidence:[]).map(x=>text(x)).filter(Boolean).slice(-4)};
- }return p;
+ }
+ for(const [date,at] of Object.entries(raw.mathsExtensions||{}).filter(([date,at])=>validDay(date)&&stamp(at)).sort().slice(-400))p.mathsExtensions[date]=at;
+ // Tagged intervals also preserve the daily claim when restoring a partial backup.
+ for(const x of p.sessions)if(x.kind==='maths-extension')p.mathsExtensions[x.day]=Math.min(p.mathsExtensions[x.day]||x.start,x.start);
+ return p;
 }
 function merge(a,b){
  a=validate(a);b=validate(b);const p=validate({...a,sessions:[...a.sessions,...b.sessions]});
@@ -37,26 +41,33 @@ function merge(a,b){
   p.days[date]={};for(const s of subjects){const x=a.days[date]?.[s],y=b.days[date]?.[s],v=choose(x,y);if(v)p.days[date][s]={...v,exitIds:[...new Set([...(x?.exitIds||[]),...(y?.exitIds||[])])].sort().slice(-8)};}
  }
  p.milestones={...a.milestones};for(const [k,v] of Object.entries(b.milestones))if(!p.milestones[k]||v.earnedAt<p.milestones[k].earnedAt)p.milestones[k]=v;
+ for(const [date,at] of Object.entries(b.mathsExtensions))p.mathsExtensions[date]=Math.min(p.mathsExtensions[date]||at,at);
  return validate(p);
 }
 function day(p,subject,now=Date.now()){const key=localDay(now);p.days[key]??={};for(const old of Object.keys(p.days).sort().slice(0,-400))delete p.days[old];return p.days[key][subject]??={updatedAt:now,unit:'',learnedAt:0,reflection:'',exitIds:[]};}
 function minutes(p,subject,now=Date.now()){return p.schedule.week[weekday(now)][subject];}
 // Union intervals across devices AND subjects. Overlap goes to the earlier session.
-function elapsed(p,date=localDay()){
+function elapsed(p,date=localDay(),kind=''){
  const out={maths:0,science:0};let covered=0;
- for(const x of p.sessions.filter(x=>x.day===date).sort((a,b)=>a.start-b.start||a.id.localeCompare(b.id))){out[x.subject]+=Math.max(0,x.end-Math.max(x.start,covered));covered=Math.max(covered,x.end);}return out;
+ for(const x of p.sessions.filter(x=>x.day===date).sort((a,b)=>a.start-b.start||a.id.localeCompare(b.id))){if(!kind||x.kind===kind)out[x.subject]+=Math.max(0,x.end-Math.max(x.start,covered));covered=Math.max(covered,x.end);}return out;
+}
+function mathsExtension(p,now=Date.now()){
+ const date=localDay(now),target=minutes(p,'maths',now),startedAt=p.mathsExtensions?.[date]||0,spent=Math.min(MATHS_EXTENSION_MS,elapsed(p,date,'maths-extension').maths),done=spent>=MATHS_EXTENSION_MS;
+ return {date,startedAt,spent,remaining:Math.max(0,MATHS_EXTENSION_MS-spent),done,available:target>0&&elapsed(p,date).maths>=target*60000&&!done};
 }
 function clock(){
  let run=null,lastMono=0,lastWall=0,touched=0,limitMultiplier=1;
  return {get subject(){return run?.subject||null;},touch(mono){touched=mono;},
-  start(subject,p,id,wall,mono,multiplier=1){if(!subjects.includes(subject))throw Error('Unknown subject');limitMultiplier=multiplier===2?2:1;run={id,subject,day:localDay(wall),start:wall,end:wall};p.sessions.push(run);p.sessions=p.sessions.slice(-3000);lastMono=touched=mono;lastWall=wall;},
+  start(subject,p,id,wall,mono,multiplier=1){if(!subjects.includes(subject))throw Error('Unknown subject');const extension=multiplier==='maths-extension';if(extension){if(subject!=='maths'||!mathsExtension(p,wall).available)return false;p.mathsExtensions??={};p.mathsExtensions[localDay(wall)]??=wall;}limitMultiplier=multiplier===2?2:1;run={id,subject,day:localDay(wall),start:wall,end:wall,...(extension?{kind:'maths-extension'}:{})};p.sessions.push(run);p.sessions=p.sessions.slice(-3000);lastMono=touched=mono;lastWall=wall;return true;},
   stop(){run=null;limitMultiplier=1;},
   tick(p,wall,mono,visible=true,activeSubject=run?.subject){
    if(!run)return {running:false};const delta=mono-lastMono,wallDelta=wall-lastWall;
    let reason=!visible?'Paused while the app is hidden.':activeSubject!==run.subject?'Paused when you changed activity.':localDay(wall)!==run.day?'A new day has started. Start today’s clock when ready.':mono-touched>=IDLE_PAUSE_MS?'Paused after 10 minutes without interaction. Quiet reading and paper work count; tap Resume when ready.':delta<0||delta>MAX_TICK_GAP_MS||wallDelta<0||Math.abs(wallDelta-delta)>CLOCK_SKEW_MS?'Paused because the browser was interrupted for too long. Resume when ready.':'';
    if(reason){run=null;return {running:false,reason};}
    // A cloud merge can replace the state object. Preserve this session's identity.
-   let saved=p.sessions.find(x=>x.id===run.id);if(!saved){saved={...run};p.sessions.push(saved);}saved.end=run.end+delta;run=saved;lastMono=mono;lastWall=wall;
+   const extension=run.kind==='maths-extension',credit=extension?Math.min(delta,mathsExtension(p,wall).remaining):delta;
+   let saved=p.sessions.find(x=>x.id===run.id);if(!saved){saved={...run};p.sessions.push(saved);}saved.end=run.end+credit;run=saved;lastMono=mono;lastWall=wall;
+   if(extension){if(mathsExtension(p,wall).done){run=null;limitMultiplier=1;return {running:false,reason:'Optional five minutes finished. Finish this thought, then return to today’s plan.'};}return {running:true};}
    const target=minutes(p,run.subject,wall),cap=target*limitMultiplier*60000;if(target&&elapsed(p,run.day)[run.subject]>=cap){const bonus=limitMultiplier===2;run=null;limitMultiplier=1;return {running:false,reason:bonus?'Double-study bonus reached. The clock stops at 2× today’s target; there is no extra time reward beyond this.':'Time goal reached. Finish your thought, take a break and try your exit check when ready.'};}
    return {running:true};
   }
@@ -137,8 +148,8 @@ function pet(p){
  return {...growthStages[level],level,maths,science,variety,retained,badges:badges.length};
 }
 function report(s,now=Date.now()){
- const p=validate(init(s));return {generatedAt:new Date(now).toISOString(),timeZone:Intl.DateTimeFormat().resolvedOptions().timeZone,schedule:p.schedule,days:Object.keys(p.days).sort().slice(-14).map(date=>({date,activeMs:elapsed(p,date),goals:p.days[date]})),today:Object.fromEntries(subjects.map(subject=>[subject,goals(s,subject,now)])),next:Object.fromEntries(subjects.map(subject=>[subject,recommend(s,subject,now)])),thinking:Object.fromEntries(subjects.map(subject=>[subject,observations(s,subject,now)])),mochi:pet(p),limits:['Minutes are editable starting goals, not a prescribed educational dose.','Foreground time is an estimate; reading, reasoning and learning quality cannot be inferred from a clock.','Studied-idea ticks and reflections are self-reported. An exit answer is evidence, not a pass/fail gate.','Mochi milestones are retained celebrations, not grades, percentiles or admissions predictions.','Original checks are finite and uncalibrated. Familiar questions do not establish novel transfer.']};
+ const p=validate(init(s));return {generatedAt:new Date(now).toISOString(),timeZone:Intl.DateTimeFormat().resolvedOptions().timeZone,schedule:p.schedule,days:Object.keys(p.days).sort().slice(-14).map(date=>({date,activeMs:elapsed(p,date),optionalMathsMs:elapsed(p,date,'maths-extension').maths,goals:p.days[date]})),today:Object.fromEntries(subjects.map(subject=>[subject,goals(s,subject,now)])),next:Object.fromEntries(subjects.map(subject=>[subject,recommend(s,subject,now)])),thinking:Object.fromEntries(subjects.map(subject=>[subject,observations(s,subject,now)])),mochi:pet(p),mathsExtension:mathsExtension(p,now),limits:['Minutes are editable starting goals, not a prescribed educational dose.','Foreground time is an estimate; reading, reasoning and learning quality cannot be inferred from a clock.','Optional Maths time is separate from the required target and never establishes mastery.','Studied-idea ticks and reflections are self-reported. An exit answer is evidence, not a pass/fail gate.','Mochi milestones are retained celebrations, not grades, percentiles or admissions predictions.','Original checks are finite and uncalibrated. Familiar questions do not establish novel transfer.']};
 }
-root.MochiPlanner={fresh,init,validate,merge,day,days,defaults,subjects,localDay,weekday,minutes,elapsed,clock,records,observations,recommend,goals,grow,pet,growthStages,report};
+root.MochiPlanner={fresh,init,validate,merge,day,days,defaults,subjects,localDay,weekday,minutes,elapsed,mathsExtension,MATHS_EXTENSION_MS,clock,records,observations,recommend,goals,grow,pet,growthStages,report};
 if(typeof module!=='undefined')module.exports=root.MochiPlanner;
 })(typeof window!=='undefined'?window:globalThis);

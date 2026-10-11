@@ -43,6 +43,14 @@ The learner may finish the thought and return to the plan. The next learning-ste
 button returns to Today at a safe boundary rather than opening endless drills.
 Unfinished work remains resumable, including on the next planned day.
 
+## Optional five-minute Maths block — v7.7.2
+
+The required Monday–Sunday targets stay unchanged. Once today’s Maths time target is complete, Today offers a secondary, optional **5 more minutes of Maths** action, even if Science is still pending. It does not replace the next required quest. Saved work, private nightly priorities and delayed retrieval keep their existing priority; otherwise the extra chooses a taught topic for fresh application or changed-structure transfer. Trying without help is encouraged, with help still available when needed.
+
+The existing foreground clock records tagged optional intervals and one start marker per local day. Pause, home, hidden/inactive windows, cloud merge and reload leave it stopped, with the same remaining five-minute budget available for explicit resume. Timing clips exactly at five minutes; it never submits or discards the current answer. The next learning-step boundary returns to Today, and the learner can stop earlier at any time. The optional offer disappears when its daily budget is used. Required targets and time completion never increase, and neither minutes nor opting in grant independent mastery. Existing deliberate 2× extra study and Bonus Quest rewards remain separate.
+
+Private exports retain `planner.mathsExtensions`, `kind: "maths-extension"` timing sessions, `learningPlanReview.mathsExtension` and per-day `optionalMathsMs` alongside existing total foreground time. Older backups restore without an optional start marker. Time goals and independently solved fresh questions are explicitly distinguished in the progress text.
+
 ## Mastery coaching
 
 Every active lesson or practice question now shows one **Quest goal** and a compact

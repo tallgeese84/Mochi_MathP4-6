@@ -35,6 +35,15 @@ function candidateUnits(state,subject,now=Date.now()){
  const E=engines[subject],d=state[keys[subject]]||E.fresh();
  return E.D.units.map(u=>E.evidence(d,u.id,now)).filter(e=>e.taught&&!e.needsTeaching).sort((a,b)=>Number(b.overdue)-Number(a.overdue)||((phaseFor(a)==='transfer'?0:1)-(phaseFor(b)==='transfer'?0:1))||a.apply-b.apply||a.last-b.last);
 }
+function mathsExtensionTask(state,now=Date.now()){
+ const p=state.planner||P.fresh();if(!P.mathsExtension(p,now).available)return null;
+ // Saved work, nightly priorities and delayed review precede extra practice.
+ const t=T.task(state,'maths',now);if(t.kind==='paper')return null;
+ if(t.resume||t.nightly||['recall','mixed','redo'].includes(t.kind))return t;
+ const E=engines.maths,d=state.entrance||E.fresh(),e=candidateUnits(state,'maths',now).find(e=>!E.prerequisite?.(d,e.id,now));
+ if(!e)return null;const phase=phaseFor(e);
+ return {subject:'maths',kind:phase==='recall'?'recall':'practice',unit:e.id,title:e.title,phase,resume:false,detail:phase==='recall'?'Remember this idea before opening help.':'Try a fresh question with help closed first. Then explain and check your method.'};
+}
 function bonusTask(state,now=Date.now(),preferred=''){
  const s=status(state,now);if(!s.unlocked||s.complete)return null;
  if(s.active){const E=engines[s.active.subject],d=state[keys[s.active.subject]]||E.fresh(),unit=s.active.unit||d.draft?.unit||candidateUnits(state,s.active.subject,now)[0]?.id,phase=s.active.phase||'apply';if(unit&&E.unit(unit))return {subject:s.active.subject,unit,title:E.unit(unit).title,phase,coins:C.reward(phase),resume:!!d.draft};}
@@ -81,6 +90,6 @@ function merge(a,b){
  }
  return validate(out);
 }
-root.MochiQuestRewards={MAX,CHEST,fresh,validate,init,status,bonusTask,bonusOptions,start,settle,merge,qualifying,phaseFor};
+root.MochiQuestRewards={MAX,CHEST,fresh,validate,init,status,bonusTask,bonusOptions,mathsExtensionTask,start,settle,merge,qualifying,phaseFor};
 if(typeof module!=='undefined')module.exports=root.MochiQuestRewards;
 })(typeof window!=='undefined'?window:globalThis);

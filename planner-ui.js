@@ -30,6 +30,11 @@ function start(subject){
  clock.start(subject,data(),uid(),Date.now(),performance.now(),spent>=target*60000?2:1);lastSave=Date.now();save(S);
  message=(spent>=target*60000?label(subject)+' bonus time is running toward the 2× Cat Point bonus. ':label(subject)+' time is running. ')+'Reading and working count; the clock is not a speed test.';$('plannerStatus').textContent=message;paintClocks();
 }
+function startMathsExtension(){
+ pause('');if(!P.mathsExtension(data()).available)return false;
+ if(!clock.start('maths',data(),uid(),Date.now(),performance.now(),'maths-extension'))return false;
+ lastSave=Date.now();save(S);message='Optional five-minute Maths practice. Try with help closed first; you can stop whenever you want.';$('plannerStatus').textContent=message;paintClocks();return true;
+}
 function paintClocks(){
  if(!$('dailyPlan'))return;const elapsed=P.elapsed(data());
  for(const s of P.subjects){const seconds=Math.floor(elapsed[s]/1000),target=P.minutes(data(),s),double=target*2,b=$('clock-'+s);$('time-'+s).textContent=`${Math.floor(seconds/60)}:${String(seconds%60).padStart(2,'0')} / ${target}m · 2× ${double}m`;b.textContent=clock.subject===s?'Pause':seconds>=target*60?'Bonus time':seconds>0?'Resume':'Start';b.setAttribute('aria-label',b.textContent+' '+label(s)+' clock');b.setAttribute('aria-pressed',String(clock.subject===s));b.disabled=!target||seconds>=double*60;$('timer-'+s).dataset.running=String(clock.subject===s);}
@@ -77,7 +82,7 @@ function paint(){
  paintClocks();if($('plannerEvidence').open)paintEvidence();
 }
 function paintEvidence(){
- const report=P.report(S);$('plannerEvidenceBody').innerHTML=P.subjects.map(s=>{const o=report.thinking[s],r=report.next[s];return `<h3>${label(s)}</h3><p>Last ${o.sample} recorded answers: ${o.independent} correct without recorded support and eligible for fresh or spaced evidence.</p>${(()=>{const t=root.MochiToday?.task?.(S,s);return t?`<p><strong>Next on Today: ${esc(t.title)}</strong> — ${esc(t.detail)}</p>`:`<p><strong>Next: ${esc(C.unit(r.unit).title)}</strong> — ${esc(r.reason)}</p>`;})()}`+(o.signals.length?o.signals.map(x=>`<p><strong>${esc(x.title)}</strong> (${x.count}/${x.sample}). ${esc(x.action)}<br><small>Examples: ${x.evidence.map(esc).join(', ')}</small></p>`).join(''):'<p>Not enough repeated evidence for a pattern yet. Ask Euna to talk through one answer.</p>');}).join('')+'<p>These observations guide questions to ask. Written and drawn explanations still need review. The learning mirror includes the plan, active-time estimates, daily reflections, evidence IDs and next steps.</p>';
+ const report=P.report(S);$('plannerEvidenceBody').innerHTML=P.subjects.map(s=>{const o=report.thinking[s],r=report.next[s];return `<h3>${label(s)}</h3><p>Last ${o.sample} recorded answers: ${o.independent} correct without recorded support and eligible for fresh or spaced evidence.</p>${(()=>{const t=root.MochiToday?.task?.(S,s);return t?`<p><strong>Next on Today: ${esc(t.title)}</strong> — ${esc(t.detail)}</p>`:`<p><strong>Next: ${esc(C.unit(r.unit).title)}</strong> — ${esc(r.reason)}</p>`;})()}`+(o.signals.length?o.signals.map(x=>`<p><strong>${esc(x.title)}</strong> (${x.count}/${x.sample}). ${esc(x.action)}<br><small>Examples: ${x.evidence.map(esc).join(', ')}</small></p>`).join(''):'<p>Not enough repeated evidence for a pattern yet. Ask Euna to talk through one answer.</p>');}).join('')+'<p><strong>Time goals and independent learning are separate.</strong> The optional five-minute Maths block does not raise required targets or certify mastery.</p><p>These observations guide questions to ask. Written and drawn explanations still need review. The learning mirror includes the plan, active-time estimates, daily reflections, evidence IDs and next steps.</p>';
 }
 function schedulePaint(){
  for(let i=0;i<7;i++)for(const s of P.subjects)$(`week-${i}-${s}`).value=data().schedule.week[i][s];
@@ -105,7 +110,7 @@ function init(){
  document.addEventListener('mochi:activity',()=>{if(clock.subject&&clock.subject!==visibleSubject())pause('Paused when you changed activity.');clearTimeout(renderTimer);renderTimer=setTimeout(paint,80);});
  window.addEventListener('pagehide',()=>pause());window.addEventListener('blur',()=>pause('Paused while this window is inactive.'));
  const reset=$('resetBtn').onclick;$('resetBtn').onclick=()=>{const before=S.learning;reset();if(before!==S.learning){clock.stop();S.planner=P.fresh();save(S);schedulePaint();paint();}};
- root.MochiPlanUI={pause,start:subject=>{if(clock.subject!==subject)start(subject);},startBonus:subject=>{if(clock.subject!==subject)start(subject);},running:()=>clock.subject,status:()=>message,flush:()=>tick(true),refresh:()=>{clock.stop();schedulePaint();paint();}};
+ root.MochiPlanUI={pause,start:subject=>{if(clock.subject!==subject)start(subject);},startBonus:subject=>{if(clock.subject!==subject)start(subject);},startMathsExtension,running:()=>clock.subject,status:()=>message,flush:()=>tick(true),refresh:()=>{clock.stop();schedulePaint();paint();}};
  setInterval(()=>tick(),1000);paint();
 }
 if(root.MochiReady)init();else document.addEventListener('mochi:ready',init,{once:true});

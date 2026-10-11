@@ -12,6 +12,28 @@ test('bonus quests stay locked until planned maths and science time is complete'
  finishDay(s);assert.equal(T.model(s,now).finished,true);assert.equal(Q.status(s,now).unlocked,true);assert.equal(Q.bonusTask(s,now).subject,'maths');
 });
 
+test('optional Maths unlocks after Maths alone and chooses fresh learned practice without new rewards',()=>{
+ const s=fresh();finishLesson(s.entrance,M,'relationships');assert.equal(Q.mathsExtensionTask(s,now),null);
+ const min=P.minutes(s.planner,'maths',now);s.planner.sessions.push({id:'maths-done',subject:'maths',day:P.localDay(now),start:now-4000000,end:now-4000000+min*60000});
+ const before=JSON.stringify(s),task=Q.mathsExtensionTask(s,now);
+ assert.equal(task.subject,'maths');assert.equal(task.unit,'relationships');assert.equal(task.phase,'apply');
+ assert.equal(T.model(s,now).completed,1);assert.equal(T.model(s,now).next.subject,'science');
+ assert.equal(JSON.stringify(s),before,'offering optional practice changes no record, mastery or reward');
+ assert.equal(s.questRewards,undefined);
+ M.startPractice(s.entrance,'relationships',{now:now+1,seed:17});M.touchDraft(s.entrance,{answer:'saved working'},now+2);
+ const resumed=Q.mathsExtensionTask(s,now+3);assert.equal(resumed.kind,'question');assert.equal(resumed.resume,true);assert.equal(s.entrance.draft.answer,'saved working');
+});
+
+test('optional Maths preserves delayed retrieval and never opens a reserved paper',()=>{
+ const s=fresh(),old=now-8*86400000;finishDay(s);
+ for(let p=0;p<3;p++)M.visit(s.entrance,'relationships',p,old);M.concept(s.entrance,'relationships',M.unit('relationships').check[2],old);M.complete(s.entrance,'relationships',old);
+ for(const [i,phase] of ['apply','apply','transfer'].entries()){
+  M.startPractice(s.entrance,'relationships',{now:old+1000+i*1000,phase,seed:31+i});M.touchDraft(s.entrance,{answer:M.question(s.entrance.draft).answerLabel,working:'My plan for this one'},old+1001+i*1000);M.respond(s.entrance,old+1002+i*1000);M.finishPractice(s.entrance);
+ }
+ const task=Q.mathsExtensionTask(s,now);assert.equal(task.kind,'recall');assert.equal(task.unit,'relationships');assert.equal(Object.keys(s.entrance.papers).length,0);
+ M.startPaper(s.entrance,'mixed-a',now);assert.equal(Q.mathsExtensionTask(s,now+1),null);
+});
+
 test('fresh first-try independent answers earn one coin and bonus questions balance subjects',()=>{
  const s=fresh();finishLesson(s.entrance,M,'relationships');finishLesson(s.sciencePath,S,'matter');finishDay(s);
  let task=Q.bonusTask(s,now);assert.equal(task.subject,'maths');assert.equal(Q.start(s,'maths',now+10),true);

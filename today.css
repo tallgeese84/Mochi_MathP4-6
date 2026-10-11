@@ -86,3 +86,7 @@
 .today-wide-card textarea{display:block;width:100%;box-sizing:border-box;margin:6px 0;border:1px solid #dccdea;border-radius:10px;padding:8px;font:inherit}
 .today-wide-card>button,.today-wide-card details>button{border:0;background:#6a4590;color:#fff;border-radius:999px;padding:10px 18px;min-height:44px;font:600 14px system-ui;cursor:pointer}
 .today-wide-safety{color:#9a4b2f!important}.today-mock{border-color:#f0c76a;background:#fffaf0}
+.today-maths-extension{margin:18px 0;padding:16px 18px;border:1px dashed #d9cce6;border-radius:18px;background:#f7f2fc}
+.today-maths-extension[hidden]{display:none!important}
+.today-maths-extension button{border:1px solid #d3c1e3;background:white;color:#604078;border-radius:12px;padding:10px 14px;min-height:44px;font:600 14px/1.4 system-ui;cursor:pointer}
+.today-maths-extension p{margin:9px 0 0;color:#786487;font-size:13px;line-height:1.5}

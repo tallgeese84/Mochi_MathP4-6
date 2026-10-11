@@ -7,6 +7,8 @@ foundations and September 2027 SPERS-Sec1 planning goal remain available. Intern
 practice targets are not official school cutoffs or validated test equivalents.
 Exact 2027 test and application dates must be checked when published.
 
+**v7.7.2 — 11 October 2026.** Required weekly minutes stay unchanged. After Maths, Euna may choose one **optional five-minute Maths block**, resume saved work or delayed review, then try fresh application or transfer with help closed first. Pause/reload retains the remaining budget. Time completion remains separate from independent learning. See [Today’s Plan](docs/TODAY_PLAN.md).
+
 **v7.7.1 — 10 October 2026.** Grown-ups opens with a **grown-up PIN** instead of a multiplication question. Plan dates and nightly-priority status now stay in Grown-ups; Today shows only a friendly line when a private plan is in use. The page is marked `noindex`. See [Grown-up PIN](#grown-up-pin).
 
 **v7.0.0 — 1 October 2026.** **Mochi’s Home** replaces the 3D room: a new, from-scratch 3D pet-care game. Euna feeds, brushes, plays with and tucks in Mochi, gives treats, teaches tricks and dresses him up. His needs are cosy and never turn sad, basic care is always free, and coins earned by learning buy treats, toys and accessories. He grows from a tiny kitten to a grown cat as she learns. See [Mochi’s Home](docs/MOCHI_HOME.md).

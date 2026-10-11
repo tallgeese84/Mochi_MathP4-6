@@ -150,3 +150,34 @@ test('normal study still stops at 1×, while explicit bonus mode stops exactly a
  const again=P.clock();again.start('maths',p,'extra',now+122000,122000,2);
  const r=again.tick(p,now+123000,123000);assert.equal(r.running,false);assert.match(r.reason,/Double-study bonus reached/);assert.equal(P.elapsed(p,P.localDay(now)).maths,121000,'the caller should refuse starts beyond 2×; core never grants an unbounded reward');
 });
+
+test('optional Maths uses one five-minute foreground budget across pause, restore and merge',()=>{
+ const p=P.fresh(),date=P.localDay(now),target=P.minutes(p,'maths',now),schedule=JSON.stringify(p.schedule);
+ const c=P.clock();assert.equal(c.start('maths',p,'locked',now,0,'maths-extension'),false);
+ p.sessions.push({id:'required',subject:'maths',day:date,start:now-3600000,end:now-3600000+target*60000});
+ assert.equal(c.start('science',p,'wrong-subject',now,0,'maths-extension'),false);
+ assert.equal(c.start('maths',p,'extra-a',now,0,'maths-extension'),true);
+ for(let t=1000;t<=120000;t+=1000)c.tick(p,now+t,t);
+ assert.equal(P.mathsExtension(p,now+120000).spent,120000);c.stop();
+ const restored=P.merge(P.validate(p),P.fresh()),d=P.clock();
+ assert.equal(d.subject,null,'reload never starts a clock');assert.equal(restored.mathsExtensions[date],now);
+ assert.equal(d.start('maths',restored,'extra-b',now+180000,180000,'maths-extension'),true);
+ for(let t=181000;t<=357000;t+=1000)d.tick(restored,now+t,t);
+ const end=d.tick(restored,now+364000,364000);
+ assert.equal(end.running,false);assert.match(end.reason,/Optional five minutes finished/);
+ assert.equal(P.mathsExtension(restored,now+364000).spent,300000,'a tolerated stall is clipped to the five-minute cap');
+ assert.equal(P.elapsed(restored,date).maths,target*60000+300000);
+ assert.equal(d.start('maths',restored,'again',now+365000,365000,'maths-extension'),false);
+ assert.equal(JSON.stringify(restored.schedule),schedule);assert.deepEqual(restored.milestones,{});
+ assert.deepEqual(P.merge(restored,restored),restored);
+});
+
+test('optional Maths pauses in the background and at midnight without spending unused minutes',()=>{
+ const p=P.fresh(),late=new Date(2026,8,21,23,59).getTime(),date=P.localDay(late),target=P.minutes(p,'maths',late);
+ p.sessions.push({id:'required',subject:'maths',day:date,start:late-3600000,end:late-3600000+target*60000});
+ const c=P.clock();c.start('maths',p,'optional',late,0,'maths-extension');c.tick(p,late+1000,1000);
+ assert.equal(c.tick(p,late+2000,2000,false).running,false);assert.equal(P.mathsExtension(p,late+2000).spent,1000);
+ c.start('maths',p,'resume',late+3000,3000,'maths-extension');c.tick(p,late+4000,4000);
+ const midnight=c.tick(p,late+61000,61000);assert.equal(midnight.running,false);assert.match(midnight.reason,/new day/);
+ assert.equal(P.elapsed(p,date,'maths-extension').maths,2000);assert.equal(P.mathsExtension(p,late+61000).available,false,'tomorrow requires its own Maths goal first');
+});

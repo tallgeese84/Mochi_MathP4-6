@@ -1,5 +1,5 @@
 {
-  "version": "7.7.1",
-  "releasedOn": "2026-10-10",
-  "summary": "Grown-ups now opens with a PIN set by a grown-up on each device. Nightly plan details stay in Grown-ups, and the page is hidden from search engines. Learning records, coins and plans are unchanged."
+  "version": "7.7.2",
+  "releasedOn": "2026-10-11",
+  "summary": "Daily study targets stay the same. After Maths, Euna can choose one optional five-minute practice block; it pauses and resumes safely, and time completion stays separate from independent learning."
 }
