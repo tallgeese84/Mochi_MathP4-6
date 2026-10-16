@@ -57,9 +57,19 @@ test('an exhausted science pool cannot turn a familiar repeat into fresh mastery
 test('active paper and unfinished question take priority over repetition safeguards',()=>{
  const state={sciencePath:S.fresh()},d=state.sciencePath;S.startPractice(d,'circuits',{seed:19,now});const keep={kind:'resume',unit:'circuits'};assert.deepEqual(P.route(S,state,keep,now),keep);S.finishPractice(d);S.startPaper(d,'mixed-a',now);assert.deepEqual(P.route(S,state,keep,now),keep);
 });
-test('a known missing replication step offers teaching without rewriting the historical answer',()=>{
- const d=S.fresh(),q=dissolve();teach(S,d,'fairtest',now-1000);const a=S.record(d,{...q,id:'synthetic-old-gap',rev:2,mode:'practice',phase:'transfer',at:now-10,responses:[{at:now-1,answer:partial}]});const before=copy(a),r=P.route(S,{sciencePath:d},{kind:'practice',unit:'circuits'},now);assert.equal(r.unit,'fairtest');assert.equal(r.kind,'learn');assert.deepEqual(a,before);S.visit(d,'fairtest',0,now+1);const next=P.route(S,{sciencePath:d},{kind:'practice',unit:'measurement'},now+2);assert.equal(next.unit,'measurement');
+test('unreviewed writing gets a bounded structured check; only an explicit review can prescribe reteaching',()=>{
+ const d=S.fresh(),q=dissolve();teach(S,d,'fairtest',now-1000);const a=S.record(d,{...q,id:'synthetic-old-gap',rev:2,mode:'practice',phase:'transfer',at:now-10,responses:[{at:now-1,answer:partial}]});const before=copy(a);
+ const r=P.route(S,{sciencePath:d},{kind:'practice',unit:'circuits'},now);assert.equal(r.unit,'fairtest');assert.equal(r.kind,'practice');assert.equal(r.phase,'apply');assert(S.pendingWriting(d,a));assert.deepEqual(a,before);
+ assert.equal(S.feedbackEvidence(d,a),'pending-review');assert.equal(S.firstOutcomeFor(d,a),null);assert.equal(S.errorLog(d,now).length,0);assert.equal(S.evidence(d,'fairtest',now).supported,0);
+ S.review(d,a.id,'needs-discussion','Synthetic adult observation',now+1);const reteach=P.route(S,{sciencePath:d},{kind:'practice',unit:'measurement'},now+2);assert.equal(reteach.kind,'learn');assert.equal(reteach.unit,'fairtest');assert.deepEqual(a,before);
+ S.visit(d,'fairtest',0,now+3);const next=P.route(S,{sciencePath:d},{kind:'practice',unit:'measurement'},now+4);assert.equal(next.unit,'measurement');
 });
+test('an adult-validated single written response is not kept as an automatic keyword error',()=>{
+ const d=S.fresh(),q=dissolve();teach(S,d,'fairtest',now-1000);const a=S.record(d,{...q,id:'synthetic-reviewed',rev:2,mode:'practice',phase:'transfer',at:now-10,responses:[{at:now-1,answer:partial,gradingVersion:2}]});S.review(d,a.id,'valid','Synthetic adult check',now+1);
+ assert.equal(a.firstCorrect,false);assert.equal(S.firstOutcomeFor(d,a),true);assert.equal(S.errorLog(d,now+2).length,0);assert.equal(S.feedbackEvidence(d,a),'independent-success');
+ const b=S.validate(d);assert.equal(S.firstOutcomeFor(b,b.attempts[0]),true);
+});
+
 test('new geometry steps use named faces and pairs, finite drawings, and checked inverse edge lengths',()=>{
  for(const id of ['geo-one-face','geo-face-pairs'])for(let form=0;form<4;form++)for(let i=0;i<150;i++){const q=E.B.make(id,form,i*104729),p=q.params;let cells=0;for(let face=0;face<p.n;face++)for(let x=0;x<p.w;x++)for(let y=0;y<p.h;y++)cells++;assert.equal(q.answer,form<2?cells:cells/p.n/p.w);assert.ok(E.B.mark(q,q.answerLabel));assert.doesNotMatch(F.diagram(q.figure,q.id),/NaN|undefined|Infinity/);}
 });

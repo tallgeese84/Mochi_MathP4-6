@@ -52,10 +52,11 @@ function route(E,s,r,now=Date.now(),manual=false){
  // A bounded revisit offers teaching for explicit evidence gaps. It does not rewrite an old score.
  const concern=recent.slice().reverse().find(a=>{
   if(a.components?.kind!=='written'||d.reviews[a.id]?.verdict==='valid')return false;
-  const q=E.question(a),p=E.B.ideaReport(q,a.responses.at(-1).answer);
-  return (d.reviews[a.id]?.verdict==='needs-discussion'||p.contradictions.length||/fair-plan/.test(q.writtenKey||'')&&p.missing.some(x=>/repeat/i.test(x)))&&(d.lessons[a.unit]?.lastViewedAt||0)<Math.max(a.answeredAt,d.reviews[a.id]?.verdict==='needs-discussion'?d.reviews[a.id].at:0);
+  return (d.reviews[a.id]?.verdict==='needs-discussion')&&(d.lessons[a.unit]?.lastViewedAt||0)<Math.max(a.answeredAt,d.reviews[a.id]?.verdict==='needs-discussion'?d.reviews[a.id].at:0);
  });
  if(concern&&!manual)return {kind:'learn',unit:concern.unit,repair:true,reason:'Build the explanation: choose what to measure, control the comparison, and repeat each condition.'};
+ const pendingCheck=!manual&&recent.slice().reverse().find(a=>E.pendingWriting(d,a)&&!history.some(x=>x.unit===a.unit&&x.form===1&&x.answeredAt>a.answeredAt));
+ if(pendingCheck&&E.evidence(d,pendingCheck.unit,now).taught)return {kind:'practice',unit:pendingCheck.unit,phase:'apply',reason:'Try one structured check. Your written explanation remains saved for review, not marked wrong.'};
  const id=r.unit;if(!id||!['practice','learn'].includes(r.kind))return r;
  const sameDay=history.filter(a=>E.dayKey(a.answeredAt)===E.dayKey(now)),tail=sameDay.slice(-3),pending=recent.some(a=>a.unit===id&&E.pendingWriting(d,a));
  if(!pending&&!(tail.length===3&&tail.every(a=>a.unit===id)))return r;

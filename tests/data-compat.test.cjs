@@ -1,5 +1,6 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 // Guards family sync, cloud backup, the Drive mirror and the progress-review export.
+// v7.7.3 adds allowlisted error tags only; upload/auth/merge semantics remain pinned.
 // App transports remain pinned; the archived v7.7 relay is kept as a negative control.
 // The downloadable relay now serves the whole family; its upload baseline is checked below.
 // If one must change, update its hash deliberately
@@ -11,7 +12,7 @@ const FROZEN={
  'cloud-backup.js':'f69f62d2800f09029020f5289a27f02844974e44dcc2105ed37243b28bdcc0e5',
  'drive-mirror.js':'5bc7fabf401e0179eeef99fbeb2cdae8cd6e9b3bddd4bdda8841e9c6cddfca08',
  'learning-review.js':'875a3ff6a0cdc34f338440ab3379a8278905f6c239ad56534d6cd97f045ceaef',
- 'network.js':'956bc684a5d280f41f2630304beaa93c138bf155b61a80f0144c2916b8810843',
+ 'network.js':'4ecd3ba590b545491448b81527b8171f08e994c88f1a151259aa082c312c4b2f',
  'tools/family-relay-tests/euna-only-v7.7.0.gs':'28722d9d45aaec8e3853f8af09efefbbe5d5062746306391089fa2164b4d967e'
 };
 test('sync/backup remain frozen; v7.7 read-only integration changes are pinned',()=>{

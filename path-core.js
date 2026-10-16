@@ -45,6 +45,20 @@ function independentFor(d,a){
  return !!(review?.verdict==='valid'&&review.at>=a.answeredAt&&a.responses.length===1&&!a.helped&&!a.revealed&&!a.guess&&!a.conflicted&&!a.skipped);
 }
 function pendingWriting(d,a){return !!(options.writingReview&&isWritten(a)&&!(d.reviews[a.id]?.at>=a.answeredAt&&d.reviews[a.id]?.verdict!=='unreviewed'));}
+// A free-text keyword result is not a verified first-answer outcome. Adult
+// reviews refer to the final submitted version, not every earlier revision.
+function firstOutcomeFor(d,a){
+ if(!options.writingReview||!isWritten(a))return !!a.firstCorrect;
+ if(pendingWriting(d,a)||a.responses.length!==1)return null;
+ return d.reviews[a.id]?.verdict==='valid'?true:d.reviews[a.id]?.verdict==='needs-discussion'?false:null;
+}
+function feedbackEvidence(d,a){
+ if(pendingWriting(d,a))return 'pending-review';
+ if(options.writingReview&&isWritten(a)&&d.reviews[a.id]?.verdict==='needs-discussion')return 'needs-discussion';
+ if(independentFor(d,a))return 'independent-success';
+ if(options.writingReview&&isWritten(a)&&d.reviews[a.id]?.verdict==='valid')return 'supported-success';
+ return a.correct?'supported-success':a.skipped?'unanswered':'confirmed-error';
+}
 function evidence(d,id,now=Date.now()){
  const all=d.attempts.filter(a=>a.unit===id&&a.mode==='practice'&&a.answeredAt<=now),answered=all.filter(a=>!a.skipped),eligible=answered.filter(a=>independentFor(d,a)&&(!a.seenBefore||a.exhausted&&!options.noRepeatCredit)&&a.phase!=='redo'),last=answered.at(-1),forms=new Set(eligible.map(a=>a.form));
  // Independent, unassisted answers on starting checks and timed papers also count: a starting check
@@ -54,14 +68,14 @@ function evidence(d,id,now=Date.now()){
  const recall=answered.filter(a=>(a.phase==='recall'||a.phase==='mixed')&&independentFor(d,a)&&a.recallOf&&a.at>=(d.attempts.find(x=>x.id===a.recallOf)?.answeredAt||Infinity)+7*DAY&&a.at>=a.lessonViewedAt+7*DAY);
  const success=[...eligible.filter(a=>independentFor(d,a)&&a.form>=1&&a.phase!=='redo'),...credit].sort((a,b)=>a.answeredAt-b.answeredAt).at(-1),gap=GAPS[Math.min(recall.length,GAPS.length-1)],due=transfer.length&&success?success.answeredAt+gap*DAY:0;
  const recent=answered.filter(a=>a.phase!=='redo'&&!pendingWriting(d,a));
- const needsTeaching=recent.length>=2&&recent.slice(-2).every(a=>!a.firstCorrect)&&((d.lessons[id]?.lastViewedAt||0)<recent.at(-1).answeredAt);
+ const needsTeaching=recent.length>=2&&recent.slice(-2).every(a=>firstOutcomeFor(d,a)===false)&&((d.lessons[id]?.lastViewedAt||0)<recent.at(-1).answeredAt);
  const taught=!!d.lessons[id]?.completedAt||paperTransfer.length>0;
  // Set a unit aside for a few days after repeated misses at its current step, so one stuck method never blocks the path.
- const need=apply.length<2?1:!transfer.length?2:0,lastWin=need?answered.filter(a=>a.form===need&&independentFor(d,a)).at(-1)?.answeredAt||0:0,misses=need?recent.filter(a=>a.form===need&&a.phase!=='mixed'&&!a.firstCorrect&&a.answeredAt>lastWin):[];
+ const need=apply.length<2?1:!transfer.length?2:0,lastWin=need?answered.filter(a=>a.form===need&&independentFor(d,a)).at(-1)?.answeredAt||0:0,misses=need?recent.filter(a=>a.form===need&&a.phase!=='mixed'&&firstOutcomeFor(d,a)===false&&a.answeredAt>lastWin):[];
  const parkedUntil=taught&&misses.length>=PARK_MISSES?misses.at(-1).answeredAt+PARK_DAYS*DAY:0;
  let stage=!taught?'Learn':apply.length<2?'Apply':!transfer.length?'Connect':!recall.length?'Revisit after a week':'Mixed-paper practice';
  const firstTransfer=transfer.map(a=>a.answeredAt).sort((a,b)=>a-b)[0]||0;
- return {id,title:unit(id).title,strand:unit(id).strand,stage,taught,attempts:answered.length,awaitingReview:answered.filter(a=>pendingWriting(d,a)).length,supported:answered.filter(a=>a.correct&&!independentFor(d,a)).length,independent:eligible.length,apply:apply.length,transfer:transfer.length,credited:checkApply.length+paperTransfer.length,forms:forms.size,delayed:recall.length,due,gap,overdue:!!due&&now>=due,needsTeaching,parked:now<parkedUntil,parkedUntil,firstTransfer,last:last?.answeredAt||0,lastSuccess:success?.id||'',reviewed:answered.filter(a=>d.reviews[a.id]?.verdict==='valid').length};
+ return {id,title:unit(id).title,strand:unit(id).strand,stage,taught,attempts:answered.length,awaitingReview:answered.filter(a=>pendingWriting(d,a)).length,supported:answered.filter(a=>feedbackEvidence(d,a)==='supported-success').length,confirmedErrors:answered.filter(a=>feedbackEvidence(d,a)==='confirmed-error').length,independent:eligible.length,apply:apply.length,transfer:transfer.length,credited:checkApply.length+paperTransfer.length,forms:forms.size,delayed:recall.length,due,gap,overdue:!!due&&now>=due,needsTeaching,parked:now<parkedUntil,parkedUntil,firstTransfer,last:last?.answeredAt||0,lastSuccess:success?.id||'',reviewed:answered.filter(a=>d.reviews[a.id]?.verdict==='valid').length};
 }
 const legacyMap={gst:'percent',percentWhole:'percent',repeatedRemainder:'remainders',workingBackwards:'remainders',cubeEdge:'volume',systematicCounting:'counting',rectanglesInGrid:'counting',factorsMultiples:'factors',constrainedDigits:'digits',areaTriangle:'area'};
 function bridge(s,d){if(options.bridge)return options.bridge(s,d);const groups=new Map();for(const a of s.learning?.attempts||[]){const id=legacyMap[a.generator];if(!id||a.skipped||!a.tries)continue;if(!groups.has(a.generator))groups.set(a.generator,[]);groups.get(a.generator).push(a);}return [...groups.values()].filter(a=>a.length>=2&&a.slice(-2).every(x=>!x.firstCorrect)).map(a=>({unit:legacyMap[a[0].generator],at:a.at(-1).answeredAt||a.at(-1).at})).filter(x=>!d.lessons[x.unit]?.completedAt&&(!d.lessons[x.unit]?.lastViewedAt||d.lessons[x.unit].lastViewedAt<x.at)).sort((a,b)=>b.at-a.at)[0]||null;}
@@ -110,7 +124,7 @@ function startMixedItem(d,now=Date.now()){
 /* Error log: every first-answer miss outside guided practice, with an optional reason tag.
    A missed question comes back unchanged a few days later; a first-try success clears it. */
 function errorLog(d,now=Date.now(),days=120){
- return d.attempts.filter(a=>!pendingWriting(d,a)&&!a.skipped&&!a.firstCorrect&&!['redo','guided','baseline'].includes(a.phase)&&a.answeredAt>=now-days*DAY&&a.answeredAt<=now).map(a=>{const e=d.errors[a.id]||{};return {id:a.id,unit:a.unit,strand:unit(a.unit).strand,title:unit(a.unit).title,form:a.form,mode:a.mode,phase:a.phase,at:a.answeredAt,question:a.question,answer:a.responses[0].answer,correctLater:a.correct,tag:e.tag||'',redoneAt:e.redoneAt||0,lastTry:e.lastTry||0};}).reverse();
+ return d.attempts.filter(a=>firstOutcomeFor(d,a)===false&&!a.skipped&&!['redo','guided','baseline'].includes(a.phase)&&a.answeredAt>=now-days*DAY&&a.answeredAt<=now).map(a=>{const e=d.errors[a.id]||{};return {id:a.id,unit:a.unit,strand:unit(a.unit).strand,title:unit(a.unit).title,form:a.form,mode:a.mode,phase:a.phase,at:a.answeredAt,question:a.question,answer:a.responses[0].answer,correctLater:a.correct,tag:e.tag||'',redoneAt:e.redoneAt||0,lastTry:e.lastTry||0};}).reverse();
 }
 function tagError(d,id,tag,now=Date.now()){if(!safeId(id)||!d.attempts.some(a=>a.id===id)||!TAGS.includes(tag))return false;d.errors[id]={...(d.errors[id]||{}),tag,at:now};return true;}
 function dueRedo(d,now=Date.now()){return errorLog(d,now,60).filter(e=>!e.redoneAt&&d.lessons[e.unit]?.completedAt&&now>=Math.max(e.at,e.lastTry)+REDO_DAYS*DAY).sort((a,b)=>a.at-b.at)[0]||null;}
@@ -281,7 +295,7 @@ function merge(a,b){
  return validate(d);
 }
 function exportData(d){return validate(d);}
-return {D,B,independentFor,pendingWriting,DAY,REV,TAGS,uid,unit,question,fresh,init,lesson,visit,concept,complete,record,evidence,recommend,startPractice,startMixed,startMixedItem,mixedNext,closeMixed,errorLog,tagError,dueRedo,startRedo,testDate,setTestDate,mockSchedule,dueMock,plan,answerFact,finishInvestigation,dayKey,touchDraft,help,respond,finishPractice,paperDefinitions,paperQuestions,startPaper,savePaperAnswer,interruptPaper,submitPaper,scorePaper,review,addExternal,report,validate,merge,exportData,ink};
+return {D,B,independentFor,pendingWriting,firstOutcomeFor,feedbackEvidence,DAY,REV,TAGS,uid,unit,question,fresh,init,lesson,visit,concept,complete,record,evidence,recommend,startPractice,startMixed,startMixedItem,mixedNext,closeMixed,errorLog,tagError,dueRedo,startRedo,testDate,setTestDate,mockSchedule,dueMock,plan,answerFact,finishInvestigation,dayKey,touchDraft,help,respond,finishPractice,paperDefinitions,paperQuestions,startPaper,savePaperAnswer,interruptPaper,submitPaper,scorePaper,review,addExternal,report,validate,merge,exportData,ink};
 }
 root.MochiPathCore={create};
 if(typeof module!=='undefined')module.exports=root.MochiPathCore;
