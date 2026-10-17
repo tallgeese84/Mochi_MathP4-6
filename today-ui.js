@@ -56,6 +56,7 @@ function runTask(t){
   ui.practice(t.unit,t.kind==='recall'?'recall':t.phase);
  }
  root.MochiNightlyPlan?.bind(t,ui.view(),S[stateKey(t.subject)]?.draft);
+ if(t.nightly&&S[stateKey(t.subject)]?.draft?.nightlyPlan)save(S);
  if(t.kind!=='paper'){if(extensionDay===P.localDay()&&t.subject==='maths')root.MochiPlanUI?.startMathsExtension();else root.MochiPlanUI?.start(t.subject);}
  paint();root.scrollTo?.({top:0,behavior:'instant'});
  }finally{nightlyLaunching=false;}

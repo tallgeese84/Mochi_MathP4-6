@@ -1,7 +1,7 @@
 /* A private, dated lesson queue. It never changes answers, evidence, rewards or time goals. */
 (function(root){
 'use strict';
-const SUBJECTS=['maths','science'],KEY={maths:'entrance',science:'sciencePath'},DAY=86400000;
+const ZONE='America/Chicago',SUBJECTS=['maths','science'],KEY={maths:'entrance',science:'sciencePath'},DAY=86400000;
 function day(at,zone){return new Intl.DateTimeFormat('en-CA',{timeZone:zone,year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(at));}
 function date(s){return typeof s==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(s)&&Number.isFinite(Date.parse(s+'T12:00:00Z'))&&new Date(s+'T12:00:00Z').toISOString().slice(0,10)===s;}
 function time(s){return typeof s==='string'&&/^\d{4}-\d\d-\d\dT.*Z$/.test(s)&&Number.isFinite(Date.parse(s));}
@@ -11,7 +11,7 @@ function validate(raw,engines,now=Date.now()){
  if(!exact(raw,['schema','id','revision','student','timeZone','reviewedDate','sessionDate','generatedAt','sourceExportedAt','subjects'])||raw.schema!==1)throw Error('Unsupported plan format.');
  if(typeof raw.id!=='string'||!/^[a-zA-Z0-9_-]{8,100}$/.test(raw.id)||!Number.isInteger(raw.revision)||raw.revision<1||raw.revision>10000||raw.student!=='Euna')throw Error('Invalid plan identity.');
  try{day(now,raw.timeZone);}catch(_){throw Error('Invalid plan timezone.');}
- if(typeof raw.timeZone!=='string'||raw.timeZone.length>60||!date(raw.reviewedDate)||!date(raw.sessionDate)||raw.reviewedDate>=raw.sessionDate)throw Error('Invalid plan dates.');
+ if(raw.timeZone!==ZONE||!date(raw.reviewedDate)||!date(raw.sessionDate)||raw.reviewedDate>=raw.sessionDate)throw Error('Invalid plan dates.');
  const gap=(Date.parse(raw.sessionDate)-Date.parse(raw.reviewedDate))/DAY;
  if(gap>3||!time(raw.generatedAt)||!time(raw.sourceExportedAt)||Date.parse(raw.sourceExportedAt)>Date.parse(raw.generatedAt)||Date.parse(raw.generatedAt)>now+300000||Date.parse(raw.generatedAt)-Date.parse(raw.sourceExportedAt)>3*DAY||day(Date.parse(raw.sourceExportedAt),raw.timeZone)<raw.reviewedDate)throw Error('Plan source is stale or inconsistent.');
  if(!exact(raw.subjects,SUBJECTS)||SUBJECTS.some(s=>!raw.subjects[s]))throw Error('Both subjects are required.');
@@ -32,10 +32,11 @@ function validate(raw,engines,now=Date.now()){
 }
 const signature=p=>JSON.stringify(p);
 function usable(p,now=Date.now()){return !!p&&day(now,p.timeZone)===p.sessionDate&&Date.parse(p.generatedAt)<=now+300000;}
-function fresh(plan,now=Date.now()){return {plan,receivedAt:now,adoptedAt:now,progress:{maths:{index:0,count:0,active:null},science:{index:0,count:0,active:null}}};}
+function fresh(plan,now=Date.now()){return {plan,receivedAt:now,adoptedAt:now,startedAt:null,progress:{maths:{index:0,count:0,active:null},science:{index:0,count:0,active:null}}};}
 function restore(raw,engines,now=Date.now()){
  if(!raw)return null;const plan=validate(raw.plan,engines,now),out=fresh(plan,now);
  out.receivedAt=Number.isFinite(raw.receivedAt)?raw.receivedAt:now;out.adoptedAt=Number.isFinite(raw.adoptedAt)?raw.adoptedAt:now;
+ out.startedAt=Number.isFinite(raw.startedAt)&&raw.startedAt>=out.adoptedAt&&raw.startedAt<=now?raw.startedAt:null;
  for(const s of SUBJECTS){const p=raw.progress?.[s],n=plan.subjects[s].steps.length;if(!p)continue;
   if(!Number.isInteger(p.index)||p.index<0||p.index>n||!Number.isInteger(p.count)||p.count<0||p.count>2)continue;
   out.progress[s]={index:p.index,count:p.count,active:p.active&&typeof p.active.id==='string'&&p.active.id.length<=150&&p.active.index===p.index?{id:p.active.id,index:p.index,unit:p.active.unit,kind:p.active.kind}:null};
@@ -58,11 +59,12 @@ function next(record,state,subject,engines,now=Date.now()){
  const phase=kind==='practice'?(bridge?'apply':step.phase==='transfer'&&ev.apply<2?'apply':step.phase):undefined;
  return {subject,kind,unit:u.id,title:u.title,resume:false,touched:0,detail:record.plan.subjects[subject].focus,nightly:true,planId:record.plan.id,stepIndex:p.index,...(phase?{phase}:{}),prerequisite:!!bridge||(kind==='lesson'&&step.kind==='practice')};
 }
-function bind(record,task,view,draft){
+function bind(record,task,view,draft,now=Date.now()){
  if(!record||!task.nightly||task.planId!==record.plan.id||task.prerequisite)return;
  const p=record.progress[task.subject];if(p.index!==task.stepIndex||view.unit!==task.unit)return;
  if(view.kind==='lesson')p.active={kind:'lesson',unit:view.unit,id:'lesson:'+view.unit,index:p.index};
  else if(view.kind==='practice'&&draft?.unit===task.unit)p.active={kind:'practice',unit:draft.unit,id:draft.id,index:p.index};
+ if(p.active){record.startedAt=record.startedAt||now;if(p.active.kind==='practice'&&!draft.nightlyPlan&&!draft.nightlyConflict)draft.nightlyPlan={planId:record.plan.id,revision:record.plan.revision,sessionDate:record.plan.sessionDate};}
 }
 function lessonDone(record,subject,id){const p=record?.progress[subject];if(p?.active?.kind!=='lesson'||p.active.unit!==id)return false;p.index++;p.count=0;p.active=null;return true;}
 function settle(record,state,subject){

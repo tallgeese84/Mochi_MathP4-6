@@ -11,7 +11,7 @@ const reason=code=>{health.reasonCode=code;};
 function resetHealth(){pendingReceivedAt=0;lastChecked=0;health={reasonCode:'NOT_CHECKED',lastAttemptAt:null,lastSuccessAt:null,consecutiveFailures:0,lastOffered:null};}
 function cancelRetry(){if(retryTimer!==null){clearTimeout(retryTimer);retryTimer=null;}}
 function retry(){cancelRetry();if(health.consecutiveFailures>2||document.hidden||navigator.onLine===false||!enabled())return;retryTimer=setTimeout(()=>{retryTimer=null;if(!document.hidden&&navigator.onLine!==false&&enabled())refresh(true);},health.consecutiveFailures===1?30000:120000);}
-const receipt=(p,receivedAt,adoptedAt=null)=>p?{planId:p.id,revision:p.revision,sessionDate:p.sessionDate,sourceExportedAt:p.sourceExportedAt,receivedAt:receivedAt?new Date(receivedAt).toISOString():null,adoptedAt:adoptedAt?new Date(adoptedAt).toISOString():null}:null;
+const receipt=(p,receivedAt,adoptedAt=null,startedAt=null)=>p?{planId:p.id,revision:p.revision,sessionDate:p.sessionDate,sourceExportedAt:p.sourceExportedAt,receivedAt:receivedAt?new Date(receivedAt).toISOString():null,adoptedAt:adoptedAt?new Date(adoptedAt).toISOString():null,startedAt:startedAt?new Date(startedAt).toISOString():null}:null;
 function get(k){try{return localStorage.getItem(k)||'';}catch(_){return '';}}
 function put(k,v){try{localStorage.setItem(k,v);return true;}catch(_){return false;}}
 const enabled=()=>get(DISABLED)!=='1';
@@ -33,7 +33,7 @@ function receive(plan){
  pending=plan;pendingReceivedAt=Date.now();persist();adopt();return true;
 }
 async function refresh(force=false){
- if(busy||!force&&Date.now()-lastAttempt<300000)return false;
+ if(busy||!force&&C.day(Date.now(),'America/Chicago')===C.day(lastAttempt,'America/Chicago')&&Date.now()-lastAttempt<300000)return false;
  const c=config();if(!enabled()){cancelRetry();reason('DISABLED');status='Nightly priorities are switched off. Built-in learning continues.';signal();return false;}
  if(!configured(c)){cancelRetry();resetHealth();reason('NOT_CONNECTED');record=null;pending=null;status='One-time connection needed: configure the existing Drive mirror, then upgrade its relay.';signal();return false;}
  if(navigator.onLine===false){cancelRetry();reason('OFFLINE');status='Offline. Using a saved plan for this date, or the built-in adaptive plan.';signal();return false;}
@@ -56,11 +56,11 @@ async function refresh(force=false){
  finally{if(epoch===requestEpoch)busy=false;}
 }
 function next(state,subject,now){return enabled()?C.next(record,state,subject,engines(),now):null;}
-function bind(task,view,draft){if(!enabled())return;C.bind(record,task,view,draft);persist();}
+function bind(task,view,draft){if(!enabled())return;C.bind(record,task,view,draft);persist();signal();}
 function boundary(state,subject){if(!enabled())return;if(C.settle(record,state,subject))persist();}
 function lessonDone(subject,id){if(!enabled())return;if(C.lessonDone(record,subject,id))persist();}
 function label(){const p=currentPlan();if(p)return `Nightly priorities · ${p.sessionDate} · based on ${p.reviewedDate}`;return enabled()?'Built-in plan · no nightly priorities loaded for this date':'Built-in adaptive plan';}
-function report(){const p=currentPlan();return {schema:1,enabled:enabled(),lastCheckedAt:lastChecked?new Date(lastChecked).toISOString():null,status:p?'available':'built-in',diagnostics:{...health},received:receipt(pending||record?.plan,pending?pendingReceivedAt:record?.receivedAt,pending?null:record?.adoptedAt),active:p?receipt(p,record.receivedAt,record.adoptedAt):null,...(p?{planId:p.id,revision:p.revision,sessionDate:p.sessionDate,reviewedDate:p.reviewedDate,sourceExportedAt:p.sourceExportedAt,receivedAt:new Date(record.receivedAt).toISOString(),adoptedAt:new Date(record.adoptedAt).toISOString(),steps:Object.fromEntries(['maths','science'].map(s=>[s,{index:record.progress[s].index,total:p.subjects[s].steps.length,questionsInStep:record.progress[s].count,activeQuestion:record.progress[s].active?.kind==='practice'?record.progress[s].active.id:null}]))}:{})};}
+function report(){const p=currentPlan();return {schema:1,enabled:enabled(),lastCheckedAt:lastChecked?new Date(lastChecked).toISOString():null,status:p?'available':'built-in',diagnostics:{...health},received:receipt(pending||record?.plan,pending?pendingReceivedAt:record?.receivedAt,pending?null:record?.adoptedAt),active:p?receipt(p,record.receivedAt,record.adoptedAt,record.startedAt):null,delivery:{localDate:C.day(Date.now(),'America/Chicago'),timeZone:'America/Chicago',stage:p?(record.startedAt?'work-started':'adopted-awaiting-task'):pending&&C.usable(pending)?'received-awaiting-boundary':pending&&pending.sessionDate>C.day(Date.now(),'America/Chicago')?'future-plan-cached':'built-in'},...(p?{planId:p.id,revision:p.revision,sessionDate:p.sessionDate,reviewedDate:p.reviewedDate,sourceExportedAt:p.sourceExportedAt,receivedAt:new Date(record.receivedAt).toISOString(),adoptedAt:new Date(record.adoptedAt).toISOString(),steps:Object.fromEntries(['maths','science'].map(s=>[s,{index:record.progress[s].index,total:p.subjects[s].steps.length,questionsInStep:record.progress[s].count,activeQuestion:record.progress[s].active?.kind==='practice'?record.progress[s].active.id:null}]))}:{})};}
 function paint(){
  // Euna sees a friendly line only when a plan is in use; plan dates and status stay in Grown-ups.
  const small=$('todayNightlyStatus');if(small){const on=!!currentPlan();small.textContent=on?'Today’s quests were picked just for you.':'';small.hidden=!on;}
