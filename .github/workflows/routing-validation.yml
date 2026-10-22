@@ -1,20 +1,38 @@
-name: Routing validation snapshot
+name: Validate daily focus handoff
 on:
   push:
     branches: [fix/daily-focus-handoff]
 permissions:
   contents: read
+concurrency:
+  group: daily-focus-handoff-validation
+  cancel-in-progress: true
 jobs:
-  snapshot:
+  repair:
+    if: github.ref == 'refs/heads/fix/daily-focus-handoff'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
         with:
-          persist-credentials: false
-      - name: Archive tracked public source only
-        run: git archive --format=zip HEAD -o "$RUNNER_TEMP/routing-source.zip"
-      - uses: actions/upload-artifact@v4
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v4
         with:
-          name: routing-public-source
-          path: ${{ runner.temp }}/routing-source.zip
-          retention-days: 1
+          node-version: '24'
+          cache: npm
+      - name: Apply byte-verified public source repair
+        run: |
+          node tools/apply-routing-fix.cjs
+          node scripts/release.cjs
+      - run: npm ci --ignore-scripts
+      - run: npm run check:release
+      - run: npm run check:course
+      - name: All regressions including full-page controls
+        run: npm test
+      - name: Commit validated changes to the isolated fix branch only
+        run: |
+          git rm .github/workflows/routing-validation.yml tools/apply-routing-fix.cjs
+          git add nightly-plan-core.js nightly-plan.js today-core.js today-ui.js entrance-ui.js science-path-ui.js docs/NIGHTLY_PLAN.md release.json index.html app.js sw.js manifest.webmanifest
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'Fix daily focus handoff and publish v7.7.5 source'
+          git push origin HEAD:refs/heads/fix/daily-focus-handoff
