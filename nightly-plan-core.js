@@ -43,6 +43,38 @@ function restore(raw,engines,now=Date.now()){
  }
  return out;
 }
+// Waiting work needs a route, not only a veto. These helpers are read-only.
+function pending(record,subject,now=Date.now()){
+ return !!(record&&SUBJECTS.includes(subject)&&usable(record.plan,now)&&record.plan.subjects[subject].steps[record.progress[subject].index]);
+}
+function reviewedToday(d,plan){
+ const today=at=>!!at&&day(at,plan.timeZone)===plan.sessionDate;
+ // A submitted single recall satisfies the scheduling allowance, even after a
+ // mistake. This is NOT delayed-recall mastery and does not change its evidence.
+ return (d.mixedLog||[]).some(x=>today(x.completedAt))||(d.attempts||[]).some(a=>a.phase==='recall'&&!a.skipped&&a.responses?.some(x=>today(x.at))&&d.draft?.id!==a.id);
+}
+function routing(record,state,subject,engines,now=Date.now()){
+ if(!record||!SUBJECTS.includes(subject)||!usable(record.plan,now))return {reasonCode:'NO_CURRENT_PLAN'};
+ if(!pending(record,subject,now))return {reasonCode:'PLAN_COMPLETE'};
+ const E=engines[subject],d=state[KEY[subject]]||E.fresh();
+ if(Object.values(d.papers||{}).some(x=>!x.submittedAt))return {reasonCode:'SAVED_PAPER'};
+ if(d.draft&&!d.attempts.find(a=>a.id===d.draft.id)?.correct)return {reasonCode:'SAVED_DRAFT'};
+ if(Object.entries(d.lessons||{}).some(([id,l])=>E.unit(id)&&l.visited?.length&&!l.completedAt))return {reasonCode:'SAVED_LESSON'};
+ if(d.mixed&&!d.mixed.completedAt&&E.mixedNext(d))return {reasonCode:'SAVED_MIXED'};
+ if(!reviewedToday(d,record.plan)&&E.D.units.some(u=>E.evidence(d,u.id,now).overdue))return {reasonCode:'DUE_RECALL'};
+ return {reasonCode:'READY'};
+}
+function prelude(record,state,subject,engines,now=Date.now()){
+ const reasonCode=routing(record,state,subject,engines,now).reasonCode;
+ if(!['SAVED_MIXED','DUE_RECALL'].includes(reasonCode))return null;
+ const E=engines[subject],d=state[KEY[subject]]||E.fresh();
+ const base={subject,nightlyPrelude:true,reasonCode,touched:0,resume:false};
+ if(reasonCode==='SAVED_MIXED')return {...base,kind:'mixed',title:'Mixed practice',resume:true,touched:d.mixed.at,detail:'Finish your saved short set, then continue today’s focus.'};
+ const rows=E.D.units.map(u=>E.evidence(d,u.id,now)),ready=rows.filter(e=>e.taught&&e.apply>=1&&!E.prerequisite?.(d,e.id,now));
+ if(ready.length>=2)return {...base,kind:'mixed',title:'Mixed practice',detail:'One short review set, then today’s focus.'};
+ const due=rows.filter(e=>e.overdue).sort((a,b)=>a.due-b.due)[0];
+ return due?{...base,kind:'recall',unit:due.id,title:due.title,detail:'Try this review without the lesson, then continue today’s focus.'}:null;
+}
 function next(record,state,subject,engines,now=Date.now()){
  if(!record||!SUBJECTS.includes(subject)||!usable(record.plan,now))return null;
  const E=engines[subject],d=state[KEY[subject]]||E.fresh(),p=record.progress[subject],step=record.plan.subjects[subject].steps[p.index];
@@ -52,8 +84,7 @@ function next(record,state,subject,engines,now=Date.now()){
  if(d.draft&&!d.attempts.find(a=>a.id===d.draft.id)?.correct)return null;
  if(d.mixed&&!d.mixed.completedAt&&E.mixedNext(d))return null;
  if(Object.entries(d.lessons||{}).some(([id,l])=>E.unit(id)&&l.visited?.length&&!l.completedAt))return null;
- const reviewedToday=(d.mixedLog||[]).some(x=>x.completedAt&&day(x.completedAt,record.plan.timeZone)===record.plan.sessionDate);
- if(!reviewedToday&&E.D.units.some(u=>E.evidence(d,u.id,now).overdue))return null;
+ if(!reviewedToday(d,record.plan)&&E.D.units.some(u=>E.evidence(d,u.id,now).overdue))return null;
  const bridge=E.prerequisite?.(d,step.unit,now),u=E.unit(bridge||step.unit),ev=E.evidence(d,u.id,now);
  const kind=(bridge?!ev.taught||ev.needsTeaching:step.kind==='lesson'||!ev.taught)?'lesson':'practice';
  const phase=kind==='practice'?(bridge?'apply':step.phase==='transfer'&&ev.apply<2?'apply':step.phase):undefined;
@@ -76,6 +107,6 @@ function settle(record,state,subject){
  p.count++;p.active=null;const step=record.plan.subjects[subject].steps[p.index];
  if(p.count>=(step?.count||1)){p.index++;p.count=0;}return true;
 }
-root.MochiNightlyPlanCore={validate,usable,fresh,restore,next,bind,lessonDone,settle,signature,day};
+root.MochiNightlyPlanCore={validate,usable,fresh,restore,pending,routing,prelude,next,bind,lessonDone,settle,signature,day};
 if(typeof module!=='undefined')module.exports=root.MochiNightlyPlanCore;
 })(typeof window!=='undefined'?window:globalThis);

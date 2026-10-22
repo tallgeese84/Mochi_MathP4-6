@@ -110,3 +110,11 @@ private response and synthetic learning records to exercise actual app controls,
 revision changes without a software release, notes preservation, deferred adoption,
 failure/legacy-relay fallback, both queues, paper deadlines, export privacy and 375px
 layout. Existing tests continue to check old questions, papers, rewards and timers.
+
+## Focus handoff (v7.7.5)
+
+A received queue is not a started queue. Daily Quests now explicitly resumes an unfinished short mixed set before the private focus instead of falling back to an unrelated adaptive repair. A completed single recall or short mixed set satisfies the daily routing allowance irrespective of correctness; this is scheduling only, never mastery credit. Drafts, incomplete lessons, active papers and prerequisite teaching still come first.
+
+Within Daily Quests, Another question, Try a similar guided question and the end of a mixed set re-evaluate the same focused route at the explicit Next boundary. Subject-overview Continue also enters that route while the subject's saved time block is available. Deliberate library and bonus activity remains separate, and no received plan interrupts an open answer or changes a time goal.
+
+The private export adds a read-only `nightlyPlanReview.routing` entry for each subject: `SAVED_PAPER`, `SAVED_DRAFT`, `SAVED_LESSON`, `SAVED_MIXED`, `DUE_RECALL`, `READY`, `PLAN_COMPLETE`, `NO_CURRENT_PLAN` or `DISABLED`. These are blockers/availability, not evidence of starting or completing learning. Only actual planned questions receive plan provenance.

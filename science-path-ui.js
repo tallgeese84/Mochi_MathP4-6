@@ -36,10 +36,13 @@ function open(kind='home',id,practicePhase){
  const skip=document.querySelector('.skip-link');if(skip){skip.href='#spTitle';skip.textContent='Skip to the learning activity';}
  $('spTitle')?.focus({preventScroll:true});
 }
-function nextRecommended(){if(root.MochiTodayUI?.atBoundary('science'))return;if(root.MochiTodayUI?.routeNightly('science'))return;const r=E.recommend(S);if(r.kind==='paper'){open('paper',r.paper);return;}if(r.kind==='resume'){if(data().draft.phase==='mixed'){mixed();return;}open('practice',data().draft.unit);return;}if(r.kind==='mixed-set'){mixed();return;}if(r.kind==='redo'){redo(r.attempt);return;}if(r.kind==='mixed'){if(root.MochiTodayUI)beginPractice(root.MochiToday.task(S,'science').unit);else open('papers');return;}if(r.kind==='learn'){open('lesson',r.unit);return;}beginPractice(r.unit,r.kind==='recall'?'recall':r.phase);}
+function nextRecommended(){if(view.kind==='home'&&root.MochiTodayUI?.launchSubject?.('science'))return;if(root.MochiTodayUI?.atBoundary('science'))return;if(root.MochiTodayUI?.routeNightly('science'))return;const r=E.recommend(S);if(r.kind==='paper'){open('paper',r.paper);return;}if(r.kind==='resume'){if(data().draft.phase==='mixed'){mixed();return;}open('practice',data().draft.unit);return;}if(r.kind==='mixed-set'){mixed();return;}if(r.kind==='redo'){redo(r.attempt);return;}if(r.kind==='mixed'){if(root.MochiTodayUI)beginPractice(root.MochiToday.task(S,'science').unit);else open('papers');return;}if(r.kind==='learn'){open('lesson',r.unit);return;}beginPractice(r.unit,r.kind==='recall'?'recall':r.phase);}
 /* A short mixed set: no topic title, no method hint, so she decides which method fits. */
 function mixed(){
- if(root.MochiTodayUI?.atBoundary('science'))return;capture(true);const d=data();
+ if(root.MochiTodayUI?.atBoundary('science'))return;
+ // Do not start a second mixed set when the finished one was the prelude.
+ if(!data().draft&&!E.mixedNext(data())&&root.MochiTodayUI?.routeNightly('science'))return;
+ capture(true);const d=data();
  if(d.draft&&d.draft.phase!=='mixed'){const old=d.attempts.find(a=>a.id===d.draft.id);if(!old?.correct&&!confirm('A question and its working are saved. Start the mixed set instead? The recorded answers will remain, but this unsent draft will be replaced.')){open('practice',d.draft.unit);return;}E.finishPractice(d);}
  if(d.draft&&d.attempts.find(a=>a.id===d.draft.id&&(a.correct||a.responses.length>=2))||d.draft?.revealed)E.finishPractice(d);
  const v=E.startMixedItem(d);save(S);if(!v){open('home');return;}open('practice',v.unit);
@@ -51,6 +54,9 @@ function redo(id){
  const v=d.draft?.redoOf===id?d.draft:E.startRedo(d,id);save(S);if(!v){open('home');return;}open('practice',v.unit);
 }
 function beginPractice(id,phase){
+ // Another/similar question is an explicit boundary in Daily Quests too.
+ if(root.MochiTodayUI?.atBoundary('science'))return;
+ if(!data().draft&&root.MochiTodayUI?.routeNightly('science'))return;
  const route=E.practiceRoute?.(S,id,phase);if(route){if(route.kind==='learn'){open('lesson',route.unit);return;}id=route.unit;phase=route.phase;}
  if(root.MochiTodayUI?.atBoundary('science'))return;
  // Save the old screen before changing draft identity. Otherwise open() could copy

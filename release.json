@@ -1,5 +1,5 @@
 {
-  "version": "7.7.4",
-  "releasedOn": "2026-10-17",
-  "summary": "Correctly dated private priorities, verified publication and question-level delivery evidence. Saved work and rewards stay intact."
+  "version": "7.7.5",
+  "releasedOn": "2026-10-22",
+  "summary": "Daily Quests finish saved work and short recall before starting private priorities; next-question buttons keep the focused route. History, time goals and rewards are unchanged."
 }
