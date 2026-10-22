@@ -40,6 +40,14 @@ function open(){
  root.scrollTo?.({top:0,behavior:'instant'});
 }
 function launch(){extensionDay='';root.MochiNightlyPlan?.adopt();runTask(T.model(S).next);}
+// Subject overview Continue is another entrance to the daily route, not a
+// separate adaptive queue. Deliberate library/bonus choices remain free choice.
+function launchSubject(subject){
+ if(nightlyLaunching||!root.MochiNightlyPlan?.pending?.(subject)||!permitNavigation())return false;
+ root.MochiNightlyPlan?.adopt();const block=T.model(S).blocks.find(b=>b.subject===subject);
+ if(!block||block.rest||block.done){open();return true;}
+ extensionDay='';runTask(block.task);return true;
+}
 function launchMathsExtension(){root.MochiNightlyPlan?.adopt();const t=Q?.mathsExtensionTask(S);if(!t)return;extensionDay=P.localDay();runTask(t);}
 function runTask(t){
  if(!t){leave();studioShow('room');return;}
@@ -62,10 +70,14 @@ function runTask(t){
  }finally{nightlyLaunching=false;}
 }
 function routeNightly(subject){
- if(!guided||nightlyLaunching)return false;
+ if(!guided||nightlyLaunching||extensionDay&&subject==='maths')return false;
  root.MochiNightlyPlan?.boundary(S,subject);root.MochiNightlyPlan?.adoptAtBoundary(S,subject);
- if(!root.MochiNightlyPlan?.active())return false;
- const task=T.task(S,subject);if(!task.nightly)return false;runTask(task);return true;
+ if(!root.MochiNightlyPlan?.pending?.(subject))return false;
+ const block=T.model(S).blocks.find(b=>b.subject===subject);
+ if(!block||block.rest||block.done){open();return true;}
+ const task=block.task;
+ if(!task.nightly&&!task.nightlyPrelude&&!task.resume)return false;
+ runTask(task);return true;
 }
 function launchBonus(subject=''){
  if(!Q)return;const task=Q.bonusTask(S,Date.now(),subject);if(!task)return;const status=Q.status(S);
@@ -220,7 +232,7 @@ function init(){
  $('todayParent').onclick=()=>{closeMenu();$('adultBtn').click();};
  $('todayWeekly').onclick=()=>{closeMenu();focusOpen('sessionPanel',$('todayMore'));$('mochiFocusHome').open=true;$('mochiFocusHome').scrollIntoView({block:'nearest'});};
  const bind=()=>{$('studioHome').onclick=e=>{e.preventDefault();open();};};bind();
- root.MochiTodayUI={open,leave,launch,atBoundary,routeNightly,paint,visible:()=>!home.hidden,refresh:()=>{bind();lastHome='';open();}};
+ root.MochiTodayUI={open,leave,launch,launchSubject,atBoundary,routeNightly,paint,visible:()=>!home.hidden,refresh:()=>{bind();lastHome='';open();}};
  document.body.classList.add('today-enabled');
  document.addEventListener('mochi:activity',paint);
  document.addEventListener('mochi:nightly-plan',()=>{lastHome='';paint();});

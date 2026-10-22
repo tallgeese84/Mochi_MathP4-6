@@ -56,11 +56,14 @@ async function refresh(force=false){
  finally{if(epoch===requestEpoch)busy=false;}
 }
 function next(state,subject,now){return enabled()?C.next(record,state,subject,engines(),now):null;}
+function prelude(state,subject,now){return enabled()?C.prelude(record,state,subject,engines(),now):null;}
+function hasPending(subject,now=Date.now()){return enabled()&&C.pending(record,subject,now);}
+function routeReport(){return typeof S==='undefined'?{}:Object.fromEntries(['maths','science'].map(subject=>[subject,enabled()?C.routing(record,S,subject,engines()):{reasonCode:'DISABLED'}]));}
 function bind(task,view,draft){if(!enabled())return;C.bind(record,task,view,draft);persist();signal();}
 function boundary(state,subject){if(!enabled())return;if(C.settle(record,state,subject))persist();}
 function lessonDone(subject,id){if(!enabled())return;if(C.lessonDone(record,subject,id))persist();}
 function label(){const p=currentPlan();if(p)return `Nightly priorities · ${p.sessionDate} · based on ${p.reviewedDate}`;return enabled()?'Built-in plan · no nightly priorities loaded for this date':'Built-in adaptive plan';}
-function report(){const p=currentPlan();return {schema:1,enabled:enabled(),lastCheckedAt:lastChecked?new Date(lastChecked).toISOString():null,status:p?'available':'built-in',diagnostics:{...health},received:receipt(pending||record?.plan,pending?pendingReceivedAt:record?.receivedAt,pending?null:record?.adoptedAt),active:p?receipt(p,record.receivedAt,record.adoptedAt,record.startedAt):null,delivery:{localDate:C.day(Date.now(),'America/Chicago'),timeZone:'America/Chicago',stage:p?(record.startedAt?'work-started':'adopted-awaiting-task'):pending&&C.usable(pending)?'received-awaiting-boundary':pending&&pending.sessionDate>C.day(Date.now(),'America/Chicago')?'future-plan-cached':'built-in'},...(p?{planId:p.id,revision:p.revision,sessionDate:p.sessionDate,reviewedDate:p.reviewedDate,sourceExportedAt:p.sourceExportedAt,receivedAt:new Date(record.receivedAt).toISOString(),adoptedAt:new Date(record.adoptedAt).toISOString(),steps:Object.fromEntries(['maths','science'].map(s=>[s,{index:record.progress[s].index,total:p.subjects[s].steps.length,questionsInStep:record.progress[s].count,activeQuestion:record.progress[s].active?.kind==='practice'?record.progress[s].active.id:null}]))}:{})};}
+function report(){const p=currentPlan();return {schema:1,enabled:enabled(),lastCheckedAt:lastChecked?new Date(lastChecked).toISOString():null,status:p?'available':'built-in',diagnostics:{...health},routing:routeReport(),received:receipt(pending||record?.plan,pending?pendingReceivedAt:record?.receivedAt,pending?null:record?.adoptedAt),active:p?receipt(p,record.receivedAt,record.adoptedAt,record.startedAt):null,delivery:{localDate:C.day(Date.now(),'America/Chicago'),timeZone:'America/Chicago',stage:p?(record.startedAt?'work-started':'adopted-awaiting-task'):pending&&C.usable(pending)?'received-awaiting-boundary':pending&&pending.sessionDate>C.day(Date.now(),'America/Chicago')?'future-plan-cached':'built-in'},...(p?{planId:p.id,revision:p.revision,sessionDate:p.sessionDate,reviewedDate:p.reviewedDate,sourceExportedAt:p.sourceExportedAt,receivedAt:new Date(record.receivedAt).toISOString(),adoptedAt:new Date(record.adoptedAt).toISOString(),steps:Object.fromEntries(['maths','science'].map(s=>[s,{index:record.progress[s].index,total:p.subjects[s].steps.length,questionsInStep:record.progress[s].count,activeQuestion:record.progress[s].active?.kind==='practice'?record.progress[s].active.id:null}]))}:{})};}
 function paint(){
  // Euna sees a friendly line only when a plan is in use; plan dates and status stay in Grown-ups.
  const small=$('todayNightlyStatus');if(small){const on=!!currentPlan();small.textContent=on?'Today’s quests were picked just for you.':'';small.hidden=!on;}
@@ -86,6 +89,6 @@ function init(){
  const start=()=>{stop();foregroundTimer=setInterval(()=>{if(!document.hidden)refresh();},300000);};
  root.addEventListener('pagehide',()=>{stop();cancelRetry();});root.addEventListener('pageshow',()=>{start();refresh();});start();
 }
-root.MochiNightlyPlan={next,bind,boundary,lessonDone,refresh,adopt,adoptAtBoundary,label,report,paint,active:()=>!!currentPlan()};
+root.MochiNightlyPlan={next,prelude,pending:hasPending,bind,boundary,lessonDone,refresh,adopt,adoptAtBoundary,label,report,paint,active:()=>!!currentPlan()};
 if(root.MochiReady)init();else document.addEventListener('mochi:ready',init,{once:true});
 })(window);
