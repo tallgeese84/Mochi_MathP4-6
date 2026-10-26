@@ -160,7 +160,7 @@ function respond(d,now=Date.now()){
  // New-twist/mixed work already requires a plan. In a nightly microcycle, the
  // changed application and final challenge also require visible reasoning before
  // the first check. This is a learning prompt, never an extra marked mistake.
- const nightlyReasoning=!!v.nightlyPlan&&['apply','transfer'].includes(v.phase);
+ const nightlyReasoning=!!v.nightlyPlan&&q.kind!=='written'&&['apply','transfer'].includes(v.phase);
  if((nightlyReasoning||options.requireMethod&&['transfer','mixed'].includes(v.phase))&&!old&&v.working.trim().length<6&&!v.strokes.length)return {ok:false,method:true,reason:nightlyReasoning?'Show one line of your thinking before you check. What relationship or operation are you using? This is not counted as a mistake.':'Write your plan in one sentence before you check, for example “Work backwards from the end.” This is not counted as a mistake.'};
  const previous=old?.responses.at(-1);
  if(previous&&previous.answer.trim()===v.answer.trim()&&(previous.working||'')===v.working&&JSON.stringify(previous.strokes||[])===JSON.stringify(v.strokes))return {ok:false,duplicate:true,reason:'You have already given this answer. Change your answer or add a new step to your working. No extra mistake is counted.'};
