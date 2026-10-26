@@ -157,8 +157,11 @@ function respond(d,now=Date.now()){
  if(!v.answer.trim())return {ok:false,reason:'Enter an answer first.'};
  if(B.validAnswer&&!B.validAnswer(q,v.answer))return {ok:false,reason:B.invalidReason?.(q,v.answer)||'Select a conclusion (or every statement) and a reason before checking. This incomplete response has not been counted as an error.'};
  if(typeof q.answer!=='string'&&!B.parse(v.answer,q.suffix))return {ok:false,reason:'Check the format of your answer. Use a number, a fraction or an answer in terms of π. This is not counted as a mistake.'};
- // On new-twist and mixed questions, a one-line plan comes before the first check (not counted as a mistake).
- if(options.requireMethod&&['transfer','mixed'].includes(v.phase)&&!old&&v.working.trim().length<6&&!v.strokes.length)return {ok:false,method:true,reason:'Write your plan in one sentence before you check, for example “Work backwards from the end.” This is not counted as a mistake.'};
+ // New-twist/mixed work already requires a plan. In a nightly microcycle, the
+ // changed application and final challenge also require visible reasoning before
+ // the first check. This is a learning prompt, never an extra marked mistake.
+ const nightlyReasoning=!!v.nightlyPlan&&['apply','transfer'].includes(v.phase);
+ if((nightlyReasoning||options.requireMethod&&['transfer','mixed'].includes(v.phase))&&!old&&v.working.trim().length<6&&!v.strokes.length)return {ok:false,method:true,reason:nightlyReasoning?'Show one line of your thinking before you check. What relationship or operation are you using? This is not counted as a mistake.':'Write your plan in one sentence before you check, for example “Work backwards from the end.” This is not counted as a mistake.'};
  const previous=old?.responses.at(-1);
  if(previous&&previous.answer.trim()===v.answer.trim()&&(previous.working||'')===v.working&&JSON.stringify(previous.strokes||[])===JSON.stringify(v.strokes))return {ok:false,duplicate:true,reason:'You have already given this answer. Change your answer or add a new step to your working. No extra mistake is counted.'};
  if(old?.responses.length>=12)return {ok:false,reason:'Study the worked example, then try a new question.'};
