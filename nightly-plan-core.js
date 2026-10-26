@@ -99,9 +99,12 @@ function next(record,state,subject,engines,now=Date.now()){
  if(!reviewedToday(d,record.plan)&&E.D.units.some(u=>E.evidence(d,u.id,now).overdue))return null;
  const bridge=E.prerequisite?.(d,step.unit,now),u=E.unit(bridge||step.unit),ev=E.evidence(d,u.id,now);
  const kind=(bridge?!ev.taught||ev.needsTeaching:step.kind==='lesson'||!ev.taught)?'lesson':'practice',requested=micro&&!bridge?micro.phase:step.phase;
- // The third slot remains conservative: if prerequisites do not yet support
- // transfer, it stays a changed application rather than forcing a leap.
- const phase=kind==='practice'?(bridge?'apply':requested==='transfer'&&ev.apply<2?'apply':requested):undefined;
+ // The final microcycle challenge can transfer after the immediately preceding
+ // changed application was a fresh first-try independent success. Otherwise the
+ // third slot stays at application level; the normal evidence gate still wins.
+ const priorApply=micro?.current===3?[...d.attempts].reverse().find(a=>a.nightlyPlan?.planId===record.plan.id&&a.nightlyPlan?.revision===record.plan.revision&&a.nightlyPlan?.sessionDate===record.plan.sessionDate&&a.phase==='apply'):null;
+ const microTransfer=!!(priorApply?.independent&&priorApply.firstCorrect&&!priorApply.seenBefore),transferReady=ev.apply>=2||microTransfer;
+ const phase=kind==='practice'?(bridge?'apply':requested==='transfer'&&!transferReady?'apply':requested):undefined;
  return {subject,kind,unit:u.id,title:u.title,resume:false,touched:0,detail:record.plan.subjects[subject].focus,nightly:true,planId:record.plan.id,stepIndex:p.index,...(phase?{phase}:{}),...(micro?{microcycle:true,challengeIndex:micro.current}:{}),prerequisite:!!bridge||(kind==='lesson'&&step.kind==='practice')};
 }
 function bind(record,task,view,draft,now=Date.now()){
