@@ -32,7 +32,7 @@ const w=dom.window,delay=ms=>new Promise(r=>setTimeout(r,ms));
  check('sp',E,d);click('spMorePractice');
  assert.equal(r.progress.science.index,1,'Another question settles the actual planned slot');assert.equal(d.draft.phase,'apply');assert.equal(d.draft.nightlyPlan.planId,p.id);assert.equal(d.draft.working,'','old working cannot leak into new check');
  check('sp',E,d);click('spMorePractice');
- assert.equal(r.progress.science.count,1);assert.equal(d.draft.phase,'apply');assert.equal(d.draft.nightlyPlan.planId,p.id);
+ assert.equal(r.progress.science.count,1);assert.equal(d.draft.phase,'transfer');assert.equal(d.draft.nightlyPlan.planId,p.id);
  check('sp',E,d);click('spNextPractice');
  assert.equal(r.progress.science.index,2);const planned=d.attempts.filter(a=>a.nightlyPlan?.planId===p.id);assert.equal(planned.length,3);assert.equal(planned[0].helped,true);assert.equal(planned[0].independent,false);assert.equal(JSON.stringify(d.attempts.slice(0,2)),oldAnswers,'old errors retained');assert.equal(JSON.stringify(state.planner.schedule),schedule);assert.equal(state.coins,42);
  // Maths resumes an incomplete lesson, then enters the planned practice.
@@ -42,6 +42,6 @@ const w=dom.window,delay=ms=>new Promise(r=>setTimeout(r,ms));
  assert.equal(md.draft.unit,'percent');assert.equal(md.draft.nightlyPlan.planId,p.id);assert.equal(M.lesson(md,'relationships').notes,'Keep my synthetic notebook.');
  check('ep',M,md);w.MochiPlanUI.pause();const minutes=w.MochiPlanner.minutes(state.planner,'maths'),end=Date.now()-10000;state.planner.sessions.push({id:'synthetic-completed-time',subject:'maths',day:w.MochiPlanner.localDay(),start:end-minutes*60000,end});
  click('epNextPractice');assert.equal(w.MochiTodayUI.visible(),true,'time limit returns home');assert.equal(md.draft,null,'no extra compulsory question');assert.equal(r.progress.maths.index,1,'recorded answer settled without completing remaining steps');assert.equal(JSON.stringify(state.planner.schedule),schedule);assert.equal(w.MochiTodayUI.routeNightly('science'),false,'free choice is not intercepted');assert.deepEqual(errors,[]);
- console.log('Full-page routing: saved set and lesson -> focus -> guided + two applications; provenance, time limit and history preserved.');
+ console.log('Full-page routing: saved set and lesson -> focus -> guided + application + transfer; provenance, time limit and history preserved.');
  dom.window.close();
 })().catch(e=>{console.error(e);dom.window.close();process.exitCode=1;});

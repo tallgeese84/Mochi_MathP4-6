@@ -10,4 +10,6 @@ test('Mochi reacts without guilt and remembers the reaction for the same questio
  const a=B.slot('ep','q1'),b=B.slot('ep','q1');
  assert.equal(a.match(/mochi-buddy-says">([^<]*)/)[1],b.match(/mochi-buddy-says">([^<]*)/)[1]);
  assert.match(a,/aria-live="polite"/);
+ const fake={dataset:{key:'q2'},querySelector:()=>({textContent:''}),classList:{remove(){},add(){}},offsetWidth:1};
+ const oldDoc=global.document;global.document={getElementById:()=>fake};try{assert.equal(B.react('ep',{correct:true,independent:true,responses:1,encouragement:'2/3 cleared — clean solve!'}),'independent');assert.equal(B.slot('ep','q2').includes('2/3 cleared — clean solve!'),true);}finally{global.document=oldDoc;}
 });

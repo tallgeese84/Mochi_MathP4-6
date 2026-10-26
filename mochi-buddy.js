@@ -4,11 +4,11 @@
 (function(root){
 'use strict';
 const lines={
- calm:['Take your time. I’m right here.','Read it slowly, then picture it.','What do you know, and what do you need?'],
- independent:['You worked that out on your own!','Purr-fect. All by yourself!','That was your own thinking. Brilliant.'],
- correct:['You got there! Help is part of learning.','Nice — now could you explain why it works?','Got it. Ready for the next one?'],
- retry:['Not yet — that’s how learning works.','Close look time. Try the quick check with me.','Mistakes help us find the tricky part.'],
- pause:['Let’s look at the lesson together, then try again.','A short look back will help. I’ll wait here.']
+ calm:['You’ve got this. Pick your first move.','Read it slowly, then picture it.','What do you know, and what do you need?'],
+ independent:['Clean solve — that was all your thinking!','You cracked that one yourself!','That was your own thinking. Brilliant.'],
+ correct:['Comeback complete — nice adjustment!','You got there! Help is part of learning.','Nice — now can you explain why it works?'],
+ retry:['Challenge accepted. Change one thing and try again.','This one is making you think — good. Find the next move.','Close look time. Try the quick check with me.'],
+ pause:['Reset with the model, then come back stronger.','A short look back will help. I’ll wait here.']
 };
 let turn=0;
 const memory={};
@@ -31,7 +31,7 @@ function mood(r){
 }
 function react(prefix,result){
  const box=root.document?.getElementById?.(prefix+'MochiBuddy');if(!box)return null;
- const m=mood(result||{}),text=pick(lines[m]);
+ const m=mood(result||{}),text=result?.encouragement||pick(lines[m]);
  box.dataset.mood=m;memory[prefix]={key:box.dataset.key||'',mood:m,text};
  const says=box.querySelector('.mochi-buddy-says');if(says)says.textContent=text;
  box.classList.remove('mochi-buddy-pop');void box.offsetWidth;box.classList.add('mochi-buddy-pop');

@@ -118,3 +118,15 @@ A received queue is not a started queue. Daily Quests now explicitly resumes an 
 Within Daily Quests, Another question, Try a similar guided question and the end of a mixed set re-evaluate the same focused route at the explicit Next boundary. Subject-overview Continue also enters that route while the subject's saved time block is available. Deliberate library and bonus activity remains separate, and no received plan interrupts an open answer or changes a time goal.
 
 The private export adds a read-only `nightlyPlanReview.routing` entry for each subject: `SAVED_PAPER`, `SAVED_DRAFT`, `SAVED_LESSON`, `SAVED_MIXED`, `DUE_RECALL`, `READY`, `PLAN_COMPLETE`, `NO_CURRENT_PLAN` or `DISABLED`. These are blockers/availability, not evidence of starting or completing learning. Only actual planned questions receive plan provenance.
+
+## Three-question microcycles (v7.7.6)
+
+When a subject priority contains exactly three practice questions for one unit, Daily Quests treats them as one coherent microcycle without rewriting the private plan or resetting queue progress:
+
+1. **Learn the move** — one guided model.
+2. **Beat the example** — one changed application.
+3. **Final challenge** — one changed transfer when prerequisites support transfer; otherwise a changed application remains in place until the pathway evidence is ready.
+
+The last two checks require a short typed line or handwritten working before the first answer check. This requirement is instructional only: an empty working box is not recorded as a wrong answer. Existing help/reveal/guess flags still determine independence normally.
+
+Euna's learner-facing feedback is deliberately encouraging and self-competitive: progress is framed as 1/3, 2/3 and 3/3, clean solves are celebrated, and a corrected answer is praised as a comeback. The app does not compare her with another child, create a leaderboard, penalize a miss, add compulsory minutes, or alter cats, coins, rewards, scores, prerequisites or prior evidence.
