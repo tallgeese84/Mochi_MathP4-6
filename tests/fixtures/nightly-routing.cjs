@@ -33,7 +33,7 @@ const w=dom.window,delay=ms=>new Promise(r=>setTimeout(r,ms));
  assert.equal(r.progress.science.index,1,'Another question settles the actual planned slot');assert.equal(d.draft.phase,'apply');assert.equal(d.draft.nightlyPlan.planId,p.id);assert.equal(d.draft.working,'','old working cannot leak into new check');
  check('sp',E,d);click('spMorePractice');
  assert.equal(r.progress.science.count,1);assert.equal(d.draft.phase,'transfer');assert.equal(d.draft.nightlyPlan.planId,p.id);
- check('sp',E,d);click('spNextPractice');
+ check('sp',E,d);if(w.document.getElementById('spSaveWriting'))click('spSaveWriting');else click('spNextPractice');
  assert.equal(r.progress.science.index,2);const planned=d.attempts.filter(a=>a.nightlyPlan?.planId===p.id);assert.equal(planned.length,3);assert.equal(planned[0].helped,true);assert.equal(planned[0].independent,false);assert.equal(JSON.stringify(d.attempts.slice(0,2)),oldAnswers,'old errors retained');assert.equal(JSON.stringify(state.planner.schedule),schedule);assert.equal(state.coins,42);
  // Maths resumes an incomplete lesson, then enters the planned practice.
  w.MochiTodayUI.open();const md=state.entrance;teach(M,md,'percent');M.visit(md,'relationships',1,now-1000);M.lesson(md,'relationships').notes='Keep my synthetic notebook.';
