@@ -1,5 +1,5 @@
 {
-  "version": "7.7.5",
-  "releasedOn": "2026-10-22",
-  "summary": "Daily Quests finish saved work and short recall before starting private priorities; next-question buttons keep the focused route. History, time goals and rewards are unchanged."
+  "version": "7.7.6",
+  "releasedOn": "2026-10-26",
+  "summary": "Nightly priorities use three-question model → application → challenge microcycles, require visible reasoning on the last two checks, and give Euna encouraging self-competition feedback without changing time goals, rewards or history."
 }
