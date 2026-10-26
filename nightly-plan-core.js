@@ -75,9 +75,21 @@ function prelude(record,state,subject,engines,now=Date.now()){
  const due=rows.filter(e=>e.overdue).sort((a,b)=>a.due-b.due)[0];
  return due?{...base,kind:'recall',unit:due.id,title:due.title,detail:'Try this review without the lesson, then continue today’s focus.'}:null;
 }
+function cycle(record,subject){
+ if(!record||!SUBJECTS.includes(subject))return null;
+ const steps=record.plan?.subjects?.[subject]?.steps||[],practice=steps.filter(x=>x.kind==='practice'),units=new Set(practice.map(x=>x.unit)),total=practice.reduce((n,x)=>n+(x.count||0),0);
+ // A coherent three-question priority becomes one learning microcycle without
+ // rewriting the private plan or its device-local queue positions.
+ if(total!==3||units.size!==1)return null;
+ const p=record.progress?.[subject]||{index:0,count:0};let done=0;
+ for(let i=0;i<p.index;i++)if(steps[i]?.kind==='practice')done+=steps[i].count||0;
+ if(steps[p.index]?.kind==='practice')done+=Math.min(p.count||0,steps[p.index].count||0);
+ done=Math.max(0,Math.min(3,done));const current=Math.min(3,done+1),phase=['guided','apply','transfer'][current-1];
+ return {unit:practice[0].unit,done,total:3,current,phase,complete:done>=3};
+}
 function next(record,state,subject,engines,now=Date.now()){
  if(!record||!SUBJECTS.includes(subject)||!usable(record.plan,now))return null;
- const E=engines[subject],d=state[KEY[subject]]||E.fresh(),p=record.progress[subject],step=record.plan.subjects[subject].steps[p.index];
+ const E=engines[subject],d=state[KEY[subject]]||E.fresh(),p=record.progress[subject],step=record.plan.subjects[subject].steps[p.index],micro=cycle(record,subject);
  if(!step)return null;
  if(Object.values(d.papers||{}).some(x=>!x.submittedAt))return null;
  // An unfinished editor, mixed set or lesson is never discarded to impose a new plan.
@@ -86,9 +98,11 @@ function next(record,state,subject,engines,now=Date.now()){
  if(Object.entries(d.lessons||{}).some(([id,l])=>E.unit(id)&&l.visited?.length&&!l.completedAt))return null;
  if(!reviewedToday(d,record.plan)&&E.D.units.some(u=>E.evidence(d,u.id,now).overdue))return null;
  const bridge=E.prerequisite?.(d,step.unit,now),u=E.unit(bridge||step.unit),ev=E.evidence(d,u.id,now);
- const kind=(bridge?!ev.taught||ev.needsTeaching:step.kind==='lesson'||!ev.taught)?'lesson':'practice';
- const phase=kind==='practice'?(bridge?'apply':step.phase==='transfer'&&ev.apply<2?'apply':step.phase):undefined;
- return {subject,kind,unit:u.id,title:u.title,resume:false,touched:0,detail:record.plan.subjects[subject].focus,nightly:true,planId:record.plan.id,stepIndex:p.index,...(phase?{phase}:{}),prerequisite:!!bridge||(kind==='lesson'&&step.kind==='practice')};
+ const kind=(bridge?!ev.taught||ev.needsTeaching:step.kind==='lesson'||!ev.taught)?'lesson':'practice',requested=micro&&!bridge?micro.phase:step.phase;
+ // The third slot remains conservative: if prerequisites do not yet support
+ // transfer, it stays a changed application rather than forcing a leap.
+ const phase=kind==='practice'?(bridge?'apply':requested==='transfer'&&ev.apply<2?'apply':requested):undefined;
+ return {subject,kind,unit:u.id,title:u.title,resume:false,touched:0,detail:record.plan.subjects[subject].focus,nightly:true,planId:record.plan.id,stepIndex:p.index,...(phase?{phase}:{}),...(micro?{microcycle:true,challengeIndex:micro.current}:{}),prerequisite:!!bridge||(kind==='lesson'&&step.kind==='practice')};
 }
 function bind(record,task,view,draft,now=Date.now()){
  if(!record||!task.nightly||task.planId!==record.plan.id||task.prerequisite)return;
@@ -107,6 +121,6 @@ function settle(record,state,subject){
  p.count++;p.active=null;const step=record.plan.subjects[subject].steps[p.index];
  if(p.count>=(step?.count||1)){p.index++;p.count=0;}return true;
 }
-root.MochiNightlyPlanCore={validate,usable,fresh,restore,pending,routing,prelude,next,bind,lessonDone,settle,signature,day};
+root.MochiNightlyPlanCore={validate,usable,fresh,restore,pending,routing,prelude,cycle,next,bind,lessonDone,settle,signature,day};
 if(typeof module!=='undefined')module.exports=root.MochiNightlyPlanCore;
 })(typeof window!=='undefined'?window:globalThis);
