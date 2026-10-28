@@ -1,5 +1,5 @@
 {
-  "version": "7.8.0",
+  "version": "7.8.1",
   "releasedOn": "2026-10-28",
-  "summary": "Motion and Light tutoring pilot: saved diagnostic choices, targeted teaching branches, evidence-linked AI guidance, and separate checks of later independent learning. Study time, saved tasks, reviews, cats and rewards are unchanged."
+  "summary": "Automatic Motion and Light AI coaching after a first incorrect attempt: one bounded tutor turn with checked-response fallback, parent pause, daily call budget, and independent-learning safeguards. Study time, saved tasks, reviews, cats and rewards stay intact."
 }

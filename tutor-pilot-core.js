@@ -2,7 +2,7 @@
    Diagnostic facts and provisional AI notes are kept separate from subject answers. */
 (function(root){
 'use strict';
-const DAY=86400000,MAX=600;
+const DAY=86400000,MAX=600,AUTO_DAILY_LIMIT=3;
 const skills={
  'relative-approach':'closing a gap from opposite directions',
  'average-speed':'total distance and total time',
@@ -15,11 +15,11 @@ const skills={
 };
 const decisions=['clarify','representation','units','check-step','independent-check'];
 const strategies=['diagram','table','units','check-step'];
-const codes=['DIAGNOSTIC_RECORDED','BUILT_IN_NOT_CONNECTED','LIVE_AI_SCHEMA_CHECKED','LIVE_AI_UNSTRUCTURED','LIVE_AI_FAILED'];
+const codes=['DIAGNOSTIC_RECORDED','BUILT_IN_NOT_CONNECTED','LIVE_AI_SCHEMA_CHECKED','LIVE_AI_UNSTRUCTURED','LIVE_AI_FAILED','AUTO_STARTED'];
 const text=(v,n=1500)=>typeof v==='string'?v.slice(0,n):'';
 const stamp=v=>Number.isFinite(v)&&v>0&&v<8640000000000000?v:0;
 const hash=s=>{let h=2166136261;for(const c of String(s)){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}return (h>>>0).toString(36);};
-const fresh=()=>({schema:1,events:[]});
+const fresh=()=>({schema:1,events:[],autoEnabled:true});
 const day=t=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/Chicago',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(t));
 function spec(subject,q){
  if(!q||q.form>2)return null;
@@ -46,10 +46,10 @@ function clean(e){
  }else if(e.kind==='support'){
   if(!strategies.includes(e.strategy))return null;x.strategy=e.strategy;x.reason=text(e.reason,100);
  }else if(e.kind==='provider'){
-  if(!codes.includes(e.reasonCode))return null;x.reasonCode=e.reasonCode;
+  if(!codes.includes(e.reasonCode))return null;x.reasonCode=e.reasonCode;x.mode=e.mode==='automatic'?'automatic':'manual';
  }else{
   if(!decisions.includes(e.nextAction)||!['uncertain','relationship','units','calculation','explanation'].includes(e.focus))return null;
-  Object.assign(x,{reply:text(e.reply,1800),quote:text(e.quote,300),quoteSource:['working','message'].includes(e.quoteSource)?e.quoteSource:'',focus:e.focus,nextAction:e.nextAction,provisional:true});
+  Object.assign(x,{reply:text(e.reply,1800),quote:text(e.quote,300),quoteSource:['working','message'].includes(e.quoteSource)?e.quoteSource:'',focus:e.focus,nextAction:e.nextAction,provisional:true,mode:e.mode==='automatic'?'automatic':'manual'});
  }
  return x;
 }
@@ -62,9 +62,9 @@ function validate(raw){
    const win=JSON.stringify(old)<JSON.stringify(e)?old:e;map.set(e.id,{...win,conflicted:true});
   }
  }
- return {schema:1,events:[...map.values()].sort((a,b)=>a.at-b.at||a.id.localeCompare(b.id)).slice(-MAX)};
+ return {schema:1,autoEnabled:raw?.autoEnabled!==false,autoSettingAt:stamp(raw?.autoSettingAt),events:[...map.values()].sort((a,b)=>a.at-b.at||a.id.localeCompare(b.id)).slice(-MAX)};
 }
-function merge(a,b){return validate({events:[...(a?.events||[]),...(b?.events||[])]});}
+function merge(a,b){const aa=validate(a),bb=validate(b),picked=bb.autoSettingAt>aa.autoSettingAt?bb:aa.autoSettingAt>bb.autoSettingAt?aa:(!aa.autoEnabled?aa:bb);return validate({autoEnabled:picked.autoEnabled,autoSettingAt:picked.autoSettingAt,events:[...aa.events,...bb.events]});}
 function events(d){return validate(d?.tutorPilot).events;}
 function append(d,e){const x=clean(e);if(!x)return null;const old=events(d).find(v=>v.id===x.id);if(old)return old;d.tutorPilot=merge(d.tutorPilot,{events:[x]});return x;}
 function base(subject,v,q,kind,now){const s=spec(subject,q);return s&&{id:`tp:${v.id}:${kind}:${now}:${hash(q.fingerprint)}`,at:now,subject,unit:q.unit,attemptId:v.id,fingerprint:q.fingerprint,subskill:s.key,structure:s.structure,kind};}
@@ -78,8 +78,23 @@ function support(d,subject,v,q,strategy,now=Date.now(),reason='diagnostic-follow
  if(!eligible(subject,v,q))return null;const b=base(subject,v,q,'support',now);b.id=`tp:${v.id}:support:${strategy}`;
  return append(d,{...b,strategy,reason});
 }
-function provider(d,subject,v,q,reasonCode,now=Date.now()){
- if(!eligible(subject,v,q))return null;return append(d,{...base(subject,v,q,'provider',now),reasonCode});
+function provider(d,subject,v,q,reasonCode,now=Date.now(),mode='manual'){
+ if(!eligible(subject,v,q))return null;return append(d,{...base(subject,v,q,'provider',now),reasonCode,mode});
+}
+// Only the first wrong attempt can prompt the model. A durable reservation prevents
+// repeat API requests after a reload or across merged device exports.
+function autoEnabled(d){return d?.tutorPilot?.autoEnabled!==false;}
+function setAuto(d,on,now=Date.now()){d.tutorPilot={...validate(d.tutorPilot),autoEnabled:!!on,autoSettingAt:now};return d.tutorPilot.autoEnabled;}
+function autoGate(d,subject,v,q,attempt,now=Date.now()){
+ if(!autoEnabled(d))return 'PAUSED_BY_PARENT';
+ if(!eligible(subject,v,q)||v.phase==='recall'||q.kind==='written'||v.revealed||!attempt||attempt.id!==v.id||attempt.correct||attempt.helped||attempt.responses?.length!==1)return 'NOT_FIRST_INCORRECT';
+ if(events(d).some(e=>e.attemptId===v.id&&(e.kind==='ai-note'||e.kind==='provider'&&e.reasonCode==='AUTO_STARTED')))return 'ALREADY_REQUESTED';
+ const used=events(d).filter(e=>e.kind==='provider'&&e.reasonCode==='AUTO_STARTED'&&e.subject===subject&&e.at<=now&&day(e.at)===day(now)).length;
+ return used>=AUTO_DAILY_LIMIT?'DAILY_LIMIT':'READY';
+}
+function reserveAuto(d,subject,v,q,attempt,now=Date.now()){
+ if(autoGate(d,subject,v,q,attempt,now)!=='READY')return null;const b=base(subject,v,q,'provider',now);
+ b.id=`tp:${v.id}:proactive:start`;return append(d,{...b,reasonCode:'AUTO_STARTED',mode:'automatic'});
 }
 function current(d,id){return events(d).filter(e=>e.attemptId===id&&!e.conflicted);}
 function decision(d,subject,v,q){
@@ -130,8 +145,8 @@ function parseAI(raw,{working='',message=''}={}){
  if(x.evidenceQuote&&(!source.includes(x.evidenceQuote)||x.evidenceSource==='none'))throw Error('AI_EVIDENCE_NOT_FOUND');
  return {reply:x.reply.trim(),focus:x.focus,quote:x.evidenceQuote,quoteSource:x.evidenceSource==='none'?'':x.evidenceSource,nextAction:x.nextAction,provisional:true};
 }
-function aiNote(d,subject,v,q,note,now=Date.now()){
- if(!eligible(subject,v,q))return null;return append(d,{...base(subject,v,q,'ai-note',now),...note});
+function aiNote(d,subject,v,q,note,now=Date.now(),mode='manual'){
+ if(!eligible(subject,v,q))return null;return append(d,{...base(subject,v,q,'ai-note',now),...note,mode});
 }
 // Choose a fresh authored variant of a pending skill *only within the same scheduled
 // unit/form/phase*. Never substitute for recall, saved work, an exam, or a prerequisite.
@@ -147,6 +162,6 @@ function choose(subject,B,d,chosen,now=Date.now()){
  }
  return chosen;
 }
-root.MochiTutorPilot={DAY,MAX,skills,decisions,strategies,fresh,validate,merge,events,spec,eligible,diagnostic,support,provider,current,decision,report,narrative,context,aiInstruction,parseAI,aiNote,choose,day};
+root.MochiTutorPilot={DAY,MAX,AUTO_DAILY_LIMIT,skills,decisions,strategies,fresh,validate,merge,events,spec,eligible,diagnostic,support,provider,current,decision,report,narrative,context,aiInstruction,parseAI,aiNote,choose,day,autoEnabled,setAuto,autoGate,reserveAuto};
 if(typeof module!=='undefined')module.exports=root.MochiTutorPilot;
 })(typeof globalThis!=='undefined'?globalThis:this);

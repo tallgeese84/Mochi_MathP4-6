@@ -43,7 +43,7 @@ function wire(subject,E,d,host,{capture,persist,refresh}){
 function status(subject,E,d){
  const v=d.draft;if(!v||!P.eligible(subject,v,E.question(v)))return '';
  const last=P.current(d,v.id).filter(e=>e.kind==='provider').at(-1),s=last?.reasonCode;
- const label=s==='LIVE_AI_SCHEMA_CHECKED'?'Live AI · provisional teaching guidance':s==='LIVE_AI_UNSTRUCTURED'?'Built-in guide · AI response could not be checked':s==='LIVE_AI_FAILED'?'Built-in guide · AI connection failed':s==='BUILT_IN_NOT_CONNECTED'?'Built-in guide · live AI not connected':'Teaching source shown after you ask';
+ const label=s==='LIVE_AI_SCHEMA_CHECKED'?(last.mode==='automatic'?'Live AI · automatic teaching guidance':'Live AI · provisional teaching guidance'):s==='LIVE_AI_UNSTRUCTURED'?'Built-in guide · AI response could not be checked':s==='LIVE_AI_FAILED'?'Built-in guide · AI connection failed':s==='BUILT_IN_NOT_CONNECTED'?'Built-in guide · live AI not connected':s==='AUTO_STARTED'?'Preparing automatic AI help':'Teaching source shown after you ask';
  return `<p class="tp-status" id="${prefix(subject)}PilotStatus">${esc(label)}</p>`;
 }
 // The model may suggest only a checked teaching aid, never a navigation or score action.
@@ -58,9 +58,19 @@ function offerAI(subject,E,d,v,q,note,out,{capture,persist}){
  b.onclick=()=>{if(d.draft?.id!==v.id)return;capture();E.help(d);P.support(d,subject,v,q,strategy,Date.now(),'live-ai-provisional-suggestion');persist();box.innerHTML=representation(P.spec(subject,q).key,strategy,q);};
  box.appendChild(b);out.after(box);
 }
-function parent(subject,E,d){
- const rows=P.narrative(E,d,subject);if(!rows.length)return '';
- return '<section class="tp-parent"><h3>What changed after teaching?</h3>'+rows.map(s=>'<p>'+esc(s)+'</p>').join('')+'<p>These are observations, not proof of a treatment effect. A changed example with the same structure is not yet broad transfer. Written-science review decisions remain with a grown-up.</p></section>';
+function proactive(subject,E,d){
+ const v=d.draft,q=v&&E.question(v),a=d.attempts?.find(x=>x.id===v?.id);
+ if(!P.autoEnabled(d))return '';
+ if(!P.eligible(subject,v,q)||!a||a.correct||v.revealed||v.phase==='recall'||q.kind==='written')return '';
+ const own=P.current(d,v.id),started=own.find(x=>x.kind==='provider'&&x.reasonCode==='AUTO_STARTED'),note=own.filter(x=>x.kind==='ai-note'&&x.mode==='automatic').at(-1);
+ const label=note?'Mochi noticed a tricky step':started?'Mochi can help without being asked':'Mochi’s quick check can help';
+ return `<aside class="tp-proactive" id="${prefix(subject)}Proactive" aria-label="Automatic AI tutoring"><strong>${esc(label)}</strong><p id="${prefix(subject)}ProactiveReply" role="status" aria-live="polite">${note?esc(note.reply):started?'The automatic suggestion was interrupted. You can still use the quick check or Ask Mochi.':'With live AI connected, Mochi can suggest one next step without being asked.'}</p></aside>`;
 }
-root.MochiTutorPilotUI={panel,wire,status,parent,representation,offerAI};
+function parent(subject,E,d){
+ const rows=P.narrative(E,d,subject),p=prefix(subject),checked=P.autoEnabled(d)?'checked':'';
+ return `<section class="tp-parent"><h3>Automatic AI teaching · ${subject==='maths'?'Motion':'Light'}</h3><label><input type="checkbox" id="${p}AutoEnabled" ${checked}> Offer one automatic AI coaching turn after an incorrect answer</label><p>Uses the existing connected AI provider. Maximum ${P.AUTO_DAILY_LIMIT} requests per subject per Chicago day. Only current question, typed working and bounded skill history are sent. You can pause this here. No automatic help in tests, redos, recall or adult-marked writing.</p>${rows.length?'<h3>What changed after teaching?</h3>'+rows.map(s=>'<p>'+esc(s)+'</p>').join('')+'<p>These observations do not prove teaching caused improvement. Written science remains for grown-up review.</p>':''}</section>`;
+}
+function wireParent(subject,d,persist){const c=document.getElementById(prefix(subject)+'AutoEnabled');if(c)c.onchange=()=>{P.setAuto(d,c.checked);persist();};}
+
+root.MochiTutorPilotUI={panel,wire,status,parent,representation,offerAI,proactive,wireParent};
 })(typeof globalThis!=='undefined'?globalThis:this);
