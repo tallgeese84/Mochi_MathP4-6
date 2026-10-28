@@ -63,13 +63,13 @@ function feedbackEvidence(d,a){
  return a.correct?'supported-success':a.skipped?'unanswered':'confirmed-error';
 }
 function evidence(d,id,now=Date.now()){
- const all=d.attempts.filter(a=>a.unit===id&&a.mode==='practice'&&a.answeredAt<=now),answered=all.filter(a=>!a.skipped),eligible=answered.filter(a=>independentFor(d,a)&&(!a.seenBefore||a.exhausted&&!options.noRepeatCredit)&&a.phase!=='redo'),last=answered.at(-1),forms=new Set(eligible.map(a=>a.form));
+ const all=d.attempts.filter(a=>a.unit===id&&a.mode==='practice'&&a.answeredAt<=now),answered=all.filter(a=>!a.skipped),eligible=answered.filter(a=>independentFor(d,a)&&!a.seenBefore&&a.phase!=='redo').filter((a,i,all)=>all.findIndex(b=>b.fingerprint===a.fingerprint)===i),last=answered.at(-1),forms=new Set(eligible.map(a=>a.form));
  // Independent, unassisted answers on starting checks and timed papers also count: a starting check
  // shows application; a paper or mock question (form 3) shows transfer, so a known method is not re-taught.
  const credit=d.attempts.filter(a=>a.unit===id&&['baseline','paper','mock'].includes(a.mode)&&independentFor(d,a)&&a.answeredAt<=now),checkApply=credit.filter(a=>a.mode==='baseline'&&a.form===1),paperTransfer=credit.filter(a=>a.form===3);
  const apply=[...eligible.filter(a=>a.form===1),...checkApply],transfer=[...eligible.filter(a=>a.form===2),...paperTransfer];
- const recall=answered.filter(a=>(a.phase==='recall'||a.phase==='mixed')&&independentFor(d,a)&&a.recallOf&&a.at>=(d.attempts.find(x=>x.id===a.recallOf)?.answeredAt||Infinity)+7*DAY&&a.at>=a.lessonViewedAt+7*DAY);
- const success=[...eligible.filter(a=>independentFor(d,a)&&a.form>=1&&a.phase!=='redo'),...credit].sort((a,b)=>a.answeredAt-b.answeredAt).at(-1),gap=GAPS[Math.min(recall.length,GAPS.length-1)],due=transfer.length&&success?success.answeredAt+gap*DAY:0;
+ const recall=[];for(const a of answered.slice().sort((a,b)=>a.at-b.at)){if((a.phase==='recall'||a.phase==='mixed')&&independentFor(d,a)&&a.recallOf&&a.at>=(d.attempts.find(x=>x.id===a.recallOf)?.answeredAt||Infinity)+7*DAY&&a.at>=a.lessonViewedAt+7*DAY&&(!recall.length||a.at>=recall.at(-1).answeredAt+7*DAY))recall.push(a);}
+ const success=[...eligible.filter(a=>independentFor(d,a)&&a.form>=1&&a.phase!=='redo'),...credit,...recall].sort((a,b)=>a.answeredAt-b.answeredAt).at(-1),gap=GAPS[Math.min(recall.length,GAPS.length-1)],due=transfer.length&&success?success.answeredAt+gap*DAY:0;
  const recent=answered.filter(a=>a.phase!=='redo'&&!pendingWriting(d,a));
  const needsTeaching=recent.length>=2&&recent.slice(-2).every(a=>firstOutcomeFor(d,a)===false)&&((d.lessons[id]?.lastViewedAt||0)<recent.at(-1).answeredAt);
  const taught=!!d.lessons[id]?.completedAt||paperTransfer.length>0;
@@ -95,7 +95,7 @@ function recommend(s,now=Date.now()){
  const ready=rows.filter(e=>e.taught&&e.apply>=1&&(!options.mixReady||options.mixReady(d,e.id,now))),due=rows.filter(e=>e.overdue),sets=setsToday(d,now);
  // Due reviews come back as one short unlabelled mixed set a day (due methods first), so new learning keeps moving.
  // On days with nothing due, a warm-up set runs every third day.
- if(due.length&&ready.length<2&&!sets)return {kind:'recall',unit:due.sort((a,b)=>a.due-b.due)[0].id,reason:'Revise this topic. Try the question without looking at the lesson.'};
+ if(due.length&&ready.length<2&&!sets&&!recallToday(d,now))return {kind:'recall',unit:due.sort((a,b)=>a.due-b.due)[0].id,reason:'Revise this topic. Try the question without looking at the lesson.'};
  if(due.length&&ready.length>=2&&!sets)return {kind:'mixed-set',due:due.length,reason:'Revise topics you have learnt. The questions are from different topics, so decide which method to use.'};
  if(!setsRecently(d,now)&&ready.length>=3)return {kind:'mixed-set',reason:'Warm up with mixed practice. Decide which method to use for each question.'};
  const redo=dueRedo(d,now);if(redo&&!redosToday(d,now))return {kind:'redo',attempt:redo.id,unit:redo.unit,reason:'Try again a question you got wrong a few days ago.'};
@@ -105,7 +105,6 @@ function recommend(s,now=Date.now()){
  const parked=rows.filter(e=>e.parked).sort((a,b)=>a.parkedUntil-b.parkedUntil)[0];if(parked)return {kind:'practice',unit:parked.id,reason:'Try this topic again. It was put aside for a few days.'};
  return {kind:'mixed',reason:'You have learnt every topic. Try a paper, then go through your working with a grown-up.'};
 }
-function freshSeed(d,id,form,rev=REV){let value=Math.floor(Math.random()*4294967296),q=B.make(id,form,value,rev);for(let tries=0;tries<64&&d.seen[q.fingerprint];tries++){value=(value+1)>>>0;q=B.make(id,form,value,rev);}return value;}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 /* A mixed set: up to four questions from methods she has already learned, due reviews first,
    shown with no topic title or method hint. */
@@ -114,7 +113,7 @@ function startMixed(d,now=Date.now()){
  const rows=D.units.map(u=>evidence(d,u.id,now)),ready=rows.filter(e=>e.taught&&e.apply>=1&&(!options.mixReady||options.mixReady(d,e.id,now)));if(ready.length<2)return null;
  // Two questions, or three when several methods are due: reviews stay about a third of a typical day.
  const overdue=ready.filter(e=>e.overdue),size=overdue.length>=2?MIXED_SIZE:Math.min(2,MIXED_SIZE),due=overdue.sort((a,b)=>a.due-b.due).slice(0,size),rest=shuffle(ready.filter(e=>!due.includes(e)).sort((a,b)=>a.last-b.last).slice(0,8));
- const chosen=[...due,...rest].slice(0,size),items=shuffle(chosen.map(e=>{const form=e.overdue?(e.delayed%2?2:1):(e.transfer?2:1);return {unit:e.id,form,seed:freshSeed(d,e.id,form),rev:REV,recall:!!e.overdue};}));
+ const candidates=[...due,...rest],items=[];for(const e of candidates){const form=e.overdue?(e.delayed%2?2:1):(e.transfer?2:1),pick=practiceChoice(d,e.id,{phase:'mixed',form,now});if(pick)items.push({unit:e.id,form,seed:pick.seed,rev:REV,recall:!!e.overdue});if(items.length>=size)break;}if(!items.length)return null;shuffle(items);
  d.mixed={id:prefix+'mix-'+uid(),at:now,items,completedAt:0};d.mixedLog=[...(d.mixedLog||[]),{id:d.mixed.id,at:now,completedAt:0}].slice(-120);return d.mixed;
 }
 function mixedNext(d){const m=d.mixed;if(!m)return null;for(const [index,it] of m.items.entries()){const done=d.attempts.some(a=>a.mixedId===m.id&&a.unit===it.unit&&a.seed===it.seed&&a.form===it.form&&(a.correct||a.responses.length>=2||a.revealed||pendingWriting(d,a)));if(!done)return {...it,index,total:m.items.length};}return null;}
@@ -132,21 +131,59 @@ function errorLog(d,now=Date.now(),days=120){
 function tagError(d,id,tag,now=Date.now()){if(!safeId(id)||!d.attempts.some(a=>a.id===id)||!TAGS.includes(tag))return false;d.errors[id]={...(d.errors[id]||{}),tag,at:now};return true;}
 function dueRedo(d,now=Date.now()){return errorLog(d,now,60).filter(e=>!e.redoneAt&&d.lessons[e.unit]?.completedAt&&now>=Math.max(e.at,e.lastTry)+REDO_DAYS*DAY).sort((a,b)=>a.at-b.at)[0]||null;}
 function startRedo(d,id,now=Date.now()){const a=d.attempts.find(x=>x.id===id);if(!a)return null;return startPractice(d,a.unit,{phase:'redo',form:a.form,seed:a.seed,rev:revOf(a),redoOf:a.id,now,force:true});}
-function startPractice(d,id,{phase,seed,form,rev,mixedId='',recall=false,redoOf='',now=Date.now(),force=false}={}){
- if(d.draft&&!force)return d.draft;const e=evidence(d,id,now),l=lesson(d,id);
+// Presentation identity, not a random seed or shuffled option order, controls novelty.
+// Read-only selection: a depleted pool returns null, never a pretend fresh question.
+function practiceChoice(d,id,{phase,seed,form,rev,now=Date.now(),allowSaved=false}={}){
+ if(!unit(id))return null;
+ const e=evidence(d,id,now),l=d.lessons[id]||{};
  phase=phase||(!l.completedAt&&!e.taught?'guided':e.overdue?'recall':e.apply<2?'apply':'transfer');
- if(!PHASES.includes(phase))throw Error('Unsupported practice phase');
- if(!(phase==='mixed'||phase==='redo')||!Number.isInteger(form))form=phase==='guided'?0:phase==='apply'?1:phase==='transfer'?2:(e.delayed%2?2:1);
+ if(!PHASES.includes(phase))return null;
+ if(!['mixed','redo'].includes(phase)||!Number.isInteger(form))form=phase==='guided'?0:phase==='apply'?1:phase==='transfer'?2:(e.delayed%2?2:1);
  rev=['redo','mixed'].includes(phase)&&Number.isInteger(rev)?Math.min(Math.max(rev,1),REV):REV;
- let value=seed??Math.floor(Math.random()*4294967296),q=B.make(id,form,value,rev),exhausted=false;
- if(d.seen[q.fingerprint]&&!['recall','mixed','redo'].includes(phase)){
-  // Look further for an unseen variant. If this form's pool is used up, reuse the one seen longest ago and
-  // let it count (flagged), so a small question pool can never trap the path.
-  let best=value,bestAt=d.seen[q.fingerprint];
-  for(let tries=0;tries<400&&d.seen[q.fingerprint];tries++){value=(value+1)>>>0;q=B.make(id,form,value,rev);if(d.seen[q.fingerprint]&&d.seen[q.fingerprint]<bestAt){best=value;bestAt=d.seen[q.fingerprint];}}
-  if(d.seen[q.fingerprint]){value=best;q=B.make(id,form,value,rev);exhausted=true;}
+ const last=new Map();for(const a of d.attempts||[])if(a.fingerprint)last.set(a.fingerprint,Math.max(last.get(a.fingerprint)||0,a.answeredAt||a.at||0));
+ let value=seed===undefined?(parseInt(B.hash(id+':'+phase+':'+(d.attempts?.length||0)),36)>>>0):seed;
+ let older=null;
+ for(let tries=0;tries<128;tries++,value=(value+0x9e3779b9)>>>0){
+  const q=B.make(id,form,value,rev),at=Math.max(last.get(q.fingerprint)||0,d.seen?.[q.fingerprint]||0),seenBefore=!!at;
+  if(allowSaved&&['mixed','redo'].includes(phase)||!seenBefore)return {phase,form,seed:value,rev,q,seenBefore,exhausted:false};
+  // Deliberate spaced retrieval and next-day teaching are allowed, but never
+  // recycled as a fresh independent application/transfer. No immediate repeats.
+  const wait=phase==='guided'?DAY:phase==='recall'||phase==='mixed'?7*DAY:Infinity;
+  if(now-at>=wait&&(!older||at<older.at))older={phase,form,seed:value,rev,q,seenBefore:true,exhausted:true,at};
  }
- const seenBefore=!!d.seen[q.fingerprint];d.seen[q.fingerprint]=d.seen[q.fingerprint]||now;
+ return older;
+}
+function practiceAvailable(d,id,phase,now=Date.now()){return !!practiceChoice(d,id,{phase,now});}
+function recallToday(d,now){return d.attempts.some(a=>a.phase==='recall'&&!a.skipped&&a.answeredAt<=now&&dayKey(a.answeredAt)===dayKey(now));}
+function avoidRepeat(s,r,now=Date.now()){
+ const d=init(s);
+ if(d.draft||Object.values(d.papers||{}).some(p=>!p.submittedAt)||!['practice','recall'].includes(r.kind))return r;
+ const phase=r.kind==='recall'?'recall':r.phase;
+ if(!(r.kind==='recall'&&recallToday(d,now))&&practiceAvailable(d,r.unit,phase,now))return r;
+ const rows=D.units.filter(u=>u.id!==r.unit).map(u=>evidence(d,u.id,now));
+ for(const e of rows.filter(e=>e.taught&&!e.parked&&!e.awaitingReview).sort((a,b)=>a.last-b.last)){
+  if(options.mixReady&&!options.mixReady(d,e.id,now))continue;
+  const nextPhase=e.apply<2?'apply':e.transfer?'apply':'transfer';
+  if(practiceAvailable(d,e.id,nextPhase,now))return {kind:e.needsTeaching?'learn':'practice',unit:e.id,phase:nextPhase,reason:'Try a different question. Familiar repeats are not new progress.'};
+ }
+ const next=D.units.find(u=>u.id!==r.unit&&!evidence(d,u.id,now).taught&&u.prerequisites.every(id=>evidence(d,id,now).taught));
+ if(next)return {kind:'learn',unit:next.id,reason:'That question is already practised. Build a different idea.'};
+ return {kind:'reflect',unit:r.unit,reason:'You have tried the available questions. Review your reasoning or choose another topic; no repeated answer is needed.'};
+}
+function practiceCounts(d,now=Date.now()){
+ const rows=d.attempts.filter(a=>a.mode==='practice'&&!a.skipped&&a.answeredAt<=now),ids=new Set(),fingerprints=new Set(),fresh=new Set();let answers=0;
+ for(const a of rows.slice().sort((a,b)=>a.at-b.at||a.answeredAt-b.answeredAt)){
+  if(ids.has(a.id))continue;ids.add(a.id);answers++;
+  if(!fingerprints.has(a.fingerprint)&&!a.seenBefore&&independentFor(d,a)&&a.phase!=='redo')fresh.add(a.fingerprint);
+  fingerprints.add(a.fingerprint);
+ }
+ return {recordedQuestions:answers,distinctQuestions:fingerprints.size,repeatQuestions:answers-fingerprints.size,freshIndependent:fresh.size};
+}
+function startPractice(d,id,{phase,seed,form,rev,mixedId='',recall=false,redoOf='',now=Date.now(),force=false}={}){
+ if(d.draft&&!force)return d.draft;
+ const chosen=practiceChoice(d,id,{phase,seed,form,rev,now,allowSaved:['mixed','redo'].includes(phase)});if(!chosen)return null;
+ const e=evidence(d,id,now),l=lesson(d,id),q=chosen.q;({phase,form,rev}=chosen);const value=chosen.seed,seenBefore=chosen.seenBefore,exhausted=chosen.exhausted;
+ d.seen[q.fingerprint]=d.seen[q.fingerprint]||now;
  const recallOf=phase==='recall'||phase==='mixed'&&recall?e.lastSuccess:'';
  d.draft={id:prefix+uid(),unit:id,form,seed:value,rev,exhausted,mixedId:phase==='mixed'?text(mixedId,120):'',redoOf:phase==='redo'?text(redoOf,120):'',at:now,updatedAt:now,phase,helped:phase==='guided',revealed:false,guess:false,seenBefore,lessonViewedAt:l.lastViewedAt||0,recallOf,answer:'',working:'',strokes:[]};return d.draft;
 }
@@ -255,7 +292,7 @@ function addExternal(d,entry,now=Date.now()){if(!text(entry.name,150)||!Number.i
 function report(d,now=Date.now()){
  const units=D.units.map(u=>evidence(d,u.id,now)),papers=paperDefinitions.map(p=>scorePaper(d,p.id)).filter(Boolean),qualifying=papers.filter(p=>p.qualifying),reviewed=d.attempts.filter(a=>d.reviews[a.id]?.verdict==='valid'&&independentFor(d,a)),reviewedStrands=new Set(reviewed.map(a=>unit(a.unit).strand));
  const external=d.external.filter(x=>x.independent&&x.unseen&&x.timed&&100*x.score/x.total>=D.target),breadth=qualifying.length===3&&Object.keys(D.strands).every(k=>{const total=qualifying.reduce((n,p)=>n+p.byStrand[k].total,0),correct=qualifying.reduce((n,p)=>n+p.byStrand[k].correct,0);return total&&correct/total>=.75;});
- return {goalMonth:d.goalMonth,target:D.target,...(options.writingReview?{writing:{total:d.attempts.filter(isWritten).length,pending:d.attempts.filter(a=>pendingWriting(d,a)).length,reviewed:d.attempts.filter(a=>isWritten(a)&&d.reviews[a.id]?.verdict==='valid'&&d.reviews[a.id].at>=a.answeredAt).length,automated:'Preliminary key-idea checks, not verified explanations.'}}:{}),plan:plan(d,now),errors:errorLog(d,now).slice(0,40),units,papers,qualifyingPapers:qualifying.length,reviewedStrands:reviewedStrands.size,externalChecks:external.length,breadth,internalTarget:qualifying.length===3&&breadth&&reviewedStrands.size===Object.keys(D.strands).length,externalReported:external.length>0,limits:options.limits||['The commercial booklet is a working benchmark, not an official entrance paper.','These original items and time limits are not psychometrically calibrated.','85% on three reserved mixed papers is an internal training goal, not an admissions cutoff.','Independent correctness does not automatically validate written reasoning.','Parent-entered external results and explanation reviews are self-reported.','No school admission probability is calculated.']};
+ return {goalMonth:d.goalMonth,target:D.target,practice:practiceCounts(d,now),...(options.writingReview?{writing:{total:d.attempts.filter(isWritten).length,pending:d.attempts.filter(a=>pendingWriting(d,a)).length,reviewed:d.attempts.filter(a=>isWritten(a)&&d.reviews[a.id]?.verdict==='valid'&&d.reviews[a.id].at>=a.answeredAt).length,automated:'Preliminary key-idea checks, not verified explanations.'}}:{}),plan:plan(d,now),errors:errorLog(d,now).slice(0,40),units,papers,qualifyingPapers:qualifying.length,reviewedStrands:reviewedStrands.size,externalChecks:external.length,breadth,internalTarget:qualifying.length===3&&breadth&&reviewedStrands.size===Object.keys(D.strands).length,externalReported:external.length>0,limits:options.limits||['The commercial booklet is a working benchmark, not an official entrance paper.','These original items and time limits are not psychometrically calibrated.','85% on three reserved mixed papers is an internal training goal, not an admissions cutoff.','Independent correctness does not automatically validate written reasoning.','Parent-entered external results and explanation reviews are self-reported.','No school admission probability is calculated.']};
 }
 function validate(raw){
  const d=fresh();if(!raw)return d;if(raw.version!==1)throw Error('Unsupported entrance-path backup version.');
@@ -301,7 +338,7 @@ function merge(a,b){
  return validate(d);
 }
 function exportData(d){return validate(d);}
-return {D,B,independentFor,pendingWriting,firstOutcomeFor,feedbackEvidence,DAY,REV,TAGS,uid,unit,question,fresh,init,lesson,visit,concept,complete,record,evidence,recommend,startPractice,startMixed,startMixedItem,mixedNext,closeMixed,errorLog,tagError,dueRedo,startRedo,testDate,setTestDate,mockSchedule,dueMock,plan,answerFact,finishInvestigation,dayKey,touchDraft,help,respond,finishPractice,paperDefinitions,paperQuestions,startPaper,savePaperAnswer,interruptPaper,submitPaper,scorePaper,review,addExternal,report,validate,merge,exportData,ink};
+return {D,B,independentFor,pendingWriting,firstOutcomeFor,feedbackEvidence,DAY,REV,TAGS,uid,unit,question,fresh,init,lesson,visit,concept,complete,record,evidence,recommend:(s,now=Date.now())=>avoidRepeat(s,recommend(s,now),now),avoidRepeat,practiceChoice,practiceAvailable,practiceCounts,startPractice,startMixed,startMixedItem,mixedNext,closeMixed,errorLog,tagError,dueRedo,startRedo,testDate,setTestDate,mockSchedule,dueMock,plan,answerFact,finishInvestigation,dayKey,touchDraft,help,respond,finishPractice,paperDefinitions,paperQuestions,startPaper,savePaperAnswer,interruptPaper,submitPaper,scorePaper,review,addExternal,report,validate,merge,exportData,ink};
 }
 root.MochiPathCore={create};
 if(typeof module!=='undefined')module.exports=root.MochiPathCore;

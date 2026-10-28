@@ -130,3 +130,11 @@ When a subject priority contains exactly three practice questions for one unit, 
 The last two checks require a short typed line or handwritten working before the first answer check. This requirement is instructional only: an empty working box is not recorded as a wrong answer. Existing help/reveal/guess flags still determine independence normally.
 
 Euna's learner-facing feedback is deliberately encouraging and self-competitive: progress is framed as 1/3, 2/3 and 3/3, clean solves are celebrated, and a corrected answer is praised as a comeback. The app does not compare her with another child, create a leaderboard, penalize a miss, add compulsory minutes, or alter cats, coins, rewards, scores, prerequisites or prior evidence.
+
+## Repetition protection (v7.7.7)
+
+Question identity uses the existing semantic fingerprint, not a different seed or shuffled options. Ordinary application/transfer practice no longer recycles an exhausted pool. The next recommendation chooses another available learned topic or an appropriate new lesson; if no different item is available, the overview offers reflection rather than another copy. This also applies to the explicit Another control and restored histories. The three-question microcycle and saved time blocks remain bounded.
+
+A private-plan slot with no available different question stays unfinished and exports `NO_FRESH_QUESTION`; unrelated fallback work is not falsely credited to that slot. Existing drafts, mixed sets and papers keep their original identities. Deliberate spaced retrieval remains available: recent identical responses do not manufacture multiple delayed-retrieval credits, and a successful retrieval moves its next due date forward. A completed single recall uses the daily routing allowance even if it was incorrect; it does not confer mastery.
+
+Parent reports add `practice.recordedQuestions`, `distinctQuestions`, `repeatQuestions` and `freshIndependent`. These are derived, read-only summaries. Earlier answers, correct/error markings, written-review status and help flags remain in history. Recycled exhausted forms no longer earn additional Maths or Science mastery credit. Earned cats, coins, rewards, schedules, secrets and private-plan schema are not changed. All new regression fixtures are synthetic.

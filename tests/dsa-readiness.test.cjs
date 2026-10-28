@@ -87,9 +87,11 @@ test('new records survive backup and merge between two tablets',()=>{
  const b=E.validate(JSON.parse(JSON.stringify(a)));assert.deepEqual(b.mixed,a.mixed);assert.equal(b.errors[miss.id].tag,'method');assert.equal(b.testDate,'2027-07-10');assert.equal(b.wide.facts.wm21.correct,true);assert.equal(b.wide.investigations.im02.note,'We found 45 handshakes');
  const other=E.fresh();E.answerFact(other,'ws03',2,false,t+500);const m=E.merge(a,other);assert.ok(m.wide.facts.wm21&&m.wide.facts.ws03);assert.equal(m.testDate,'2027-07-10');assert.equal(m.errors[miss.id].tag,'method');
 });
-test('questions never run out: a used-up pool reuses the oldest question and still counts',()=>{
- const d=E.fresh();taught(d,'digits');const seen=new Set();for(let i=0;i<12;i++){const a=answer(d,'digits','apply',now+i*1000);seen.add(a.fingerprint);}
- assert.ok(seen.size<12,'pool is small');assert.ok(E.evidence(d,'digits',now+DAY).apply>=2);
+test('a used-up question pool stops instead of recycling answers for extra mastery',()=>{
+ const d=E.fresh();taught(d,'digits');const seen=new Set();let completed=0;
+ for(let i=0;i<12;i++){E.finishPractice(d);const v=E.startPractice(d,'digits',{phase:'apply',now:now+i*1000});if(!v)break;const q=E.question(v);assert(!seen.has(q.fingerprint));seen.add(q.fingerprint);E.touchDraft(d,{answer:q.answerLabel,working:'Use the digit conditions.'},now+i*1000+1);assert(E.respond(d,now+i*1000+2).ok);completed++;}
+ E.finishPractice(d);assert(completed>0&&completed<12,'finite bank is recognised');const history=JSON.stringify(d.attempts);
+ assert.equal(E.startPractice(d,'digits',{phase:'apply',now:now+13000}),null);assert.equal(JSON.stringify(d.attempts),history);assert.equal(E.evidence(d,'digits',now+DAY).apply,completed);
 });
 test('a learner with 30% first-try misses at four questions a day still reaches every unit',()=>{
  const real=Math.random;try{for(const ms0 of [6,7,8,11]){let ms=ms0;Math.random=()=>((ms=(ms*48271)%2147483647)/2147483647);

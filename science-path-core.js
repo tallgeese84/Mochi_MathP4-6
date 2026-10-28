@@ -26,7 +26,7 @@ root.MochiSciencePath=core.create(D,B,{stateKey:'sciencePath',writingReview:true
  'External results and explanation reviews are parent-reported evidence.'
 ]});
 const E=root.MochiSciencePath,Practice=root.MochiSciencePractice||(typeof require==='function'?require('./science-practice.js'):null),normal=E.recommend;
-E.recommend=(s,now=Date.now())=>Practice.route(E,s,normal(s,now),now);
-E.practiceRoute=(s,id,phase,now=Date.now())=>phase?{kind:'practice',unit:id,phase}:Practice.route(E,s,{kind:'practice',unit:id},now,true);
+E.recommend=(s,now=Date.now())=>E.avoidRepeat(s,Practice.route(E,s,normal(s,now),now),now);
+E.practiceRoute=(s,id,phase,now=Date.now())=>E.avoidRepeat(s,phase?{kind:'practice',unit:id,phase}:Practice.route(E,s,{kind:'practice',unit:id},now,true),now);
 if(typeof module!=='undefined')module.exports=root.MochiSciencePath;
 })(typeof globalThis!=='undefined'?globalThis:this);

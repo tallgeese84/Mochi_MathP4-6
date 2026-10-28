@@ -15,6 +15,8 @@ E.recommend=(s,now=Date.now())=>{
  const needed=r.unit&&E.prerequisite(d,r.unit,now);if(!needed)return PB.extensionRecommendation(E,d,r,now);
  const e=E.evidence(d,needed,now);return {kind:!e.taught||e.needsTeaching?'learn':'practice',unit:needed,geometryBridge:true,reason:'Build the geometric relationship before more complex solids.'};
 };
+const routed=E.recommend;E.recommend=(s,now=Date.now())=>E.avoidRepeat(s,routed(s,now),now);
+E.practiceRoute=(s,id,phase,now=Date.now())=>E.avoidRepeat(s,{kind:'practice',unit:id,...(phase?{phase}:{})},now);
 root.MochiEntrance=E;
 if(typeof module!=='undefined')module.exports=root.MochiEntrance;
 })(typeof globalThis!=='undefined'?globalThis:this);

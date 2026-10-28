@@ -29,6 +29,7 @@ function task(state,subject,now=Date.now()){
  const nightly=root.MochiNightlyPlan?.next(s,subject,now);if(nightly)return nightly;
  const r=E.recommend({...s,[key[subject]]:{...d,draft:null}},now);
  if(r.kind==='mixed-set')return {subject,kind:'mixed',title:'Mixed practice',resume:!!(d.mixed&&!d.mixed.completedAt),touched:d.mixed&&!d.mixed.completedAt?d.mixed.at:0,detail:r.due?'Revise topics you have learnt. Decide which method to use for each question.':'Questions from different topics. Decide which method to use for each one.'};
+ if(r.kind==='reflect')return {subject,kind:'reflect',unit:r.unit,title:'Review your reasoning',resume:false,touched:0,detail:r.reason};
  if(r.kind==='redo')return {subject,kind:'redo',attempt:r.attempt,unit:r.unit,title:'Second try',resume:false,touched:0,detail:'Try again a question you got wrong a few days ago.'};
  if(r.kind==='mixed'){
   // Home never opens or previews a reserved paper. When the course is explored,

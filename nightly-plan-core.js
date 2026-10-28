@@ -62,7 +62,7 @@ function routing(record,state,subject,engines,now=Date.now()){
  if(Object.entries(d.lessons||{}).some(([id,l])=>E.unit(id)&&l.visited?.length&&!l.completedAt))return {reasonCode:'SAVED_LESSON'};
  if(d.mixed&&!d.mixed.completedAt&&E.mixedNext(d))return {reasonCode:'SAVED_MIXED'};
  if(!reviewedToday(d,record.plan)&&E.D.units.some(u=>E.evidence(d,u.id,now).overdue))return {reasonCode:'DUE_RECALL'};
- return {reasonCode:'READY'};
+ return next(record,state,subject,engines,now)?{reasonCode:'READY'}:{reasonCode:'NO_FRESH_QUESTION'};
 }
 function prelude(record,state,subject,engines,now=Date.now()){
  const reasonCode=routing(record,state,subject,engines,now).reasonCode;
@@ -105,6 +105,7 @@ function next(record,state,subject,engines,now=Date.now()){
  const priorApply=micro?.current===3?[...d.attempts].reverse().find(a=>a.nightlyPlan?.planId===record.plan.id&&a.nightlyPlan?.revision===record.plan.revision&&a.nightlyPlan?.sessionDate===record.plan.sessionDate&&a.phase==='apply'):null;
  const microTransfer=!!(priorApply?.independent&&priorApply.firstCorrect&&!priorApply.seenBefore),transferReady=ev.apply>=2||microTransfer;
  const phase=kind==='practice'?(bridge?'apply':requested==='transfer'&&!transferReady?'apply':requested):undefined;
+ if(kind==='practice'&&E.practiceAvailable&&!E.practiceAvailable(d,u.id,phase,now))return null;
  return {subject,kind,unit:u.id,title:u.title,resume:false,touched:0,detail:record.plan.subjects[subject].focus,nightly:true,planId:record.plan.id,stepIndex:p.index,...(phase?{phase}:{}),...(micro?{microcycle:true,challengeIndex:micro.current}:{}),prerequisite:!!bridge||(kind==='lesson'&&step.kind==='practice')};
 }
 function bind(record,task,view,draft,now=Date.now()){
