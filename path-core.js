@@ -4,6 +4,7 @@
 'use strict';
 function create(D,B,options={}){
 const stateKey=options.stateKey||'entrance',prefix=options.prefix||'entrance-';
+const Pilot=root.MochiTutorPilot||(typeof require==='function'?require('./tutor-pilot-core.js'):null),subject=stateKey==='sciencePath'?'science':'maths';
 const AMAX=B.answerLimit||180,REV=Number.isInteger(B.REV)&&B.REV>=1?B.REV:1,revOf=v=>Number.isInteger(v?.rev)&&v.rev>=1?Math.min(v.rev,REV):1,DAY=86400000,unit=id=>D.units.find(u=>u.id===id),stamp=n=>Number.isFinite(n)&&n>0&&n<8640000000000000?n:0;
 const text=(s,n=6000)=>typeof s==='string'?s.slice(0,n):'',copy=x=>JSON.parse(JSON.stringify(x));
 const uid=()=>root.crypto?.randomUUID?.()||Date.now().toString(36)+'-'+Math.random().toString(36).slice(2);
@@ -181,7 +182,9 @@ function practiceCounts(d,now=Date.now()){
 }
 function startPractice(d,id,{phase,seed,form,rev,mixedId='',recall=false,redoOf='',now=Date.now(),force=false}={}){
  if(d.draft&&!force)return d.draft;
- const chosen=practiceChoice(d,id,{phase,seed,form,rev,now,allowSaved:['mixed','redo'].includes(phase)});if(!chosen)return null;
+ let chosen=practiceChoice(d,id,{phase,seed,form,rev,now,allowSaved:['mixed','redo'].includes(phase)});if(!chosen)return null;
+ // Pilot only chooses between fresh authored variants of this already-scheduled form.
+ if(seed===undefined&&Pilot)chosen=Pilot.choose(subject,B,d,chosen,now);
  const e=evidence(d,id,now),l=lesson(d,id),q=chosen.q;({phase,form,rev}=chosen);const value=chosen.seed,seenBefore=chosen.seenBefore,exhausted=chosen.exhausted;
  d.seen[q.fingerprint]=d.seen[q.fingerprint]||now;
  const recallOf=phase==='recall'||phase==='mixed'&&recall?e.lastSuccess:'';
@@ -292,7 +295,7 @@ function addExternal(d,entry,now=Date.now()){if(!text(entry.name,150)||!Number.i
 function report(d,now=Date.now()){
  const units=D.units.map(u=>evidence(d,u.id,now)),papers=paperDefinitions.map(p=>scorePaper(d,p.id)).filter(Boolean),qualifying=papers.filter(p=>p.qualifying),reviewed=d.attempts.filter(a=>d.reviews[a.id]?.verdict==='valid'&&independentFor(d,a)),reviewedStrands=new Set(reviewed.map(a=>unit(a.unit).strand));
  const external=d.external.filter(x=>x.independent&&x.unseen&&x.timed&&100*x.score/x.total>=D.target),breadth=qualifying.length===3&&Object.keys(D.strands).every(k=>{const total=qualifying.reduce((n,p)=>n+p.byStrand[k].total,0),correct=qualifying.reduce((n,p)=>n+p.byStrand[k].correct,0);return total&&correct/total>=.75;});
- return {goalMonth:d.goalMonth,target:D.target,practice:practiceCounts(d,now),...(options.writingReview?{writing:{total:d.attempts.filter(isWritten).length,pending:d.attempts.filter(a=>pendingWriting(d,a)).length,reviewed:d.attempts.filter(a=>isWritten(a)&&d.reviews[a.id]?.verdict==='valid'&&d.reviews[a.id].at>=a.answeredAt).length,automated:'Preliminary key-idea checks, not verified explanations.'}}:{}),plan:plan(d,now),errors:errorLog(d,now).slice(0,40),units,papers,qualifyingPapers:qualifying.length,reviewedStrands:reviewedStrands.size,externalChecks:external.length,breadth,internalTarget:qualifying.length===3&&breadth&&reviewedStrands.size===Object.keys(D.strands).length,externalReported:external.length>0,limits:options.limits||['The commercial booklet is a working benchmark, not an official entrance paper.','These original items and time limits are not psychometrically calibrated.','85% on three reserved mixed papers is an internal training goal, not an admissions cutoff.','Independent correctness does not automatically validate written reasoning.','Parent-entered external results and explanation reviews are self-reported.','No school admission probability is calculated.']};
+ return {goalMonth:d.goalMonth,target:D.target,practice:practiceCounts(d,now),...(Pilot&&d.tutorPilot?{tutorPilot: Pilot.report({question,independentFor,pendingWriting},d,subject,now)}:{}),...(options.writingReview?{writing:{total:d.attempts.filter(isWritten).length,pending:d.attempts.filter(a=>pendingWriting(d,a)).length,reviewed:d.attempts.filter(a=>isWritten(a)&&d.reviews[a.id]?.verdict==='valid'&&d.reviews[a.id].at>=a.answeredAt).length,automated:'Preliminary key-idea checks, not verified explanations.'}}:{}),plan:plan(d,now),errors:errorLog(d,now).slice(0,40),units,papers,qualifyingPapers:qualifying.length,reviewedStrands:reviewedStrands.size,externalChecks:external.length,breadth,internalTarget:qualifying.length===3&&breadth&&reviewedStrands.size===Object.keys(D.strands).length,externalReported:external.length>0,limits:options.limits||['The commercial booklet is a working benchmark, not an official entrance paper.','These original items and time limits are not psychometrically calibrated.','85% on three reserved mixed papers is an internal training goal, not an admissions cutoff.','Independent correctness does not automatically validate written reasoning.','Parent-entered external results and explanation reviews are self-reported.','No school admission probability is calculated.']};
 }
 function validate(raw){
  const d=fresh();if(!raw)return d;if(raw.version!==1)throw Error('Unsupported entrance-path backup version.');
@@ -300,6 +303,7 @@ function validate(raw){
  for(const [k,v] of Object.entries(raw.seen||{}).slice(-12000))if(/^[a-z0-9]{1,12}$/.test(k)&&stamp(v))d.seen[k]=v;
  for(const rawAttempt of (Array.isArray(raw.attempts)?raw.attempts:[]).slice(-5000).sort((a,b)=>(a?.at||0)-(b?.at||0))){const a=record(d,rawAttempt);if(a)d.seen[a.fingerprint]=Math.min(d.seen[a.fingerprint]||a.at,a.at);}
  d.draft=cleanDraft(raw.draft);
+ if(raw.tutorPilot&&Pilot)d.tutorPilot=Pilot.validate(raw.tutorPilot);
  for(const def of paperDefinitions){const x=raw.papers?.[def.id];if(!x||!stamp(x.startedAt))continue;const p={id:def.id,startedAt:x.startedAt,updatedAt:stamp(x.updatedAt)||x.startedAt,deadline:def.minutes?x.startedAt+def.minutes*60000:0,submittedAt:stamp(x.submittedAt),assisted:!!x.assisted,interrupted:!!x.interrupted,conflicted:!!x.conflicted,seenBefore:!!x.seenBefore,index:Math.max(0,Math.min(def.units.length-1,Math.trunc(x.index)||0)),answers:{},flags:[...new Set((Array.isArray(x.flags)?x.flags:[]).filter(i=>Number.isInteger(i)&&i>=0&&i<def.units.length))]};
   for(let i=0;i<def.units.length;i++){const a=x.answers?.[i];if(a)p.answers[i]={answer:text(a.answer,AMAX),working:text(a.working),strokes:ink(a.strokes),updatedAt:stamp(a.updatedAt)||x.startedAt};}if(p.submittedAt&&p.submittedAt<p.startedAt)p.conflicted=true;for(const a of Object.values(p.answers))if(a.updatedAt<p.startedAt||p.submittedAt&&a.updatedAt>p.submittedAt||p.deadline&&a.updatedAt>p.deadline)p.conflicted=true;
   d.papers[def.id]=p;for(const q of paperQuestions(def.id))d.seen[q.fingerprint]=Math.min(d.seen[q.fingerprint]||p.startedAt,p.startedAt);
@@ -335,6 +339,7 @@ function merge(a,b){
  const td=(b.testDateAt||0)>(a.testDateAt||0)?b:a;if(td.testDate){d.testDate=td.testDate;d.testDateAt=td.testDateAt;}
  for(const id of new Set([...Object.keys(a.wide.facts),...Object.keys(b.wide.facts)])){const x=a.wide.facts[id],y=b.wide.facts[id];d.wide.facts[id]=copy(!x?y:!y?x:y.at<x.at?y:x);}
  for(const id of new Set([...Object.keys(a.wide.investigations),...Object.keys(b.wide.investigations)])){const x=a.wide.investigations[id],y=b.wide.investigations[id];const w=copy(newest(x,y,'at'));w.doneAt=Math.min(x?.doneAt||Infinity,y?.doneAt||Infinity);d.wide.investigations[id]=w;}
+ if(Pilot&&(a.tutorPilot||b.tutorPilot))d.tutorPilot=Pilot.merge(a.tutorPilot,b.tutorPilot);
  return validate(d);
 }
 function exportData(d){return validate(d);}

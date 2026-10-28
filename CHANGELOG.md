@@ -1,5 +1,15 @@
 # v7.7.2 — 2026-10-11
 
+## 7.8.0 — candidate, not deployed (2026-10-28)
+
+- Connect existing Motion/Light diagnostics to saved subskill evidence and checked teaching aids.
+- Carry observations into the existing AI tutor; require bounded, evidence-quoted provisional responses and distinguish live help from fallback.
+- Separate supported completion, changed independent application and delayed independent evidence in subject reports.
+- Prefer a compatible fresh authored variant only within an already-selected topic/form/phase.
+- Preserve nightly-plan schema, private relay/backup code, saved work, prerequisites, schedules, adult reviews and rewards.
+- Add 36 synthetic unit regressions. Full CI and real-provider/tablet checks remain a release gate; see `docs/tutoring-pilot.md`.
+
+
 Keep the required weekly Maths/Science minutes unchanged. After the Maths target is reached, offer one optional five-minute Maths block using the existing foreground clock, with a shared daily budget across pause, reload, backup and sync. Preserve saved work, nightly priorities and delayed retrieval; otherwise choose fresh taught application or a changed problem. Stop counting at five minutes and return to Today at the next question boundary without submitting or discarding working. Add optional-time export fields and distinguish time completion from independent learning. Existing intentional 2× extra study and reward rules remain available separately.
 
 # v7.7.1 — 2026-10-10
