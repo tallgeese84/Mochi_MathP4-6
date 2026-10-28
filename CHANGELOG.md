@@ -1,5 +1,14 @@
 # v7.7.2 — 2026-10-11
 
+## 7.8.1 — proactive AI teaching (2026-10-28)
+
+- In Motion and Light practice, automatically offer one AI tutor turn after an eligible first incorrect answer when a live provider is connected.
+- Give one next-step question or scaffold, without supplying the solution or requiring a child to open Ask Mochi.
+- Keep tutoring evidence separated from grades and adult Science reviews; label automatic and fallback responses distinctly.
+- One automatic request per question and up to three per subject per America/Chicago day; parent can pause in each subject's evidence panel.
+- Do not auto-tutor correct responses, previously helped attempts, recall, tests, mixed practice, redos or adult-marked writing.
+- Abort stale responses and preserve learning history, time limits, prerequisites, scheduled work, cats, rewards and private relay.
+
 ## 7.8.0 — candidate, not deployed (2026-10-28)
 
 - Connect existing Motion/Light diagnostics to saved subskill evidence and checked teaching aids.
