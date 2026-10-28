@@ -54,7 +54,8 @@ function runTask(t){
  nightlyLaunching=true;try{
  closeMenu();leave();guided=true;document.body.classList.add('today-guided');
  const ui=U(t.subject),E=engines()[t.subject],d=S[stateKey(t.subject)];
- if(t.kind==='paper')ui.open('paper',t.paper);
+ if(t.kind==='reflect')ui.repeatNotice(t.detail);
+ else if(t.kind==='paper')ui.open('paper',t.paper);
  else if(t.kind==='question')ui.open('practice',t.unit);
  else if(t.kind==='lesson')ui.open('lesson',t.unit);
  else if(t.kind==='mixed')ui.mixed();

@@ -1,5 +1,5 @@
 {
-  "version": "7.7.6",
-  "releasedOn": "2026-10-26",
-  "summary": "Nightly priorities use three-question model → application → challenge microcycles, require visible reasoning on the last two checks, and give Euna encouraging self-competition feedback without changing time goals, rewards or history."
+  "version": "7.7.7",
+  "releasedOn": "2026-10-27",
+  "summary": "Practice avoids immediate identical questions, switches away from exhausted forms, and separates distinct learning evidence from repeated activity. Saved work, schedules, rewards and history stay intact."
 }
