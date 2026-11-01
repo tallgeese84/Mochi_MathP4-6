@@ -1,5 +1,8 @@
 # Mochi · Euna’s maths and science studio
 
+**v7.8.2 (1 November 2026).** Daily Quests searches more verified authored variants for Motion, Light and Circuits, shows a clear fallback instead of pretending exhausted questions are fresh, and now offers proactive Circuits coaching with bounded JSON-format repair. Plans, time goals, saved work, adult Science review and earned cats are preserved. See [the release notes](docs/EUNA_V782_RELEASE.md).
+
+
 An offline-capable family maths and science studio with optional conversational AI.
 Both subjects now build towards **June 2027 entrance-style preparation**, with
 separate evidence of application, transfer and retention. The original primary
