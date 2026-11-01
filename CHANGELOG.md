@@ -1,5 +1,12 @@
 # v7.7.2 — 2026-10-11
 
+## 7.8.2 — stronger daily-plan routing and proactive coaching (2026-11-01)
+
+- Daily Quests searches farther through the **existing original** Motion, Light, and Circuits question pools before reporting `NO_FRESH_QUESTION`. Previously seen application/transfer prompts remain ineligible for fresh independence; an exhausted plan stays pending and is clearly explained instead of fabricating a completion or adding extra homework.
+- One automatic AI response-format retry after a first wrong answer, with the same verified-output contract and a checked local guide when live AI fails. Limits, provider configuration, pause settings, and no-answer-key safeguards remain in effect.
+- Proactive, evidence-linked Circuits help joins Motion and Light. Its diagrams ask Euna to trace complete paths without implying that current leaks out of an open switch. Diagnostic support remains visible after multiple misses, with no changes to adult review or scoring.
+- Today's main action labels the actual guided, changed-practice, or independent stage. This update leaves synced data, saved drafts, scheduled recall, weekday minutes, cats and rewards intact.
+
 ## 7.8.1 — proactive AI teaching (2026-10-28)
 
 - In Motion and Light practice, automatically offer one AI tutor turn after an eligible first incorrect answer when a live provider is connected.
