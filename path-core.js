@@ -144,7 +144,11 @@ function practiceChoice(d,id,{phase,seed,form,rev,now=Date.now(),allowSaved=fals
  const last=new Map();for(const a of d.attempts||[])if(a.fingerprint)last.set(a.fingerprint,Math.max(last.get(a.fingerprint)||0,a.answeredAt||a.at||0));
  let value=seed===undefined?(parseInt(B.hash(id+':'+phase+':'+(d.attempts?.length||0)),36)>>>0):seed;
  let older=null;
- for(let tries=0;tries<128;tries++,value=(value+0x9e3779b9)>>>0){
+ // Motion and Science's original authored variants have a larger candidate space.
+ // Search farther before declaring an independent question unavailable; never
+ // recycle an old application or transfer question as fresh learning.
+ const searchLimit=['motion','light','circuits'].includes(id)?768:128;
+ for(let tries=0;tries<searchLimit;tries++,value=(value+0x9e3779b9)>>>0){
   const q=B.make(id,form,value,rev),at=Math.max(last.get(q.fingerprint)||0,d.seen?.[q.fingerprint]||0),seenBefore=!!at;
   if(allowSaved&&['mixed','redo'].includes(phase)||!seenBefore)return {phase,form,seed:value,rev,q,seenBefore,exhausted:false};
   // Deliberate spaced retrieval and next-day teaching are allowed, but never
