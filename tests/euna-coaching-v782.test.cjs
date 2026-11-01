@@ -25,7 +25,9 @@ test('Circuits recognizes eligible illustrated questions without enabling unrela
  }
 });
 test('Circuits auto-coaching is one first-miss turn with a per-day budget',()=>{
- const d=S.fresh(),v=S.startPractice(d,'circuits',{phase:'apply',seed:16,now}),q=S.question(v);
+ const d=S.fresh(),seed=Array.from({length:200},(_,i)=>i).find(i=>P.spec('science',S.B.make('circuits',1,i)));
+ assert(Number.isInteger(seed),'there must be an eligible authored circuit variant');
+ const v=S.startPractice(d,'circuits',{phase:'apply',seed,now}),q=S.question(v);
  assert(P.spec('science',q));
  const a={id:v.id,correct:false,helped:false,responses:[{at:now+1,answer:'synthetic wrong'}]};
  assert.equal(P.autoGate(d,'science',v,q,a,now),'READY');
