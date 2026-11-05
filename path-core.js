@@ -14,7 +14,7 @@ const GAPS=[7,14,30,60,90],MIXED_SIZE=options.mixedSize||3,PARK_MISSES=4,PARK_DA
 const dayKey=t=>{const x=new Date(t);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');};
 const DEFAULT_TEST=options.testDate||D.testDate||'2027-07-03',isDate=v=>typeof v==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(v)&&Number.isFinite(Date.parse(v+'T00:00:00'));
 const safeId=v=>typeof v==='string'&&v.length>0&&v.length<=120&&!['__proto__','constructor','prototype'].includes(v);
-const fresh=()=>({version:1,goalMonth:D.goalMonth,target:D.target,lessons:{},attempts:[],seen:{},papers:{},draft:null,reviews:{},external:[],mixed:null,mixedLog:[],errors:{},testDate:'',testDateAt:0,wide:{facts:{},investigations:{}}});
+const fresh=()=>({version:1,goalMonth:D.goalMonth,target:D.target,lessons:{},attempts:[],seen:{},papers:{},draft:null,reviews:{},external:[],mixed:null,mixedLog:[],errors:{},deferredDrafts:[],testDate:'',testDateAt:0,wide:{facts:{},investigations:{}}});
 function init(s){return s[stateKey]||(s[stateKey]=fresh());}
 function identity(v){return !!(v&&unit(v.unit)&&Number.isInteger(v.form)&&v.form>=0&&v.form<=3&&Number.isSafeInteger(v.seed)&&v.seed>=0&&v.seed<=4294967295);}
 function question(v){if(!identity(v))throw Error('Unknown entrance question');return B.make(v.unit,v.form,v.seed,revOf(v));}
@@ -79,7 +79,7 @@ function evidence(d,id,now=Date.now()){
  const parkedUntil=taught&&misses.length>=PARK_MISSES?misses.at(-1).answeredAt+PARK_DAYS*DAY:0;
  let stage=!taught?'Learn':apply.length<2?'Apply':!transfer.length?'Connect':!recall.length?'Revisit after a week':'Mixed-paper practice';
  const firstTransfer=transfer.map(a=>a.answeredAt).sort((a,b)=>a-b)[0]||0;
- return {id,title:unit(id).title,strand:unit(id).strand,stage,taught,attempts:answered.length,awaitingReview:answered.filter(a=>pendingWriting(d,a)).length,supported:answered.filter(a=>feedbackEvidence(d,a)==='supported-success').length,confirmedErrors:answered.filter(a=>feedbackEvidence(d,a)==='confirmed-error').length,independent:eligible.length,apply:apply.length,transfer:transfer.length,credited:checkApply.length+paperTransfer.length,forms:forms.size,delayed:recall.length,due,gap,overdue:!!due&&now>=due,needsTeaching,parked:now<parkedUntil,parkedUntil,firstTransfer,last:last?.answeredAt||0,lastSuccess:success?.id||'',reviewed:answered.filter(a=>d.reviews[a.id]?.verdict==='valid').length};
+ return {id,title:unit(id).title,strand:unit(id).strand,stage,mastered:!!(taught&&apply.length>=2&&transfer.length>=1&&recall.length>=1),taught,attempts:answered.length,awaitingReview:answered.filter(a=>pendingWriting(d,a)).length,supported:answered.filter(a=>feedbackEvidence(d,a)==='supported-success').length,confirmedErrors:answered.filter(a=>feedbackEvidence(d,a)==='confirmed-error').length,independent:eligible.length,apply:apply.length,transfer:transfer.length,credited:checkApply.length+paperTransfer.length,forms:forms.size,delayed:recall.length,due,gap,overdue:!!due&&now>=due,needsTeaching,parked:now<parkedUntil,parkedUntil,firstTransfer,last:last?.answeredAt||0,lastSuccess:success?.id||'',reviewed:answered.filter(a=>d.reviews[a.id]?.verdict==='valid').length};
 }
 const legacyMap={gst:'percent',percentWhole:'percent',repeatedRemainder:'remainders',workingBackwards:'remainders',cubeEdge:'volume',systematicCounting:'counting',rectanglesInGrid:'counting',factorsMultiples:'factors',constrainedDigits:'digits',areaTriangle:'area'};
 function bridge(s,d){if(options.bridge)return options.bridge(s,d);const groups=new Map();for(const a of s.learning?.attempts||[]){const id=legacyMap[a.generator];if(!id||a.skipped||!a.tries)continue;if(!groups.has(a.generator))groups.set(a.generator,[]);groups.get(a.generator).push(a);}return [...groups.values()].filter(a=>a.length>=2&&a.slice(-2).every(x=>!x.firstCorrect)).map(a=>({unit:legacyMap[a[0].generator],at:a.at(-1).answeredAt||a.at(-1).at})).filter(x=>!d.lessons[x.unit]?.completedAt&&(!d.lessons[x.unit]?.lastViewedAt||d.lessons[x.unit].lastViewedAt<x.at)).sort((a,b)=>b.at-a.at)[0]||null;}
@@ -216,12 +216,25 @@ function respond(d,now=Date.now()){
  return {ok:true,attempt:a,needsLesson:!a.correct&&a.responses.length>=2&&v.phase!=='mixed'&&v.phase!=='redo',mixedNext:v.phase==='mixed'&&(a.correct||a.responses.length>=2)};
 }
 function finishPractice(d){d.draft=null;}
+function deferDraft(d,now=Date.now()){
+ if(!d?.draft)return false;
+ d.deferredDrafts=Array.isArray(d.deferredDrafts)?d.deferredDrafts:[];
+ if(d.deferredDrafts.some(x=>x.id===d.draft.id))return false;
+ const saved=cleanDraft(d.draft);if(!saved)return false;
+ d.deferredDrafts.push({...saved,deferredAt:now});d.deferredDrafts=d.deferredDrafts.slice(-8);d.draft=null;return true;
+}
+function resumeDeferred(d,id){
+ if(d.draft||!Array.isArray(d.deferredDrafts)||!d.deferredDrafts.length)return false;
+ const i=id?d.deferredDrafts.findIndex(x=>x.id===id):d.deferredDrafts.length-1;if(i<0)return false;
+ const [old]=d.deferredDrafts.splice(i,1),draft=cleanDraft(old);if(!draft)return false;d.draft=draft;return true;
+}
 const paperDefinitions=options.paperDefinitions||[
  // The original checks and papers are frozen at bank revision 1 so past results never change.
  {id:'baseline-a',kind:'baseline',rev:1,title:'Starting-point check · A',minutes:0,units:['relationships','percent','area','volume','counting','factors']},
  {id:'baseline-b',kind:'baseline',rev:1,title:'Starting-point check · B',minutes:0,units:['remainders','simultaneous','motion','spatial','cycles','cases']},
  ...['A','B','C'].map(letter=>({id:'mixed-'+letter.toLowerCase(),kind:'paper',rev:1,title:'Mixed reasoning paper '+letter,minutes:75,units:D.units.filter(u=>!u.bridge&&!u.extension).map(u=>u.id)})),
- ...mathsMocks()
+ ...mathsMocks(),
+ ...(options.extraPapers||[])
 ];
 /* DSA-style mocks, modelled on reported formats: about 90 minutes, no calculator, whole-number answers,
    questions in rising order of difficulty worth 1–4 marks (55 marks). Each mock draws a different mix. */
@@ -239,7 +252,7 @@ function paperQuestions(id){
  // A fixed independent blueprint; prior paper values are excluded from later forms.
  const earlier=new Set();for(const prev of paperDefinitions){if(prev.id===id)break;for(const q of paperQuestions(prev.id))earlier.add(q.fingerprint);}
  const rev=def.rev||REV,used=new Set(def.units),attempt=(unit,form)=>{let seed=parseInt(B.hash((options.fingerprintPrefix||'ep-paper-v1:')+id+':'+unit),36)>>>0,q=B.make(unit,form,seed,rev);for(let k=0;k<200&&earlier.has(q.fingerprint);k++)q=B.make(unit,form,seed=(seed+1)>>>0,rev);return earlier.has(q.fingerprint)?null:q;};
- const list=def.units.map((unit,i)=>{const form=def.kind==='baseline'?1:3;let q=attempt(unit,form);
+ const list=def.units.map((unit,i)=>{const form=Number.isInteger(def.forms?.[i])?def.forms[i]:(def.kind==='baseline'?1:3);let q=attempt(unit,form);
   // A mock never repeats an earlier question: if a method has run out of unseen variants, a spare method from the same group stands in.
   if(!q&&def.kind==='mock')for(const spare of def.spares?.[i]||[]){if(used.has(spare))continue;q=attempt(spare,form);if(q){used.add(spare);break;}}
   // Then a changed-structure (form 2) question of the same method; only as a last resort a repeat.
@@ -272,8 +285,8 @@ function submitPaper(d,id,now=Date.now()){
 function scorePaper(d,id){
  const p=d.papers[id],def=paperDefinitions.find(x=>x.id===id);if(!p?.submittedAt||!def)return null;const qs=paperQuestions(id),byStrand=Object.fromEntries(Object.keys(D.strands).map(k=>[k,{correct:0,total:0}]));
  let correct=0,marks=0,markTotal=0;const results=qs.map((q,i)=>{const v=p.answers[i]||{},ok=B.mark(q,v.answer||''),m=def.kind==='mock'&&def.marks?.[i]||1;byStrand[q.strand].total++;byStrand[q.strand].correct+=Number(ok);correct+=Number(ok);markTotal+=m;marks+=ok?m:0;return {index:i,unit:q.unit,marks:m,question:q.text,correct:ok,blank:!v.answer?.trim(),answer:v.answer||'',working:v.working||'',strokes:v.strokes||[],reference:q.answerLabel+(q.reasonLabel?' — '+q.reasonLabel:''),steps:q.steps,...(B.parts?{components:B.parts(q,v.answer||''),answerDisplay:B.describe(q,v.answer||''),figure:q.figure}:{})};});
- const percent=100*correct/qs.length,timed=['paper','mock'].includes(def.kind)&&!!p.deadline&&p.submittedAt<=p.deadline+1500,independent=!p.assisted&&!p.interrupted&&!p.conflicted,qualifying=def.kind==='paper'&&percent>=D.target&&timed&&independent&&!p.seenBefore;
- return {id,kind:def.kind,correct,total:qs.length,percent,marks,markTotal,markPercent:100*marks/markTotal,byStrand,timed,independent,unseen:!p.seenBefore,qualifying,results,seconds:Math.round((p.submittedAt-p.startedAt)/1000),status:def.kind==='baseline'?'Starting-point evidence, not a readiness score.':def.kind==='mock'?'DSA-style mock: compare marks over time. It is not an admissions score.':qualifying?'Internal paper target achieved. External calibration is still needed.':!independent?'Supported or interrupted practice paper.':!timed?'Untimed or overtime practice paper.':'Use the results to choose the next lessons.'};
+ const percent=100*correct/qs.length,timed=['paper','mock','hcis'].includes(def.kind)&&!!p.deadline&&p.submittedAt<=p.deadline+1500,independent=!p.assisted&&!p.interrupted&&!p.conflicted,qualifying=def.kind==='paper'&&percent>=D.target&&timed&&independent&&!p.seenBefore;
+ return {id,kind:def.kind,correct,total:qs.length,percent,marks,markTotal,markPercent:100*marks/markTotal,byStrand,timed,independent,unseen:!p.seenBefore,qualifying,results,seconds:Math.round((p.submittedAt-p.startedAt)/1000),status:def.kind==='baseline'?'Starting-point evidence, not a readiness score.':def.kind==='hcis'?'HCIS-aligned original Maths check, not an official test or admissions score.':def.kind==='mock'?'DSA-style mock: compare marks over time. It is not an admissions score.':qualifying?'Internal paper target achieved. External calibration is still needed.':!independent?'Supported or interrupted practice paper.':!timed?'Untimed or overtime practice paper.':'Use the results to choose the next lessons.'};
 }
 function testDate(d){return isDate(d.testDate)?d.testDate:DEFAULT_TEST;}
 function setTestDate(d,value,now=Date.now()){if(!isDate(value))return false;d.testDate=value;d.testDateAt=now;return true;}
@@ -307,6 +320,7 @@ function validate(raw){
  for(const [k,v] of Object.entries(raw.seen||{}).slice(-12000))if(/^[a-z0-9]{1,12}$/.test(k)&&stamp(v))d.seen[k]=v;
  for(const rawAttempt of (Array.isArray(raw.attempts)?raw.attempts:[]).slice(-5000).sort((a,b)=>(a?.at||0)-(b?.at||0))){const a=record(d,rawAttempt);if(a)d.seen[a.fingerprint]=Math.min(d.seen[a.fingerprint]||a.at,a.at);}
  d.draft=cleanDraft(raw.draft);
+ d.deferredDrafts=(Array.isArray(raw.deferredDrafts)?raw.deferredDrafts:[]).slice(-8).map(x=>({...cleanDraft(x),deferredAt:stamp(x?.deferredAt)})).filter(x=>x.id&&x.id!==d.draft?.id);
  if(raw.tutorPilot&&Pilot)d.tutorPilot=Pilot.validate(raw.tutorPilot);
  for(const def of paperDefinitions){const x=raw.papers?.[def.id];if(!x||!stamp(x.startedAt))continue;const p={id:def.id,startedAt:x.startedAt,updatedAt:stamp(x.updatedAt)||x.startedAt,deadline:def.minutes?x.startedAt+def.minutes*60000:0,submittedAt:stamp(x.submittedAt),assisted:!!x.assisted,interrupted:!!x.interrupted,conflicted:!!x.conflicted,seenBefore:!!x.seenBefore,index:Math.max(0,Math.min(def.units.length-1,Math.trunc(x.index)||0)),answers:{},flags:[...new Set((Array.isArray(x.flags)?x.flags:[]).filter(i=>Number.isInteger(i)&&i>=0&&i<def.units.length))]};
   for(let i=0;i<def.units.length;i++){const a=x.answers?.[i];if(a)p.answers[i]={answer:text(a.answer,AMAX),working:text(a.working),strokes:ink(a.strokes),updatedAt:stamp(a.updatedAt)||x.startedAt};}if(p.submittedAt&&p.submittedAt<p.startedAt)p.conflicted=true;for(const a of Object.values(p.answers))if(a.updatedAt<p.startedAt||p.submittedAt&&a.updatedAt>p.submittedAt||p.deadline&&a.updatedAt>p.deadline)p.conflicted=true;
@@ -329,6 +343,9 @@ function merge(a,b){
  for(const [k,v]of [...Object.entries(a.seen),...Object.entries(b.seen)])d.seen[k]=Math.min(d.seen[k]||v,v);
  const combined=new Map();for(const x of [...a.attempts,...b.attempts])combined.set(x.id,combined.has(x.id)?combineAttempts(combined.get(x.id),x):x);for(const x of [...combined.values()].sort((x,y)=>x.at-y.at||x.id.localeCompare(y.id)))record(d,x);
  d.draft=copy(newest(a.draft,b.draft)||null);if(d.draft&&d.attempts.find(x=>x.id===d.draft.id)?.correct)d.draft=null;
+ const held=new Map();for(const x of [...(a.deferredDrafts||[]),...(b.deferredDrafts||[])]){const prior=held.get(x.id);held.set(x.id,copy(newest(prior,x)||x));}
+ d.deferredDrafts=[...held.values()].filter(x=>x.id!==d.draft?.id&&!d.attempts.find(z=>z.id===x.id)?.correct).sort((x,y)=>(x.deferredAt||0)-(y.deferredAt||0)).slice(-8);
+
  if(a.draft&&b.draft&&a.draft.id===b.draft.id&&d.draft){d.draft.helped=a.draft.helped||b.draft.helped;d.draft.revealed=a.draft.revealed||b.draft.revealed;d.draft.guess=a.draft.guess||b.draft.guess;Object.assign(d.draft,mergePlan(a.draft,b.draft));}
  for(const def of paperDefinitions){const x=a.papers[def.id],y=b.papers[def.id];if(!x&&!y)continue;let win;if(x?.submittedAt&&y?.submittedAt)win=x.submittedAt<y.submittedAt?x:y.submittedAt<x.submittedAt?y:newest(x,y);else win=x?.submittedAt?x:y?.submittedAt?y:newest(x,y);const p=copy(win);
   if(x&&y){p.assisted=x.assisted||y.assisted;p.interrupted=x.interrupted||y.interrupted;p.conflicted=x.conflicted||y.conflicted||x.startedAt!==y.startedAt;p.seenBefore=x.seenBefore||y.seenBefore;p.flags=[...new Set([...x.flags,...y.flags])].sort((x,y)=>x-y);
@@ -347,7 +364,7 @@ function merge(a,b){
  return validate(d);
 }
 function exportData(d){return validate(d);}
-return {D,B,independentFor,pendingWriting,firstOutcomeFor,feedbackEvidence,DAY,REV,TAGS,uid,unit,question,fresh,init,lesson,visit,concept,complete,record,evidence,recommend:(s,now=Date.now())=>avoidRepeat(s,recommend(s,now),now),avoidRepeat,practiceChoice,practiceAvailable,practiceCounts,startPractice,startMixed,startMixedItem,mixedNext,closeMixed,errorLog,tagError,dueRedo,startRedo,testDate,setTestDate,mockSchedule,dueMock,plan,answerFact,finishInvestigation,dayKey,touchDraft,help,respond,finishPractice,paperDefinitions,paperQuestions,startPaper,savePaperAnswer,interruptPaper,submitPaper,scorePaper,review,addExternal,report,validate,merge,exportData,ink};
+return {D,B,independentFor,pendingWriting,firstOutcomeFor,feedbackEvidence,DAY,REV,TAGS,uid,unit,question,fresh,init,lesson,visit,concept,complete,record,evidence,recommend:(s,now=Date.now())=>avoidRepeat(s,recommend(s,now),now),avoidRepeat,practiceChoice,practiceAvailable,practiceCounts,startPractice,startMixed,startMixedItem,mixedNext,closeMixed,errorLog,tagError,dueRedo,startRedo,testDate,setTestDate,mockSchedule,dueMock,plan,answerFact,finishInvestigation,dayKey,touchDraft,help,respond,finishPractice,paperDefinitions,paperQuestions,startPaper,savePaperAnswer,interruptPaper,submitPaper,scorePaper,review,addExternal,report,validate,merge,exportData,ink,deferDraft,resumeDeferred};
 }
 root.MochiPathCore={create};
 if(typeof module!=='undefined')module.exports=root.MochiPathCore;
