@@ -257,7 +257,9 @@ function paperQuestions(id){
   if(!q&&def.kind==='mock')for(const spare of def.spares?.[i]||[]){if(used.has(spare))continue;q=attempt(spare,form);if(q){used.add(spare);break;}}
   // Then a changed-structure (form 2) question of the same method; only as a last resort a repeat.
   if(!q&&def.kind==='mock')q=attempt(unit,2)||B.make(unit,form,parseInt(B.hash(id+':'+unit),36)>>>0,rev);
-  if(!q)throw Error('Paper family has no unseen variant');earlier.add(q.fingerprint);return q;});
+  if(!q&&def.kind==='hcis')for(const f of [form===1?2:1,0]){q=attempt(unit,f);if(q)break;}
+  if(!q&&def.kind==='hcis')for(const spare of def.spares?.[i]||[]){if(used.has(spare))continue;for(const f of [form,form===1?2:1,0]){q=attempt(spare,f);if(q)break;}if(q){used.add(spare);break;}}
+  if(!q)throw Error('Paper family has no unseen variant: '+def.id+' / '+unit);earlier.add(q.fingerprint);return q;});
  // Mocks keep their rising-difficulty order, as in a real paper.
  if(def.kind==='mock'){paperCache.set(id,list);return list.map(copy);}
  // Mix the strands without exposing a chapter sequence or topic label.
