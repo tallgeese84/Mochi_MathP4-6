@@ -6,7 +6,7 @@ function answer(d,id,phase,seed,t){E.finishPractice(d);const v=E.startPractice(d
 test('HCIS topic focus is additive to legacy NUS High preparation',()=>{
  const d=E.fresh();assert.equal(E.plan(d,at).total,42);assert.equal(E.hcisReport(d,at).total,15);
  assert(E.unit('hcis-statistics'));assert.equal(H.TOPICS.some(x=>x[0]==='hcis-statistics'),true);
- const p=H.papers();assert.equal(p.length,10);assert(p.every(x=>x.kind==='hcis'&&x.units.length===15&&x.minutes===45&&x.calculator));
+ const p=H.papers();assert.equal(p.length,10);assert(p.every(x=>x.kind==='hcis'&&x.units.length===12&&x.minutes===45&&x.calculator));
  assert.equal(p[0].date,'2026-12-12');assert.equal(p.at(-1).date,'2027-09-11');
 });
 test('statistics offers original guided, applied, transfer and paper forms',()=>{
@@ -16,11 +16,11 @@ test('statistics offers original guided, applied, transfer and paper forms',()=>
 });
 test('monthly papers do not become official or inflate DSA internal scores',()=>{
  const d=E.fresh(),p=H.papers()[0],questions=E.paperQuestions(p.id);
- assert.equal(questions.length,15);assert(questions.every(x=>[1,2].includes(x.form)));
+ assert.equal(questions.length,12);assert(questions.every(x=>[1,2].includes(x.form)));
  E.startPaper(d,p.id,at);
  questions.forEach((q,i)=>E.savePaperAnswer(d,p.id,i,{answer:q.answerLabel,working:'Independent paper reasoning'},at+100+i));
  const s=E.submitPaper(d,p.id,at+10000);
- assert.equal(s.correct,15);assert.equal(s.timed,true);assert.equal(s.independent,true);
+ assert.equal(s.correct,12);assert.equal(s.timed,true);assert.equal(s.independent,true);
  assert.equal(s.qualifying,false);assert.match(s.status,/not an official test/i);
  assert.equal(E.report(d,at+11000).qualifyingPapers,0);
  assert.equal(E.hcisReport(d,at+11000).papers.length,1);
