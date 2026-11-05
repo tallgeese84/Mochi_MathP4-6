@@ -300,7 +300,7 @@ function mockSchedule(d,now=Date.now()){
 function dueMock(d,now=Date.now()){return mockSchedule(d,now).find(m=>m.status==='due')||null;}
 /* Pacing against the selection-test date. The last six weeks are kept for full papers and review. */
 function plan(d,now=Date.now()){
- const date=testDate(d),t=Date.parse(date+'T00:00:00'),weeksLeft=Math.max(0,Math.ceil((t-now)/(7*DAY))),rows=D.units.map(u=>evidence(d,u.id,now));
+ const date=testDate(d),t=Date.parse(date+'T00:00:00'),weeksLeft=Math.max(0,Math.ceil((t-now)/(7*DAY))),rows=D.units.filter(u=>!u.hcis).map(u=>evidence(d,u.id,now));
  const secure=rows.filter(e=>e.transfer>0).length,remaining=rows.length-secure,studyWeeks=Math.max(1,weeksLeft-6),perWeek=remaining/studyWeeks;
  const recentRate=rows.filter(e=>e.firstTransfer&&e.firstTransfer>=now-28*DAY).length/4,started=d.attempts.some(a=>a.answeredAt<now-28*DAY);
  const status=!remaining?'covered':!started?'starting':recentRate>=perWeek*.9?'on-track':recentRate>=perWeek*.5?'a-little-behind':'behind';
