@@ -137,6 +137,13 @@ const DSA_MODULES=['puzzles','numbers'];
 for(const name of DSA_MODULES){let M=root['MochiDSA_'+name];if(!M&&typeof require==='function'){try{M=require('./dsa-'+name+'.js');}catch(_){M=null;}}if(M)units.push(...M.units.map(u=>({...u,extension:true,module:name})));}
 const PB=root.MochiPaperPractice||(typeof require==='function'?require('./paper-practice.js'):null);
 if(PB)for(const u of units)if(PB.guidance[u.id])u.ideas.push('Connecting to paper-style problems: '+PB.guidance[u.id]);
+add('hcis-statistics','number','Read data, mean, median and range','m-data','HCIS',[],[
+ 'Mean is total divided by number of observations. Explain why you divide by that count.',
+ 'Arrange the data before selecting the median. For an even number of observations, average the two middle values.',
+ 'The range is largest minus smallest. Check labels and units before interpreting tables and graphs.'
+],['The data are 3, 5 and 7. What is the mean?',['3','5','7'],1,'The total is 15; 15 divided by 3 is 5.'],
+ 'Averages are summaries of a data set, not necessarily an individual observation.');
+{const u=units.at(-1);u.bridge=true;u.microBridge=true;u.hcis=true;}
 const stages=[{until:'2026-11',title:'Repair and build',detail:'Secure the reference whole, equations, cube meaning and systematic counting.'},{until:'2027-02',title:'Connect methods',detail:'Develop rates, number theory, geometry and unfamiliar transfer.'},{until:'2027-04',title:'Choose independently',detail:'Mix methods without topic labels and revisit ideas after delays.'},{until:'2027-06',title:'Practise full papers',detail:'Use reserved papers, review reasoning, and verify with external unseen work.'}];
 root.MochiEntranceData={DSA_MODULES,version:1,goalMonth:'2027-06',target:85,strands,units,stages,scope:'Working benchmark: the supplied PD STEM Education NUS High DSA preparation booklet (2024), not an official entrance paper. Original lessons and figures; some explicitly labelled foundation bridges and extensions. The selection-test date (first Saturday of July 2027, as in 2026) is a working estimate a grown-up can change.'};
 if(typeof module!=='undefined')module.exports=root.MochiEntranceData;

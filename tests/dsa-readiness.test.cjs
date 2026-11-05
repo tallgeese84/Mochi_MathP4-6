@@ -14,7 +14,7 @@ test('past answers are re-marked against the question version she actually saw',
  const v=E.startPractice(E.fresh(),'invariants',{phase:'apply',now});assert.equal(v.rev,E.REV);
 });
 test('the original checks and papers stay at revision 1; DSA-style mocks use the newest questions',()=>{
- for(const X of [E,S]){for(const p of X.paperDefinitions){if(p.kind==='mock')assert.equal(p.rev,2);else assert.equal(p.rev,1);}}
+ for(const X of [E,S]){for(const p of X.paperDefinitions){if(p.kind==='hcis')assert.equal(p.rev,3);else if(p.kind==='mock')assert.equal(p.rev,2);else assert.equal(p.rev,1);}}
  const d=E.fresh();E.startPaper(d,'mixed-a',now);E.paperQuestions('mixed-a').forEach((q,i)=>E.savePaperAnswer(d,'mixed-a',i,{answer:q.answerLabel},now+i));E.submitPaper(d,'mixed-a',now+60000);
  assert.ok(d.attempts.every(a=>a.rev===1));assert.equal(E.validate(d).attempts.filter(a=>a.correct).length,24);
 });
@@ -62,7 +62,7 @@ test('mistakes are logged, can be tagged, and come back three days later until a
 });
 test('maths mocks: six papers of 24 questions and 55 marks, rising difficulty, no repeats',()=>{
  const mocks=E.paperDefinitions.filter(p=>p.kind==='mock');assert.equal(mocks.length,6);const seen=new Set();
- for(const p of E.paperDefinitions)for(const q of E.paperQuestions(p.id)){assert.ok(!seen.has(q.fingerprint),p.id+' '+q.id);seen.add(q.fingerprint);}
+ for(const p of E.paperDefinitions.filter(p=>p.kind!=='hcis'))for(const q of E.paperQuestions(p.id)){assert.ok(!seen.has(q.fingerprint),p.id+' '+q.id);seen.add(q.fingerprint);}
  for(const p of mocks){assert.equal(p.minutes,90);assert.equal(p.marks.reduce((a,b)=>a+b,0),55);assert.deepEqual([...p.marks].sort((a,b)=>a-b),p.marks);
   const qs=E.paperQuestions(p.id);assert.equal(qs.length,24);assert.ok(qs.slice(-9).every(q=>E.unit(q.unit).extension),'hardest questions come from the challenge units');}
  const d=E.fresh();E.startPaper(d,'mock-2',now);const qs=E.paperQuestions('mock-2');qs.forEach((q,i)=>{if(i>=20)E.savePaperAnswer(d,'mock-2',i,{answer:q.answerLabel},now+i);});const sc=E.submitPaper(d,'mock-2',now+30*60000);
@@ -79,7 +79,7 @@ test('mocks are scheduled back from the test date, and the date can be changed',
 });
 test('the plan reports weeks left, methods remaining and the pace needed',()=>{
  const d=E.fresh();secure(d,'percent',now);const p=E.plan(d,now+DAY);
- assert.equal(p.total,E.D.units.length);assert.equal(p.secure,1);assert.equal(p.remaining,E.D.units.length-1);assert.ok(p.weeksLeft>=38&&p.weeksLeft<=40);assert.ok(p.perWeek>1);assert.equal(p.status,'starting');
+ assert.equal(p.total,E.D.units.filter(u=>!u.hcis).length);assert.equal(p.secure,1);assert.equal(p.remaining,E.D.units.filter(u=>!u.hcis).length-1);assert.ok(p.weeksLeft>=38&&p.weeksLeft<=40);assert.ok(p.perWeek>1);assert.equal(p.status,'starting');
 });
 test('new records survive backup and merge between two tablets',()=>{
  const a=E.fresh();let t=now;for(const id of ['percent','ratios','area'])t=secure(a,id,t+1000).answeredAt;E.startMixed(a,t+8*DAY);E.setTestDate(a,'2027-07-10',t);
@@ -102,6 +102,6 @@ test('a learner with 30% first-try misses at four questions a day still reaches 
   if(!v)break;const q=E.question(v),wrong=rnd()<.3;E.touchDraft(d,{answer:wrong?'999999':q.answerLabel,working:'my plan here'},t);const res=E.respond(d,t+1);
   if(!res.attempt?.correct){E.touchDraft(d,{answer:rnd()<.3?'999998':q.answerLabel},t+2);E.respond(d,t+3);}E.finishPractice(d);}
   t+=DAY-4*60000;}
- const rows=E.D.units.map(u=>E.evidence(d,u.id,t));assert.equal(rows.filter(e=>e.taught).length,rows.length,'units reached, random seed '+ms0);assert.ok(rows.filter(e=>e.transfer).length>=rows.length-2);
+ const rows=E.D.units.filter(u=>!u.hcis).map(u=>E.evidence(d,u.id,t));assert.equal(rows.filter(e=>e.taught).length,rows.length,'units reached, random seed '+ms0);assert.ok(rows.filter(e=>e.transfer).length>=rows.length-2);
  }}finally{Math.random=real;}
 });

@@ -64,7 +64,7 @@ test('a corrected answer earns a recovery point only after a different fresh ind
 });
 // The original papers are generated at bank revision 1; the DSA-style mocks are separate and come after them.
 test('reserved paper questions are byte-for-byte identical to the v6.6.0 blueprint',()=>{
- const legacy=E.paperDefinitions.filter(p=>p.kind!=='mock');
+ const legacy=E.paperDefinitions.filter(p=>p.kind!=='mock'&&p.kind!=='hcis');
  const digest=crypto.createHash('sha256').update(JSON.stringify(legacy.map(p=>E.paperQuestions(p.id)))).digest('hex');assert.equal(digest,'b771c2d33015cb17f5067d7735b09b478c20201fd6a79d5d72f83c400c661360');
  for(const p of legacy)assert.ok(p.units.every(id=>!id.startsWith('geo-')));
 });

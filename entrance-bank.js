@@ -94,6 +94,12 @@ function make(unit,form,seed,rev=REV){
  const out=(text,answer,steps,params={},extra={})=>q={unit,strand:u.strand,form,seed,id:`ep1:${unit}:${form}:${seed}`,text,answer,steps,params,level:form===0?1:form===1?2:3,...extra};
  if(u.bridge){const G=root.MochiGeometryBridge||(typeof require==='function'?require('./geometry-bridge.js'):null),v=G.make(unit,form,seed,r,rev);if(v)out(v.text,v.answer,v.steps,v.params,v);}
  if(u.extension){const X=moduleOf(u),v=X.make(unit,form,seed,r,rev);if(v)out(v.text,v.answer,v.steps,v.params,v);}
+ else if(unit==='hcis-statistics'){
+  if(form===0){const mean=r(6,18),a=r(1,4),v=[mean-a,mean,mean+a];out('The three scores are '+v.join(', ')+'. What is their mean?',mean,['Add the three scores: '+v.reduce((s,x)=>s+x,0)+'.','Divide by three: '+mean+'.'],{v});}
+  if(form===1){const base=r(8,19),v=[base+6,base-3,base,base+2,base-1];out('Five measurements are '+v.join(', ')+'. What is the median?',base,['Sort all measurements from smallest to largest.','The third of five readings is '+base+'.'],{v});}
+  if(form===2){const a=r(3,17),b=r(2,8),v=[a,a+b,a+2*b,a+b];out('A table lists four groups with '+v.join(', ')+' children. What is the range of group sizes?',2*b,['The maximum is '+(a+2*b)+' and the minimum is '+a+'.','Subtract to get '+(2*b)+'.'],{v});}
+  if(form===3){const n=r(10,25),a=r(2,7),m=r(3,9),v=[n,n+m,n+a,n+a+m],max=Math.max(...v);out('A chart records library visitors over four days: '+v.join(', ')+'. How many more visited on the busiest than on the quietest day?',max-n,['Highest reading is '+max+'.','Lowest reading is '+n+'.','Difference = '+(max-n)+'.'],{v});}
+ }
  else if(unit==='relationships'){
   if(form===0){const x=r(3,14),a=r(3,8),b=r(4,20);out(`A number is multiplied by ${a}, then ${b} is added. The result is ${a*x+b}. What is the number?`,x,[`Let the number be x: ${a}x + ${b} = ${a*x+b}.`,`Subtract ${b}, then divide by ${a}: x = ${x}.`,`Check: ${a} × ${x} + ${b} = ${a*x+b}.`],{x,a,b});}
   if(form===1){const small=r(13,45),difference=r(7,21),total=2*small+difference;out(`Two trays contain ${total} counters altogether. The first tray contains ${difference} more than the second. How many counters are in the second tray?`,small,[`Remove the difference: ${total} − ${difference} = ${2*small}.`,`This is twice the smaller amount: ${2*small} ÷ 2 = ${small}.`,`The other tray has ${small+difference}; together they have ${total}.`],{total,difference});}
