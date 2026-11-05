@@ -6,6 +6,13 @@
 'use strict';
 const q=(prompt,choices,correct,explain)=>({prompt,choices,correct,explain});
 const maths={
+ 'hcis-statistics':[
+  q('What must be done before calculating a mean?',['Add all values and count how many there are.','Choose the largest value.','Subtract the two middle values.'],0,'Mean is total divided by the number of observations.'),
+  q('Before choosing the median, what do you do?',['Take the largest reading.','Put all readings in order.','Divide the total by the number of readings.'],1,'The median is the middle of the ordered data.'),
+  q('Which calculation finds the range?',['Highest plus lowest.','Mean minus one.','Highest minus lowest.'],2,'Range is the largest minus the smallest observation.'),
+  q('How do you compare the busiest and quietest days?',['Subtract the smallest count from the largest.','Add all daily counts.','Divide the largest by four.'],0,'Read the highest and lowest counts and subtract.')
+ ],
+
  relationships:[
   q('To undo “multiply, then add”, which step do you undo first?',['Divide the result first.','Take away the amount that was added.','Add the two given numbers.'],1,'Undo the last step first. Remove what was added, then divide to undo the multiplication.'),
   q('If you subtract the known difference from the total of two amounts, what remains?',['One copy of the larger amount.','Two equal copies of the smaller amount.','The difference again.'],1,'Removing the extra part makes the two amounts equal, so what remains is twice the smaller amount.'),

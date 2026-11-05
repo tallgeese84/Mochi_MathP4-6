@@ -16,7 +16,7 @@ test('statistics offers original guided, applied, transfer and paper forms',()=>
 });
 test('monthly papers do not become official or inflate DSA internal scores',()=>{
  const d=E.fresh(),p=H.papers()[0],questions=E.paperQuestions(p.id);
- assert.equal(questions.length,12);assert(questions.every(x=>[1,2].includes(x.form)));
+ assert.equal(questions.length,12);assert(questions.every(x=>[0,1,2].includes(x.form)));
  E.startPaper(d,p.id,at);
  questions.forEach((q,i)=>E.savePaperAnswer(d,p.id,i,{answer:q.answerLabel,working:'Independent paper reasoning'},at+100+i));
  const s=E.submitPaper(d,p.id,at+10000);

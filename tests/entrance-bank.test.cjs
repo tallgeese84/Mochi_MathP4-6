@@ -32,7 +32,13 @@ function solveThreeSets(N,a,b,c){
 function solveFive(T,L){let best=null;for(let s=1;s<L;s++)for(let y=s+1;y<L;y++)for(let z=y+1;z<L;z++){const w=T-L-s-y-z;if(w>z&&w<L)best=Math.max(best??0,s);}return best;}
 function independentlySolve(q){const p=q.params,f=q.form;
  switch(q.unit){
- case 'geo-one-face':case 'geo-face-pairs':return f<2?range(1,p.n).reduce(n=>n+range(1,p.w).reduce(m=>m+range(1,p.h).length,0),0):range(1,20).find(edge=>p.n*p.w*edge===p.n*p.w*p.h);
+ case 'hcis-statistics':{
+   const vals=[...q.text.matchAll(/\b\d+\b/g)].map(x=>Number(x[0]));
+   if(f===0)return vals.reduce((a,b)=>a+b,0)/vals.length;
+   if(f===1)return [...vals].sort((a,b)=>a-b)[Math.floor(vals.length/2)];
+   return Math.max(...vals)-Math.min(...vals);
+  }
+  case 'geo-one-face':case 'geo-face-pairs':return f<2?range(1,p.n).reduce(n=>n+range(1,p.w).reduce(m=>m+range(1,p.h).length,0),0):range(1,20).find(edge=>p.n*p.w*edge===p.n*p.w*p.h);
  case 'geo-measure':return /space|volume|fill|inside/.test(p.quantity)?'cm³':/area|surface|face|cover/.test(p.quantity)?'cm²':'cm';
  case 'geo-layers':return f===0?Array.from({length:p.c},()=>p.a*p.b).reduce((a,b)=>a+b,0):f===1?range(1,12).find(x=>x*x*x===p.a**3):f===2?p.a*p.b*p.c/(p.a*p.b):p.a*p.b*p.c/(p.b*p.c);
  case 'geo-surface':return f===0?p.a*p.a:f===1?sum([p.a*p.b,p.a*p.b,p.a*p.c,p.a*p.c,p.b*p.c,p.b*p.c]):2*(p.count*p.a*p.a+p.count*p.a*p.a+p.a*p.a);
