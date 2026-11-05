@@ -40,6 +40,17 @@ function open(){
  root.scrollTo?.({top:0,behavior:'instant'});
 }
 function launch(){extensionDay='';root.MochiNightlyPlan?.adopt();runTask(T.model(S).next);}
+function focusInstead(){
+ const d=S.entrance,E=root.MochiEntrance,b=T.model(S).blocks.find(x=>x.subject==='maths');
+ if(!b||b.done||b.rest||!root.MochiNightlyPlan?.pending?.('maths')||!d?.draft)return;
+ if(!E.deferDraft(d))return;
+ save(S);extensionDay='';runTask(T.model(S).blocks.find(x=>x.subject==='maths').task);
+}
+function resumeHeld(){
+ const d=S.entrance,E=root.MochiEntrance;if(d?.draft||!d?.deferredDrafts?.length)return;
+ if(!E.resumeDeferred(d))return;save(S);
+ runTask({subject:'maths',kind:'question',unit:d.draft.unit,title:E.unit(d.draft.unit).title,resume:true});
+}
 // Subject overview Continue is another entrance to the daily route, not a
 // separate adaptive queue. Deliberate library/bonus choices remain free choice.
 function launchSubject(subject){
@@ -57,6 +68,7 @@ function runTask(t){
  if(t.kind==='reflect')ui.repeatNotice(t.detail);
  else if(t.kind==='paper')ui.open('paper',t.paper);
  else if(t.kind==='question')ui.open('practice',t.unit);
+  else if(t.kind==='deferred'){if(E.resumeDeferred(d,t.deferredId)){save(S);ui.open('practice',t.unit);}else ui.open('home');}
  else if(t.kind==='lesson')ui.open('lesson',t.unit);
  else if(t.kind==='mixed')ui.mixed();
  else if(t.kind==='redo')ui.redo(t.attempt);
@@ -183,6 +195,9 @@ function paint(){
    $('todayTaskDetail').textContent=t?t.detail:m.finished?'Your planned study time is complete.':'Your learning and saved work will be here when you return.';
    $('todayStart').textContent=t?(t.resume?'Continue ':'Start ')+names[t.subject]+(isPaper?' paper':''):m.finished?'Visit Mochi':'Visit Mochi';
    $('todayStart').dataset.subject=t?.subject||'';
+    const md=S.entrance||{},held=!!md.draft&&!md.attempts?.find(a=>a.id===md.draft.id)?.correct,mblock=m.blocks.find(x=>x.subject==='maths');
+    $('todayFocusInstead').hidden=!(held&&mblock&&!mblock.done&&!mblock.rest&&root.MochiNightlyPlan?.pending?.('maths'));
+    $('todayResumeDeferred').hidden=!!md.draft||!md.deferredDrafts?.length;
    $('todayQuestStrip').innerHTML=m.blocks.map(b=>`<div class="today-quest-chip" data-status="${b.done?'done':b.rest?'rest':t?.subject===b.subject?'now':'next'}"><span class="today-quest-icon" aria-hidden="true">${b.done?'✓':b.rest?'–':b.subject==='maths'?'M':'S'}</span><span><strong>${esc(b.name)}</strong><small>${b.rest?'Rest':b.done?'Done':Math.max(1,Math.ceil(b.remaining/60000))+' min left'}</small></span></div>`).join('');
    $('todayProgress').textContent=m.restDay?'Rest day':`${m.completed}/${m.planned} time goals complete`;
    $('todayProgressBar').max=m.planned||1;$('todayProgressBar').value=m.completed;
@@ -214,7 +229,7 @@ function paint(){
 function init(){
  if(!T||!root.MochiPlanUI||!U('maths')||!U('science')||$('todayHome'))return;
  home=document.createElement('main');home.id='todayHome';home.hidden=true;
- home.innerHTML=`<div class="today-layout"><div class="today-main"><div class="today-greeting"><img src="euna-avatar.webp" width="44" height="44" alt=""><p id="todayDate"></p></div><h1 id="todayTitle" tabindex="-1"></h1><p id="todayIntro" class="today-intro"></p><section class="today-card" aria-label="Today’s study plan"><div class="today-card-top"><span id="todayNowLabel" class="today-eyebrow"></span><span id="todayTaskSubject" class="today-subject"></span></div><h2 id="todayTaskTitle"></h2><p id="todayTaskDetail"></p><button id="todayStart" class="today-primary" type="button">Start next quest</button><div id="todayQuestStrip" class="today-quest-strip" aria-label="Daily quest progress"></div><div class="today-progress"><span id="todayProgress"></span><progress id="todayProgressBar" max="2" value="0" aria-label="Daily study time goals reached"></progress></div></section><section id="todayBonus" class="today-bonus" hidden><div><strong>Bonus quest</strong><small id="todayBonusText"></small></div><span id="todayBonusCoins" class="today-bonus-coins"></span><p id="todayCatBonus" class="today-cat-bonus"></p><div id="todayBonusChoices" class="today-bonus-choices"></div></section><p id="todayNote" class="today-note"></p><p id="todayNightlyStatus" class="today-note" aria-live="polite"></p><section id="todayWide" class="today-wide" aria-label="Explore and wonder"></section></div><aside class="today-companion" aria-label="Mochi and rewards"><button id="todayMochi" class="today-mochi" type="button"><span class="today-mochi-says" id="todayMochiSays"></span><span class="mochi-greet" id="todayMochiGreet"><img id="todayMochiImage" src="mochi-flat-avatar.svg" width="150" height="150" alt=""></span><span class="today-mochi-visit">Visit Mochi’s room <span aria-hidden="true">→</span></span></button><div class="today-stats"><span class="today-stat"><span class="today-stat-icon" aria-hidden="true">🪙</span><strong id="todayCoins">0</strong><small>coins</small></span><span class="today-stat"><span class="today-stat-icon" aria-hidden="true">🐾</span><strong id="todayCatPoints">0</strong><small>Cat Points</small></span></div><div id="todayNextCat" class="today-next-cat"></div></aside></div>`;
+ home.innerHTML=`<div class="today-layout"><div class="today-main"><div class="today-greeting"><img src="euna-avatar.webp" width="44" height="44" alt=""><p id="todayDate"></p></div><h1 id="todayTitle" tabindex="-1"></h1><p id="todayIntro" class="today-intro"></p><section class="today-card" aria-label="Today’s study plan"><div class="today-card-top"><span id="todayNowLabel" class="today-eyebrow"></span><span id="todayTaskSubject" class="today-subject"></span></div><h2 id="todayTaskTitle"></h2><p id="todayTaskDetail"></p><button id="todayStart" class="today-primary" type="button">Start next quest</button><button id="todayFocusInstead" type="button" hidden>Save this question for later · do today's Maths focus</button><button id="todayResumeDeferred" type="button" hidden>Resume a saved Maths question</button><div id="todayQuestStrip" class="today-quest-strip" aria-label="Daily quest progress"></div><div class="today-progress"><span id="todayProgress"></span><progress id="todayProgressBar" max="2" value="0" aria-label="Daily study time goals reached"></progress></div></section><section id="todayBonus" class="today-bonus" hidden><div><strong>Bonus quest</strong><small id="todayBonusText"></small></div><span id="todayBonusCoins" class="today-bonus-coins"></span><p id="todayCatBonus" class="today-cat-bonus"></p><div id="todayBonusChoices" class="today-bonus-choices"></div></section><p id="todayNote" class="today-note"></p><p id="todayNightlyStatus" class="today-note" aria-live="polite"></p><section id="todayWide" class="today-wide" aria-label="Explore and wonder"></section></div><aside class="today-companion" aria-label="Mochi and rewards"><button id="todayMochi" class="today-mochi" type="button"><span class="today-mochi-says" id="todayMochiSays"></span><span class="mochi-greet" id="todayMochiGreet"><img id="todayMochiImage" src="mochi-flat-avatar.svg" width="150" height="150" alt=""></span><span class="today-mochi-visit">Visit Mochi’s room <span aria-hidden="true">→</span></span></button><div class="today-stats"><span class="today-stat"><span class="today-stat-icon" aria-hidden="true">🪙</span><strong id="todayCoins">0</strong><small>coins</small></span><span class="today-stat"><span class="today-stat-icon" aria-hidden="true">🐾</span><strong id="todayCatPoints">0</strong><small>Cat Points</small></span></div><div id="todayNextCat" class="today-next-cat"></div></aside></div>`;
  const optional=document.createElement('section');optional.id='todayMathsExtension';optional.className='today-maths-extension';optional.hidden=true;optional.setAttribute('aria-label','Optional Maths practice');
  optional.innerHTML='<button id="todayMathsExtensionStart" type="button">Optional · 5 more minutes of Maths</button><p id="todayMathsExtensionNote"></p>';
  home.querySelector('#todayBonus').before(optional);$('viewEntrance').before(home);
@@ -224,7 +239,7 @@ function init(){
  menu=document.createElement('dialog');menu.id='todayMenu';menu.setAttribute('aria-labelledby','todayMenuTitle');
  menu.innerHTML='<div class="today-menu-heading"><h2 id="todayMenuTitle">Everything else</h2><button id="todayMenuClose" type="button" aria-label="Close menu">×</button></div><p>Your daily plan already chooses the next step.</p><button data-today-home type="button">Today’s plan <span>Continue the guided route</span></button><button data-today-subject="maths" data-today-view="lessons" type="button">Maths lessons <span>Browse methods and worked examples</span></button><button data-today-subject="science" data-today-view="lessons" type="button">Science lessons <span>Explore ideas and evidence</span></button><button data-today-subject="labs" type="button">Experiment activities <span>Optional exploration</span></button><button data-today-subject="room" type="button">Mochi’s room <span>Cats, clothing and rewards</span></button><details><summary>Practice papers</summary><p>Keep reserved papers for planned assessments. Browsing this menu does not open their questions.</p><button data-today-subject="maths" data-today-view="papers" type="button">Maths papers and starting checks</button><button data-today-subject="science" data-today-view="papers" type="button">Science papers and starting checks</button></details><div class="today-adult"><button id="todayWeekly" type="button">Weekly time plan</button><button id="todayParent" type="button">Grown-up settings & progress</button></div>';
  document.body.append(menu);
- $('todayStart').onclick=launch;$('todayMathsExtensionStart').onclick=launchMathsExtension;$('todayMochi').onclick=()=>go('room');$('todayBack').onclick=open;$('todayFinish').onclick=open;more.onclick=openMenu;$('todayMenuClose').onclick=closeMenu;
+ $('todayStart').onclick=launch;$('todayFocusInstead').onclick=focusInstead;$('todayResumeDeferred').onclick=resumeHeld;$('todayMathsExtensionStart').onclick=launchMathsExtension;$('todayMochi').onclick=()=>go('room');$('todayBack').onclick=open;$('todayFinish').onclick=open;more.onclick=openMenu;$('todayMenuClose').onclick=closeMenu;
  menu.querySelector('[data-today-home]').onclick=open;
  for(const b of menu.querySelectorAll('[data-today-subject]'))b.onclick=()=>go(b.dataset.todaySubject,b.dataset.todayView);
  menu.addEventListener('close',()=>{more.setAttribute('aria-expanded','false');lastFocus?.focus?.({preventScroll:true});});
