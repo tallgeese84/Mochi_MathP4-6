@@ -27,6 +27,7 @@ function task(state,subject,now=Date.now()){
  // subject recommendation can otherwise select a repair instead indefinitely.
  const prelude=root.MochiNightlyPlan?.prelude?.(s,subject,now);if(prelude)return prelude;
  const nightly=root.MochiNightlyPlan?.next(s,subject,now);if(nightly)return nightly;
+ if(subject==='maths'&&d.deferredDrafts?.length){const saved=d.deferredDrafts.at(-1);return {subject,kind:'deferred',unit:saved.unit,title:E.unit(saved.unit).title,resume:true,touched:saved.deferredAt||saved.updatedAt,detail:'Your saved working is still here. Resume when you are ready.',deferredId:saved.id};}
  const r=E.recommend({...s,[key[subject]]:{...d,draft:null}},now);
  if(r.kind==='mixed-set')return {subject,kind:'mixed',title:'Mixed practice',resume:!!(d.mixed&&!d.mixed.completedAt),touched:d.mixed&&!d.mixed.completedAt?d.mixed.at:0,detail:r.due?'Revise topics you have learnt. Decide which method to use for each question.':'Questions from different topics. Decide which method to use for each one.'};
  if(r.kind==='reflect')return {subject,kind:'reflect',unit:r.unit,title:'Review your reasoning',resume:false,touched:0,detail:r.reason};
