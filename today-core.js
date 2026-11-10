@@ -48,6 +48,24 @@ function task(state,subject,now=Date.now()){
  }
  return {subject,kind:r.kind==='learn'?'lesson':r.kind==='recall'?'recall':'practice',unit:r.unit,...(r.phase?{phase:r.phase}:{}),title:E.unit(r.unit).title,resume:false,touched:0,detail:r.kind==='learn'?'Learn a new topic, study the worked example, then try a question.':r.kind==='recall'?'Revise this topic without looking at the lesson.':'Try the next question.'};
 }
+// v7.10 study-time balance. Unaided first-answer success over the previous seven days, on distinct
+// practice questions (guided, scaffolded and unreviewed written answers excluded).
+function unaidedRate(E,d,now){
+ const start=now-7*86400000,today=P.localDay(now),seen=new Set();let n=0,ok=0;
+ for(const a of d.attempts||[]){if(a.mode!=='practice'||a.skipped||a.phase==='guided'||a.scaffold||!(a.answeredAt>=start)||P.localDay(a.answeredAt)===today||E.pendingWriting(d,a)||seen.has(a.fingerprint))continue;seen.add(a.fingerprint);n++;if(E.independentFor(d,a))ok++;}
+ return {n,unaided:ok,rate:n?ok/n:null};
+}
+function balance(state,now=Date.now()){
+ const m=unaidedRate(engines.maths,state.entrance||engines.maths.fresh(),now),s=unaidedRate(engines.science,state.sciencePath||engines.science.fresh(),now);
+ return {shift:m.n>=10&&s.n>=20&&s.rate>=0.85&&m.rate<0.5?P.SHIFT_MINUTES:0,maths:m,science:s};
+}
+// Decided once, at the first Home visit of a day with both subjects scheduled; the total is unchanged.
+function settleBalance(state,now=Date.now()){
+ const p=state.planner;if(!p||!P.setShift||p.balance?.enabled===false||p.shifts?.[P.localDay(now)])return false;
+ if(P.scheduled(p,'maths',now)<=0||P.scheduled(p,'science',now)<P.SCIENCE_FLOOR+P.SHIFT_MINUTES)return false;
+ const b=balance(state,now),pc=r=>r.rate===null?'no data':Math.round(r.rate*100)+'% of '+r.n;
+ return P.setShift(p,b.shift,`Maths unaided ${pc(b.maths)}; Science unaided ${pc(b.science)} (last 7 days)`,now);
+}
 function model(state,now=Date.now()){
  const p=state.planner||P.fresh(),date=P.localDay(now),time=P.elapsed(p,date);
  const blocks=P.subjects.map(subject=>{const minutes=P.minutes(p,subject,now),spent=Math.max(0,time[subject]||0);return {subject,name:names[subject],minutes,spent,remaining:Math.max(0,minutes*60000-spent),rest:minutes===0,done:minutes>0&&spent>=minutes*60000,task:task(state,subject,now)};});
@@ -59,5 +77,5 @@ function model(state,now=Date.now()){
  const planned=blocks.filter(b=>!b.rest).length,completed=blocks.filter(b=>b.done).length;
  return {date,blocks,next:next?.task||null,subject:next?.subject||null,planned,completed,restDay:planned===0,finished:planned>0&&planned===completed,order:next?[next,...blocks.filter(b=>b!==next)]:blocks};
 }
-root.MochiToday={task,model,names};if(typeof module!=='undefined')module.exports=root.MochiToday;
+root.MochiToday={task,model,names,balance,settleBalance};if(typeof module!=='undefined')module.exports=root.MochiToday;
 })(typeof window!=='undefined'?window:globalThis);

@@ -11,3 +11,4 @@
 @media(prefers-reduced-motion:reduce){#roomImg,#accLayer{transition:none}}
 .mochi-growth-guide{border-top:1px solid #ddcde9;margin-top:16px;padding-top:4px}.mochi-growth-guide summary{min-height:44px;padding:12px 0;box-sizing:border-box;cursor:pointer;color:#593571;font-weight:600}.mochi-growth-guide ol{padding-left:24px}.mochi-growth-guide li{padding:12px 10px;margin:4px 0;border-radius:12px;line-height:1.6}.mochi-growth-guide li[aria-current=step]{background:#e7d7f1}.mochi-growth-guide li span{display:block;font-size:14px}.mochi-growth-guide li small{font-size:13px;margin-top:4px}
 @media print{.daily-plan,.plan-schedule{display:none!important}}
+.plan-balance{margin:14px 0;padding:12px 14px;border-radius:14px;background:#f6effb}.plan-balance label{display:flex;gap:10px;align-items:flex-start;line-height:1.45}.plan-balance input{margin-top:4px;flex:none}
