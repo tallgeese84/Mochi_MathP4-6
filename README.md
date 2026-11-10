@@ -1,5 +1,7 @@
 # Mochi · Euna’s maths and science studio
 
+**v7.10.0 (9 November 2026).** The nightly plan now changes what Euna practises: stale saved questions are set aside so they never block it, Maths microcycles teach one problem type with fading help (worked example → first steps → on her own), weak units get completion problems, equal-additions ratios use the difference method with a bar model, study time can tilt five minutes towards Maths with the same total, AI coaching covers Ratios, Two conditions and Percentages, and grown-ups get a written-answer review queue. See `docs/FEEDBACK_LOOP_V710.md`.
+
 **v7.8.2 (1 November 2026).** Daily Quests searches more verified authored variants for Motion, Light and Circuits, shows a clear fallback instead of pretending exhausted questions are fresh, and now offers proactive Circuits coaching with bounded JSON-format repair. Plans, time goals, saved work, adult Science review and earned cats are preserved. See [the release notes](docs/EUNA_V782_RELEASE.md).
 
 
