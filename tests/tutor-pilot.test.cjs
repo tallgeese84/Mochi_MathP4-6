@@ -18,11 +18,16 @@ test('pilot distinguishes catch-up gaps, average speed and mirror normals',()=>{
  assert.equal(P.spec('maths',M.B.make('motion',1,55)).key,'average-speed');
  assert.equal(P.spec('science',S.B.make('light',2,55)).key,'mirror-normal');
  assert.equal(P.spec('science',S.B.make('light',1,55)).key,'shadow-size');
- assert.equal(P.spec('maths',M.B.make('percent',1,55)),null);
+ assert.equal(P.spec('maths',M.B.make('area',1,55)),null);
+ // v7.10: Ratios, Two conditions and Percentages joined the pilot, with type-specific skills.
+ assert.equal(P.spec('maths',M.B.make('percent',1,55)).key,'reverse-percent');
+ assert.equal(P.spec('maths',M.B.make('ratios',1,55)).key,'ratio-fixed-part');
+ assert.equal(P.spec('maths',M.B.make('simultaneous',0,55)).key,'assume-all');
+ for(let i=0;i<80;i++){const q=M.B.make('ratios',2,(i*2654435761)>>>0);assert.equal(P.spec('maths',q).key,q.structure==='pb3:ratios:equal-additions'?'ratio-equal-additions':'ratio-weighted-groups');}
 });
 test('papers, mixed checks, redos and other topics do not acquire pilot help',()=>{
  const t=setup();for(const phase of ['mixed','redo','paper','baseline','mock'])assert.equal(P.eligible(t.subject,{...t.v,phase},t.q),false);
- assert.equal(P.eligible('maths',t.v,M.B.make('percent',2,1)),false);
+ assert.equal(P.eligible('maths',t.v,M.B.make('area',2,1)),false);
 });
 test('diagnostic keeps the actual first selection and is idempotent',()=>{
  const t=setup(),c=check(t),e=P.diagnostic(t.d,t.subject,t.v,t.q,c,1,now+1);

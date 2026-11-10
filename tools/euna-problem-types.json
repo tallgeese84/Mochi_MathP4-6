@@ -1,0 +1,752 @@
+{
+ "student": "Euna",
+ "subject": "maths",
+ "bankRevision": 3,
+ "note": "Optional nightly-plan fields: practice steps may add \"form\" (1 or 2) and, with form 2, one \"structure\" below. Omit both to let the app choose the type from her latest miss.",
+ "units": [
+  {
+   "unit": "relationships",
+   "title": "Turn words into relationships",
+   "forms": {
+    "1": [
+     {
+      "sample": "Two trays contain 93 counters altogether. The first tray contains 13 more than the second. How many counters are in the second tray?"
+     }
+    ],
+    "2": [
+     {
+      "structure": "pb3:relationships:equal-stacks",
+      "sample": "Red blocks all have height 9 cm. Blue blocks all have the same unknown height. A stack of 4 red blocks and 2 blue blocks is exactly as tall as a stack of 7 red blocks …"
+     },
+     {
+      "structure": "pb3:relationships:swap-height",
+      "sample": "Two models stand on a level floor beside a platform. With the taller model on the platform, its top is 92 cm above the shorter model's top. When the models exchange pl…"
+     }
+    ]
+   }
+  },
+  {
+   "unit": "percent",
+   "title": "Choose the percentage whole",
+   "forms": {
+    "1": [
+     {
+      "sample": "After a 30% discount, a desk costs $140. What was its price before the discount?",
+      "skill": "the remaining percentage is the known amount"
+     }
+    ],
+    "2": [
+     {
+      "structure": "pb3:percent:order-of-changes",
+      "sample": "Two shops sell the same bag at the same original price and offer the same fixed-value voucher and a 25% discount. At Shop A the discount is applied first, then the vou…",
+      "skill": "the order of a discount and a voucher"
+     },
+     {
+      "structure": "pb3:percent:two-wholes",
+      "sample": "At a museum, adult admission is $22 and child admission is $10. On Saturday, 60 more children than adults visited. On Sunday, the number of adults was 20% lower and th…",
+      "skill": "two groups, two different wholes"
+     }
+    ]
+   }
+  },
+  {
+   "unit": "remainders",
+   "title": "Work backwards through changing amounts",
+   "forms": {
+    "1": [
+     {
+      "sample": "A child spends 1/4 of some money and then another $15. There is $33 left. How much money was there at first?"
+     }
+    ],
+    "2": [
+     {
+      "structure": "pb3:remainders:restock-between-sales",
+      "sample": "A shop sells one quarter of its notebooks in the morning. A delivery then adds 40 notebooks. In the afternoon it sells two fifths of the notebooks then available. Ther…"
+     },
+     {
+      "structure": "pb3:remainders:reverse-transfers",
+      "sample": "There are counters in jars A and B. First, one third of the counters in A are moved to B. Then half of the counters now in B are moved to A. At the end A has 84 counte…"
+     }
+    ]
+   }
+  },
+  {
+   "unit": "simultaneous",
+   "title": "Combine two conditions",
+   "forms": {
+    "1": [
+     {
+      "sample": "Two notebooks and three pens cost $42. Four notebooks and one pen cost $54. What is the price of one notebook?",
+      "skill": "compare two conditions to isolate one item"
+     }
+    ],
+    "2": [
+     {
+      "structure": "pb3:simultaneous:replacement-before-baseline",
+      "sample": "A box originally contains 39 coins, all either 10-cent or 50-cent coins. 5 of the 50-cent coins are replaced, one for one, by 10-cent coins. The box now contains $11.9…",
+      "skill": "undo the replacements before the assumption"
+     },
+     {
+      "structure": "pb3:simultaneous:three-pair-totals",
+      "sample": "Three crates A, B and C have masses recorded in pairs: A and B together are 41 kg; B and C together are 33 kg; C and A together are 32 kg. What is the mass of A and B …",
+      "skill": "each item counted twice in pair totals"
+     }
+    ]
+   }
+  },
+  {
+   "unit": "ratios",
+   "title": "Ratios with a fixed quantity",
+   "forms": {
+    "1": [
+     {
+      "sample": "The ratio of red to blue tiles is 2:3. After 77 blue tiles are added, it is 3:8. No red tiles are changed. How many tiles were there at first?",
+      "skill": "matching the part that does not change"
+     }
+    ],
+    "2": [
+     {
+      "structure": "pb3:ratios:equal-additions",
+      "sample": "Red and blue counters are initially in the ratio 4:7. Then 18 red counters and 18 blue counters are added. The ratio becomes 2:3. How many blue counters were there ini…",
+      "skill": "equal additions keep the difference"
+     },
+     {
+      "structure": "pb3:ratios:weighted-groups",
+      "sample": "A school has 60 pupils in Group A and an unknown number in Group B. Two fifths of Group A and three quarters of Group B attend an art club. Across the two groups toget…",
+      "skill": "fractions of two different groups"
+     }
+    ]
+   }
+  },
+  {
+   "unit": "rates",
+   "title": "Combine rates, not completion times",
+   "forms": {
+    "1": [
+     {
+      "sample": "Pump A fills a tank in 12 hours; pump B fills it in 24 hours. Both have constant rates and can operate independently. Starting together with an empty tank, how many ho…"
+     }
+    ],
+    "2": [
+     {
+      "structure": "pb3:rates:pair-rates-then-leave",
+      "sample": "At constant independent rates, workers A and B together label 13 parcels per minute, B and C together label 11, and C and A together label 10. All three start on a bat…"
+     },
+     {
+      "structure": "pb3:rates:unknown-inflow",
+      "sample": "Water enters a tank at a constant rate. Starting with the same amount of water each time, one pump empties it in 84 minutes, while two identical pumps working together…"
+     }
+    ]
+   }
+  },
+  {
+   "unit": "motion",
+   "title": "Relative motion and average speed",
+   "forms": {
+    "1": [
+     {
+      "sample": "A rider travels 700 km at 100 km/h, then returns along the same route at 70 km/h without stopping. What is the average speed for the whole journey? Give an exact fract…",
+      "skill": "total distance and total time"
+     }
+    ],
+    "2": [
+     {
+      "structure": "pb3:motion:average-with-stop-inverse",
+      "sample": "A cyclist rides to a park at 20 km/h, rests there for 30 minutes, and returns along the same route at 30 km/h. Her average speed for the entire outing, including the r…",
+      "skill": "average speed including a stop"
+     },
+     {
+      "structure": "pb3:motion:three-runner-gaps",
+      "sample": "Three runners A, B and C move in the same direction along a straight track at constant speeds, with C fastest and A slowest. Initially B is 77 m ahead of C, and A is 6…",
+      "skill": "same-direction catch-up gaps"
+     }
+    ]
+   }
+  },
+  {
+   "unit": "capacity",
+   "title": "Equivalent capacity and whole objects",
+   "forms": {
+    "1": [
+     {
+      "sample": "A rack holds 24 large trays or 48 small trays. It currently contains 3 large trays and 8 small trays. What is the greatest number of additional large trays that will fit?"
+     }
+    ],
+    "2": [
+     {
+      "sample": "A container holds 15 small boxes or 9 large boxes. It is full of small boxes. What is the minimum number of small boxes that must be removed to make room for 5 large b…"
+     }
+    ]
+   }
+  },
+  {
+   "unit": "area",
+   "title": "Compare areas using shared heights",
+   "forms": {
+    "1": [
+     {
+      "sample": "B, D and C lie in that order on a straight line, with BD = 3 cm and DC = 12 cm. Triangle ABD has area 39 cm². What is the area of triangle ADC?"
+     }
+    ],
+    "2": [
+     {
+      "structure": "pb3:area:intersecting-lines",
+      "sample": "ABCD is a rectangle of area 1080 cm². E lies on AB with AE:EB = 1:2, and F is the midpoint of AD. DE and BF meet at O. Find the shaded area AEOF. The drawing is not to…"
+     },
+     {
+      "structure": "pb3:area:opposite-triangles",
+      "sample": "O is a point inside rectangle ABCD and is joined to all four corners. Triangle AOB has area 84 cm², BOC has area 168 cm², and COD has area 252 cm². What is the shaded …"
+     }
+    ]
+   }
+  },
+  {
+   "unit": "decomposition",
+   "title": "See the hidden area relationship",
+   "forms": {
+    "1": [
+     {
+      "sample": "ABCD is a rectangle of length 16 cm and breadth 8 cm. E and G lie on AB and DC respectively, with EG perpendicular to AB. F and H lie on BC and AD. Find the shaded are…"
+     }
+    ],
+    "2": [
+     {
+      "sample": "ABCD is a square of side 50 cm. Points E, F, G and H lie on BC, CD, DA and AB respectively, with BE/BC = CF/CD = DG/DA = AH/AB = 1/3. Segments AE, BF, CG and DH enclos…"
+     }
+    ]
+   }
+  },
+  {
+   "unit": "circles",
+   "title": "Curved boundaries and area ratios",
+   "forms": {
+    "1": [
+     {
+      "sample": "Three semicircular arcs have diameters 10, 4, 8 cm respectively. Find their total curved length, excluding the straight diameter segments. Give the answer in terms of π."
+     }
+    ],
+    "2": [
+     {
+      "structure": "pb3:circles:circumference-to-area",
+      "sample": "Two circles have the same centre. The larger radius is 4 times the smaller radius. The larger circumference exceeds the smaller circumference by 48π cm. Find the area …"
+     },
+     {
+      "structure": "pb3:circles:semicircle-subtraction",
+      "sample": "A, B and C lie on a straight line with AB = 22 cm and BC = 18 cm. A semicircle is drawn on AC as diameter. Two smaller semicircles, on AB and BC as diameters, lie insi…"
+     }
+    ]
+   }
+  },
+  {
+   "unit": "angles",
+   "title": "Build an angle argument",
+   "forms": {
+    "1": [
+     {
+      "sample": "Triangle ABC has AB = AC and angle BAC = 88°. BC is extended beyond C. Find the exterior angle between CA and the extension of BC at C."
+     }
+    ],
+    "2": [
+     {
+      "sample": "Five points on a circle are joined in order A–C–E–B–D–A to form a five-point star. The angle at tip A is 44°. Find the sum of the other four tip angles."
+     }
+    ]
+   }
+  },
+  {
+   "unit": "spatial",
+   "title": "Fold nets and compare cube views",
+   "forms": {
+    "1": [
+     {
+      "sample": "The illustrated net folds into a cube. Which numbered face is opposite face 2?"
+     }
+    ],
+    "2": [
+     {
+      "sample": "The pictures show two orientations of the same cube. Its faces are numbered 1 to 6, once each. Which number is opposite face 5?"
+     }
+    ]
+   }
+  },
+  {
+   "unit": "volume",
+   "title": "From cube edges to exposed faces",
+   "forms": {
+    "1": [
+     {
+      "sample": "3 identical cubes, each of edge 4 cm, are joined in a straight row with complete faces touching. Find the total exposed surface area of the resulting solid."
+     }
+    ],
+    "2": [
+     {
+      "structure": "pb3:volume:rearrange-surface",
+      "sample": "24 identical cubes, each of edge 1 cm, are first joined in one straight row. They are then rearranged into a solid cuboid 4 cubes long, 3 cubes wide and 2 cubes high, …"
+     },
+     {
+      "structure": "pb3:volume:three-tunnels",
+      "sample": "A solid cube has edge 21 cm. Three straight square tunnels, each 3 cm by 3 cm, pass through its centre: left to right, front to back, and top to bottom. Each opening i…"
+     }
+    ]
+   }
+  },
+  {
+   "unit": "factors",
+   "title": "Prime factors and complete factor counts",
+   "forms": {
+    "1": [
+     {
+      "sample": "What is the least positive whole number divisible by both 12 and 270?"
+     }
+    ],
+    "2": [
+     {
+      "structure": "pb3:factors:complete-prime-pairs",
+      "sample": "What is the smallest positive whole number that 1080 must be multiplied by to make a perfect square?"
+     },
+     {
+      "structure": "pb3:factors:restricted-factor-pairs",
+      "sample": "A rectangle has area 720 cm² and both side lengths are whole numbers of centimetres. Its length is at least its breadth, its breadth is at least 4 cm, and its length i…"
+     }
+    ]
+   }
+  },
+  {
+   "unit": "cycles",
+   "title": "Remainders, cycles and near-multiples",
+   "forms": {
+    "1": [
+     {
+      "sample": "Find the smallest positive whole number which leaves remainder 2 when divided by 3, remainder 3 when divided by 4, and remainder 6 when divided by 7."
+     }
+    ],
+    "2": [
+     {
+      "sample": "A sequence begins 3 and each term is obtained by multiplying the previous term by 3. What is the remainder when the sum of its 39th and 80th terms is divided by 5?"
+     }
+    ]
+   }
+  },
+  {
+   "unit": "counting",
+   "title": "Count systematically without duplicates",
+   "forms": {
+    "1": [
+     {
+      "sample": "How many rectangles, including squares, have their sides along the lines of the complete grid shown?"
+     }
+    ],
+    "2": [
+     {
+      "structure": "pb3:counting:contain-a-cell",
+      "sample": "The grid has 4 columns and 5 rows. The marked cell is in column 3 from the left and row 2 from the top. How many rectangles, including squares, have boundaries on grid…"
+     },
+     {
+      "structure": "pb3:counting:unordered-pairs-with-exclusion",
+      "sample": "A team must contain two pupils from a club of 9 pupils and one pupil from a different club of 7 pupils. No pupil belongs to both clubs. One particular pupil in the fir…"
+     }
+    ]
+   }
+  },
+  {
+   "unit": "digits",
+   "title": "Place-value patterns and palindromes",
+   "forms": {
+    "1": [
+     {
+      "sample": "How many 3-digit positive integers are palindromes? A palindrome reads the same forwards and backwards."
+     }
+    ],
+    "2": [
+     {
+      "sample": "How many three-digit palindromes are divisible by 9 and have a hundreds digit from 4 to 7, inclusive?"
+     }
+    ]
+   }
+  },
+  {
+   "unit": "sums",
+   "title": "Group terms before calculating",
+   "forms": {
+    "1": [
+     {
+      "sample": "Evaluate 1 − 2 + 3 − 4 + … − 128 + 129."
+     }
+    ],
+    "2": [
+     {
+      "sample": "Evaluate 59² − 57² without separately multiplying both squares."
+     }
+    ]
+   }
+  },
+  {
+   "unit": "patterns",
+   "title": "Build and test a general rule",
+   "forms": {
+    "1": [
+     {
+      "sample": "A straight row of adjoining matchstick squares uses 88 sticks. Every neighbouring pair shares one complete side. How many squares are in the row?"
+     }
+    ],
+    "2": [
+     {
+      "sample": "A tile staircase has 20 rows. The top row has 5 tiles, and each row below has 3 more tiles than the preceding row. How many tiles are there altogether?"
+     }
+    ]
+   }
+  },
+  {
+   "unit": "spirals",
+   "title": "Track a spiral by complete turns",
+   "forms": {
+    "1": [
+     {
+      "sample": "A pen draws a square spiral with segment lengths 1, 1, 2, 2, 3, 3, … cm, turning left after each segment. It stops after drawing exactly 181 cm. How much of its final …"
+     }
+    ],
+    "2": [
+     {
+      "sample": "Numbers begin with 1 at the centre of a square spiral. From 1, move right 1 step, up 1, left 2, down 2, right 3, up 3, and continue the pattern. What is the horizontal…"
+     }
+    ]
+   }
+  },
+  {
+   "unit": "cases",
+   "title": "Use every condition and test cases",
+   "forms": {
+    "1": [
+     {
+      "sample": "One of Dev, Ravi, Farah and Ben broke the classroom vase. Each of them makes one statement. Dev: “Ravi did not do it.” Ravi: “Dev did it.” Farah: “Ravi did it.” Ben: “…"
+     }
+    ],
+    "2": [
+     {
+      "sample": "A and B are different non-zero digits. The two-digit numbers AB and BA have sum 77. A is 3 greater than B. Find AB."
+     }
+    ]
+   }
+  },
+  {
+   "unit": "invariants",
+   "title": "What stays unchanged?",
+   "forms": {
+    "1": [
+     {
+      "sample": "86 switches are initially off and numbered 1 to 86. On pass k, every switch whose number is a multiple of k is flipped, for k = 1 to 86. How many switches are on at th…"
+     }
+    ],
+    "2": [
+     {
+      "sample": "A bag has many beads of each of 3 colours, at least 6 of every colour. What is the smallest number of beads that must be drawn without looking to guarantee 6 of the sa…"
+     }
+    ]
+   }
+  },
+  {
+   "unit": "bounds",
+   "title": "Prove a maximum or minimum",
+   "forms": {
+    "1": [
+     {
+      "sample": "In a group of 40 pupils, 30 play chess and 27 play badminton. What is the smallest possible number who play both?"
+     }
+    ],
+    "2": [
+     {
+      "sample": "Puzzle tokens are sold only in complete packs. A pack of 5 costs $4; A pack of 9 costs $7; A pack of 15 costs $11. With $31, what is the greatest number of tokens that…"
+     }
+    ]
+   }
+  },
+  {
+   "unit": "geo-measure",
+   "title": "Length, covering and filling",
+   "forms": {
+    "1": [
+     {
+      "sample": "A rectangular board is being measured. We need the area of its top surface. Choose the correct centimetre-based unit."
+     }
+    ],
+    "2": [
+     {
+      "sample": "A cube has edge 3 cm. A pupil calculates 3 × 3. Which unit belongs to the quantity actually calculated?"
+     }
+    ]
+   }
+  },
+  {
+   "unit": "geo-layers",
+   "title": "Build volume one layer at a time",
+   "forms": {
+    "1": [
+     {
+      "sample": "A solid cube has volume 27 cm³. All its edges have equal length. Find one edge length and check it by multiplying three equal lengths."
+     }
+    ],
+    "2": [
+     {
+      "sample": "A cuboid has a base 5 cm by 6 cm and volume 120 cm³. How high is it?"
+     }
+    ]
+   }
+  },
+  {
+   "unit": "geo-surface",
+   "title": "Cover faces, then hide the joins",
+   "forms": {
+    "1": [
+     {
+      "sample": "A closed cuboid measures 7 cm long, 4 cm wide and 6 cm high. What is the total area of all SIX faces?"
+     }
+    ],
+    "2": [
+     {
+      "sample": "2 identical cubes, each of edge 5 cm, are joined in a straight row along complete faces. What is the total EXPOSED surface area?"
+     }
+    ]
+   }
+  },
+  {
+   "unit": "geo-angles",
+   "title": "Name the angle before calculating",
+   "forms": {
+    "1": [
+     {
+      "sample": "B, C and D lie on a straight line, with D beyond C. Angle ACB is 70°. Find angle ACD, marked x."
+     }
+    ],
+    "2": [
+     {
+      "sample": "Three adjacent openings together form a straight angle. Two are 60° and 50°. Find the third opening x."
+     }
+    ]
+   }
+  },
+  {
+   "unit": "geo-one-face",
+   "title": "Find the area of one face",
+   "forms": {
+    "1": [
+     {
+      "sample": "A cuboid is 7 cm long, 5 cm wide and 3 cm high. Find the area of ONLY its right end face."
+     }
+    ],
+    "2": [
+     {
+      "sample": "The top of a cuboid covers 40 cm². This rectangular face has one edge 8 cm long. Find the other edge of that face."
+     }
+    ]
+   }
+  },
+  {
+   "unit": "geo-face-pairs",
+   "title": "Pair matching faces",
+   "forms": {
+    "1": [
+     {
+      "sample": "A cuboid is 2 cm long, 5 cm wide and 3 cm high. Find the area of ONLY its two end faces."
+     }
+    ],
+    "2": [
+     {
+      "sample": "The top and bottom of a cuboid together cover 28 cm². Each of these matching rectangular faces has one edge 7 cm long. Find the other edge of one face."
+     }
+    ]
+   }
+  },
+  {
+   "unit": "ch-totals",
+   "title": "Challenge · Keep track of every total",
+   "forms": {
+    "1": [
+     {
+      "sample": "Three friends, Pia, Qi and Ravi, each own a different number of stickers. They find a pile of spare stickers. Pia says, “If I take the whole pile, I will have 5 times …"
+     }
+    ],
+    "2": [
+     {
+      "sample": "50 children are at two games, Hoops and Ladders. First, one third of the children at Hoops move to Ladders. Then one third of the children now at Ladders move to Hoops…"
+     }
+    ]
+   }
+  },
+  {
+   "unit": "ch-motion",
+   "title": "Challenge · Same time, different distances",
+   "forms": {
+    "1": [
+     {
+      "sample": "Mia and Ben live on a straight road. A playground is exactly halfway between their houses. A shop on the road is 120 m from the playground, on Ben’s side. They leave h…"
+     }
+    ],
+    "2": [
+     {
+      "sample": "An escalator moves upward at a steady speed. Jun walks up it, taking one step at a time, and counts 15 steps. He then runs down the same upward-moving escalator at 3 t…"
+     }
+    ]
+   }
+  },
+  {
+   "unit": "ch-circles",
+   "title": "Challenge · Hidden radii and circle patterns",
+   "forms": {
+    "1": [
+     {
+      "sample": "A hexagon is drawn with all six corners on a circle. Going round, its sides are 3, 3, 3, 1, 1, 1 cm. Let A be the area of an equilateral triangle with sides 1 cm. The …"
+     }
+    ],
+    "2": [
+     {
+      "sample": "A circle is drawn. A square is drawn inside it with all four corners on the circle. A circle is drawn inside that square, touching all four sides. Squares and circles …"
+     }
+    ]
+   }
+  },
+  {
+   "unit": "ch-angles",
+   "title": "Challenge · Angles on grids and overlapping shapes",
+   "forms": {
+    "1": [
+     {
+      "sample": "On a grid of unit squares, segments start at corner O and go to points that are: 1 right and 1 up; 8 right and 2 up; 5 right and 3 up. Find the sum of the angles that …"
+     }
+    ],
+    "2": [
+     {
+      "sample": "Three squares with sides 8 cm, 6 cm and 6 cm stand side by side on one straight line, left to right. The middle square overlaps the left square by 2 cm along the line,…"
+     }
+    ]
+   }
+  },
+  {
+   "unit": "ch-number",
+   "title": "Challenge · Factors, squares and letter sums",
+   "forms": {
+    "1": [
+     {
+      "sample": "How many factors of 2700 are odd multiples of 15?"
+     }
+    ],
+    "2": [
+     {
+      "sample": "A whole number A is 10 more than a positive square number and 14 less than another square number. Find the sum of all possible values of A."
+     }
+    ]
+   }
+  },
+  {
+   "unit": "ch-sequences",
+   "title": "Challenge · Find the rule behind a sequence",
+   "forms": {
+    "1": [
+     {
+      "sample": "Each term after the first two is the sum of the two terms before it: 4, 6, 10, 16, 26, … What is the 8th term?"
+     }
+    ],
+    "2": [
+     {
+      "sample": "In a sequence of whole numbers, each term after the first two is the sum of the two terms before it. The 6th term is 26 and the 7th term is 43. What is the 1st term?"
+     }
+    ]
+   }
+  },
+  {
+   "unit": "pz-logic",
+   "title": "Challenge · Logic and strategy",
+   "forms": {
+    "1": [
+     {
+      "sample": "Five players take part in a badminton competition. Each player plays every other player exactly once, and every game has a winner. What is the greatest number of playe…"
+     }
+    ],
+    "2": [
+     {
+      "sample": "Five friends, Asha, Ben, Cai, Dev and Eli, live on an island where everyone is either a truth-teller, who always tells the truth, or a liar, who always lies. At least …"
+     }
+    ]
+   }
+  },
+  {
+   "unit": "pz-space",
+   "title": "Challenge · Seeing in 3D and counting shapes",
+   "forms": {
+    "1": [
+     {
+      "sample": "In triangle ABC, three straight lines are drawn from A to side BC, and one line is drawn across the triangle parallel to BC, as shown. How many triangles of any size a…"
+     }
+    ],
+    "2": [
+     {
+      "sample": "A row of 5 equal squares is drawn, and both diagonals of every square are drawn, as shown. How many triangles of any size are there?"
+     }
+    ]
+   }
+  },
+  {
+   "unit": "pz-count",
+   "title": "Challenge · Counting cleverly",
+   "forms": {
+    "1": [
+     {
+      "sample": "How many three-digit numbers have digits that add up to 8? (For example, 170 is one of them.)"
+     }
+    ],
+    "2": [
+     {
+      "sample": "How many three-digit numbers (from 100 to 999) contain at least one digit 9?"
+     }
+    ]
+   }
+  },
+  {
+   "unit": "nx-digits",
+   "title": "Challenge · Digits and divisibility",
+   "forms": {
+    "1": [
+     {
+      "sample": "What is the last digit of 3^1849?"
+     }
+    ],
+    "2": [
+     {
+      "sample": "All the whole numbers from 21 to 104 are multiplied together. How many zeros are at the end of the product?"
+     }
+    ]
+   }
+  },
+  {
+   "unit": "nx-cycles",
+   "title": "Challenge · Clocks, calendars and laps",
+   "forms": {
+    "1": [
+     {
+      "sample": "Today is a Thursday. What day of the week will it be 1071 days from today? Give your answer as a number: Monday = 1, Tuesday = 2, …, Sunday = 7."
+     }
+    ],
+    "2": [
+     {
+      "sample": "Chloe and Kumar start together from the same point on a circular track 600 m round. Chloe cycles at 270 m/min and Kumar at 150 m/min, in the same direction. How many t…"
+     }
+    ]
+   }
+  },
+  {
+   "unit": "nx-extremes",
+   "title": "Challenge · Most and least",
+   "forms": {
+    "1": [
+     {
+      "sample": "Three whole numbers add up to 43. What is the largest possible value of their product?"
+     }
+    ],
+    "2": [
+     {
+      "sample": "A bag can carry at most 21 kg. Bricks of type A weigh 7 kg and are worth S$10 each. Bricks of type B weigh 9 kg and are worth S$13 each. Any number of each type may be…"
+     }
+    ]
+   }
+  }
+ ]
+}

@@ -1,11 +1,41 @@
-/* Offline-safe tutoring branches for Motion, Light and Circuits. */
+/* Offline-safe tutoring branches for Motion, Ratios, Two conditions, Percentages, Light and Circuits. */
 (function(root){
 'use strict';
 const P=root.MochiTutorPilot,esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const prefix=s=>s==='maths'?'ep':'sp';
 function check(subject,E,v,q){return q.diagnostic||root.MochiPathCoach?.diagnostic(subject,v.unit,E,v.form);}
+// v7.10 checked built-in aids for Ratios, Two conditions and Percentages. They name the relationship
+// and a representation; they never give the answer. They work offline and without an AI key.
+const MATHS_AIDS={
+ 'ratio-units':'Draw equal boxes for each part of the ratio. Point to the boxes the given number belongs to: one colour, the total or the difference. Then find what one box is worth.',
+ 'ratio-fixed-part':'Find the colour that does not change. Rename both ratios so that colour has the same number of parts. Then the change in the other colour, in parts, matches the counters added.',
+ 'ratio-equal-additions':'Both colours get the same number of counters, so the difference between them stays the same. Rename the ratios so the difference is the same number of parts. Then count how many parts red grew by.',
+ 'ratio-weighted-groups':'The two fractions belong to different groups, so do not average them. Make a table with members and non-members for each group, then add the columns.',
+ 'ratio-moving-total':'Moving counters from one box to the other keeps the total the same. Write each box as a fraction of the total, before and after.',
+ 'assume-all':'Suppose every one were the first kind. Work out the total that would give, and compare it with the real total. Each swap to the other kind changes the total by the same amount.',
+ 'compare-conditions':'Write each condition in its own row. Make one item appear the same number of times in both rows. Then compare the rows: the difference comes from the other item only.',
+ 'coin-replacement':'Undo the replacements first to find the value at the start. Then suppose every coin was the smaller coin and compare with that value.',
+ 'pair-totals':'Add all the pair totals. Every item has been counted twice, so half of that sum is all three together.',
+ 'age-difference':'Everyone gets older by the same number of years, so the difference in ages never changes. Draw that difference as units, before and after.',
+ 'percent-change':'Ask: a percentage of what? Find that part of the starting amount, then decide whether to add it or take it away.',
+ 'reverse-percent':'After the change, the amount you know is the remaining percentage, not 100%. Find 1% first, then 100%.',
+ 'successive-percent':'The second change acts on the new amount, not the original. Work backwards one change at a time.',
+ 'percent-two-wholes':'Each percentage belongs to its own group. Work out each group’s new number separately before adding them.',
+ 'percent-order':'Follow each shop step by step. When the discount comes after the voucher, how much of the voucher is really saved?'
+};
+function mathsAid(key,strategy,q){
+ const p=q.params||{},t=(heads,rows)=>`<div class="tp-table-scroll"><table><thead><tr>${heads.map(x=>`<th>${esc(x)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(x=>`<td>${esc(x)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+ if(strategy==='units')return '<p>Write what each number stands for (counters, dollars, years or parts) beside it. Keep parts and actual amounts apart until you know the value of one part.</p>';
+ let extra='';
+ if(key==='ratio-equal-additions'&&p.a&&p.c)extra=t(['','Red','Blue','Difference'],[['Before',p.a,p.b,p.b-p.a+' part(s)'],['After',p.c,p.d,p.d-p.c+' part(s)']])+'<p>Make the Difference column match first.</p>';
+ else if(key==='ratio-weighted-groups')extra=t(['Group','Members','Non-members'],[['Group A','?','?'],['Group B','?','?'],['Both groups','add','add']]);
+ else if(key==='reverse-percent'&&p.rate&&p.paid)extra=t(['Percentage','Amount'],[[(100-p.rate)+'%','$'+p.paid],['1%','?'],['100%','?']]);
+ else if(key==='compare-conditions')extra=t(['Condition','First item','Second item','Total'],[['1','…','…','…'],['2','…','…','…']]);
+ return `<p>${esc(MATHS_AIDS[key])}</p>${strategy==='table'||strategy==='diagram'?extra:''}`;
+}
 function representation(key,strategy,q){
  const p=q.params||{};
+ if(MATHS_AIDS[key])return mathsAid(key,strategy,q);
  if(strategy==='units')return '<p>Write the units beside each quantity. Distance divided by time must give a speed. Convert minutes to hours only when the other quantities use hours. Keep the relationship you already chose.</p>';
  if(strategy==='check-step')return '<p>You selected the relevant relationship. That does not prove every later step is right. Keep your method and compare your written setup with the quantities in the question. Then check the units and one calculation at a time.</p>';
  const table=(heads,rows)=>`<div class="tp-table-scroll"><table><thead><tr>${heads.map(x=>`<th>${esc(x)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(x=>`<td>${esc(x)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
@@ -69,7 +99,7 @@ function proactive(subject,E,d){
 }
 function parent(subject,E,d){
  const rows=P.narrative(E,d,subject),p=prefix(subject),checked=P.autoEnabled(d)?'checked':'';
- return `<section class="tp-parent"><h3>Automatic AI teaching · ${subject==='maths'?'Motion':'Light and Circuits'}</h3><label><input type="checkbox" id="${p}AutoEnabled" ${checked}> Offer one automatic AI coaching turn after an incorrect answer</label><p>Uses the existing connected AI provider. Maximum ${P.AUTO_DAILY_LIMIT} requests per subject per Chicago day. Only current question, typed working and bounded skill history are sent. You can pause this here. No automatic help in tests, redos, recall or adult-marked writing.</p>${rows.length?'<h3>What changed after teaching?</h3>'+rows.map(s=>'<p>'+esc(s)+'</p>').join('')+'<p>These observations do not prove teaching caused improvement. Written science remains for grown-up review.</p>':''}</section>`;
+ return `<section class="tp-parent"><h3>Automatic AI teaching · ${subject==='maths'?'Motion, Ratios, Two conditions and Percentages':'Light and Circuits'}</h3><p class="tp-connection"><strong>${typeof keyReady==='function'&&keyReady()?'AI provider: connected on this tablet.':'AI provider: not connected on this tablet.'}</strong> ${typeof keyReady==='function'&&keyReady()?'Automatic and Ask Mochi help can use live AI.':'Mochi uses the built-in guide only. Add a key under Grown-ups → Tutor on this tablet to turn on live help.'}</p><label><input type="checkbox" id="${p}AutoEnabled" ${checked}> Offer one automatic AI coaching turn after an incorrect answer</label><p>Uses the existing connected AI provider. Maximum ${P.AUTO_DAILY_LIMIT} requests per subject per Chicago day. Only current question, typed working and bounded skill history are sent. You can pause this here. No automatic help in tests, redos, recall or adult-marked writing.</p>${rows.length?'<h3>What changed after teaching?</h3>'+rows.map(s=>'<p>'+esc(s)+'</p>').join('')+'<p>These observations do not prove teaching caused improvement. Written science remains for grown-up review.</p>':''}</section>`;
 }
 function wireParent(subject,d,persist){const c=document.getElementById(prefix(subject)+'AutoEnabled');if(c)c.onchange=()=>{P.setAuto(d,c.checked);persist();};}
 

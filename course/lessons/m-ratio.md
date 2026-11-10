@@ -20,6 +20,8 @@ To simplify 12 : 18 : 24, divide all terms by the same common factor six, giving
 Initially red and blue beads are in the ratio 2 : 3. Only red beads are added, and the ratio becomes 4 : 3. Since the blue count is unchanged and its ratio number is already three in both descriptions, the same unit size works. The added red beads represent two original units.
 
 If the stated ratios were 2 : 3 and 5 : 6, first rename the initial ratio as 4 : 6. Now six units of blue match in both states, making the red increase one common unit. 'One ratio unit' has no fixed value across separately drawn models until a relationship establishes it.
+
+Now suppose the same number of beads is added to both colours, and 4 : 5 becomes 8 : 9. Both colours grow by the same amount, so the difference between them does not change. The difference is one unit before and one unit after, so the units already match. Red grows from four units to eight: the added beads are four units. If 20 beads were added to each colour, one unit is five beads, so there were 20 red and 25 blue beads at first. When the two differences are not equal, rename the ratios so the differences match before comparing.
 ## Guided task
 A recipe uses flour, sugar and butter in the ratio 5 : 2 : 3 by mass. If butter is 180 g, three units are 180 g, so one unit is 60 g. Flour is 300 g and sugar is 120 g. Total mass is 600 g.
 

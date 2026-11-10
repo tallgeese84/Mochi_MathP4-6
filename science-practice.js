@@ -59,10 +59,14 @@ function route(E,s,r,now=Date.now(),manual=false){
  if(pendingCheck&&E.evidence(d,pendingCheck.unit,now).taught)return {kind:'practice',unit:pendingCheck.unit,phase:'apply',reason:'Try one structured check. Your written explanation remains saved for review, not marked wrong.'};
  const id=r.unit;if(!id||!['practice','learn'].includes(r.kind))return r;
  const sameDay=history.filter(a=>E.dayKey(a.answeredAt)===E.dayKey(now)),tail=sameDay.slice(-3),pending=recent.some(a=>a.unit===id&&E.pendingWriting(d,a));
- if(!pending&&!(tail.length===3&&tail.every(a=>a.unit===id)))return r;
+ // v7.10: at most two questions of one unit and question type a day in ordinary practice, so a familiar
+ // template cannot fill a session. Daily-plan steps, recall and mixed review are routed elsewhere.
+ const ev0=r.kind==='practice'?E.evidence(d,id,now):null,form=!ev0?null:r.phase?({guided:0,apply:1,transfer:2}[r.phase]??null):ev0.overdue?null:!d.lessons[id]?.completedAt&&!ev0.taught?0:ev0.apply<2?1:2;
+ const capped=form!==null&&sameDay.filter(a=>a.unit===id&&a.form===form).length>=2;
+ if(!pending&&!capped&&!(tail.length===3&&tail.every(a=>a.unit===id)))return r;
  const e=E.evidence(d,id,now);
  // After three familiar circuit outcomes, explain a changed layout rather than choosing again.
- if(!pending&&id==='circuits'&&e.apply>=2&&tail.every(a=>a.form!==2))return {...r,kind:'practice',phase:'transfer',reason:'Try a different representation and explain the complete circuit paths.'};
+ if(!pending&&id==='circuits'&&e.apply>=2&&tail.every(a=>a.form!==2)&&!(capped&&form===2)&&sameDay.filter(a=>a.unit===id&&a.form===2).length<2)return {...r,kind:'practice',phase:'transfer',reason:'Try a different representation and explain the complete circuit paths.'};
  const alternatives=E.D.units.filter(u=>u.id!==id).map(u=>E.evidence(d,u.id,now)).filter(e=>!e.parked&&!recent.some(a=>a.unit===e.id&&E.pendingWriting(d,a)));
  const ready=alternatives.filter(e=>e.taught&&(e.apply<2||!e.transfer)).sort((a,b)=>a.last-b.last)[0];
  if(ready)return {kind:ready.needsTeaching?'learn':'practice',unit:ready.id,reason:'Change the representation or topic. Familiar repeats do not count as new mastery.'};

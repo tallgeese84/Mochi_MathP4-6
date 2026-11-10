@@ -53,3 +53,12 @@
 .sp-ideas{margin:18px 0;padding:12px 16px;border:1px solid #d7c9e1;border-radius:14px;background:#faf7fd}
 .sp-ideas ul{list-style:none;margin:8px 0;padding:0}.sp-ideas li{padding:6px 0;line-height:1.5;font-size:14px}
 .sp-ideas li[data-found=true] span{color:#2f6b3a;font-weight:700}.sp-ideas li em{font-size:12px;color:#6b5f74;margin-left:6px}
+/* v7.10 grown-up queue for written explanations */
+.wr-queue{margin:0 0 18px;padding:14px 16px;border:1px solid #e3dde8;border-radius:16px;background:#fbf9fd}
+.wr-queue h3{margin:0 0 6px}
+.wr-card{margin:12px 0;padding:12px 14px;border-radius:14px;background:#fff;border:1px solid #ece6f1}
+.wr-meta{margin:0;font-size:13px;color:#6b6175}.wr-q{font-weight:600}.wr-answer{margin:6px 0}
+.wr-ideas{margin:6px 0;padding-left:18px}.wr-ideas li[data-found=true]{color:#2f6b4f}.wr-note{font-size:13px;color:#6b6175}
+.wr-ink{display:block;width:100%;max-width:420px;height:auto;border:1px dashed #d8d0df;border-radius:10px;margin:6px 0}
+.wr-ai{margin:8px 0;padding:8px 10px;border-radius:10px;background:#fdf0e3;color:#5a3412}.wr-ai-none{background:#f4f1f7;color:#4d4556}
+.wr-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.wr-quiet{background:transparent}

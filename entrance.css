@@ -25,3 +25,9 @@
 .ep-attempt-note .ep-check span{min-width:0}
 .ep-attempt-note p{margin:0 0 0 34px;font-size:12px;line-height:1.5;color:#74657e}
 .ep-answer-area+.ep-actions{padding-top:20px;margin-top:24px;border-top:1px solid #e8e3ec}
+/* v7.10 teaching scaffolds: worked example of the same type, or opening steps to finish. */
+.ep-scaffold{margin:20px 0 0;border:1px solid #f4d4b4;border-radius:18px;background:var(--ux-ginger-soft,#fdf0e3);padding:20px 24px;color:#3a2a1c}
+.ep-scaffold-kicker{margin:0 0 10px;font-weight:700;color:#9a5418;font-size:15px}
+.ep-scaffold .ep-question-text{font-size:18px}
+.ep-scaffold-next{font-weight:700;color:#7a4314;list-style:'✏️ '}
+@media (max-width:600px){.ep-scaffold{padding:16px}}

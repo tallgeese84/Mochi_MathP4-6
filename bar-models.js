@@ -18,7 +18,22 @@ function brace(x1,x2,y,label,below=false){
 function svg(height,body,alt){
  return `<figure class="bm-figure"><svg viewBox="0 0 480 ${height}" role="img" aria-label="${esc(alt)}" class="bm-svg">${body}</svg><figcaption>Bar model</figcaption></figure>`;
 }
+// v7.10 before-and-after model for equal additions: the gap between the bars keeps its length, so the
+// parts are matched by the difference, and the extra parts on red show the added counters.
+function equalAdditions(p){
+ const gcd=(x,y)=>y?gcd(y,x%y):x,d1=p.b-p.a,d2=p.d-p.c;if(!(d1>0&&d2>0&&p.added>0))return '';
+ const L=d1*d2/gcd(d1,d2),m1=L/d1,m2=L/d2,A=p.a*m1,Bb=p.b*m1,inc=p.c*m2-A,max=Bb+inc;
+ if(!(inc>0)||max>24)return '';
+ const u=Math.min(U,360/max),part=p.added/inc;
+ const row=(y,label,n,ext)=>{let s=`<text x="${X-12}" y="${y+H/2+5}" text-anchor="end" class="bm-label">${esc(label)}</text>`;for(let i=0;i<n;i++)s+=`<rect x="${X+i*u}" y="${y}" width="${u}" height="${H}" rx="3" class="bm-unit"/>`;for(let i=0;i<ext;i++)s+=`<rect x="${X+(n+i)*u}" y="${y}" width="${u}" height="${H}" rx="3" class="bm-extra"/>`;return s;};
+ const pl=n=>n===1?'part':'parts';
+ const body=`<text x="${X}" y="16" class="bm-small">Before</text>`+row(24,'Red',A,0)+row(64,'Blue',Bb,0)+brace(X+A*u,X+Bb*u,64+H,`difference: ${L} ${pl(L)}`,true)
+  +`<text x="${X}" y="152" class="bm-small">After (+${p.added} each)</text>`+row(160,'Red',A,inc)+row(200,'Blue',Bb,inc)+brace(X+(A+inc)*u,X+(Bb+inc)*u,200+H,`still ${L} ${pl(L)}`,true)
+  +`<text x="${X}" y="292" class="bm-note">Red gained ${inc} shaded ${pl(inc)} = ${p.added} counters.</text><text x="${X}" y="312" class="bm-note">So 1 part = ${part}.</text>`;
+ return svg(326,body,`Bar model: before, red has ${A} parts and blue ${Bb} parts, a difference of ${L}. After adding ${p.added} counters to each, red has ${A+inc} parts and blue ${Bb+inc}; the difference is still ${L} parts, so ${inc} parts are ${p.added} counters.`);
+}
 function model(q){
+ if(q?.structure==='pb3:ratios:equal-additions'&&q.params)return equalAdditions(q.params);
  if(!q||!q.params||q.paperStandard)return ''; // Old numeric bar examples must not be attached to new structures.
  const p=q.params;
  if(q.unit==='relationships'&&q.form===1&&p.total!=null&&p.difference!=null){

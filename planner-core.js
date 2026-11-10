@@ -5,7 +5,10 @@ const C=root.MochiCourse||(typeof require==='function'?require('./course-core.js
 const Teaching=root.MochiTeaching||(typeof require==='function'?require('./teaching-core.js'):null);
 const DAY=86400000,MATHS_EXTENSION_MS=5*60000,IDLE_PAUSE_MS=10*60*1000,MAX_TICK_GAP_MS=30000,CLOCK_SKEW_MS=2000,subjects=['maths','science'],days=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 const defaults=[[25,20],[20,25],[25,20],[20,25],[15,15],[30,30],[10,10]];
-const fresh=()=>({version:1,schedule:{updatedAt:0,week:defaults.map(([maths,science])=>({maths,science}))},sessions:[],days:{},milestones:{},mathsExtensions:{}});
+const fresh=()=>({version:1,schedule:{updatedAt:0,week:defaults.map(([maths,science])=>({maths,science}))},sessions:[],days:{},milestones:{},mathsExtensions:{},balance:{enabled:true,updatedAt:0},shifts:{}});
+// v7.10 study-time balance: on a day when Science practice is going very well and Maths is not, a few
+// minutes move from Science to Maths. The day's total never changes, and a grown-up can turn it off.
+const SHIFT_MINUTES=5,SCIENCE_FLOOR=10;
 const init=s=>s.planner||(s.planner=fresh());
 const stamp=n=>Number.isFinite(n)&&n>0&&n<8640000000000000?n:0;
 const answered=a=>stamp(a.answeredAt)||stamp(a.responses?.[0]?.at)||stamp(a.at);
@@ -31,6 +34,8 @@ function validate(raw){
  for(const [date,at] of Object.entries(raw.mathsExtensions||{}).filter(([date,at])=>validDay(date)&&stamp(at)).sort().slice(-400))p.mathsExtensions[date]=at;
  // Tagged intervals also preserve the daily claim when restoring a partial backup.
  for(const x of p.sessions)if(x.kind==='maths-extension')p.mathsExtensions[x.day]=Math.min(p.mathsExtensions[x.day]||x.start,x.start);
+ p.balance={enabled:raw.balance?.enabled!==false,updatedAt:stamp(raw.balance?.updatedAt)};
+ for(const [date,v] of Object.entries(raw.shifts||{}).filter(([date,v])=>validDay(date)&&Number.isInteger(v?.minutes)&&v.minutes>=0&&v.minutes<=SHIFT_MINUTES&&stamp(v.at)).sort().slice(-120))p.shifts[date]={minutes:v.minutes,at:v.at,reason:text(v.reason,160)};
  return p;
 }
 function merge(a,b){
@@ -42,10 +47,20 @@ function merge(a,b){
  }
  p.milestones={...a.milestones};for(const [k,v] of Object.entries(b.milestones))if(!p.milestones[k]||v.earnedAt<p.milestones[k].earnedAt)p.milestones[k]=v;
  for(const [date,at] of Object.entries(b.mathsExtensions))p.mathsExtensions[date]=Math.min(p.mathsExtensions[date]||at,at);
+ p.balance=choose(a.balance,b.balance);
+ // The first decision for a day stands on every device, so a target never flips mid-day.
+ for(const [date,v] of Object.entries(b.shifts))if(!p.shifts[date]||v.at<p.shifts[date].at)p.shifts[date]=v;
  return validate(p);
 }
 function day(p,subject,now=Date.now()){const key=localDay(now);p.days[key]??={};for(const old of Object.keys(p.days).sort().slice(0,-400))delete p.days[old];return p.days[key][subject]??={updatedAt:now,unit:'',learnedAt:0,reflection:'',exitIds:[]};}
-function minutes(p,subject,now=Date.now()){return p.schedule.week[weekday(now)][subject];}
+function scheduled(p,subject,now=Date.now()){return p.schedule.week[weekday(now)][subject];}
+function shiftFor(p,now=Date.now()){
+ const v=p.balance?.enabled!==false&&p.shifts?.[localDay(now)],m=scheduled(p,'maths',now),sc=scheduled(p,'science',now);
+ return v&&v.minutes>0&&m>0&&sc-v.minutes>=SCIENCE_FLOOR?v.minutes:0;
+}
+function minutes(p,subject,now=Date.now()){const base=scheduled(p,subject,now),k=shiftFor(p,now);return subject==='maths'?base+k:subject==='science'?base-k:base;}
+function setShift(p,minutes,reason='',now=Date.now()){const date=localDay(now);if(p.shifts?.[date])return false;p.shifts??={};p.shifts[date]={minutes:Math.max(0,Math.min(SHIFT_MINUTES,Math.trunc(minutes)||0)),at:now,reason:text(reason,160)};return true;}
+function setBalance(p,enabled,now=Date.now()){p.balance={enabled:!!enabled,updatedAt:now};}
 // Union intervals across devices AND subjects. Overlap goes to the earlier session.
 function elapsed(p,date=localDay(),kind=''){
  const out={maths:0,science:0};let covered=0;
@@ -150,6 +165,6 @@ function pet(p){
 function report(s,now=Date.now()){
  const p=validate(init(s));return {generatedAt:new Date(now).toISOString(),timeZone:Intl.DateTimeFormat().resolvedOptions().timeZone,schedule:p.schedule,days:Object.keys(p.days).sort().slice(-14).map(date=>({date,activeMs:elapsed(p,date),optionalMathsMs:elapsed(p,date,'maths-extension').maths,goals:p.days[date]})),today:Object.fromEntries(subjects.map(subject=>[subject,goals(s,subject,now)])),next:Object.fromEntries(subjects.map(subject=>[subject,recommend(s,subject,now)])),thinking:Object.fromEntries(subjects.map(subject=>[subject,observations(s,subject,now)])),mochi:pet(p),mathsExtension:mathsExtension(p,now),limits:['Minutes are editable starting goals, not a prescribed educational dose.','Foreground time is an estimate; reading, reasoning and learning quality cannot be inferred from a clock.','Optional Maths time is separate from the required target and never establishes mastery.','Studied-idea ticks and reflections are self-reported. An exit answer is evidence, not a pass/fail gate.','Mochi milestones are retained celebrations, not grades, percentiles or admissions predictions.','Original checks are finite and uncalibrated. Familiar questions do not establish novel transfer.']};
 }
-root.MochiPlanner={fresh,init,validate,merge,day,days,defaults,subjects,localDay,weekday,minutes,elapsed,mathsExtension,MATHS_EXTENSION_MS,clock,records,observations,recommend,goals,grow,pet,growthStages,report};
+root.MochiPlanner={fresh,init,validate,merge,day,days,defaults,subjects,localDay,weekday,minutes,scheduled,shiftFor,setShift,setBalance,SHIFT_MINUTES,SCIENCE_FLOOR,elapsed,mathsExtension,MATHS_EXTENSION_MS,clock,records,observations,recommend,goals,grow,pet,growthStages,report};
 if(typeof module!=='undefined')module.exports=root.MochiPlanner;
 })(typeof window!=='undefined'?window:globalThis);

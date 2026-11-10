@@ -63,7 +63,8 @@ Required keys:
 Lesson step: `{ "kind": "lesson", "unit": "existing-unit-id" }`.
 Practice step: `{ "kind": "practice", "unit": "existing-unit-id", "phase": "guided|apply|transfer", "count": 1 }`.
 `count` may also be 2. Use real IDs from entrance-data/science-path-data in this release.
-No extra keys are accepted. Both subjects must be provided even on a scheduled rest day;
+From v7.10 a practice step may also carry `form` (1 or 2) and, with form 2, a `structure`
+listed in `tools/euna-problem-types.json`. No other extra keys are accepted. Both subjects must be provided even on a scheduled rest day;
 the saved schedule controls whether they actually run.
 
 Before writing: read the latest mirror and document revision, validate timestamps and
@@ -138,3 +139,9 @@ Question identity uses the existing semantic fingerprint, not a different seed o
 A private-plan slot with no available different question stays unfinished and exports `NO_FRESH_QUESTION`; unrelated fallback work is not falsely credited to that slot. Existing drafts, mixed sets and papers keep their original identities. Deliberate spaced retrieval remains available: recent identical responses do not manufacture multiple delayed-retrieval credits, and a successful retrieval moves its next due date forward. A completed single recall uses the daily routing allowance even if it was incorrect; it does not confer mastery.
 
 Parent reports add `practice.recordedQuestions`, `distinctQuestions`, `repeatQuestions` and `freshIndependent`. These are derived, read-only summaries. Earlier answers, correct/error markings, written-review status and help flags remain in history. Recycled exhausted forms no longer earn additional Maths or Science mastery credit. Earned cats, coins, rewards, schedules, secrets and private-plan schema are not changed. All new regression fixtures are synthetic.
+
+## Same-type microcycles and unblocked routing (v7.10)
+
+A Maths microcycle now teaches one problem type: a worked example of that type, then the same type with its opening steps shown, then the same type unaided. The type is the step's `form`/`structure`, else her latest first-answer miss in the unit, else the next form her evidence needs. It is frozen in the device-local queue (`progress.maths.target`) when the first step starts. Step attempts carry `scaffold` (`example`/`steps`, recorded as help) or `modelled: true` (application, not transfer). Science microcycles are unchanged.
+
+A saved question last touched on an earlier day, or whose solution was opened, is set aside at the next Home visit, so `SAVED_DRAFT` no longer persists across days. Only a lesson opened on the session day reports `SAVED_LESSON`. Details: `docs/FEEDBACK_LOOP_V710.md`.

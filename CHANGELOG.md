@@ -1,5 +1,16 @@
 # v7.7.2 — 2026-10-11
 
+## 7.10.0 — the feedback loop teaches, not just schedules (2026-11-09)
+
+- A question left from an earlier day, or whose solution was opened, is set aside at the next Home visit so it no longer blocks the nightly plan. It returns after three days; nothing is deleted. Old half-read lessons stay in the library.
+- Maths microcycles keep one problem type: worked example → opening steps shown → the same type unaided. Nightly plans may name the type (`form`, `structure`); otherwise it is her latest miss. A modelled success counts as application, not transfer.
+- Completion problems when a unit's recent unaided success is below half, fading after a supported success; protected on small banks. Delayed recall and mixed review use harder types only once solved. Used-up units no longer stall new learning.
+- Equal-additions ratio solutions use the difference (units) method with a before-and-after bar model; both Ratio lessons gain a worked example.
+- Optional same-total time balance moves 5 minutes from Science to Maths on days when Science is ≥85% and Maths <50% unaided. Ordinary Science practice serves at most two of one unit and type a day.
+- Automatic AI coaching now covers Ratios, Two conditions and Percentages, with checked offline aids; grown-up panels show whether an AI provider is connected.
+- Grown-ups: a written-answer review queue with optional AI suggestions that a grown-up must accept.
+- Learning history, marks, papers, rewards and cats are preserved; the nightly plan format gains only optional fields. See `docs/FEEDBACK_LOOP_V710.md`.
+
 ## 7.8.2 — stronger daily-plan routing and proactive coaching (2026-11-01)
 
 - Daily Quests searches farther through the **existing original** Motion, Light, and Circuits question pools before reporting `NO_FRESH_QUESTION`. Previously seen application/transfer prompts remain ineligible for fresh independence; an exhausted plan stays pending and is clearly explained instead of fabricating a completion or adding extra homework.

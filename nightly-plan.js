@@ -61,12 +61,16 @@ function hasPending(subject,now=Date.now()){return enabled()&&C.pending(record,s
 function routeReport(){return typeof S==='undefined'?{}:Object.fromEntries(['maths','science'].map(subject=>[subject,enabled()?C.routing(record,S,subject,engines()):{reasonCode:'DISABLED'}]));}
 function challenge(subject){
  const c=currentPlan()?C.cycle(record,subject):null;if(!c)return null;
- const names=['Learn the move','Beat the example','Final challenge'];
+ const names=record?.progress?.[subject]?.target?['Study the example','Finish the steps','On your own']:['Learn the move','Beat the example','Final challenge'];
  return {...c,name:c.complete?'Challenge cleared':names[Math.max(0,c.current-1)]};
 }
 function motivate(subject,attempt){
  if(!attempt?.nightlyPlan)return '';const c=challenge(subject);if(!c)return '';
  const n=c.current,tries=attempt.responses?.length||1,solo=!!(attempt.correct&&attempt.independent&&tries===1);
+ // v7.10 same-type cycle: the example, then the opening steps, then the same type on her own.
+ if(attempt.scaffold==='example')return attempt.correct?'1/3 cleared. You used the example well — next, finish one with the first steps shown.':'Look at the worked example again. Which of its steps matches this question? Then try again.';
+ if(attempt.scaffold==='steps')return attempt.correct?'2/3 cleared. You finished the steps — now solve one of the same type on your own.':'Read the steps you were given. What does the next step need? Then try again.';
+ if(attempt.modelled)return attempt.correct?(solo?'3/3! You solved this type on your own. That is a strong finish!':'3/3 cleared. We will bring this type back later so you can solve it solo.'):'Same type as the example. Write the first step the example used, then try again.';
  if(attempt.correct){
   if(n===1)return '1/3 cleared. Nice start, Euna — now beat the example on a changed problem.';
   if(n===2)return solo?'2/3 cleared — clean solve! One final challenge left.':'Good comeback. 2/3 cleared — use what you fixed on the final challenge.';
