@@ -4,7 +4,11 @@
 (function(root){
 'use strict';
 const topicIds=['relationships','percent','remainders','simultaneous','ratios','rates','motion','area','circles','volume','counting','factors'];
-const gcd=(a,b)=>b?gcd(b,a%b):Math.abs(a),frac=(a,b)=>{const g=gcd(a,b);return b/g===1?String(a/g):`${a/g}/${b/g}`;};
+const gcd=(a,b)=>b?gcd(b,a%b):Math.abs(a),
+// v7.10: the primary-school units method. The equal additions keep the blue-minus-red difference, so
+// make that difference the same number of parts in both ratios; the red parts then show the addition.
+equalAdditionSteps=(A,B,C,D,added)=>{const d1=B-A,d2=D-C,L=d1*d2/gcd(d1,d2),m1=L/d1,m2=L/d2,before=[A*m1,B*m1],after=[C*m2,D*m2],inc=after[0]-before[0],part=added/inc,pl=n=>n===1?'part':'parts';
+ return [`Both colours get the same number of counters, so the difference between blue and red stays the same.`,`Before, ${A}:${B} has a difference of ${d1} ${pl(d1)}. After, ${C}:${D} has a difference of ${d2} ${pl(d2)}.`,d1===d2?`The differences already match, so one part has the same value in both ratios.`:`Make the differences equal (${L} parts): ${[m1>1?`${A}:${B} becomes ${before[0]}:${before[1]}`:`keep ${A}:${B}`,m2>1?`${C}:${D} becomes ${after[0]}:${after[1]}`:`keep ${C}:${D}`].join(' and ')}.`,inc===1?`Red grows from ${before[0]} to ${after[0]} parts, so 1 part is the ${added} added counters.`:`Red grows from ${before[0]} to ${after[0]} parts: ${inc} parts = ${added} counters, so 1 part = ${added} ÷ ${inc} = ${part}.`,`Blue at first = ${before[1]} × ${part} = ${before[1]*part}.`,`Check: red ${before[0]*part} → ${after[0]*part} and blue ${before[1]*part} → ${after[1]*part}, which is ${C}:${D}.`];},frac=(a,b)=>{const g=gcd(a,b);return b/g===1?String(a/g):`${a/g}/${b/g}`;};
 const cash=n=>Number.isInteger(n)?String(n):n.toFixed(2);
 function random(seed){let n=seed>>>0;return (a,b)=>{n=(Math.imul(n,1664525)+1013904223)>>>0;return a+Math.floor(n/4294967296*(b-a+1));};}
 const guidance={
@@ -63,7 +67,7 @@ function make(unit,seed){
     [`In Group A, ${2*A/5} attend and ${3*A/5} do not. Let Group B have 4x pupils: 3x attend and x do not.`,`The overall ratio means ${q}(${2*A/5} + 3x) = ${p}(${3*A/5} + x).`,`So ${3*q-p}x = ${p*3*A/5-q*2*A/5}, giving x = ${B/4}.`,`Group B has 4 × ${B/4} = ${B} pupils.`,`Check the combined counts: ${yes} members and ${no} non-members simplify to ${p}:${q}.`],{A,p,q},['The two fractions refer to two different groups. Do not average them.','Represent Group B as 4x pupils. List members and non-members in each group before combining.']);
   }else{const a=r(2,5),b=a+r(1,4),k=r(1,4),unitSize=r(6,25),added=k*unitSize,g1=gcd(a,b),g2=gcd(a+k,b+k);
    out('equal-additions',`Red and blue counters are initially in the ratio ${a/g1}:${b/g1}. Then ${added} red counters and ${added} blue counters are added. The ratio becomes ${(a+k)/g2}:${(b+k)/g2}. How many blue counters were there initially?`,b*unitSize,
-    [`Equal additions leave the difference between the blue and red counts unchanged.`,`Let original amounts be ${a/g1}x and ${b/g1}x. The later ratio gives ${(b+k)/g2}(${a/g1}x + ${added}) = ${(a+k)/g2}(${b/g1}x + ${added}).`,`Solve this balanced relationship: x = ${g1*unitSize}.`,`Original blue count = ${b/g1} × ${g1*unitSize} = ${b*unitSize}.`,`Check the new counts: ${(a+k)*unitSize}:${(b+k)*unitSize} has the required ratio.`],{a:a/g1,b:b/g1,c:(a+k)/g2,d:(b+k)/g2,added},['Both groups increase by the same number. Which difference stays unchanged?','Ratio parts from the two stages may have different sizes. Write counts, not just differences of ratio numbers.']);
+    equalAdditionSteps(a/g1,b/g1,(a+k)/g2,(b+k)/g2,added),{a:a/g1,b:b/g1,c:(a+k)/g2,d:(b+k)/g2,added},['Both colours get the same number of counters. Which difference stays the same?','Make the difference the same number of parts in both ratios. Then compare the red parts.']);
   }
  }else if(unit==='rates'){
   if(!variant){const pump=r(3,9),inflow=r(1,pump-1),net1=pump-inflow,net2=2*pump-inflow,net3=3*pump-inflow,stock=(net1*net2/gcd(net1,net2))*net3/gcd(net1*net2/gcd(net1,net2),net3)*r(1,3),t1=stock/net1,t2=stock/net2,t3=stock/net3;

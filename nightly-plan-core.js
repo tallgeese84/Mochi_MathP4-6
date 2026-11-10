@@ -7,6 +7,11 @@ function date(s){return typeof s==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(s)&&Numb
 function time(s){return typeof s==='string'&&/^\d{4}-\d\d-\d\dT.*Z$/.test(s)&&Number.isFinite(Date.parse(s));}
 function plain(s,max){return typeof s==='string'&&s.length>0&&s.length<=max&&!/[<>\u0000-\u001f]/.test(s);}
 function exact(x,keys){return x&&typeof x==='object'&&!Array.isArray(x)&&Object.keys(x).every(k=>keys.includes(k));}
+function producible(E,unit,structure){
+ if(typeof structure!=='string'||!/^pb3:[a-z0-9-]{1,40}:[a-z0-9-]{1,60}$/.test(structure)||typeof E?.B?.make!=='function')return false;
+ for(let i=0;i<48;i++){try{if(E.B.make(unit,2,(i*2654435761+7)>>>0,E.REV).structure===structure)return true;}catch(_){return false;}}
+ return false;
+}
 function validate(raw,engines,now=Date.now()){
  if(!exact(raw,['schema','id','revision','student','timeZone','reviewedDate','sessionDate','generatedAt','sourceExportedAt','subjects'])||raw.schema!==1)throw Error('Unsupported plan format.');
  if(typeof raw.id!=='string'||!/^[a-zA-Z0-9_-]{8,100}$/.test(raw.id)||!Number.isInteger(raw.revision)||raw.revision<1||raw.revision>10000||raw.student!=='Euna')throw Error('Invalid plan identity.');
@@ -21,10 +26,14 @@ function validate(raw,engines,now=Date.now()){
   if(!exact(block,['focus','steps'])||!plain(block.focus,160)||!Array.isArray(block.steps)||!block.steps.length||block.steps.length>5)throw Error('Invalid subject plan.');
   let total=0;
   const steps=block.steps.map(step=>{
-   if(!exact(step,['kind','unit','phase','count'])||typeof step.unit!=='string'||!E?.unit(step.unit)||!['lesson','practice'].includes(step.kind))throw Error('Unknown lesson or action.');
-   if(step.kind==='lesson'){if(step.phase!==undefined||step.count!==undefined)throw Error('Lessons cannot set question counts.');return {kind:'lesson',unit:step.unit};}
+   if(!exact(step,['kind','unit','phase','count','form','structure'])||typeof step.unit!=='string'||!E?.unit(step.unit)||!['lesson','practice'].includes(step.kind))throw Error('Unknown lesson or action.');
+   if(step.kind==='lesson'){if(step.phase!==undefined||step.count!==undefined||step.form!==undefined||step.structure!==undefined)throw Error('Lessons cannot set question counts.');return {kind:'lesson',unit:step.unit};}
    if(!['guided','apply','transfer'].includes(step.phase)||!Number.isInteger(step.count)||step.count<1||step.count>2)throw Error('Invalid practice step.');
-   total+=step.count;return {kind:'practice',unit:step.unit,phase:step.phase,count:step.count};
+   // v7.10: an optional problem type. form 1 is the standard method, form 2 the harder paper-style
+   // type; structure names one paper-style type (see tools/euna-problem-types.json). Both must exist.
+   if(step.form!==undefined&&![1,2].includes(step.form))throw Error('Invalid problem type.');
+   if(step.structure!==undefined&&(step.form!==2||!producible(E,step.unit,step.structure)))throw Error('Invalid problem type.');
+   total+=step.count;return {kind:'practice',unit:step.unit,phase:step.phase,count:step.count,...(step.form!==undefined?{form:step.form}:{}),...(step.structure!==undefined?{structure:step.structure}:{})};
   });
   if(total>6)throw Error('Too many planned questions.');subjects[subject]={focus:block.focus,steps};
  }
@@ -39,10 +48,11 @@ function restore(raw,engines,now=Date.now()){
  out.startedAt=Number.isFinite(raw.startedAt)&&raw.startedAt>=out.adoptedAt&&raw.startedAt<=now?raw.startedAt:null;
  for(const s of SUBJECTS){const p=raw.progress?.[s],n=plan.subjects[s].steps.length;if(!p)continue;
   if(!Number.isInteger(p.index)||p.index<0||p.index>n||!Number.isInteger(p.count)||p.count<0||p.count>2)continue;
-  out.progress[s]={index:p.index,count:p.count,active:p.active&&typeof p.active.id==='string'&&p.active.id.length<=150&&p.active.index===p.index?{id:p.active.id,index:p.index,unit:p.active.unit,kind:p.active.kind}:null};
+  out.progress[s]={index:p.index,count:p.count,active:p.active&&typeof p.active.id==='string'&&p.active.id.length<=150&&p.active.index===p.index?{id:p.active.id,index:p.index,unit:p.active.unit,kind:p.active.kind}:null,...(validTarget(p.target,engines[s])?{target:{unit:p.target.unit,form:p.target.form,structure:p.target.structure||''}}:{})};
  }
  return out;
 }
+function validTarget(t,E){return !!(t&&typeof t.unit==='string'&&E?.unit(t.unit)&&[1,2].includes(t.form)&&(!t.structure||typeof t.structure==='string'&&t.structure.length<=110));}
 // Waiting work needs a route, not only a veto. These helpers are read-only.
 function pending(record,subject,now=Date.now()){
  return !!(record&&SUBJECTS.includes(subject)&&usable(record.plan,now)&&record.plan.subjects[subject].steps[record.progress[subject].index]);
@@ -53,13 +63,16 @@ function reviewedToday(d,plan){
  // mistake. This is NOT delayed-recall mastery and does not change its evidence.
  return (d.mixedLog||[]).some(x=>today(x.completedAt))||(d.attempts||[]).some(a=>a.phase==='recall'&&!a.skipped&&a.responses?.some(x=>today(x.at))&&d.draft?.id!==a.id);
 }
+// Only a lesson opened on the session day takes precedence (v7.10); an older half-read lesson stays
+// in the library and no longer blocks the plan.
+function openLesson(d,E,plan){return Object.entries(d.lessons||{}).some(([id,l])=>E.unit(id)&&l.visited?.length&&!l.completedAt&&!!l.lastViewedAt&&day(l.lastViewedAt,plan.timeZone)===plan.sessionDate);}
 function routing(record,state,subject,engines,now=Date.now()){
  if(!record||!SUBJECTS.includes(subject)||!usable(record.plan,now))return {reasonCode:'NO_CURRENT_PLAN'};
  if(!pending(record,subject,now))return {reasonCode:'PLAN_COMPLETE'};
  const E=engines[subject],d=state[KEY[subject]]||E.fresh();
  if(Object.values(d.papers||{}).some(x=>!x.submittedAt))return {reasonCode:'SAVED_PAPER'};
  if(d.draft&&!d.attempts.find(a=>a.id===d.draft.id)?.correct)return {reasonCode:'SAVED_DRAFT'};
- if(Object.entries(d.lessons||{}).some(([id,l])=>E.unit(id)&&l.visited?.length&&!l.completedAt))return {reasonCode:'SAVED_LESSON'};
+ if(openLesson(d,E,record.plan))return {reasonCode:'SAVED_LESSON'};
  if(d.mixed&&!d.mixed.completedAt&&E.mixedNext(d))return {reasonCode:'SAVED_MIXED'};
  if(!reviewedToday(d,record.plan)&&E.D.units.some(u=>E.evidence(d,u.id,now).overdue))return {reasonCode:'DUE_RECALL'};
  return next(record,state,subject,engines,now)?{reasonCode:'READY'}:{reasonCode:'NO_FRESH_QUESTION'};
@@ -95,7 +108,7 @@ function next(record,state,subject,engines,now=Date.now()){
  // An unfinished editor, mixed set or lesson is never discarded to impose a new plan.
  if(d.draft&&!d.attempts.find(a=>a.id===d.draft.id)?.correct)return null;
  if(d.mixed&&!d.mixed.completedAt&&E.mixedNext(d))return null;
- if(Object.entries(d.lessons||{}).some(([id,l])=>E.unit(id)&&l.visited?.length&&!l.completedAt))return null;
+ if(openLesson(d,E,record.plan))return null;
  if(!reviewedToday(d,record.plan)&&E.D.units.some(u=>E.evidence(d,u.id,now).overdue))return null;
  const bridge=E.prerequisite?.(d,step.unit,now),u=E.unit(bridge||step.unit),ev=E.evidence(d,u.id,now);
  const kind=(bridge?!ev.taught||ev.needsTeaching:step.kind==='lesson'||!ev.taught)?'lesson':'practice',requested=micro&&!bridge?micro.phase:step.phase;
@@ -104,9 +117,28 @@ function next(record,state,subject,engines,now=Date.now()){
  // third slot stays at application level; the normal evidence gate still wins.
  const priorApply=micro?.current===3?[...d.attempts].reverse().find(a=>a.nightlyPlan?.planId===record.plan.id&&a.nightlyPlan?.revision===record.plan.revision&&a.nightlyPlan?.sessionDate===record.plan.sessionDate&&a.phase==='apply'):null;
  const microTransfer=!!(priorApply?.independent&&priorApply.firstCorrect&&!priorApply.seenBefore),transferReady=ev.apply>=2||microTransfer;
+ // v7.10 Maths microcycles keep one problem type: a worked example, then the same type with its
+ // opening steps shown, then the same type unaided. The type is the plan's, or her latest miss.
+ const tgt=micro&&subject==='maths'&&!bridge&&kind==='practice'?target(record,subject,d,E,u.id,ev,now):null;
+ if(tgt){
+  const n=micro.current,phase=n===1?'guided':n===2?'apply':tgt.form===2?'transfer':'apply',scaffold=n===1?'example':n===2?'steps':'';
+  if(!E.practiceChoice(d,u.id,{phase,form:tgt.form,structure:tgt.structure,targeted:true,now}))return null;
+  return {subject,kind,unit:u.id,title:u.title,resume:false,touched:0,detail:record.plan.subjects[subject].focus,nightly:true,planId:record.plan.id,stepIndex:p.index,phase,microcycle:true,challengeIndex:n,target:{form:tgt.form,structure:tgt.structure},...(scaffold?{scaffold}:{modelled:true}),prerequisite:false};
+ }
  const phase=kind==='practice'?(bridge?'apply':requested==='transfer'&&!transferReady?'apply':requested):undefined;
  if(kind==='practice'&&E.practiceAvailable&&!E.practiceAvailable(d,u.id,phase,now))return null;
  return {subject,kind,unit:u.id,title:u.title,resume:false,touched:0,detail:record.plan.subjects[subject].focus,nightly:true,planId:record.plan.id,stepIndex:p.index,...(phase?{phase}:{}),...(micro?{microcycle:true,challengeIndex:micro.current}:{}),prerequisite:!!bridge||(kind==='lesson'&&step.kind==='practice')};
+}
+// The microcycle's problem type: frozen once started; otherwise the plan's form/structure, else the
+// type of her most recent first-answer miss in this unit, else the next form her evidence needs.
+// A type with too few unseen questions for a whole cycle falls back to the unit's other questions.
+function target(record,subject,d,E,unit,ev,now){
+ const p=record.progress[subject];if(p.target?.unit===unit)return p.target;
+ if(!E.practiceChoice||!E.freshCount)return null;
+ const planned=record.plan.subjects[subject].steps.find(x=>x.kind==='practice'&&x.unit===unit&&x.form),miss=E.missTarget?.(d,unit,now);
+ let t=planned?{unit,form:planned.form,structure:planned.structure||(miss?.form===planned.form?miss.structure:'')}:miss?{unit,...miss}:{unit,form:ev.apply<2?1:2,structure:''};
+ if(t.structure&&E.freshCount(d,unit,t.form,E.REV,t.structure,4)<4)t={...t,structure:''};
+ return E.freshCount(d,unit,t.form,E.REV,t.structure,4)>=4?t:null;
 }
 function bind(record,task,view,draft,now=Date.now()){
  if(!record||!task.nightly||task.planId!==record.plan.id||task.prerequisite)return;
@@ -114,6 +146,8 @@ function bind(record,task,view,draft,now=Date.now()){
  if(view.kind==='lesson')p.active={kind:'lesson',unit:view.unit,id:'lesson:'+view.unit,index:p.index};
  else if(view.kind==='practice'&&draft?.unit===task.unit)p.active={kind:'practice',unit:draft.unit,id:draft.id,index:p.index};
  if(p.active){record.startedAt=record.startedAt||now;if(p.active.kind==='practice'&&!draft.nightlyPlan&&!draft.nightlyConflict)draft.nightlyPlan={planId:record.plan.id,revision:record.plan.revision,sessionDate:record.plan.sessionDate};}
+ // Freeze the microcycle's problem type once its first question starts, so all three steps match.
+ if(p.active?.kind==='practice'&&task.target&&!p.target)p.target={unit:task.unit,form:task.target.form,structure:task.target.structure||''};
 }
 function lessonDone(record,subject,id){const p=record?.progress[subject];if(p?.active?.kind!=='lesson'||p.active.unit!==id)return false;p.index++;p.count=0;p.active=null;return true;}
 function settle(record,state,subject){

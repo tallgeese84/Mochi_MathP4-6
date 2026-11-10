@@ -17,6 +17,7 @@ test('bar models never change question data or fingerprints',()=>{
 test('independent questions and papers never render a bar model',()=>{
  const ui=fs.readFileSync(path.join(__dirname,'..','entrance-ui.js'),'utf8');
  const uses=[...ui.matchAll(/MochiBarModels\?\.(model|lessonModel)/g)].length;
- assert.equal(uses,3,'only worked example, revealed solution and lesson page');
+ assert.equal(uses,4,'only worked example, revealed solution, lesson page and the v7.10 worked-example scaffold');
+ assert.match(ui,/if\(v\.scaffold==='example'[\s\S]{0,400}MochiBarModels\?\.model\(x\)/,'the scaffold model belongs to the separate worked example, which is recorded as help');
  assert.match(ui,/v\.revealed\?`\$\{\(root\.MochiBarModels/);
 });

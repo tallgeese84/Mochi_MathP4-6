@@ -74,7 +74,9 @@ function runTask(t){
  else if(t.kind==='redo')ui.redo(t.attempt);
  else {
   if(d?.draft&&d.attempts.find(a=>a.id===d.draft.id)?.correct)E.finishPractice(d);
-  ui.practice(t.unit,t.kind==='recall'?'recall':t.phase);
+  // A same-type microcycle step (v7.10) starts its exact problem type and support level here.
+  if(t.target&&d&&!d.draft&&E.startPractice(d,t.unit,{phase:t.phase,form:t.target.form,structure:t.target.structure||'',targeted:true,scaffold:t.scaffold||'',modelled:!!t.modelled}))ui.open('practice',t.unit);
+  else ui.practice(t.unit,t.kind==='recall'?'recall':t.phase);
  }
  root.MochiNightlyPlan?.bind(t,ui.view(),S[stateKey(t.subject)]?.draft);
  if(t.nightly&&S[stateKey(t.subject)]?.draft?.nightlyPlan)save(S);
@@ -177,9 +179,19 @@ function paintWide(){
  if($('todayInvDone'))$('todayInvDone').onclick=()=>{M.finishInvestigation(d,inv.id,$('todayInvNote').value);save(S);lastWide='';paintWide();};
  if($('todayMockOpen'))$('todayMockOpen').onclick=()=>{leave();U(mock.subject).open('papers');};
 }
+// Safe-boundary housekeeping on Home (v7.10). A question left from an earlier day, or one whose worked
+// solution was opened, is set aside losslessly so it never blocks today's plan; the day's study-time
+// balance is fixed once. Nothing runs while a question or lesson is open.
+function housekeep(){
+ const now=Date.now();let changed=false;
+ for(const subject of ['maths','science']){const E=engines()[subject],d=S[stateKey(subject)];if(d&&E?.parkStale?.(d,now))changed=true;}
+ if(T.settleBalance?.(S,now))changed=true;
+ if(changed)save(S);
+}
 function paint(){
  root.MochiNightlyPlan?.paint();
  if(!home)return;
+ if(!home.hidden&&!current())housekeep();
  const m=T.model(S),v=current(),bonus=Q?.status(S),bonusOptions=Q?.bonusOptions?.(S)||[],bonusTask=bonusOptions[0]||Q?.bonusTask(S),cat=F?.report?.(S),study=P?P.elapsed(P.init(S)):null,extension=P.mathsExtension(P.init(S));
  // Existing modules can navigate by their own controls. Never leave two main views visible.
  if(v||!$('viewScience').hidden||!$('viewCourse').hidden||$('viewMaths').style.display!=='none'||$('viewRoom').style.display!=='none'||!$('viewMap').hidden)leave();
@@ -189,7 +201,7 @@ function paint(){
    $('todayDate').textContent=new Date().toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric'});
    $('todayTitle').textContent=m.restDay&&!t?'Rest day':m.finished&&!t?'Daily quests complete':'Today’s quests';
    $('todayIntro').textContent=isPaper?'Resume the saved paper first.':m.restDay&&!t?'No catch-up debt. Optional practice is still available.':m.finished&&!t?'Done for today. Bonus questions are optional.':'One quest at a time.';
-   $('todayNowLabel').textContent=t?(isPaper?'SAVED PAPER':t.resume?'CONTINUE':t.nightly&&t.microcycle?(t.phase==='guided'?'LEARN THE IDEA':t.phase==='transfer'?'INDEPENDENT CHALLENGE':'CHANGED PRACTICE'):'NEXT QUEST'):'DAILY QUESTS';
+   $('todayNowLabel').textContent=t?(isPaper?'SAVED PAPER':t.resume?'CONTINUE':t.nightly&&t.microcycle?(t.scaffold==='example'?'STUDY THE EXAMPLE':t.scaffold==='steps'?'FINISH THE STEPS':t.modelled?'ON YOUR OWN':t.phase==='guided'?'LEARN THE IDEA':t.phase==='transfer'?'INDEPENDENT CHALLENGE':'CHANGED PRACTICE'):'NEXT QUEST'):'DAILY QUESTS';
    $('todayTaskTitle').textContent=t?t.title:m.finished?'Nice work, Euna':'A break with Mochi';
    $('todayTaskSubject').textContent=t?names[t.subject]:m.restDay?'Rest day':'Maths + Science';
    $('todayTaskDetail').textContent=t?t.detail:m.finished?'Your planned study time is complete.':'Your learning and saved work will be here when you return.';

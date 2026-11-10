@@ -71,4 +71,6 @@ test('new parent evidence excludes earlier questions, help, repeated exposure an
  E.startPractice(d,'percent',{phase:'transfer',seed:989,now:now+1});E.help(d);E.touchDraft(d,{answer:E.question(d.draft).answerLabel,working:'Synthetic assisted'},now+2);E.respond(d,now+3);row=E.paperPracticeReport(E.validate(d),now+4).find(x=>x.id==='percent');assert.equal(row.attempts,2);assert.equal(row.independent,1);
 });
 
-test('new ratio structures never inherit the old 5:3 transfer bar model, and mass units are accepted',()=>{const M=require('../bar-models.js');for(const seed of seeds){const q=B.make('ratios',2,seed);assert.equal(M.model(q),'');const m=B.make('simultaneous',2,seed);if(m.suffix==='kg')assert.ok(B.mark(m,m.answerLabel+' kg'));}assert.ok(M.model(B.make('ratios',2,7,2)).includes('Box A'));});
+test('new ratio structures never inherit the old 5:3 transfer bar model, and mass units are accepted',()=>{const M=require('../bar-models.js');for(const seed of seeds){const q=B.make('ratios',2,seed),bar=M.model(q);assert.doesNotMatch(bar,/Box A/);
+ // v7.10: equal additions get their own before-and-after model, built from this question's numbers.
+ if(q.structure==='pb3:ratios:equal-additions'){assert.match(bar,/Before/);assert.match(bar,new RegExp(`\\+${q.params.added} each`));}else assert.equal(bar,'');const m=B.make('simultaneous',2,seed);if(m.suffix==='kg')assert.ok(B.mark(m,m.answerLabel+' kg'));}assert.ok(M.model(B.make('ratios',2,7,2)).includes('Box A'));});

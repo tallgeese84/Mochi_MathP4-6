@@ -10,7 +10,9 @@ for(const subject of ['maths','science'])test('nightly '+subject+' queue: lesson
  const untouched=JSON.stringify(s);let task=C.next(r,s,subject,engines,now);assert.equal(task.kind,'lesson');assert.equal(JSON.stringify(s),untouched,'read-only route');
  C.bind(r,task,{kind:'lesson',unit:id},null);assert.equal(C.lessonDone(r,subject,'wrong'),false);teach(E,d,id);assert(C.lessonDone(r,subject,id));assert.equal(C.lessonDone(r,subject,id),false,'no duplicate step credit');
  for(let i=0;i<3;i++){
-  task=C.next(r,s,subject,engines,now);assert.equal(task.phase,['guided','apply','transfer'][i]);assert.equal(task.microcycle,true);assert.equal(task.challengeIndex,i+1);
+  task=C.next(r,s,subject,engines,now);assert.equal(task.phase,subject==='maths'?['guided','apply','apply'][i]:['guided','apply','transfer'][i]);assert.equal(task.microcycle,true);assert.equal(task.challengeIndex,i+1);
+  // v7.10: a Maths microcycle keeps one problem type (here the standard form 1) while help fades.
+  if(subject==='maths'){assert.deepEqual(task.target,{form:1,structure:''});assert.equal(task.scaffold,['example','steps',undefined][i]);assert.equal(!!task.modelled,i===2);}
   const v=E.startPractice(d,id,{phase:task.phase,seed:7101+i*113,now});C.bind(r,task,{kind:'practice',unit:id},v);
   assert.equal(C.settle(r,s,subject),false,'opening is not doing');const q=E.question(v);E.touchDraft(d,{answer:E===M?q.answerLabel:q.answer,working:i?'Use the given relationship, then check the result.':''},now+1);E.respond(d,now+2);
   assert.equal(C.settle(r,s,subject),false,'checking does not skip the feedback');const before=JSON.stringify(d.attempts);E.finishPractice(d);assert(C.settle(r,s,subject));assert.equal(JSON.stringify(d.attempts),before,'queue never writes marks');assert.equal(C.settle(r,s,subject),false);

@@ -13,7 +13,9 @@ function task(state,subject,now=Date.now()){
  // A correct draft is a finished answer, not an unfinished task. Preserve it until
  // the learner deliberately continues; never discard an unsent or incorrect draft.
  const draft=d.draft,answer=draft&&d.attempts.find(a=>a.id===draft.id);
- const recent=Object.entries(d.lessons).filter(([id,l])=>E.unit(id)&&l.visited.length&&!l.completedAt).sort((a,b)=>b[1].lastViewedAt-a[1].lastViewedAt)[0];
+ // Only a lesson opened today is resumed first (v7.10); an older half-read lesson stays in the library
+ // and never blocks the day's route.
+ const recent=Object.entries(d.lessons).filter(([id,l])=>E.unit(id)&&l.visited.length&&!l.completedAt&&P.localDay(l.lastViewedAt||0)===P.localDay(now)).sort((a,b)=>b[1].lastViewedAt-a[1].lastViewedAt)[0];
  if(draft&&!answer?.correct&&draft.phase==='mixed')return {subject,kind:'mixed',title:'Mixed practice',resume:true,touched:draft.updatedAt||draft.at,detail:'Your question is saved. Decide which method to use.'};
  if(draft&&!answer?.correct&&draft.phase==='redo')return {subject,kind:'redo',attempt:draft.redoOf,unit:draft.unit,title:'Second try',resume:true,touched:draft.updatedAt||draft.at,detail:'Your saved question is waiting.'};
  if(draft&&!answer?.correct){
@@ -27,7 +29,10 @@ function task(state,subject,now=Date.now()){
  // subject recommendation can otherwise select a repair instead indefinitely.
  const prelude=root.MochiNightlyPlan?.prelude?.(s,subject,now);if(prelude)return prelude;
  const nightly=root.MochiNightlyPlan?.next(s,subject,now);if(nightly)return nightly;
- if(subject==='maths'&&d.deferredDrafts?.length){const saved=d.deferredDrafts.at(-1);return {subject,kind:'deferred',unit:saved.unit,title:E.unit(saved.unit).title,resume:true,touched:saved.deferredAt||saved.updatedAt,detail:'Your saved working is still here. Resume when you are ready.',deferredId:saved.id};}
+ // A question set aside by choice is offered after the focus. One set aside automatically returns only
+ // after three days, and only if it holds unsent working: a recorded miss comes back as a second try.
+ const saved=E.heldOffer?E.heldOffer(d,now):subject==='maths'?d.deferredDrafts?.at(-1):null;
+ if(saved&&E.unit(saved.unit))return {subject,kind:'deferred',unit:saved.unit,title:E.unit(saved.unit).title,resume:true,touched:saved.deferredAt||saved.updatedAt,detail:'Your saved working is still here. Resume when you are ready.',deferredId:saved.id};
  const r=E.recommend({...s,[key[subject]]:{...d,draft:null}},now);
  // Preserve overdue recall and repairs ahead of elective HCIS topic practice.
  const h=subject==='maths'&&['learn','practice'].includes(r.kind)?E.hcisRecommendation?.(d,now):null;
