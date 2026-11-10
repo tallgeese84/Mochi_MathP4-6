@@ -24,7 +24,7 @@ test('never interrupt independent correct, recall, tests, writing, or already-he
  assert.equal(P.autoGate(d,'maths',v,{...q,kind:'written'},a,today),'NOT_FIRST_INCORRECT');
  assert.equal(P.autoGate(d,'maths',{...v,revealed:true},q,a,today),'NOT_FIRST_INCORRECT');
  assert.equal(P.autoGate(d,'maths',v,q,{...a,responses:[...a.responses,a.responses[0]]},today),'NOT_FIRST_INCORRECT');
- assert.equal(P.autoGate(d,'maths',v,{...q,unit:'percent'},a,today),'NOT_FIRST_INCORRECT');
+ assert.equal(P.autoGate(d,'maths',v,{...q,unit:'area'},a,today),'NOT_FIRST_INCORRECT');
 });
 test('three calls per subject per Chicago day, and next-day allowance resets',()=>{
  const d={attempts:[]};for(let i=0;i<P.AUTO_DAILY_LIMIT;i++){
