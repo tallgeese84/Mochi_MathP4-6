@@ -1,5 +1,14 @@
 # v7.7.2 — 2026-10-11
 
+## 7.11.0 — AI replies she can read, and help that teaches (2026-11-12)
+
+- Every child-facing AI reply is shown as plain maths. LaTeX and Markdown codes (`\[`, `\times`, `\frac{3}{4}`, `\boxed{…}`, `**bold**`) become `×`, `÷`, `3/4`, `5²` and plain text before display; every tutor prompt also asks for plain text. Reported from a photo of an Ask Mochi reply in Maths practice.
+- Mochi is not a calculator. A bare sum typed into a tutor box ("284937 × 273833") gets a built-in coaching reply (estimate, split into easier parts) and no model call. Every tutor prompt now forbids working a calculation out for her.
+- No answer before she has solved it. A reply that states the checked answer of an open question is rewritten once; if it still does, the built-in hint is shown. Applies to Ask Mochi in Maths and Science practice, the automatic turn and the original Mochi chat.
+- Automatic help in every topic. After a first wrong answer outside the six pilot topics, Mochi offers one next-step nudge that uses her typed working (at most three a day per subject, one per question, recorded as help, off with the existing grown-up switch). The pilot topics keep their quick checks.
+- Ask Mochi is told when a worked example or opening steps are on screen. AI suggestions in the written-answer queue are cleaned the same way.
+- New `tutor-guard.js` and `tutor-nudge.js`. Learning history, marks, papers, rewards, cats and the nightly plan format are unchanged. See `docs/AI_FEEDBACK_V711.md`.
+
 ## 7.10.1 — the nightly cycle moves on after Save and exit (2026-11-12)
 
 - A nightly plan question left through Save and exit or Home (often after opening its solution) now counts as that step. Before, the step was never recorded, so the cycle offered the worked-example step again and the counter stayed at 0/3 while new questions carried the plan's provenance (seen on 11 November: eight Geo Surface questions, all supported). Found by reproducing the reported pattern in a browser.

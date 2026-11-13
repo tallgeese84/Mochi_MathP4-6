@@ -29,7 +29,8 @@ function prompt(E,a){
 function parse(raw){
  const s=String(raw||'').trim(),m=s.match(/\{[\s\S]*\}/);if(!m)throw Error('format');const x=JSON.parse(m[0]);
  if(!['valid','needs-discussion'].includes(x.verdict)||typeof x.reason!=='string'||!x.reason.trim())throw Error('format');
- return {verdict:x.verdict,reason:x.reason.trim().slice(0,300),missing:Array.isArray(x.missing)?x.missing.filter(v=>typeof v==='string').map(v=>v.slice(0,80)).slice(0,6):[]};
+ const tidy=v=>(root.MochiTutorGuard?root.MochiTutorGuard.clean(v):String(v)).trim();
+ return {verdict:x.verdict,reason:tidy(x.reason).slice(0,300),missing:Array.isArray(x.missing)?x.missing.filter(v=>typeof v==='string').map(v=>tidy(v).slice(0,80)).filter(Boolean).slice(0,6):[]};
 }
 async function suggest(E,a){
  if(typeof callModel!=='function'||typeof netReady!=='function'||!netReady()){suggestions.set(a.id,{error:'AI is not connected on this tablet. Please read this one yourself.'});return;}

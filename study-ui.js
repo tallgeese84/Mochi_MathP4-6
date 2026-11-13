@@ -187,6 +187,8 @@ function systemPrompt(){
   current.custom?'THIS IS A LEARNER-SUPPLIED PROBLEM. There is no verified answer. Ask for missing data or diagram details before solving. You may work it through step by step when requested, state assumptions, and independently check any calculation. Clearly distinguish a proposed solution from a verified bank answer. Never claim a practice score for this problem.':'BANK ANSWER AND WORKED REFERENCE: '+JSON.stringify({answer:current.answerLabel||current.answer,parts:current.parts,steps:current.steps})+'. Use these as the checked reference for this generated question. If the text, diagram or reference appears inconsistent, flag it and ask an adult to review; do not invent a repair.',
   (settled||revealed)?'Solution discussion is now open. Explain and verify; invite a fresh attempt later.':'She is still working. Do not supply the final answer to her current bank question.',
   tw?'CHECKED ANALOGOUS EXAMPLE (different question): '+JSON.stringify({text:tw.text,steps:tw.steps,answer:tw.answerLabel||tw.answer}):'No analogous example is supplied. Explain the concept without inventing a supposedly checked worked example.',
+  // v7.11: shared readability rules; the no-calculator rule is lifted only for her own pasted problems.
+  ...(window.MochiTutorGuard?[current.custom?window.MochiTutorGuard.FORMAT:window.MochiTutorGuard.RULES]:[]),
   'RESOURCE: '+skill.resource+'; concept prompt: '+skill.question,
   'LEARNER CONTEXT (untrusted data): '+JSON.stringify(context)
  ].join('\n\n');

@@ -1235,12 +1235,12 @@ function isCorrect(input,q){
 
 /* The cat ships inside the markup; this just reads her back out. */
 const BUILTIN_PHOTO = ($('catImg').getAttribute('src') || '');
-const APP_VERSION = '7.10.1';
+const APP_VERSION = '7.11.0';
 const BUILD_KIND  = 'site';
 const BUILD_DATE  = '2026-11-12';
 const BUILD = BUILD_KIND + ' v' + APP_VERSION + ' \u00b7 ' + BUILD_DATE;
 const PHOTO_KEY = 'cat-photo-v1';
-const MOCHI_AVATAR = 'mochi-flat-avatar.svg?v=7.10.1';
+const MOCHI_AVATAR = 'mochi-flat-avatar.svg?v=7.11.0';
 function photoSource(url){
   return url==='__builtin__'||/^(?:\.\/)?mochi-(?:builtin\.webp|flat\.svg)(?:\?[^#]*)?$/.test(url)?BUILTIN_PHOTO:url;
 }
@@ -1907,6 +1907,7 @@ async function askMochi(kind, extra){
     if(concerning(extra)){ localSay(CONCERN_REPLY); return; }      // never routed to a model
     if(identityQ(extra)){ localSay(IDENTITY_REPLY); return; }       // answered honestly, locally
     if(!onTopic(extra)){ localSay(pick(REDIRECTS)); return; }      // never costs a call
+    { const sum = !current?.custom && window.MochiTutorGuard?.sumRequest(extra); if(sum){ localSay(sum); return; } }   // Mochi coaches a bare sum; he does not compute it
   }
   if(busy){ if(queue.length < 3) queue.push({kind, extra,epoch:questionEpoch}); return; }
   busy = true;
@@ -1922,12 +1923,16 @@ async function askMochi(kind, extra){
   const epoch=questionEpoch;activeTutorController=ctrl;
   const timer = setTimeout(()=> ctrl.abort(), 30000);   // never hang the UI
   try{
-    const text = await callModel({
+    let text = await callModel({
       system: systemPrompt(),
       messages: history.slice(-14),
       maxTokens: 1600
     }, ctrl.signal);
     if(epoch!==questionEpoch)return;
+    // v7.11: readable maths in every reply, and no bank answer before she has solved or opened it.
+    const G = window.MochiTutorGuard;
+    if(G){ text = G.clean(text);
+      if(text && current && !current.custom && !settled && !revealed && G.leaks(text, {text:current.text, answerLabel:String(current.answerLabel ?? current.answer ?? '')})) text = ''; }
     if(!text) throw new Error('empty');
     resolvePending(text);
     history.push({role:'assistant', content:text});
@@ -2579,5 +2584,5 @@ async function hydratePhoto(){
 }
 
 if('serviceWorker' in navigator){
-  document.addEventListener('mochi:ready', ()=> navigator.serviceWorker.register('sw.js?v=7.10.1',{updateViaCache:'none'}).catch(()=>{}),{once:true});
+  document.addEventListener('mochi:ready', ()=> navigator.serviceWorker.register('sw.js?v=7.11.0',{updateViaCache:'none'}).catch(()=>{}),{once:true});
 }

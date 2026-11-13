@@ -4,3 +4,4 @@
 .tp-ai-aid { margin-top: .8rem; }.tp-ai-aid-button { min-height:48px; padding:.7rem 1rem; border-radius:12px; }.tp-ai-aid-button:focus-visible { outline:3px solid currentColor; outline-offset:3px; }
 
 .tp-proactive{border:1px solid #aec7dc;border-left:4px solid #5d83a9;border-radius:14px;padding:14px 16px;margin:16px 0;background:#f5f9fc;line-height:1.55;color:#243548}.tp-proactive strong{display:block;margin-bottom:8px;font-size:1rem}.tp-proactive p{margin:0}.tp-parent input[type="checkbox"]{min-width:20px;min-height:20px;vertical-align:middle;margin-right:8px}
+.tp-proactive p{white-space:pre-wrap}

@@ -1,5 +1,5 @@
 {
-  "version": "7.10.1",
+  "version": "7.11.0",
   "releasedOn": "2026-11-12",
-  "summary": "Fixes the nightly Maths cycle repeating its first step: a question left through Save and exit or Home now counts, so the cycle moves on to the first-steps and on-your-own questions. Records, papers, cats and weekly totals are unchanged."
+  "summary": "AI help Euna can read: tutor replies are shown as plain maths with no codes, Mochi coaches a sum and never computes it or gives the answer away, and one automatic next-step nudge follows a first wrong answer in every Maths and Science topic. Records, papers, cats and weekly totals are unchanged."
 }
