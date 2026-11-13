@@ -182,3 +182,18 @@ test('the nightly reviewer’s problem-type catalog matches the question bank',(
  const c=require('../tools/euna-problem-types.json'),r=c.units.find(u=>u.unit==='ratios');assert.ok(r.forms[2].some(t=>t.structure===EA));
  for(const u of c.units)for(const t of u.forms[2])if(t.structure)assert.doesNotThrow(()=>C.validate(plan([{kind:'practice',unit:u.unit,phase:'apply',count:1,form:2,structure:t.structure}]),engines,now));
 });
+
+// v7.10.1: leaving a plan question through Save and exit or Home must still count the step.
+test('an answered plan step is counted when she leaves through Home, so the cycle moves on',()=>{
+ const s=state(),d=s.entrance;teach(M,d,'percent');
+ const r=C.fresh(C.validate(plan([{kind:'practice',unit:'percent',phase:'guided',count:1},{kind:'practice',unit:'percent',phase:'apply',count:2}]),engines,now),now);
+ const task=C.next(r,s,'maths',engines,now);
+ const v=M.startPractice(d,'percent',{phase:task.phase,form:task.target.form,structure:task.target.structure,targeted:true,scaffold:task.scaffold,now});C.bind(r,task,{kind:'practice',unit:'percent'},v,now);
+ M.touchDraft(d,{answer:'1',working:'one line of my thinking'},now+1);M.respond(d,now+2);M.help(d,true,now+3);
+ // Home: the revealed question is set aside, then the plan step is settled before the next launch.
+ assert.equal(M.parkStale(d,now+4),true);assert.equal(C.settle(r,s,'maths'),true);
+ assert.equal(C.cycle(r,'maths').done,1);assert.equal(C.next(r,s,'maths',engines,now+5).scaffold,'steps','step 2 follows, not another worked example');
+ const ui=require('node:fs').readFileSync(require('node:path').join(__dirname,'..','today-ui.js'),'utf8');
+ assert.match(ui,/function launchSubject\(subject\)\{[^}]*settlePlan\(subject\);\s*root\.MochiNightlyPlan\?\.adopt\(\);const block=T\.model/,'the step is settled before the next task is chosen');
+ assert.match(ui,/parkStale\?\.\(d,now\)\)changed=true;[\s\S]{0,160}MochiNightlyPlan\?\.boundary\(S,subject\)/,'a question set aside on Home is counted');
+});
