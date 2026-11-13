@@ -53,8 +53,17 @@ function resumeHeld(){
 }
 // Subject overview Continue is another entrance to the daily route, not a
 // separate adaptive queue. Deliberate library/bonus choices remain free choice.
+// v7.10.1: count an answered plan question before choosing the next one. Leaving a question through
+// Save and exit or Home skipped this, so the same microcycle step (the worked example) came back and
+// the counter stayed at 0/3 while every new question carried the plan's provenance.
+function settlePlan(subject){
+ const E=engines()[subject],d=S[stateKey(subject)];if(!E||!d)return;
+ if(d.draft&&d.attempts.find(a=>a.id===d.draft.id)?.correct){E.finishPractice(d);save(S);}
+ root.MochiNightlyPlan?.boundary(S,subject);
+}
 function launchSubject(subject){
  if(nightlyLaunching||!root.MochiNightlyPlan?.pending?.(subject)||!permitNavigation())return false;
+ settlePlan(subject);
  root.MochiNightlyPlan?.adopt();const block=T.model(S).blocks.find(b=>b.subject===subject);
  if(!block||block.rest||block.done){open();return true;}
  extensionDay='';runTask(block.task);return true;
@@ -184,7 +193,9 @@ function paintWide(){
 // balance is fixed once. Nothing runs while a question or lesson is open.
 function housekeep(){
  const now=Date.now();let changed=false;
- for(const subject of ['maths','science']){const E=engines()[subject],d=S[stateKey(subject)];if(d&&E?.parkStale?.(d,now))changed=true;}
+ for(const subject of ['maths','science']){const E=engines()[subject],d=S[stateKey(subject)];if(d&&E?.parkStale?.(d,now))changed=true;
+  // A question set aside here may hold the plan's answered step: count it now (v7.10.1).
+  if(d&&!nightlyLaunching)root.MochiNightlyPlan?.boundary(S,subject);}
  if(T.settleBalance?.(S,now))changed=true;
  if(changed)save(S);
 }

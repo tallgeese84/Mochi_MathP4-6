@@ -1,5 +1,9 @@
 # v7.7.2 — 2026-10-11
 
+## 7.10.1 — the nightly cycle moves on after Save and exit (2026-11-12)
+
+- A nightly plan question left through Save and exit or Home (often after opening its solution) now counts as that step. Before, the step was never recorded, so the cycle offered the worked-example step again and the counter stayed at 0/3 while new questions carried the plan's provenance (seen on 11 November: eight Geo Surface questions, all supported). Found by reproducing the reported pattern in a browser.
+
 ## 7.10.0 — the feedback loop teaches, not just schedules (2026-11-09)
 
 - A question left from an earlier day, or whose solution was opened, is set aside at the next Home visit so it no longer blocks the nightly plan. It returns after three days; nothing is deleted. Old half-read lessons stay in the library.

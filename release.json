@@ -1,5 +1,5 @@
 {
-  "version": "7.10.0",
-  "releasedOn": "2026-11-09",
-  "summary": "Nightly plans now teach one problem type with fading help, stale saved questions no longer block them, weak Maths units get completion problems, AI coaching covers Ratios, Two conditions and Percentages, and grown-ups get a written-answer review queue. Records, papers, cats and weekly totals are unchanged."
+  "version": "7.10.1",
+  "releasedOn": "2026-11-12",
+  "summary": "Fixes the nightly Maths cycle repeating its first step: a question left through Save and exit or Home now counts, so the cycle moves on to the first-steps and on-your-own questions. Records, papers, cats and weekly totals are unchanged."
 }
