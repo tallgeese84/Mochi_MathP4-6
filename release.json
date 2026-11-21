@@ -1,5 +1,5 @@
 {
-  "version": "7.11.0",
-  "releasedOn": "2026-11-12",
-  "summary": "AI help Euna can read: tutor replies are shown as plain maths with no codes, Mochi coaches a sum and never computes it or gives the answer away, and one automatic next-step nudge follows a first wrong answer in every Maths and Science topic. Records, papers, cats and weekly totals are unchanged."
+  "version": "7.12.0",
+  "releasedOn": "2026-11-20",
+  "summary": "AMC 8 preparation: three new Maths topics (right triangles and square roots, probability, coordinates and negative numbers) and 40-minute contest sprints of 25 original multiple-choice questions with a review by topic. Records, papers, mocks, cats and weekly totals are unchanged."
 }

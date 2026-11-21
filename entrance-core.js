@@ -13,7 +13,7 @@ E.prerequisite=(d,id,now=Date.now())=>G?.prerequisite(E,d,id,now)||null;
 E.recommend=(s,now=Date.now())=>{
  const r=normal(s,now),d=E.init(s);if(['paper','resume','recall','mixed-set','redo'].includes(r.kind))return r;
  const focus=G?.focus(s,E,now);if(focus)return focus;
- const needed=r.unit&&E.prerequisite(d,r.unit,now);if(!needed)return PB.extensionRecommendation(E,d,r,now);
+ const needed=r.unit&&E.prerequisite(d,r.unit,now);if(!needed){const x=PB.extensionRecommendation(E,d,r,now),CT=root.MochiContest;return x.paperExtension||!CT?x:CT.recommend(E,d,x,now);}
  const e=E.evidence(d,needed,now);return {kind:!e.taught||e.needsTeaching?'learn':'practice',unit:needed,geometryBridge:true,reason:'Build the geometric relationship before more complex solids.'};
 };
 const routed=E.recommend;E.recommend=(s,now=Date.now())=>E.avoidRepeat(s,routed(s,now),now);

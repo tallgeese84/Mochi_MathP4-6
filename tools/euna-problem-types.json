@@ -747,6 +747,54 @@
      }
     ]
    }
+  },
+  {
+   "unit": "amc-right",
+   "title": "Contest · Right triangles and square roots",
+   "forms": {
+    "1": [
+     {
+      "sample": "A rectangular field is 54 m long and 72 m wide. A straight path joins two opposite corners. How long is the path?"
+     }
+    ],
+    "2": [
+     {
+      "sample": "A triangle has two sides of length 35 cm. Its third side, the base, is 56 cm long. What is the area of the triangle?"
+     }
+    ]
+   }
+  },
+  {
+   "unit": "amc-chance",
+   "title": "Contest · Probability by counting",
+   "forms": {
+    "1": [
+     {
+      "sample": "3 fair coins are tossed. What is the probability of getting more heads than tails? Give your answer as a fraction in its simplest form."
+     }
+    ],
+    "2": [
+     {
+      "sample": "A bag holds 2 red and 2 blue counters. Two counters are taken out at random, one after the other, without putting the first one back. What is the probability that one …"
+     }
+    ]
+   }
+  },
+  {
+   "unit": "amc-coords",
+   "title": "Contest · Coordinates and negative numbers",
+   "forms": {
+    "1": [
+     {
+      "sample": "The points A(2, −3) and B(2, 2) are joined by a straight line. How long is AB?"
+     }
+    ],
+    "2": [
+     {
+      "sample": "A(4, 1) and B(6, −5) are neighbouring corners of a square. What is the area of the square, in square units?"
+     }
+    ]
+   }
   }
  ]
 }

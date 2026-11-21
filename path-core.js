@@ -314,7 +314,7 @@ const paperDefinitions=options.paperDefinitions||[
 /* DSA-style mocks, modelled on reported formats: about 90 minutes, no calculator, whole-number answers,
    questions in rising order of difficulty worth 1–4 marks (55 marks). Each mock draws a different mix. */
 function mathsMocks(){
- const core=D.units.filter(u=>!u.bridge&&!u.extension).map(u=>u.id),bridges=D.units.filter(u=>u.bridge&&!u.microBridge).map(u=>u.id),ext=D.units.filter(u=>u.extension).map(u=>u.id);
+ const core=D.units.filter(u=>!u.bridge&&!u.extension).map(u=>u.id),bridges=D.units.filter(u=>u.bridge&&!u.microBridge).map(u=>u.id),ext=D.units.filter(u=>u.extension&&!u.contest).map(u=>u.id);// v7.12 contest units stay out, so existing mocks are unchanged
  if(core.length<24||bridges.length<3||ext.length<9)return [];
  const perm=(list,salt)=>list.map(id=>[parseInt(B.hash(salt+':'+id),36),id]).sort((a,b)=>a[0]-b[0]||(a[1]<b[1]?-1:1)).map(x=>x[1]);
  return [25,21,17,12,8,4].map((weeks,k)=>{const c=perm(core,'mock-core-'+Math.floor(k/2)).slice((k%2)*12,(k%2)*12+12),b=perm(bridges,'mock-bridge-'+k).slice(0,3),x=perm(ext,'mock-ext-'+k).slice(0,9);

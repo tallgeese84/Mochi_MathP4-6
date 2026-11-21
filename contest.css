@@ -1,0 +1,29 @@
+/* v7.12 Contest practice (AMC 8 style). Uses the Maths pathway palette. */
+.ct-date{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;margin:0 0 18px}.ct-date p{margin:0}.ct-date .ep-primary{margin-left:auto}
+.ct-rules,.ct-new{margin:0 0 18px}.ct-rules ul,.ct-tips ul{margin:8px 0;padding-left:20px}.ct-rules li,.ct-tips li{margin:4px 0}.ct-tips summary{cursor:pointer;font-weight:600;color:#62477a}
+.ct-new-list{display:flex;flex-wrap:wrap;gap:8px}
+.ct-history{width:100%;border-collapse:collapse;margin:6px 0 14px}.ct-history th,.ct-history td{text-align:left;padding:8px 6px;border-bottom:1px solid #eee4f4}.ct-history td:last-child{text-align:right}
+.ct-topics{list-style:none;padding:0;margin:8px 0;display:grid;gap:6px}.ct-topics li{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;padding:6px 10px;border-radius:10px;background:#f8f4fb}.ct-topics li span:first-child{flex:1;min-width:140px}.ct-topics li span:nth-child(2){font-variant-numeric:tabular-nums;font-weight:650}
+.ct-fine{margin-top:18px}
+.ct-sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.ct-card h2{margin-top:0}.ct-home{margin:18px 0}
+.ct-bar{position:sticky;top:0;z-index:3;display:flex;justify-content:space-between;align-items:center;gap:12px;background:#fff;border:1px solid #e2d8ea;border-radius:14px;padding:10px 16px;margin:0 0 12px;font-weight:600;color:#513767}
+.ct-clock{font-variant-numeric:tabular-nums;font-size:20px;letter-spacing:.5px}.ct-clock.ct-low{color:#b2462d}
+.ct-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:6px;margin:0 0 14px}
+.entrance-view .ct-grid button{min-height:40px;padding:6px 0;border-radius:10px;font-variant-numeric:tabular-nums}
+.entrance-view .ct-grid button.ct-done{background:#ede4f6;border-color:#b39cc6}
+.entrance-view .ct-grid button.ct-flag{box-shadow:inset 0 -3px 0 #e2873b}
+.entrance-view .ct-grid button[aria-current]{outline:3px solid #785295;outline-offset:1px}
+.ct-question .entrance-figure{display:block;max-width:440px;width:100%;margin:6px auto 12px}
+.ct-text{white-space:pre-wrap;font-size:18px;line-height:1.6;margin:8px 0 14px}
+.ct-options{display:grid;gap:8px;margin:12px 0 16px}
+.entrance-view .ct-options button{display:flex;align-items:center;gap:14px;text-align:left;padding:12px 16px;font-size:18px;color:#2f2440}
+.entrance-view .ct-options button[aria-checked=true]{background:#785295;border-color:#785295;color:#fff}
+.ct-letter{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;border:1.5px solid currentColor;font-weight:700;font-size:15px;flex:none}
+.ct-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between}
+.ct-submit{margin:16px 0;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-end}.ct-submit p{margin:0;flex-basis:100%;text-align:right}
+.ct-review{padding-left:0;list-style:none;display:grid;gap:8px}.ct-review>li{border:1px solid #eee4f4;border-radius:12px;padding:8px 12px}
+.ct-review summary{cursor:pointer;line-height:1.5}.ct-right .ct-mark{color:#2f9d72;font-weight:700}.ct-wrong .ct-mark{color:#b2462d;font-weight:700}
+.ct-choices{color:#5b4a6b}.ct-steps{padding-left:20px}.ct-steps li{margin:4px 0}
+.ct-parent h4{margin:14px 0 4px}
+@media (max-width:600px){.ct-bar{font-size:14px;padding:8px 10px}.ct-clock{font-size:18px}.ct-text,.entrance-view .ct-options button{font-size:16px}.ct-history th:nth-child(4),.ct-history td:nth-child(4){display:none}}

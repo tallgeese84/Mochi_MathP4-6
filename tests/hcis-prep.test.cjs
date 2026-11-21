@@ -4,7 +4,7 @@ const at=Date.parse('2026-11-05T17:00:00Z'),DAY=86400000;
 function teach(d,id){for(let i=0;i<3;i++)E.visit(d,id,i,at-2*DAY);E.concept(d,id,E.unit(id).check[2],at-2*DAY+1);assert(E.complete(d,id,at-2*DAY+2));}
 function answer(d,id,phase,seed,t){E.finishPractice(d);const v=E.startPractice(d,id,{phase,seed,now:t}),q=E.question(v);E.touchDraft(d,{answer:q.answerLabel,working:'Add, divide and check the original context.'},t+1);const a=E.respond(d,t+2);assert(a.ok);assert(a.attempt.correct);return a.attempt;}
 test('HCIS topic focus is additive to legacy NUS High preparation',()=>{
- const d=E.fresh();assert.equal(E.plan(d,at).total,42);assert.equal(E.hcisReport(d,at).total,15);
+ const d=E.fresh();assert.equal(E.plan(d,at).total,45);// v7.12 adds three contest unitsassert.equal(E.hcisReport(d,at).total,15);
  assert(E.unit('hcis-statistics'));assert.equal(H.TOPICS.some(x=>x[0]==='hcis-statistics'),true);
  const p=H.papers();assert.equal(p.length,10);assert(p.every(x=>x.kind==='hcis'&&x.units.length===12&&x.minutes===45&&x.calculator));
  assert.equal(p[0].date,'2026-12-12');assert.equal(p.at(-1).date,'2027-09-11');

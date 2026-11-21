@@ -26,6 +26,7 @@ function build(state,version){
  if(root.MochiEntrance&&state.entrance){data.entrance=root.MochiEntrance.exportData(state.entrance);data.entranceReview=root.MochiEntrance.report(data.entrance);}
  if(root.MochiSciencePath&&state.sciencePath){data.sciencePath=root.MochiSciencePath.exportData(state.sciencePath);data.sciencePathReview=root.MochiSciencePath.report(data.sciencePath);}
  if(root.MochiQuestRewards&&state.questRewards)data.questRewards=root.MochiQuestRewards.validate(state.questRewards);
+ if(root.MochiContest&&state.contest){data.contest=root.MochiContest.exportData(state.contest);data.contestReview=root.MochiContest.report(data.contest);}
  data.source={appVersion:version||'unknown',student:'Euna',timeZone:Intl.DateTimeFormat().resolvedOptions().timeZone||'unknown'};
  if(root.MochiPlanner){data.planner=root.MochiPlanner.validate(root.MochiPlanner.init(state));data.learningPlanReview=root.MochiPlanner.report(state);}
  if(root.MochiNightlyPlan)data.nightlyPlanReview=root.MochiNightlyPlan.report();

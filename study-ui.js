@@ -60,6 +60,7 @@ function studyInit(){
      const entranceRestored=window.MochiEntrance&&raw.entrance?MochiEntrance.validate(raw.entrance):null;
      const sciencePathRestored=window.MochiSciencePath&&raw.sciencePath?MochiSciencePath.validate(raw.sciencePath):null;
      const planRestored=window.MochiPlanner&&raw.planner?MochiPlanner.validate(raw.planner):null;
+     const contestRestored=window.MochiContest&&raw.contest?MochiContest.validate(raw.contest):null;
      if(!confirm('Replace learning history on this device with this backup? API settings and Mochi’s room are kept.'))return;
      window.MochiEntranceUI?.pause();window.MochiSciencePathUI?.pause();
      if(typeof coursePause==='function')coursePause();
@@ -67,6 +68,7 @@ function studyInit(){
      if(friendsRestored)S.catFriends=friendsRestored;
      if(entranceRestored)S.entrance=entranceRestored;
      if(sciencePathRestored)S.sciencePath=sciencePathRestored;
+     if(contestRestored)S.contest=contestRestored;
      S.learning=restored;if(scienceRestored)S.science=scienceRestored;if(courseRestored)S.course=courseRestored;studyAttempt=null;studyInit();if(typeof studioInit==='function')studioInit();save(S);renderQuestion();studyParent();if(typeof scInit==='function'){SCI.q=null;SCI.state=null;scInit();if(SCI.view!=='maths')scShow(SCI.view);}if(typeof courseRefresh==='function')courseRefresh();$('backupStatus').textContent='Learning history restored.';
      window.MochiEntranceUI?.refresh();window.MochiSciencePathUI?.refresh();window.MochiPlanUI?.refresh();window.MochiTodayUI?.refresh();
    }catch(err){$('backupStatus').textContent='Could not restore: '+err.message;}finally{e.target.value='';}
