@@ -5,13 +5,15 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 // The downloadable relay now serves the whole family; its upload baseline is checked below.
 // If one must change, update its hash deliberately
 // and confirm existing tablets can still read and merge the data they already hold.
+// v7.12 deliberately adds one optional top-level key, `contest` (merged by sprint id, exported with a review);
+// tests/contest-sprint.test.cjs checks that states without it, and older tablets, merge unchanged.
 const root=path.join(__dirname,'..');
 const read=f=>fs.readFileSync(path.join(root,f),'utf8');
 const FROZEN={
- 'cloud-sync.js':'c476de9e218322275dd71c9857dbc23c18decbf007968ac42cdb069e15f1d6bd',
+ 'cloud-sync.js':'c8e14c820052a5e3a6f122645d6a9b016e5a660bd15a82bb29b743076fa88511',
  'cloud-backup.js':'f69f62d2800f09029020f5289a27f02844974e44dcc2105ed37243b28bdcc0e5',
  'drive-mirror.js':'5bc7fabf401e0179eeef99fbeb2cdae8cd6e9b3bddd4bdda8841e9c6cddfca08',
- 'learning-review.js':'875a3ff6a0cdc34f338440ab3379a8278905f6c239ad56534d6cd97f045ceaef',
+ 'learning-review.js':'cb546e5b8941b28aba71a179288d9e3b0129c7b67957191138ec072586b0bcb8',
  'network.js':'4ecd3ba590b545491448b81527b8171f08e994c88f1a151259aa082c312c4b2f',
  'tools/family-relay-tests/euna-only-v7.7.0.gs':'28722d9d45aaec8e3853f8af09efefbbe5d5062746306391089fa2164b4d967e'
 };

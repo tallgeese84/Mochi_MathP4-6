@@ -133,7 +133,7 @@ if(G)units.push(...G.units);
 const X=root.MochiDSAExtension||(typeof require==='function'?require('./dsa-extension.js'):null);
 if(X)units.push(...X.units);
 // Further challenge modules register themselves as MochiDSA_<name> and are loaded from dsa-<name>.js.
-const DSA_MODULES=['puzzles','numbers'];
+const DSA_MODULES=['puzzles','numbers','contest'];
 for(const name of DSA_MODULES){let M=root['MochiDSA_'+name];if(!M&&typeof require==='function'){try{M=require('./dsa-'+name+'.js');}catch(_){M=null;}}if(M)units.push(...M.units.map(u=>({...u,extension:true,module:name})));}
 const PB=root.MochiPaperPractice||(typeof require==='function'?require('./paper-practice.js'):null);
 if(PB)for(const u of units)if(PB.guidance[u.id])u.ideas.push('Connecting to paper-style problems: '+PB.guidance[u.id]);

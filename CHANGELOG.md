@@ -1,5 +1,13 @@
 # v7.7.2 — 2026-10-11
 
+## 7.12.0 — AMC 8 preparation (2026-11-20)
+
+- Three contest topics that the Singapore primary syllabus leaves out, as Maths extension units with lessons, Quick checks and figures: right triangles and square roots (`amc-right`), probability by counting (`amc-chance`), and coordinates and negative numbers (`amc-coords`). Four forms each, several structurally different types per form, every answer recomputed by an independent route in tests.
+- Contest sprints in Maths → Papers: 25 original multiple-choice questions in 40 minutes, no calculator, choices A–E built from each question's own worked steps, flag and return, a clock that survives reloads, and a review with results by topic and every worked solution. Suggested on Today and the Maths overview before 26 January 2027.
+- Before the contest, Mochi may suggest one new contest lesson a day once its foundations are learnt.
+- Sprint answers are kept out of mastery evidence (a correct choice may be a guess); they sync, back up and appear in the nightly export as `contest` and `contestReview`.
+- Existing questions, reserved papers and mocks are byte-identical: contest units stay out of mock selection. See `docs/CONTEST_PREP_V712.md`, which includes text for the ChatGPT nightly task.
+
 ## 7.11.0 — AI replies she can read, and help that teaches (2026-11-12)
 
 - Every child-facing AI reply is shown as plain maths. LaTeX and Markdown codes (`\[`, `\times`, `\frac{3}{4}`, `\boxed{…}`, `**bold**`) become `×`, `÷`, `3/4`, `5²` and plain text before display; every tutor prompt also asks for plain text. Reported from a photo of an Ask Mochi reply in Maths practice.

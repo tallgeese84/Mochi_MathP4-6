@@ -415,7 +415,7 @@ const science={
 function check(subject,unit,form){
  const set=subject==='science'?science:maths;let list=set[unit];
  // Challenge modules (dsa-<name>.js) carry their own Quick checks.
- if(!list&&subject!=='science')for(const name of ['puzzles','numbers']){const M=root['MochiDSA_'+name];if(M?.quickChecks?.[unit]){list=M.quickChecks[unit];break;}}
+ if(!list&&subject!=='science')for(const name of (root.MochiEntranceData?.DSA_MODULES||['puzzles','numbers','contest'])){const M=root['MochiDSA_'+name];if(M?.quickChecks?.[unit]){list=M.quickChecks[unit];break;}}
  if(!list||!Number.isInteger(form)||form<0||form>=list.length)return null;
  return list[form];
 }

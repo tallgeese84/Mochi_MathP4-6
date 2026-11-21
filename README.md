@@ -1,5 +1,7 @@
 # Mochi · Euna’s maths and science studio
 
+**v7.12.0 (20 November 2026).** AMC 8 preparation: three new contest topics (right triangles and square roots, probability, coordinates and negative numbers) and timed contest sprints of 25 original multiple-choice questions in 40 minutes, with a review by topic. See `docs/CONTEST_PREP_V712.md`.
+
 **v7.11.0 (12 November 2026).** AI help she can read and learn from: tutor replies are shown as plain maths (no LaTeX or Markdown codes), Mochi coaches a sum and never computes it, a reply that gives away the checked answer is replaced, and one automatic next-step nudge now follows a first wrong answer in every Maths and Science topic. See `docs/AI_FEEDBACK_V711.md`.
 
 **v7.10.0 (9 November 2026).** The nightly plan now changes what Euna practises: stale saved questions are set aside so they never block it, Maths microcycles teach one problem type with fading help (worked example → first steps → on her own), weak units get completion problems, equal-additions ratios use the difference method with a bar model, study time can tilt five minutes towards Maths with the same total, AI coaching covers Ratios, Two conditions and Percentages, and grown-ups get a written-answer review queue. See `docs/FEEDBACK_LOOP_V710.md`.
