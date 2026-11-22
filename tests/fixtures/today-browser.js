@@ -16,7 +16,7 @@ async function runTodayChecks(w){
  const original=frozen(),before=w.eval('JSON.stringify({math:S.entrance,science:S.sciencePath})');
  for(let i=0;i<3;i++)w.MochiTodayUI.paint();
  check(w.eval('JSON.stringify({math:S.entrance,science:S.sciencePath})')===before,'Rendering has no question or mastery side effects');
- click('todayStart');check(w.MochiEntranceUI.view().kind==='lesson','One click starts the recommended lesson');
+ click('todayStart');click('lgAgree');check(w.MochiEntranceUI.view().kind==='lesson','Agreed goal starts the recommended lesson');
  check(w.MochiPlanUI.running()==='maths','Start explicitly begins maths time');
  check(w.getComputedStyle(d.querySelector('.ep-nav')).display==='none','Library navigation recedes during focused study');
  click('epLessonNext');input('epLessonNotes','My saved lesson note.');click('todayBack');
@@ -44,7 +44,7 @@ async function runTodayChecks(w){
  w.MochiPlanUI.pause();w.eval(`{const now=Date.now(),minutes=MochiPlanner.minutes(S.planner,'maths');S.planner.sessions.push({id:'synthetic-finished-maths',subject:'maths',day:MochiPlanner.localDay(),start:now-7200000,end:now-7200000+minutes*60000});save(S);}`);
  w.MochiTodayUI.paint();check(w.MochiEntranceUI.view().kind==='practice','Reaching time never jumps out of an answer');
  check($('epAnswer').value==='17','Answer still present at time goal');click('todayBack');
- check($('todayStart').dataset.subject==='science','Science is the next planned block');click('todayStart');
+ check($('todayStart').dataset.subject==='maths','Time expiry requests a safe Maths finish');click('todayStart');input('lgNextStep','Use a bar model to show the equal parts next time.');click('lgSaveFinish');check($('todayStart').dataset.subject==='science','Science follows the safely saved Maths block');click('todayStart');click('lgAgree');
  check(w.MochiSciencePathUI.view().kind==='lesson','Science begins directly, not at a second dashboard');check(w.MochiPlanUI.running()==='science','Only science time runs now');
  click('todayBack');const dataBeforeMenus=w.eval('JSON.stringify({math:S.entrance,science:S.sciencePath})');
  menu();d.querySelector('[data-today-subject="maths"][data-today-view="papers"]').click();

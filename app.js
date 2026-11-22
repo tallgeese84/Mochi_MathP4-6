@@ -1235,12 +1235,12 @@ function isCorrect(input,q){
 
 /* The cat ships inside the markup; this just reads her back out. */
 const BUILTIN_PHOTO = ($('catImg').getAttribute('src') || '');
-const APP_VERSION = '7.12.0';
+const APP_VERSION = '7.13.0';
 const BUILD_KIND  = 'site';
-const BUILD_DATE  = '2026-11-20';
+const BUILD_DATE  = '2026-11-21';
 const BUILD = BUILD_KIND + ' v' + APP_VERSION + ' \u00b7 ' + BUILD_DATE;
 const PHOTO_KEY = 'cat-photo-v1';
-const MOCHI_AVATAR = 'mochi-flat-avatar.svg?v=7.12.0';
+const MOCHI_AVATAR = 'mochi-flat-avatar.svg?v=7.13.0';
 function photoSource(url){
   return url==='__builtin__'||/^(?:\.\/)?mochi-(?:builtin\.webp|flat\.svg)(?:\?[^#]*)?$/.test(url)?BUILTIN_PHOTO:url;
 }
@@ -2525,7 +2525,7 @@ $('photoClear').onclick = async ()=>{
 $('ovClose').onclick = ()=>{ $('ov').classList.remove('show');$('adultBtn').focus(); };
 $('parentDismiss').onclick=()=> $('ovClose').click();
 $('resetBtn').onclick = ()=>{
-  if(!confirm('Reset all learning progress and coins on this device? Back up first if you want to keep them.'))return;
+  if(!confirm('Reset all learning progress and coins on this device? Back up first if you want to keep them. Learning reward points and recorded cash payments are kept.'))return;
   window.MochiEntranceUI?.pause();window.MochiSciencePathUI?.pause();
   if(window.MochiEntrance)S.entrance=MochiEntrance.fresh();
   if(window.MochiSciencePath)S.sciencePath=MochiSciencePath.fresh();
@@ -2556,6 +2556,7 @@ async function boot(){
   if(window.MochiEntrance)S.entrance=MochiEntrance.validate(S.entrance);
   if(window.MochiSciencePath)S.sciencePath=MochiSciencePath.validate(S.sciencePath);
   if(window.MochiContest)S.contest=MochiContest.validate(S.contest);
+  if(window.MochiLearningGoals)S.learningGoals=MochiLearningGoals.validate(S.learningGoals);
   MochiLearning.init(S);studyInit();if(typeof studioInit==='function')studioInit();renderQuestion();if(typeof scInit==='function')scInit();updateNet();
   window.MochiReady=true;document.dispatchEvent?.(new Event('mochi:ready'));
   hydratePhoto();
@@ -2586,5 +2587,5 @@ async function hydratePhoto(){
 }
 
 if('serviceWorker' in navigator){
-  document.addEventListener('mochi:ready', ()=> navigator.serviceWorker.register('sw.js?v=7.12.0',{updateViaCache:'none'}).catch(()=>{}),{once:true});
+  document.addEventListener('mochi:ready', ()=> navigator.serviceWorker.register('sw.js?v=7.13.0',{updateViaCache:'none'}).catch(()=>{}),{once:true});
 }

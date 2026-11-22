@@ -13,6 +13,7 @@ function counts(attempts,science=false){
   latestAttempt:latest?new Date(latest).toISOString():null};
 }
 function build(state,version){
+ if(root.MochiLearningGoalsUI)root.MochiLearningGoalsUI.capture(false);
  if(root.MochiEntranceUI)root.MochiEntranceUI.capture(false);
  if(root.MochiSciencePathUI)root.MochiSciencePathUI.capture(false);
  if(root.MochiPlanUI)root.MochiPlanUI.flush();
@@ -27,6 +28,7 @@ function build(state,version){
  if(root.MochiSciencePath&&state.sciencePath){data.sciencePath=root.MochiSciencePath.exportData(state.sciencePath);data.sciencePathReview=root.MochiSciencePath.report(data.sciencePath);}
  if(root.MochiQuestRewards&&state.questRewards)data.questRewards=root.MochiQuestRewards.validate(state.questRewards);
  if(root.MochiContest&&state.contest){data.contest=root.MochiContest.exportData(state.contest);data.contestReview=root.MochiContest.report(data.contest);}
+ if(root.MochiLearningGoals&&state.learningGoals){data.learningGoals=root.MochiLearningGoals.validate(state.learningGoals);data.learningGoalsReview=root.MochiLearningGoals.summary(state);}
  data.source={appVersion:version||'unknown',student:'Euna',timeZone:Intl.DateTimeFormat().resolvedOptions().timeZone||'unknown'};
  if(root.MochiPlanner){data.planner=root.MochiPlanner.validate(root.MochiPlanner.init(state));data.learningPlanReview=root.MochiPlanner.report(state);}
  if(root.MochiNightlyPlan)data.nightlyPlanReview=root.MochiNightlyPlan.report();
@@ -38,6 +40,7 @@ function build(state,version){
    'Use the export timestamp and latest attempt dates to check freshness. Empty records do not establish a weakness.',
    'Science choices and structured reasoning checks are separate; free-text and ink explanations are not automatically graded. Repeated items are familiar practice.',
    'Current unsent drafts are not completed assessments. Older backups may lack some reasoning fields.']};
+ data.review.limits.push('Learning reward points record parent-reviewed completion habits, not independent mastery. Recorded cash settlement is a parent entry, not a verified transfer. Missing optional learningGoals data does not prove missed work.');
  return data;
 }
 root.MochiReview={build,counts};

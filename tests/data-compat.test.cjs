@@ -7,13 +7,16 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 // and confirm existing tablets can still read and merge the data they already hold.
 // v7.12 deliberately adds one optional top-level key, `contest` (merged by sprint id, exported with a review);
 // tests/contest-sprint.test.cjs checks that states without it, and older tablets, merge unchanged.
+// v7.13 adds optional learningGoals and its review summary.
+// tests/learning-goals-integration.test.cjs exercises missing-key sync, deduplicated
+// awards/payments, private exports, older backup imports and reset preservation.
 const root=path.join(__dirname,'..');
 const read=f=>fs.readFileSync(path.join(root,f),'utf8');
 const FROZEN={
- 'cloud-sync.js':'c8e14c820052a5e3a6f122645d6a9b016e5a660bd15a82bb29b743076fa88511',
+ 'cloud-sync.js':'f06d6cc3b2b3214334e299ddc73d63c1213c6d6d20775e2980c1569d5bb37d2e',
  'cloud-backup.js':'f69f62d2800f09029020f5289a27f02844974e44dcc2105ed37243b28bdcc0e5',
  'drive-mirror.js':'5bc7fabf401e0179eeef99fbeb2cdae8cd6e9b3bddd4bdda8841e9c6cddfca08',
- 'learning-review.js':'cb546e5b8941b28aba71a179288d9e3b0129c7b67957191138ec072586b0bcb8',
+ 'learning-review.js':'972b65609fbfb6a358b848613735df7580d6386699bf7c429e2d998a32ca2a60',
  'network.js':'4ecd3ba590b545491448b81527b8171f08e994c88f1a151259aa082c312c4b2f',
  'tools/family-relay-tests/euna-only-v7.7.0.gs':'28722d9d45aaec8e3853f8af09efefbbe5d5062746306391089fa2164b4d967e'
 };

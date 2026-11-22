@@ -59,7 +59,10 @@ function bonusOptions(state,now=Date.now()){
 }
 function status(state,now=Date.now()){
  const d=day(state,now),m=T.model(state,now),success=d.success.slice(),base=success.length,chest=d.chest,earned=success.reduce((n,x)=>n+(x.coins||1),0)+(chest?CHEST:0);
- return {day:dayKey(now),unlocked:m.finished,complete:base>=MAX,success,max:MAX,earned,chest,active:d.active,attempted:d.attempts.length};
+ // Learning goals can close a block early. Existing bonus coins still require
+ // the original planned study-time threshold as well as closed daily blocks.
+ const timeComplete=m.blocks.every(b=>b.rest||(b.timeDone??b.done));
+ return {day:dayKey(now),unlocked:m.finished&&timeComplete,complete:base>=MAX,success,max:MAX,earned,chest,active:d.active,attempted:d.attempts.length};
 }
 function start(state,subject,now=Date.now()){
  const s=status(state,now);if(!s.unlocked||s.complete||s.active||!validSubject(subject))return false;

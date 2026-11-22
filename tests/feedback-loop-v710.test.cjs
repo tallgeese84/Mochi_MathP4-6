@@ -141,11 +141,15 @@ test('five minutes move from Science to Maths only when Science is strong and Ma
 });
 test('ordinary Science practice serves at most two of one unit and type a day',()=>{
  const s=state(),d=s.sciencePath;for(const u of ['heat','graphs','matter'])teach(S,d,u);
+ // This cap uses the device's calendar day. The shared 16:00 UTC fixture is
+ // midnight in Singapore, so its preceding minute belongs to yesterday there.
+ const today=new Date(2026,10,10,12).getTime();
  // Misses keep the next Heat question at the same (form 1) type.
- attempt(S,d,'heat',{phase:'apply'},false,now-60000);attempt(S,d,'graphs',{phase:'apply'},true,now-50000);
- assert.equal(Practice.route(S,s,{kind:'practice',unit:'heat'},now,true).unit,'heat','one so far: allowed');
- attempt(S,d,'heat',{phase:'apply'},false,now-40000);
- const r=Practice.route(S,s,{kind:'practice',unit:'heat'},now,true);assert.notEqual(r.unit,'heat','a third of the same type moves on');
+ attempt(S,d,'heat',{phase:'apply'},false,today-60000);attempt(S,d,'graphs',{phase:'apply'},true,today-50000);
+ assert.equal(Practice.route(S,s,{kind:'practice',unit:'heat'},today,true).unit,'heat','one so far: allowed');
+ attempt(S,d,'heat',{phase:'apply'},false,today-40000);
+ const r=Practice.route(S,s,{kind:'practice',unit:'heat'},today,true);assert.notEqual(r.unit,'heat','a third of the same type moves on');
+ assert.equal(Practice.route(S,s,{kind:'practice',unit:'heat'},new Date(2026,10,11,12).getTime(),true).unit,'heat','a new local day resets the cap');
 });
 
 // 5. AI coaching for the weak Maths units.

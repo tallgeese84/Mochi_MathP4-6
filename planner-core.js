@@ -83,7 +83,7 @@ function clock(){
    const extension=run.kind==='maths-extension',credit=extension?Math.min(delta,mathsExtension(p,wall).remaining):delta;
    let saved=p.sessions.find(x=>x.id===run.id);if(!saved){saved={...run};p.sessions.push(saved);}saved.end=run.end+credit;run=saved;lastMono=mono;lastWall=wall;
    if(extension){if(mathsExtension(p,wall).done){run=null;limitMultiplier=1;return {running:false,reason:'Optional five minutes finished. Finish this thought, then return to today’s plan.'};}return {running:true};}
-   const target=minutes(p,run.subject,wall),cap=target*limitMultiplier*60000;if(target&&elapsed(p,run.day)[run.subject]>=cap){const bonus=limitMultiplier===2;run=null;limitMultiplier=1;return {running:false,reason:bonus?'Double-study bonus reached. The clock stops at 2× today’s target; there is no extra time reward beyond this.':'Time goal reached. Finish your thought, take a break and try your exit check when ready.'};}
+   const target=minutes(p,run.subject,wall),cap=target*limitMultiplier*60000;if(target&&elapsed(p,run.day)[run.subject]>=cap){const bonus=limitMultiplier===2;run=null;limitMultiplier=1;return {running:false,reason:bonus?'Double-study bonus reached. The clock stops at 2× today’s target; there is no extra time reward beyond this.':'Time goal reached. Finish or save this question with a next step, then take a break.'};}
    return {running:true};
   }
  };
