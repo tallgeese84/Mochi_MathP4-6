@@ -68,7 +68,13 @@ function settleBalance(state,now=Date.now()){
 }
 function model(state,now=Date.now()){
  const p=state.planner||P.fresh(),date=P.localDay(now),time=P.elapsed(p,date);
- const blocks=P.subjects.map(subject=>{const minutes=P.minutes(p,subject,now),spent=Math.max(0,time[subject]||0);return {subject,name:names[subject],minutes,spent,remaining:Math.max(0,minutes*60000-spent),rest:minutes===0,done:minutes>0&&spent>=minutes*60000,task:task(state,subject,now)};});
+ const L=root.MochiLearningGoals,goals=L?.status?.(state,now)?.goals||[];
+ const blocks=P.subjects.map(subject=>{
+  const minutes=P.minutes(p,subject,now),spent=Math.max(0,time[subject]||0),timeDone=minutes>0&&spent>=minutes*60000,goal=goals.find(g=>g.category===subject),closed=!!goal?.finish;
+  const needsFinish=!!goal&&!closed&&timeDone,next=task(state,subject,now);
+  const route=needsFinish&&next.kind!=='paper'?{subject,kind:'finish',unit:goal.unit,title:'Finish your '+names[subject]+' goal',detail:'Explain and check what you learnt, or save a clear next step. Your question stays saved.',resume:true,touched:goal.startedAt}:next;
+  return {subject,name:names[subject],minutes,spent,remaining:Math.max(0,minutes*60000-spent),rest:minutes===0,timeDone,goal:goal||null,needsFinish,done:goal?closed:timeDone,task:route};
+ });
  const papers=blocks.filter(b=>b.task.kind==='paper').sort((a,b)=>(a.task.deadline||Infinity)-(b.task.deadline||Infinity)||a.task.touched-b.task.touched);
  const available=blocks.filter(b=>!b.rest&&!b.done);
  const resumed=available.filter(b=>b.task.resume).sort((a,b)=>b.task.touched-a.task.touched);

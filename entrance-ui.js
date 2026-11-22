@@ -194,7 +194,7 @@ function wire(){
  if(view.kind==='practice'){
   wireEditor();root.MochiUX?.wireKeypad('ep',()=>capture(true));
   if($('epCheckAnswer'))$('epCheckAnswer').onclick=()=>{
-   tutorAbort(false);capture();const cu=data().draft?.unit,eb=cu?E.evidence(data(),cu):null,mb=!!(data().mixed&&!data().mixed.completedAt);const result=E.respond(data());if(!result.ok){message=result.reason;render();return;}
+   tutorAbort(false);capture();const cu=data().draft?.unit,eb=cu?E.evidence(data(),cu):null,mb=!!(data().mixed&&!data().mixed.completedAt);root.MochiLearningGoalsUI?.bind('maths');const result=E.respond(data());root.MochiLearningGoalsUI?.observe('maths');if(!result.ok){message=result.reason;render();return;}
    const a=result.attempt,quiet=['mixed','redo'].includes(a.phase);fx=a.correct?(a.independent&&!a.seenBefore?'solo':'correct'):'retry';message=a.correct?'':quiet?(a.responses.length>=2?'Study the worked solution. This question will come back in a few days.':'Not quite. Try again, or look at the worked solution.'):result.needsLesson?'Study the worked solution or the lesson, then try a similar question.':'Not quite. Try the quick check below, then try again.';const encouragement=root.MochiNightlyPlan?.motivate?.('maths',a)||'';if(encouragement)message=encouragement;
    if(a.phase==='guided'&&root.MochiPlanner){const d=MochiPlanner.day(MochiPlanner.init(S),'maths');d.exitIds=[...new Set([...d.exitIds,'entrance:'+a.id])].slice(-8);d.updatedAt=Date.now();}
    save(S);render();if(!a.correct&&root.MochiTutorPilot?.autoGate(data(),'maths',data().draft,E.question(data().draft),a)==='READY')askTutor('',true);else if(!a.correct)root.MochiTutorNudge?.run('maths',E,data(),()=>save(S));{const ea=cu&&E.evidence(data(),cu),A=result.attempt;if(A?.correct&&eb&&!eb.transfer&&ea?.transfer)root.MochiCelebrate?.show({kind:'topic',title:'Topic mastered!',detail:E.unit(cu).title,sub:'You solved a challenge question on your own.'});else if(mb&&data().mixed?.completedAt)root.MochiCelebrate?.show({kind:'set',title:'Mixed practice complete!',detail:'Well done!'});}root.MochiBuddy?.react('ep',{subject:'maths',correct:!!a.correct,independent:!!a.independent&&!a.seenBefore,responses:a.responses?.length||1,needsLesson:!!result.needsLesson,encouragement});
@@ -203,11 +203,11 @@ function wire(){
   if($('epHint'))$('epHint').onclick=()=>{capture();E.help(data());hintLevel=Math.min(3,hintLevel+1);if(hintLevel>=3)E.help(data(),true);render();save(S);};
   if($('epTutorAsk'))$('epTutorAsk').onclick=()=>{tutorAbort(false);askTutor();};for(const b of host.querySelectorAll('[data-ep-tutor]'))b.onclick=()=>askTutor(tutorPreset(b.dataset.epTutor));if($('epTutorInput'))$('epTutorInput').onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();askTutor();}};
   if($('epReveal'))$('epReveal').onclick=()=>{capture();E.help(data(),true);render();save(S);};
-  if($('epNextMixed'))$('epNextMixed').onclick=()=>{capture();E.finishPractice(data());save(S);mixed();};
+  if($('epNextMixed'))$('epNextMixed').onclick=()=>{if(root.MochiLearningGoalsUI?.boundary('maths'))return;capture();E.finishPractice(data());save(S);mixed();};
   root.MochiReadinessUI?.wireTags(host,E,data(),()=>save(S));
-  if($('epNextPractice'))$('epNextPractice').onclick=()=>{capture();E.finishPractice(data());save(S);nextRecommended();};
-  if($('epMorePractice'))$('epMorePractice').onclick=()=>{capture();const id=view.unit;E.finishPractice(data());beginPractice(id);};
-  if($('epFreshGuided'))$('epFreshGuided').onclick=()=>{capture();const id=view.unit;E.finishPractice(data());beginPractice(id,'guided');};
+  if($('epNextPractice'))$('epNextPractice').onclick=()=>{if(root.MochiLearningGoalsUI?.boundary('maths'))return;capture();E.finishPractice(data());save(S);nextRecommended();};
+  if($('epMorePractice'))$('epMorePractice').onclick=()=>{if(root.MochiLearningGoalsUI?.boundary('maths'))return;capture();const id=view.unit;E.finishPractice(data());beginPractice(id);};
+  if($('epFreshGuided'))$('epFreshGuided').onclick=()=>{if(root.MochiLearningGoalsUI?.boundary('maths'))return;capture();const id=view.unit;E.finishPractice(data());beginPractice(id,'guided');};
   if($('epRevisitLesson'))$('epRevisitLesson').onclick=()=>{capture();E.help(data());open('lesson',view.unit);};if($('epDeferToFocus'))$('epDeferToFocus').onclick=()=>{capture();if(!E.deferDraft(data()))return;save(S);if(root.MochiTodayUI){root.MochiTodayUI.open();root.MochiTodayUI.launchSubject('maths');}else open('home');};
    $('epSaveHome').onclick=()=>root.MochiTodayUI?root.MochiTodayUI.open():open('home');$('epPrintPractice').onclick=printPractice;
  }

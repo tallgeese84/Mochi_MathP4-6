@@ -19,7 +19,7 @@
   const savedRewards=JSON.stringify({coins:state().coins,catFriends:state().catFriends}),oldVersion=w.eval('APP_VERSION');
   localStorage.setItem('mochi_drive_mirror_url_v1','https://script.google.com/macros/s/synthetic-test/exec');localStorage.setItem('mochi_drive_mirror_secret_v1','synthetic-secret-for-tests-only');
   await N.refresh(true);ok(JSON.stringify({coins:state().coins,catFriends:state().catFriends})===savedRewards,'Receiving a plan cannot change rewards');w.MochiTodayUI.open();ok(N.report().planId===plan.id,'Private plan received');ok($('todayTaskDetail').textContent===plan.subjects.maths.focus,'Homepage uses private priority');ok(!$('todayNightlyStatus').hidden&&!$('todayNightlyStatus').textContent.includes(date),'Child sees a friendly plan line without plan dates');ok(N.label().includes(date),'Grown-up status keeps the plan date');
-  click('todayStart');ok(w.MochiEntranceUI.view().unit==='percent','Launches planned Maths lesson');
+  click('todayStart');click('lgAgree');ok(w.MochiEntranceUI.view().unit==='percent','Launches planned Maths lesson');
   const teachAtScreen=(E,UI,key,id,prefix)=>{const data=state()[key];for(let i=0;i<3;i++)E.visit(data,id,i,Date.now());E.concept(data,id,E.unit(id).check[2]);UI.open('lesson',id);click(prefix+'CompleteLesson');};
   teachAtScreen(M,w.MochiEntranceUI,'entrance','percent','ep');ok(state().entrance.draft.phase==='guided','Finish lesson leads into planned guided question');
   for(let i=0;i<3;i++){
@@ -35,7 +35,7 @@
   mode='legacy';await N.refresh(true);ok($('nightlyPlanStatus').textContent.includes('One-time relay upgrade'),'Old relay explicitly needs setup');mode='good';
   // Turn off the synthetic Maths schedule to exercise the full Science route within its existing budget.
   w.MochiTodayUI.open();M.finishPractice(state().entrance);w.eval('S.planner.schedule.week.forEach(x=>x.maths=0)');
-  click('todayStart');ok(w.MochiSciencePathUI.view().unit==='fairtest','Planned Science lesson');teachAtScreen(S,w.MochiSciencePathUI,'sciencePath','fairtest','sp');ok(state().sciencePath.draft.phase==='guided','Science guided sequence');
+  click('todayStart');click('lgAgree');ok(w.MochiSciencePathUI.view().unit==='fairtest','Planned Science lesson');teachAtScreen(S,w.MochiSciencePathUI,'sciencePath','fairtest','sp');ok(state().sciencePath.draft.phase==='guided','Science guided sequence');
   for(let i=0;i<3;i++){const data=state().sciencePath;ok(data.draft.phase===(i===0?'guided':'apply'),'Science phase '+i);input('spAnswer',S.question(data.draft).answer);click('spCheckAnswer');ok(data.attempts.at(-1).correct,'Science answer');click('spNextPractice');}
   ok(N.report().steps.science.index===3,'Finite Science queue is consumed');ok(Number.isFinite(state().coins)&&state().coins>=37,'Prior coins are preserved through normal learning');ok(w.eval('APP_VERSION')===oldVersion,'Data updates do not change app version');
   w.MochiTodayUI.open();w.eval('S.planner.schedule.week.forEach(x=>x.maths=25)');

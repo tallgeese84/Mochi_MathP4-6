@@ -68,8 +68,11 @@ function launchSubject(subject){
  if(!block||block.rest||block.done){open();return true;}
  extensionDay='';runTask(block.task);return true;
 }
-function launchMathsExtension(){root.MochiNightlyPlan?.adopt();const t=Q?.mathsExtensionTask(S);if(!t)return;extensionDay=P.localDay();runTask(t);}
+function launchMathsExtension(){if(root.MochiLearningGoalsUI?.active('maths')){root.MochiLearningGoalsUI.finish('maths');return;}root.MochiNightlyPlan?.adopt();const t=Q?.mathsExtensionTask(S);if(!t)return;extensionDay=P.localDay();runTask(t);}
+function extendCurrent(){extensionDay=P.localDay();guided=true;document.body.classList.add('today-guided');root.MochiPlanUI?.startMathsExtension();paint();}
 function runTask(t){
+ if(t?.kind==='finish'){root.MochiLearningGoalsUI?.finish(t.subject);return;}
+ if(t&&!extensionDay&&root.MochiLearningGoalsUI?.beforeTask(t,()=>runTask(t)))return;
  if(!t){leave();studioShow('room');return;}
  nightlyLaunching=true;try{
  closeMenu();leave();guided=true;document.body.classList.add('today-guided');
@@ -88,6 +91,7 @@ function runTask(t){
   else ui.practice(t.unit,t.kind==='recall'?'recall':t.phase);
  }
  root.MochiNightlyPlan?.bind(t,ui.view(),S[stateKey(t.subject)]?.draft);
+ root.MochiLearningGoalsUI?.bind(t.subject);
  if(t.nightly&&S[stateKey(t.subject)]?.draft?.nightlyPlan)save(S);
  if(t.kind!=='paper'){if(extensionDay===P.localDay()&&t.subject==='maths')root.MochiPlanUI?.startMathsExtension();else root.MochiPlanUI?.start(t.subject);}
  paint();root.scrollTo?.({top:0,behavior:'instant'});
@@ -100,6 +104,7 @@ function routeNightly(subject){
  const block=T.model(S).blocks.find(b=>b.subject===subject);
  if(!block||block.rest||block.done){open();return true;}
  const task=block.task;
+ if(root.MochiLearningGoalsUI?.boundary(subject))return true;
  if(!task.nightly&&!task.nightlyPrelude&&!task.resume)return false;
  runTask(task);return true;
 }
@@ -131,6 +136,7 @@ function collectBonus(){
 }
 function atBoundary(subject){
  if(!guided||nightlyLaunching)return false;
+ if(root.MochiLearningGoalsUI?.boundary(subject))return true;
  root.MochiNightlyPlan?.boundary(S,subject);
  if(extensionDay&&subject==='maths'){
   if(extensionDay===P.localDay()&&!P.mathsExtension(P.init(S)).done)return false;
@@ -203,6 +209,7 @@ function housekeep(){
 }
 function paint(){
  root.MochiNightlyPlan?.paint();
+ root.MochiLearningGoalsUI?.paint();
  if(!home)return;
  if(!home.hidden&&!current())housekeep();
  const m=T.model(S),v=current(),bonus=Q?.status(S),bonusOptions=Q?.bonusOptions?.(S)||[],bonusTask=bonusOptions[0]||Q?.bonusTask(S),cat=F?.report?.(S),study=P?P.elapsed(P.init(S)):null,extension=P.mathsExtension(P.init(S));
@@ -212,24 +219,24 @@ function paint(){
   const signature=JSON.stringify([m,bonus,bonusOptions,rewardNote,cat?.points,cat?.timeBonusAwards,study,extension]);if(signature!==lastHome){lastHome=signature;
    const t=m.next,first=m.order[0],isPaper=t?.kind==='paper';
    $('todayDate').textContent=new Date().toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric'});
-   $('todayTitle').textContent=m.restDay&&!t?'Rest day':m.finished&&!t?'Daily quests complete':'Today’s quests';
-   $('todayIntro').textContent=isPaper?'Resume the saved paper first.':m.restDay&&!t?'No catch-up debt. Optional practice is still available.':m.finished&&!t?'Done for today. Bonus questions are optional.':'One quest at a time.';
+   $('todayTitle').textContent=m.restDay&&!t?'Rest day':m.finished&&!t?'Today’s plan complete':'Today’s quests';
+   $('todayIntro').textContent=isPaper?'Resume the saved paper first.':m.restDay&&!t?'No catch-up debt. Optional practice is still available.':m.finished&&!t?'Your study blocks are closed. Extra practice is optional.':'One quest at a time.';
    $('todayNowLabel').textContent=t?(isPaper?'SAVED PAPER':t.resume?'CONTINUE':t.nightly&&t.microcycle?(t.scaffold==='example'?'STUDY THE EXAMPLE':t.scaffold==='steps'?'FINISH THE STEPS':t.modelled?'ON YOUR OWN':t.phase==='guided'?'LEARN THE IDEA':t.phase==='transfer'?'INDEPENDENT CHALLENGE':'CHANGED PRACTICE'):'NEXT QUEST'):'DAILY QUESTS';
    $('todayTaskTitle').textContent=t?t.title:m.finished?'Nice work, Euna':'A break with Mochi';
    $('todayTaskSubject').textContent=t?names[t.subject]:m.restDay?'Rest day':'Maths + Science';
-   $('todayTaskDetail').textContent=t?t.detail:m.finished?'Your planned study time is complete.':'Your learning and saved work will be here when you return.';
-   $('todayStart').textContent=t?(t.resume?'Continue ':'Start ')+names[t.subject]+(isPaper?' paper':''):m.finished?'Visit Mochi':'Visit Mochi';
+   $('todayTaskDetail').textContent=t?t.detail:m.finished?'Your work stays saved. There is no catch-up debt.':'Your learning and saved work will be here when you return.';
+   $('todayStart').textContent=t?(t.kind==='finish'?'Finish '+names[t.subject]+' goal':(t.resume?'Continue ':'Start ')+names[t.subject]+(isPaper?' paper':'')):m.finished?'Visit Mochi':'Visit Mochi';
    $('todayStart').dataset.subject=t?.subject||'';
     const md=S.entrance||{},held=!!md.draft&&!md.attempts?.find(a=>a.id===md.draft.id)?.correct,mblock=m.blocks.find(x=>x.subject==='maths');
     $('todayFocusInstead').hidden=!(held&&mblock&&!mblock.done&&!mblock.rest&&root.MochiNightlyPlan?.pending?.('maths'));
     $('todayResumeDeferred').hidden=!!md.draft||!md.deferredDrafts?.length;
-   $('todayQuestStrip').innerHTML=m.blocks.map(b=>`<div class="today-quest-chip" data-status="${b.done?'done':b.rest?'rest':t?.subject===b.subject?'now':'next'}"><span class="today-quest-icon" aria-hidden="true">${b.done?'✓':b.rest?'–':b.subject==='maths'?'M':'S'}</span><span><strong>${esc(b.name)}</strong><small>${b.rest?'Rest':b.done?'Done':Math.max(1,Math.ceil(b.remaining/60000))+' min left'}</small></span></div>`).join('');
-   $('todayProgress').textContent=m.restDay?'Rest day':`${m.completed}/${m.planned} time goals complete`;
+   $('todayQuestStrip').innerHTML=m.blocks.map(b=>`<div class="today-quest-chip" data-status="${b.done?'done':b.rest?'rest':t?.subject===b.subject?'now':'next'}"><span class="today-quest-icon" aria-hidden="true">${b.done?'✓':b.rest?'–':b.subject==='maths'?'M':'S'}</span><span><strong>${esc(b.name)}</strong><small>${b.rest?'Rest':b.done?(b.goal?.finish?.kind==='parked'?'Saved for later':'Finished'):b.timeDone?'Finish & check':Math.max(1,Math.ceil(b.remaining/60000))+' min left'}</small></span></div>`).join('');
+   $('todayProgress').textContent=m.restDay?'Rest day':`${m.completed}/${m.planned} study blocks closed`;
    $('todayProgressBar').max=m.planned||1;$('todayProgressBar').value=m.completed;
    $('todayMathsExtension').hidden=!Q?.mathsExtensionTask(S)||m.next?.kind==='paper';
-   $('todayMathsExtensionStart').textContent=extension.startedAt?'Resume optional Maths':'Optional · 5 more minutes of Maths';
+   $('todayMathsExtensionStart').textContent=root.MochiLearningGoalsUI?.active('maths')?'Finish this Maths problem · optional 5 minutes':extension.startedAt?'Resume optional Maths':'Optional · 5 more minutes of Maths';
    $('todayMathsExtensionNote').textContent=extension.startedAt?`${Math.ceil(extension.remaining/60000)} optional min left. Your daily Maths quest is already complete.`:'Your daily Maths quest is complete. Try a fresh question with help closed first. You can stop whenever you want.';
-   const bonusBox=$('todayBonus');bonusBox.hidden=!m.finished||m.restDay;
+   const bonusBox=$('todayBonus');bonusBox.hidden=!bonus?.unlocked||m.restDay;
    if(!bonusBox.hidden){
     $('todayBonusCoins').textContent=`${bonus?.earned||0} bonus coin${bonus?.earned===1?'':'s'} today`;
     $('todayBonusText').textContent=bonus?.complete?'Three strong extra answers finished today’s chest.':`${bonus?.success.length||0}/3 complete · transfer or week-later recall earns 2 coins; fresh application earns 1`;
@@ -243,18 +250,18 @@ function paint(){
  }
  bar.hidden=!v||!['lesson','practice'].includes(v.kind)||!guided;
  if(!bar.hidden){
-  const b=m.blocks.find(b=>b.subject===v.subject),running=root.MochiPlanUI?.running()===v.subject,optional=!!extensionDay&&v.subject==='maths',finished=optional?(extension.done||extensionDay!==P.localDay()):b.done;
+  const b=m.blocks.find(b=>b.subject===v.subject),running=root.MochiPlanUI?.running()===v.subject,optional=!!extensionDay&&v.subject==='maths',finished=optional?(extension.done||extensionDay!==P.localDay()):b.timeDone||b.done;
   $('todayFocusSubject').textContent=names[v.subject];
-  $('todayFocusTime').textContent=optional?(finished?'Optional five minutes finished':Math.max(1,Math.ceil(extension.remaining/60000))+' optional min left'):b.rest?'Optional study':b.done?'Time goal reached':Math.max(1,Math.ceil(b.remaining/60000))+' min left';
+  $('todayFocusTime').textContent=optional?(finished?'Optional five minutes finished':Math.max(1,Math.ceil(extension.remaining/60000))+' optional min left'):b.rest?'Optional study':b.timeDone?'Time to finish & check':b.done?'Learning goal finished':Math.max(1,Math.ceil(b.remaining/60000))+' min left';
   $('todayTimer').hidden=b.rest||finished;$('todayTimer').textContent=running?'Pause time':'Resume time';$('todayTimer').setAttribute('aria-pressed',String(running));
-  $('todayFocusNote').textContent=finished?'Finish this thought, then return to your plan.':optional?(running?'Optional practice. Try with help closed first, then explain and check.':root.MochiPlanUI?.status?.()||'Optional time is paused. Your work is saved.'):running?'Reading, thinking and paper work count.':(root.MochiPlanUI?.status?.()||'Time is paused. Your work is saved.');
-  $('todayFinish').hidden=!finished&&!optional;$('todayFinish').textContent=optional?'Stop optional practice':'Back to today’s plan';
+  $('todayFocusNote').textContent=finished?'Finish this problem, check your thinking, or save a clear next step. You can stop safely.':optional?(running?'Optional practice. Try with help closed first, then explain and check.':root.MochiPlanUI?.status?.()||'Optional time is paused. Your work is saved.'):running?(b.remaining<=2*60000?'Last two minutes: finish, explain and check. Save a next step if you need a break.':'Reading, thinking and paper work count.'):(root.MochiPlanUI?.status?.()||'Time is paused. Your work is saved.');
+  $('todayFinish').hidden=!finished&&!optional&&!b.goal;$('todayFinish').textContent=optional?'Stop optional practice':b.goal?'Finish & check':'Back to today’s plan';
  }
 }
 function init(){
  if(!T||!root.MochiPlanUI||!U('maths')||!U('science')||$('todayHome'))return;
  home=document.createElement('main');home.id='todayHome';home.hidden=true;
- home.innerHTML=`<div class="today-layout"><div class="today-main"><div class="today-greeting"><img src="euna-avatar.webp" width="44" height="44" alt=""><p id="todayDate"></p></div><h1 id="todayTitle" tabindex="-1"></h1><p id="todayIntro" class="today-intro"></p><section class="today-card" aria-label="Today’s study plan"><div class="today-card-top"><span id="todayNowLabel" class="today-eyebrow"></span><span id="todayTaskSubject" class="today-subject"></span></div><h2 id="todayTaskTitle"></h2><p id="todayTaskDetail"></p><button id="todayStart" class="today-primary" type="button">Start next quest</button><button id="todayFocusInstead" type="button" hidden>Save this question for later · do today's Maths focus</button><button id="todayResumeDeferred" type="button" hidden>Resume a saved Maths question</button><div id="todayQuestStrip" class="today-quest-strip" aria-label="Daily quest progress"></div><div class="today-progress"><span id="todayProgress"></span><progress id="todayProgressBar" max="2" value="0" aria-label="Daily study time goals reached"></progress></div></section><section id="todayBonus" class="today-bonus" hidden><div><strong>Bonus quest</strong><small id="todayBonusText"></small></div><span id="todayBonusCoins" class="today-bonus-coins"></span><p id="todayCatBonus" class="today-cat-bonus"></p><div id="todayBonusChoices" class="today-bonus-choices"></div></section><p id="todayNote" class="today-note"></p><p id="todayNightlyStatus" class="today-note" aria-live="polite"></p><section id="todayWide" class="today-wide" aria-label="Explore and wonder"></section></div><aside class="today-companion" aria-label="Mochi and rewards"><button id="todayMochi" class="today-mochi" type="button"><span class="today-mochi-says" id="todayMochiSays"></span><span class="mochi-greet" id="todayMochiGreet"><img id="todayMochiImage" src="mochi-flat-avatar.svg" width="150" height="150" alt=""></span><span class="today-mochi-visit">Visit Mochi’s room <span aria-hidden="true">→</span></span></button><div class="today-stats"><span class="today-stat"><span class="today-stat-icon" aria-hidden="true">🪙</span><strong id="todayCoins">0</strong><small>coins</small></span><span class="today-stat"><span class="today-stat-icon" aria-hidden="true">🐾</span><strong id="todayCatPoints">0</strong><small>Cat Points</small></span></div><div id="todayNextCat" class="today-next-cat"></div></aside></div>`;
+ home.innerHTML=`<div class="today-layout"><div class="today-main"><div class="today-greeting"><img src="euna-avatar.webp" width="44" height="44" alt=""><p id="todayDate"></p></div><h1 id="todayTitle" tabindex="-1"></h1><p id="todayIntro" class="today-intro"></p><section class="today-card" aria-label="Today’s study plan"><div class="today-card-top"><span id="todayNowLabel" class="today-eyebrow"></span><span id="todayTaskSubject" class="today-subject"></span></div><h2 id="todayTaskTitle"></h2><p id="todayTaskDetail"></p><button id="todayStart" class="today-primary" type="button">Start next quest</button><button id="todayFocusInstead" type="button" hidden>Save this question for later · do today's Maths focus</button><button id="todayResumeDeferred" type="button" hidden>Resume a saved Maths question</button><div id="todayQuestStrip" class="today-quest-strip" aria-label="Daily quest progress"></div><div class="today-progress"><span id="todayProgress"></span><progress id="todayProgressBar" max="2" value="0" aria-label="Daily study blocks finished or saved"></progress></div></section><section id="todayBonus" class="today-bonus" hidden><div><strong>Bonus quest</strong><small id="todayBonusText"></small></div><span id="todayBonusCoins" class="today-bonus-coins"></span><p id="todayCatBonus" class="today-cat-bonus"></p><div id="todayBonusChoices" class="today-bonus-choices"></div></section><p id="todayNote" class="today-note"></p><p id="todayNightlyStatus" class="today-note" aria-live="polite"></p><section id="todayWide" class="today-wide" aria-label="Explore and wonder"></section></div><aside class="today-companion" aria-label="Mochi and rewards"><button id="todayMochi" class="today-mochi" type="button"><span class="today-mochi-says" id="todayMochiSays"></span><span class="mochi-greet" id="todayMochiGreet"><img id="todayMochiImage" src="mochi-flat-avatar.svg" width="150" height="150" alt=""></span><span class="today-mochi-visit">Visit Mochi’s room <span aria-hidden="true">→</span></span></button><div class="today-stats"><span class="today-stat"><span class="today-stat-icon" aria-hidden="true">🪙</span><strong id="todayCoins">0</strong><small>coins</small></span><span class="today-stat"><span class="today-stat-icon" aria-hidden="true">🐾</span><strong id="todayCatPoints">0</strong><small>Cat Points</small></span></div><div id="todayNextCat" class="today-next-cat"></div></aside></div>`;
  const optional=document.createElement('section');optional.id='todayMathsExtension';optional.className='today-maths-extension';optional.hidden=true;optional.setAttribute('aria-label','Optional Maths practice');
  optional.innerHTML='<button id="todayMathsExtensionStart" type="button">Optional · 5 more minutes of Maths</button><p id="todayMathsExtensionNote"></p>';
  home.querySelector('#todayBonus').before(optional);$('viewEntrance').before(home);
@@ -264,7 +271,7 @@ function init(){
  menu=document.createElement('dialog');menu.id='todayMenu';menu.setAttribute('aria-labelledby','todayMenuTitle');
  menu.innerHTML='<div class="today-menu-heading"><h2 id="todayMenuTitle">Everything else</h2><button id="todayMenuClose" type="button" aria-label="Close menu">×</button></div><p>Your daily plan already chooses the next step.</p><button data-today-home type="button">Today’s plan <span>Continue the guided route</span></button><button data-today-subject="maths" data-today-view="lessons" type="button">Maths lessons <span>Browse methods and worked examples</span></button><button data-today-subject="science" data-today-view="lessons" type="button">Science lessons <span>Explore ideas and evidence</span></button><button data-today-subject="labs" type="button">Experiment activities <span>Optional exploration</span></button><button data-today-subject="room" type="button">Mochi’s room <span>Cats, clothing and rewards</span></button><details><summary>Practice papers</summary><p>Keep reserved papers for planned assessments. Browsing this menu does not open their questions.</p><button data-today-subject="maths" data-today-view="papers" type="button">Maths papers and starting checks</button><button data-today-subject="science" data-today-view="papers" type="button">Science papers and starting checks</button></details><div class="today-adult"><button id="todayWeekly" type="button">Weekly time plan</button><button id="todayParent" type="button">Grown-up settings & progress</button></div>';
  document.body.append(menu);
- $('todayStart').onclick=launch;$('todayFocusInstead').onclick=focusInstead;$('todayResumeDeferred').onclick=resumeHeld;$('todayMathsExtensionStart').onclick=launchMathsExtension;$('todayMochi').onclick=()=>go('room');$('todayBack').onclick=open;$('todayFinish').onclick=open;more.onclick=openMenu;$('todayMenuClose').onclick=closeMenu;
+ $('todayStart').onclick=launch;$('todayFocusInstead').onclick=focusInstead;$('todayResumeDeferred').onclick=resumeHeld;$('todayMathsExtensionStart').onclick=launchMathsExtension;$('todayMochi').onclick=()=>go('room');$('todayBack').onclick=open;$('todayFinish').onclick=()=>{const v=current();if(v&&root.MochiLearningGoalsUI?.active(v.subject))root.MochiLearningGoalsUI.finish(v.subject);else open();};more.onclick=openMenu;$('todayMenuClose').onclick=closeMenu;
  menu.querySelector('[data-today-home]').onclick=open;
  for(const b of menu.querySelectorAll('[data-today-subject]'))b.onclick=()=>go(b.dataset.todaySubject,b.dataset.todayView);
  menu.addEventListener('close',()=>{more.setAttribute('aria-expanded','false');lastFocus?.focus?.({preventScroll:true});});
@@ -273,7 +280,7 @@ function init(){
  $('todayParent').onclick=()=>{closeMenu();$('adultBtn').click();};
  $('todayWeekly').onclick=()=>{closeMenu();focusOpen('sessionPanel',$('todayMore'));$('mochiFocusHome').open=true;$('mochiFocusHome').scrollIntoView({block:'nearest'});};
  const bind=()=>{$('studioHome').onclick=e=>{e.preventDefault();open();};};bind();
- root.MochiTodayUI={open,leave,launch,launchSubject,atBoundary,routeNightly,paint,visible:()=>!home.hidden,refresh:()=>{bind();lastHome='';open();}};
+ root.MochiTodayUI={open,leave,launch,launchSubject,extendCurrent,atBoundary,routeNightly,paint,visible:()=>!home.hidden,refresh:()=>{bind();lastHome='';open();}};
  document.body.classList.add('today-enabled');
  document.addEventListener('mochi:activity',paint);
  document.addEventListener('mochi:nightly-plan',()=>{lastHome='';paint();});

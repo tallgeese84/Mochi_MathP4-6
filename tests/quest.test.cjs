@@ -12,6 +12,20 @@ test('bonus quests stay locked until planned maths and science time is complete'
  finishDay(s);assert.equal(T.model(s,now).finished,true);assert.equal(Q.status(s,now).unlocked,true);assert.equal(Q.bonusTask(s,now).subject,'maths');
 });
 
+test('closing learning goals early does not change the existing bonus-coin time requirement',()=>{
+ const L=require('../learning-goals-core.js'),s=fresh();
+ finishLesson(s.entrance,M,'relationships');finishLesson(s.sciencePath,S,'matter');
+ for(const subject of ['maths','science']){
+  const g=L.beginGoal(s,{category:subject,subject,title:'Explain the agreed idea'},now-1000).goal;
+  assert.equal(L.recordFinish(s,g.id,{kind:'parked',nextStep:'Draw the quantities, then compare the relationship.'},now-100).ok,true);
+ }
+ assert.equal(T.model(s,now).finished,true,'learning blocks may be safely closed without more time');
+ assert.equal(Q.status(s,now).unlocked,false,'cash-goal closure never grants the existing time-based coin unlock');
+ assert.equal(Q.bonusTask(s,now),null);assert.equal(Q.start(s,'maths',now),false);
+ assert.equal(s.coins,40);assert.equal(L.status(s,now).points,0);
+ finishDay(s);assert.equal(Q.status(s,now).unlocked,true,'original bonus condition remains available');
+});
+
 test('optional Maths unlocks after Maths alone and chooses fresh learned practice without new rewards',()=>{
  const s=fresh();finishLesson(s.entrance,M,'relationships');assert.equal(Q.mathsExtensionTask(s,now),null);
  const min=P.minutes(s.planner,'maths',now);s.planner.sessions.push({id:'maths-done',subject:'maths',day:P.localDay(now),start:now-4000000,end:now-4000000+min*60000});

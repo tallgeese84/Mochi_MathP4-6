@@ -1,5 +1,7 @@
 # Mochi · Euna’s maths and science studio
 
+**v7.13.0 (21 November 2026).** Agreed learning goals now have a finish, explain and check step alongside the daily clock. A separate four-week family reward trial offers Maths 2 points, Science 2 points and return-and-remember 1 point per day, at US$0.20 per point. Grown-ups review the evidence and record weekly cash payments. Existing mastery, coins and Cat Points keep their own rules. See [Learning goals and family reward points](docs/LEARNING_GOALS_V713.md).
+
 **v7.12.0 (20 November 2026).** AMC 8 preparation: three new contest topics (right triangles and square roots, probability, coordinates and negative numbers) and timed contest sprints of 25 original multiple-choice questions in 40 minutes, with a review by topic. See `docs/CONTEST_PREP_V712.md`.
 
 **v7.11.0 (12 November 2026).** AI help she can read and learn from: tutor replies are shown as plain maths (no LaTeX or Markdown codes), Mochi coaches a sum and never computes it, a reply that gives away the checked answer is replaced, and one automatic next-step nudge now follows a first wrong answer in every Maths and Science topic. See `docs/AI_FEEDBACK_V711.md`.

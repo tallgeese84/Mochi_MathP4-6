@@ -24,3 +24,10 @@ test('optional bonus quests start bounded bonus study timing and expose Cat Poin
  assert.match(src,/startBonus\?\.\(task\.subject\)/);
  assert.match(src,/Cat Points/);assert.match(src,/2× time/);assert.match(src,/capped at 2×/);
 });
+
+
+test('an agreed goal stays open at the time boundary until explained or safely saved',()=>{
+ const L=require('../learning-goals-core.js'),s=fresh();M.startPractice(s.entrance,'volume',{now:now-1000,seed:772});const id=s.entrance.draft.id;assert(L.beginGoal(s,{category:'maths',subject:'maths',unit:'volume',title:'Explain and check the volume',draftId:id},now-500).ok);worked(s,'maths',15);
+ let m=T.model(s,now);assert.equal(m.blocks[0].timeDone,true);assert.equal(m.blocks[0].done,false);assert.equal(m.next.kind,'finish');assert.equal(m.next.subject,'maths');assert.equal(s.entrance.draft.id,id);assert.equal(L.status(s,now).points,0);
+ assert(L.recordFinish(s,L.dayKey(now)+':maths',{kind:'parked',nextStep:'Draw the container and label the three dimensions.'},now).ok);m=T.model(s,now);assert.equal(m.blocks[0].done,true);assert.equal(m.next.subject,'science');assert.equal(s.entrance.draft.id,id);assert.equal(L.status(s,now).points,0);
+});
