@@ -7,6 +7,7 @@ window.MochiNetwork = {
       return await Promise.race([
         (async () => {
           const response = await fetch(url, {...options, signal:controller.signal});
+          if (typeof readJSON === 'function') return await readJSON(response);
           if (readJSON) {
             if (response.type === 'opaque') throw Object.assign(Error('Cloud response is not readable.'), {planCode:'OPAQUE_RESPONSE'});
             if (!response.ok) throw Object.assign(Error(`Cloud read failed (${response.status}).`), {planCode:'HTTP_ERROR'});

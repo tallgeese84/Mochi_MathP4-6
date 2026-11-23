@@ -24,7 +24,7 @@ async function saveBackup(data=makeBackup()){
   if(busy)return false;busy=true;
   try{
     /* Store the exact same JSON object as the downloaded file — no wrapper or credentials. */
-    const r=await window.MochiNetwork.request(ep,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    const r=await window.MochiNetwork.request(ep+'?print=silent',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
     if(!r.ok)throw Error(`Firebase backup write failed (${r.status}).`);
     setStatus('Learning backup saved to Firebase cloud backup.');
     document.dispatchEvent(new CustomEvent('mochi:cloud-backup-saved',{detail:{exported:data.exported||''}}));

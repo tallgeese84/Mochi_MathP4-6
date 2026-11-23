@@ -10,14 +10,16 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 // v7.13 adds optional learningGoals and its review summary.
 // tests/learning-goals-integration.test.cjs exercises missing-key sync, deduplicated
 // awards/payments, private exports, older backup imports and reset preservation.
+// v7.13.1 keeps the Firebase schema and changes checkpoint and response handling.
+// Two-device behavior and backup compatibility are exercised in cloud-sync.test.cjs.
 const root=path.join(__dirname,'..');
 const read=f=>fs.readFileSync(path.join(root,f),'utf8');
 const FROZEN={
- 'cloud-sync.js':'f06d6cc3b2b3214334e299ddc73d63c1213c6d6d20775e2980c1569d5bb37d2e',
- 'cloud-backup.js':'f69f62d2800f09029020f5289a27f02844974e44dcc2105ed37243b28bdcc0e5',
+ 'cloud-sync.js':'17d786145637643503f7d4ea3f0f298a54be41c131bd4b9a79f2cc200df54664',
+ 'cloud-backup.js':'a8237588bb7c0e9e0df0196d146b0c78e7fd471a7d00f399775be9c80c7532a8',
  'drive-mirror.js':'5bc7fabf401e0179eeef99fbeb2cdae8cd6e9b3bddd4bdda8841e9c6cddfca08',
  'learning-review.js':'972b65609fbfb6a358b848613735df7580d6386699bf7c429e2d998a32ca2a60',
- 'network.js':'4ecd3ba590b545491448b81527b8171f08e994c88f1a151259aa082c312c4b2f',
+ 'network.js':'9295381b7ad29d88db6c310a9b95565240ab49815711a99e2e3a62a33ca794e3',
  'tools/family-relay-tests/euna-only-v7.7.0.gs':'28722d9d45aaec8e3853f8af09efefbbe5d5062746306391089fa2164b4d967e'
 };
 test('sync/backup remain frozen; v7.7 read-only integration changes are pinned',()=>{
